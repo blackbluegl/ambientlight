@@ -7,43 +7,39 @@
 
 #include "SwitchHandler.h"
 #include <string.h>
-#include <stdlib.h>     /* atoi */
+#include <stdlib.h>
 #include "../rfm12ask/Rfm12ASK.h"
-
 
 using namespace std;
 
+int zeroWait=320;//was 400
+int oneWait=900;//was oneWait
 
 SwitchHandler::SwitchHandler() {
-	// TODO Auto-generated constructor stub
 }
 
 SwitchHandler::~SwitchHandler() {
-	// TODO Auto-generated destructor stub
 }
 
 void SwitchHandler::handleSwitch(std::string commandValues) {
-	std::string::size_type prev_pos = 0, pos = 0;
+	std::string::size_type prevPos = 0, pos = 0;
 
 	pos = commandValues.find('|', pos);
-	std::string systemString(commandValues.substr(prev_pos, pos - prev_pos));
-	prev_pos = ++pos;
+	string systemString(commandValues.substr(prevPos, pos - prevPos));
+	prevPos = ++pos;
 
 	pos = commandValues.find('|', pos);
-	std::string substringHouseCode(
-			commandValues.substr(prev_pos, pos - prev_pos));
+	string substringHouseCode(commandValues.substr(prevPos, pos - prevPos));
 	int houseCode = atoi(substringHouseCode.c_str());
-	prev_pos = ++pos;
+	prevPos = ++pos;
 
 	pos = commandValues.find('|', pos);
-	std::string substringSwitchNumber(
-			commandValues.substr(prev_pos, pos - prev_pos));
+	string substringSwitchNumber(commandValues.substr(prevPos, pos - prevPos));
 	int switchNumber = atoi(substringSwitchNumber.c_str());
-	prev_pos = ++pos;
+	prevPos = ++pos;
 
 	pos = commandValues.find('|', pos);
-	std::string substringPowerState(
-			commandValues.substr(prev_pos, pos - prev_pos));
+	string substringPowerState(commandValues.substr(prevPos, pos - prevPos));
 	int powerState = atoi(substringPowerState.c_str());
 
 	if (systemString.compare("ELRO") == 0) {
@@ -53,12 +49,13 @@ void SwitchHandler::handleSwitch(std::string commandValues) {
 	return;
 }
 
+
 void SwitchHandler::handleElroSwitch(int houseCode, int switchNumber, int powerState) {
 	Rfm12ASK rfm12;
 	rfm12.rf12SetupTx();
 	rfm12.rf12EnableTransmitter();
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 6; i++) {
 		//send data here
 		sendHouseCode(houseCode);
 		sendSwitchCode(switchNumber);
@@ -83,7 +80,6 @@ void SwitchHandler::sendPowerCode(int code) {
 void SwitchHandler::sendHouseCode(int housecode) {
 	char houseCodeBitMask = housecode;
 	//the housecode is only 5 bits long. so we ignore the first 3.
-
 	for (int i = 3; i < 8; i++) {
 		//test the current bit if it is set or not
 		if (houseCodeBitMask & (1 << i)) {
@@ -107,31 +103,31 @@ void SwitchHandler::sendSwitchCode(int number) {
 void SwitchHandler::send0() {
 	Rfm12ASK rfm12;
 	rfm12.rf12TransmitHigh();
-	microSleep(400);
+	microSleep(zeroWait);
 	rfm12.rf12TransmitLow();
-	microSleep(1000);
+	microSleep(oneWait);
 	rfm12.rf12TransmitHigh();
-	microSleep(400);
+	microSleep(zeroWait);
 	rfm12.rf12TransmitLow();
-	microSleep(1000);
+	microSleep(oneWait);
 }
 
 void SwitchHandler::sendF() {
 	Rfm12ASK rfm12;
 	rfm12.rf12TransmitHigh();
-	microSleep(400);
+	microSleep(zeroWait);
 	rfm12.rf12TransmitLow();
-	microSleep(1000);
+	microSleep(oneWait);
 	rfm12.rf12TransmitHigh();
-	microSleep(1000);
+	microSleep(oneWait);
 	rfm12.rf12TransmitLow();
-	microSleep(400);
+	microSleep(zeroWait);
 }
 
 void SwitchHandler::sendSync() {
 	Rfm12ASK rfm12;
 	rfm12.rf12TransmitHigh();
-	microSleep(400);
+	microSleep(zeroWait);
 	rfm12.rf12TransmitLow();
 	microSleep(10000);
 }

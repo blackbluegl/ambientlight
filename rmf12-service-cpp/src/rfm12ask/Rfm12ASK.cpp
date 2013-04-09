@@ -25,12 +25,9 @@ using namespace std;
 
 
 Rfm12ASK::Rfm12ASK() {
-	// TODO Auto-generated constructor stub
-
 }
 
 Rfm12ASK::~Rfm12ASK() {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -44,7 +41,6 @@ void Rfm12ASK::rf12_xfer(unsigned int data) {
 
 	if (wiringPiSPIDataRW(0, result, 2) < 0) {
 		fprintf(stderr, "SPI send failed: %s\n", strerror(errno));
-
 	}
 }
 
@@ -58,7 +54,7 @@ void Rfm12ASK::rf12TransmitHigh() {
 
 void Rfm12ASK::rf12EnableTransmitter(){
 	rf12_xfer(RF_XMITTER_ON);
-	delay(15);
+	delay(10);
 }
 
 void Rfm12ASK::rf12TransmitLow(){
@@ -74,7 +70,7 @@ int Rfm12ASK::rf12SetupTx() {
 	}
 
 	rf12_xfer(0xFF00); //reset RFM12
-	delay(50);
+	delay(5); //was 50
 	//init device
 	rf12_xfer(0x8017); // disable FIFO, 433MHz, 12.0pF
 	rf12_xfer(0x8208); // synth off, PLL off, enable xtal, enable clk pin, disable Batt
@@ -88,7 +84,6 @@ int Rfm12ASK::rf12SetupTx() {
 	rf12_xfer(0xC000); // clock output 1.00MHz, can be used to see if SPI works
 	rf12_xfer(0xE000); // disable wakeuptimer
 	rf12_xfer(0xC800); // disable low duty cycle
-	delay(50);
 	return 0;
 }
 
