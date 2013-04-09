@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_settings"
+        android:title="@string/menu_settings"
+        android:showAsAction="never" />
+    <item android:id="@+id/menu_create" 
+        android:title="@string/button_create" 
+        android:showAsAction="ifRoom|withText" 
+        android:icon="@drawable/ic_create"/>   
+    <item android:id="@+id/menu_save" 
+        android:title="@string/button_save" 
+        android:showAsAction="ifRoom|withText" 
+        android:icon="@drawable/ic_menu_save"
+/>
+</menu>
