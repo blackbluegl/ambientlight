@@ -15,6 +15,7 @@ import org.ambient.control.rest.RestClient;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
+import org.ambientlight.scenery.SceneryConfiguration;
 import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 
@@ -99,7 +100,7 @@ public class HomeFragment extends Fragment {
 	}
 
 	
-	private View initRoomView(LayoutInflater inflater, final String serverName, boolean isCurrentRoomServerSelected) throws InterruptedException, ExecutionException {
+	private View initRoomView(LayoutInflater inflater, final String serverName,  boolean isCurrentRoomServerSelected) throws InterruptedException, ExecutionException {
 		
 		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 
@@ -137,7 +138,8 @@ public class HomeFragment extends Fragment {
 		});		
 		
 		TextView sceneryLabel = (TextView) roomContainerView.findViewById(R.id.textViewSceneryName);
-		sceneryLabel.setText(roomConfig.roomItemConfigurations.get(0).currentSceneryConfiguration.sceneryName);
+		sceneryLabel.setText(roomConfig.currentScenery);
+		sceneryLabel.setTag(serverName+"sceneryLabel");
 		
 		//init dynamically the clickable light object icons
 		int amountPerRow = getLightObjectAmountPerRow();
@@ -157,7 +159,7 @@ public class HomeFragment extends Fragment {
 			
 			View lightObject = (View) inflater.inflate(R.layout.layout_room_lightobject, null);
 			RoomItemConfiguration currentRoomItemConfiguration = roomConfig.roomItemConfigurations.get(i);
-			initRoomItemIconView(serverName, currentRoomItemConfiguration, lightObject);
+			initRoomItemIconView(serverName, roomConfig.currentScenery, currentRoomItemConfiguration, lightObject);
 
 			row.addView(lightObject);
 		}
@@ -191,10 +193,10 @@ public class HomeFragment extends Fragment {
 	}
 
 	
-	private void initRoomItemIconView(final String serverName, final RoomItemConfiguration currentConfig, View lightObjectView) {
+	private void initRoomItemIconView(final String serverName, String sceneryName, final RoomItemConfiguration currentConfig, View lightObjectView) {
 
 		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon
-				(serverName, currentConfig, lightObjectView);
+				(serverName,sceneryName, currentConfig, lightObjectView);
 		
 		this.configuredlightObjects.add(roomItemMapper);
 		
@@ -222,21 +224,23 @@ public class HomeFragment extends Fragment {
 	}
 
 
-	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final String serverName,
+	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final String serverName,  String sceneryName,
 			final RoomItemConfiguration currentConfig, View lightObjectView) {
 		AbstractRoomItemViewMapper result = null;
 
-		if (currentConfig.currentSceneryConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
+		SceneryConfiguration sceneryConfig = currentConfig.getSceneryConfigurationBySceneryName(sceneryName);
+		
+		if ( sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
 			result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.name, serverName,
-					currentConfig.currentSceneryConfiguration.powerState,currentConfig.currentSceneryConfiguration.bypassOnSceneryChange);
+					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
 		
-		if(currentConfig.currentSceneryConfiguration instanceof SwitchingConfiguration){
+		if( sceneryConfig instanceof SwitchingConfiguration){
 			result = new SwitchItemViewMapper(lightObjectView, currentConfig.name, serverName,
-					currentConfig.currentSceneryConfiguration.powerState,currentConfig.currentSceneryConfiguration.bypassOnSceneryChange);
+					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
 		
-		result.setBypassSceneryChangeState(currentConfig.currentSceneryConfiguration.bypassOnSceneryChange);
+		result.setBypassSceneryChangeState(sceneryConfig.bypassOnSceneryChange);
 		
 		return result;
 	}
@@ -272,15 +276,15 @@ public class HomeFragment extends Fragment {
 
 		for (AbstractRoomItemViewMapper currentToRefresh : removeMappers) {
 			RoomItemConfiguration currentConfig = roomConfiguration.getRoomItemConfigurationByName(currentToRefresh.getItemName());
-			this.initRoomItemIconView(roomServerName, currentConfig, currentToRefresh.getLightObjectView());
+			this.initRoomItemIconView(roomServerName, roomConfiguration.currentScenery, currentConfig, currentToRefresh.getLightObjectView());
 		}
 
 		updateRoomPowerSwitchState(roomServerName);
 		updateRoomBackground(roomServerName);
 		updateMasterSwitchState();
 		
-		TextView sceneryLabel = (TextView) this.myHomeView.findViewWithTag(roomServerName+"roomLabel");
-		sceneryLabel.setText(roomConfiguration.roomItemConfigurations.get(0).currentSceneryConfiguration.sceneryName);
+		TextView sceneryLabel = (TextView) this.myHomeView.findViewWithTag(roomServerName+"sceneryLabel");
+		sceneryLabel.setText(roomConfiguration.currentScenery);
 	}
 	
 

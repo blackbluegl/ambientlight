@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("room")
 public class RoomConfiguration {
 	public String roomName;
+	public String currentScenery;
 	public int width;
 	public int height;
 	public List<RoomItemConfiguration> roomItemConfigurations = new ArrayList<RoomItemConfiguration>();

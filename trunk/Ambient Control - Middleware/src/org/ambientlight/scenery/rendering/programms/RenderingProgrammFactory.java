@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.scenery.SceneryConfiguration;
 import org.ambientlight.scenery.entities.LightObject;
 import org.ambientlight.scenery.rendering.Renderer;
@@ -25,18 +26,19 @@ public class RenderingProgrammFactory implements
 	List<LightObject> queueDeleteLightObjects = new ArrayList<LightObject>();
 
 	
-	public void addLightObjectToRender(Renderer renderer,
-			LightObject lightObject, FadeInTransition transition) {
-
-		if (lightObject.getConfiguration().currentSceneryConfiguration.powerState == false) {
+	public void addLightObjectToRender(Renderer renderer,LightObject lightObject, FadeInTransition transition) {
+		
+		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
+		
+		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery).powerState == false) {
 			return;
 		}
 
 		// create SimpleColor
 		RenderingProgramm renderProgram = null;
-		if (lightObject.getConfiguration().currentSceneryConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
+		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery) instanceof SimpleColorRenderingProgramConfiguration) {
 			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject
-					.getConfiguration().currentSceneryConfiguration;
+					.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery);
 			Color simpleColor = new Color(config.getR(), config.getG(),
 					config.getB());
 			renderProgram = new SimpleColor(simpleColor);
@@ -59,12 +61,14 @@ public class RenderingProgrammFactory implements
 	
 	public void updatePowerStateForLightObject(Renderer renderer,
 			LightObject lightObject, Boolean powerState) {
-		if(lightObject.getConfiguration().currentSceneryConfiguration.powerState==powerState){
+		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
+
+		if(lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery).powerState==powerState){
 			System.out.println("RenderingProgrammFactory: lightObject"+ lightObject.getConfiguration().name+"already set to: "+powerState);
 			return;
 		}
 		
-		lightObject.getConfiguration().currentSceneryConfiguration.powerState = powerState;
+		lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery).powerState = powerState;
 		if (powerState == false) {
 
 			// set fadeout effect
@@ -87,8 +91,10 @@ public class RenderingProgrammFactory implements
 	
 	public void updateRenderingConfigurationForLightObject(Renderer renderer,
 			SceneryConfiguration newConfig, LightObject lightObject) {
+		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
 		renderer.removeRenderTaskForLightObject(lightObject);
-		lightObject.getConfiguration().currentSceneryConfiguration = newConfig;
+		lightObject.getConfiguration().sceneryConfigurationBySzeneryName.remove(currentScenery);
+		lightObject.getConfiguration().sceneryConfigurationBySzeneryName.put(currentScenery, newConfig);
 		this.addLightObjectToRender(renderer, lightObject,effectFactory.getFadeInEffect(lightObject));
 	}
 
