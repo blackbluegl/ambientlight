@@ -37,7 +37,7 @@ public class CreateTestConfig {
 		sw1.switchingUnitCode=3;
 		sw1.name="kleine Stehlampe";
 		this.createSceneryMappingForSwitch(rc, sw1);
-		sw1.sceneryConfigurationBySzeneryName.get(0).bypassOnSceneryChange=true;
+		sw1.getSceneryConfigurationBySceneryName("scene1").bypassOnSceneryChange=true;
 		
 		SwitchObjectConfiguration sw2 = new SwitchObjectConfiguration();
 		sw2.deviceType="ELRO";
@@ -160,14 +160,14 @@ public class CreateTestConfig {
 		LightObjectConfiguration lo4 = new LightObjectConfiguration();
 		lo4.name="Highboard";
 		
-		SimpleColorRenderingProgramConfiguration currentColor = new SimpleColorRenderingProgramConfiguration();
-		currentColor.setB(0);
-		currentColor.setG(255);
-		currentColor.setR(0);
-		currentColor.powerState=true;
-		currentColor.sceneryName="scene1";
+//		SimpleColorRenderingProgramConfiguration currentColor = new SimpleColorRenderingProgramConfiguration();
+//		currentColor.setB(0);
+//		currentColor.setG(255);
+//		currentColor.setR(0);
+//		currentColor.powerState=true;
+//		currentColor.sceneryName="scene1";
+//		lo.currentSceneryConfiguration=currentColor;
 		
-		lo.currentSceneryConfiguration=currentColor;
 		this.createSceneryMapping(rc, lo);
 		lo.height=20;
 		lo.layerNumber=2;
@@ -175,16 +175,16 @@ public class CreateTestConfig {
 		lo.xOffsetInRoom=5;
 		lo.yOffsetInRoom=5;
 		
+//		
+//		SimpleColorRenderingProgramConfiguration currentColor2 = new SimpleColorRenderingProgramConfiguration();
+//		currentColor2.setB(0);
+//		currentColor2.setG(0);
+//		currentColor2.setR(255);
+//		
+//		currentColor2.powerState=true;
+//		currentColor2.sceneryName="scene1";	
+//		lo2.currentSceneryConfiguration=currentColor2;
 		
-		SimpleColorRenderingProgramConfiguration currentColor2 = new SimpleColorRenderingProgramConfiguration();
-		currentColor2.setB(0);
-		currentColor2.setG(0);
-		currentColor2.setR(255);
-		
-		currentColor2.powerState=true;
-		currentColor2.sceneryName="scene1";
-		
-		lo2.currentSceneryConfiguration=currentColor2;
 		this.createSceneryMapping(rc, lo2);
 		lo2.height=20;
 		lo2.layerNumber=2;
@@ -193,13 +193,14 @@ public class CreateTestConfig {
 		lo2.yOffsetInRoom=5;
 		
 		
-		SimpleColorRenderingProgramConfiguration currentColor3 = new SimpleColorRenderingProgramConfiguration();
-		currentColor3.setB(255);
-		currentColor3.setG(0);
-		currentColor3.setR(0);
-		currentColor3.powerState=true;
-		currentColor3.sceneryName="scene1";
-		lo3.currentSceneryConfiguration=currentColor3;
+//		SimpleColorRenderingProgramConfiguration currentColor3 = new SimpleColorRenderingProgramConfiguration();
+//		currentColor3.setB(255);
+//		currentColor3.setG(0);
+//		currentColor3.setR(0);
+//		currentColor3.powerState=true;
+//		currentColor3.sceneryName="scene1";
+//		lo3.currentSceneryConfiguration=currentColor3;
+		
 		this.createSceneryMapping(rc, lo3);
 		lo3.height=20;
 		lo3.layerNumber=2;
@@ -208,14 +209,14 @@ public class CreateTestConfig {
 		lo3.yOffsetInRoom=5;
 		
 		
-		SimpleColorRenderingProgramConfiguration currentColor4 = new SimpleColorRenderingProgramConfiguration();
-		currentColor4.setB(255);
-		currentColor4.setG(0);
-		currentColor4.setR(255);
-		currentColor4.powerState=true;
-		currentColor4.sceneryName="scene1";
+//		SimpleColorRenderingProgramConfiguration currentColor4 = new SimpleColorRenderingProgramConfiguration();
+//		currentColor4.setB(255);
+//		currentColor4.setG(0);
+//		currentColor4.setR(255);
+//		currentColor4.powerState=true;
+//		currentColor4.sceneryName="scene1";
+//		lo4.currentSceneryConfiguration=currentColor4;
 		
-		lo4.currentSceneryConfiguration=currentColor4;
 		this.createSceneryMapping(rc, lo4);
 		lo4.height=20;
 		lo4.layerNumber=3;
@@ -224,14 +225,14 @@ public class CreateTestConfig {
 		lo4.yOffsetInRoom=5;
 		
 		
-		SimpleColorRenderingProgramConfiguration currentColorBG = new SimpleColorRenderingProgramConfiguration();
-		currentColorBG.setB(20);
-		currentColorBG.setG(20);
-		currentColorBG.setR(20);
-		currentColorBG.powerState=true;
-		currentColorBG.sceneryName="scene1";
+//		SimpleColorRenderingProgramConfiguration currentColorBG = new SimpleColorRenderingProgramConfiguration();
+//		currentColorBG.setB(20);
+//		currentColorBG.setG(20);
+//		currentColorBG.setR(20);
+//		currentColorBG.powerState=true;
+//		currentColorBG.sceneryName="scene1";
+//		background.currentSceneryConfiguration=currentColorBG;
 		
-		background.currentSceneryConfiguration=currentColorBG;
 		this.createSceneryMapping(rc, background);
 		background.height=200;
 		background.layerNumber=1;
@@ -250,6 +251,7 @@ public class CreateTestConfig {
 		rc.height=400;
 		rc.width=400;
 		rc.roomName="testRoom";
+		rc.currentScenery="scene1";
 
 		return rc;
 	}
@@ -261,37 +263,28 @@ public class CreateTestConfig {
 		scL01.setB(i);
 		scL01.setG(10);
 		scL01.setR(100);
-		scL01.sceneryName="scene1";
 		scL01.powerState=true;
 		
 		SimpleColorRenderingProgramConfiguration scL02 = new SimpleColorRenderingProgramConfiguration();
 		scL02.setB(122);
 		scL02.setG(i);
 		scL02.setR(100);
-		scL02.sceneryName="scene2";
 		scL02.powerState=true;
-
-		lc.sceneryConfigurationBySzeneryName.add(scL01);
-		lc.sceneryConfigurationBySzeneryName.add(scL02);
+		lc.sceneryConfigurationBySzeneryName.put("scene1", scL01);
+		lc.sceneryConfigurationBySzeneryName.put("scene2", scL02);
 	}
 	
 	
 	private void createSceneryMappingForSwitch(RoomConfiguration rc, SwitchObjectConfiguration sc){
 		SwitchingConfiguration config = new SwitchingConfiguration();
 		config.powerState=true;
-		config.sceneryName="scene1";
 		
 		SwitchingConfiguration config2 = new SwitchingConfiguration();
 		config2.powerState=false;
-		config2.sceneryName="scene2";
+
+		sc.sceneryConfigurationBySzeneryName.put("scene1", config);
+		sc.sceneryConfigurationBySzeneryName.put("scene2", config2);
 		
-		SwitchingConfiguration config3 = new SwitchingConfiguration();
-		config3.powerState=true;
-		config3.sceneryName="scene1";
-		
-		sc.sceneryConfigurationBySzeneryName.add(config);
-		sc.sceneryConfigurationBySzeneryName.add(config2);
-		sc.currentSceneryConfiguration=config3;
 	}
 		
 		

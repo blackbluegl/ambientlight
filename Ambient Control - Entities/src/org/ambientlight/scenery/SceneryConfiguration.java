@@ -5,7 +5,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public abstract class SceneryConfiguration {
-	public String sceneryName;
 	public boolean powerState = true;
 	public boolean bypassOnSceneryChange=false;
 }

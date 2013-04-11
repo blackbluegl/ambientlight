@@ -55,7 +55,7 @@ public  class RestClient {
 			RenderingProgrammConfigurationLightObjectNameMapper newConfigMapper = new RenderingProgrammConfigurationLightObjectNameMapper();
 			
 			newConfigMapper.lightObjectName=currentRoomItemConfiguration.name;
-			newConfigMapper.config=currentRoomItemConfiguration.currentSceneryConfiguration;
+			newConfigMapper.config=currentRoomItemConfiguration.getSceneryConfigurationBySceneryName(newSceneryName);
 			
 			newLightObjectConfigForScenery.add(newConfigMapper);
 		}

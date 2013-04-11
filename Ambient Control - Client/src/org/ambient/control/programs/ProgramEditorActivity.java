@@ -43,7 +43,7 @@ public class ProgramEditorActivity extends Activity {
 			RoomConfiguration room = RestClient.getRoom(roomServer);
 			RoomItemConfiguration current =	room.getRoomItemConfigurationByName(lightObject);
 			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) 
-					current.currentSceneryConfiguration;
+					current.getSceneryConfigurationBySceneryName(room.currentScenery);
 			color=	Color.rgb(config.getR(), config.getG(), config.getB());
 		} catch (Exception e) {
 			e.printStackTrace();

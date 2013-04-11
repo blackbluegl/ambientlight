@@ -66,9 +66,9 @@ public class AmbientControlMW {
 		for(RoomItemConfiguration currentItem: AmbientControlMW.getRoomConfig().roomItemConfigurations){
 			if(currentItem instanceof SwitchObjectConfiguration){
 				SwitchObjectConfiguration currentSwitch = (SwitchObjectConfiguration) currentItem;
-			System.out.println("restoring switchingPowerState for: "+currentSwitch.name+"to: "+currentSwitch.currentSceneryConfiguration.powerState);
+			System.out.println("restoring switchingPowerState for: "+currentSwitch.name+"to: "+currentSwitch.getSceneryConfigurationBySceneryName(roomConfig.currentScenery).powerState);
 			AmbientControlMW.getRoom().getSwitchingDevice().writeData(currentSwitch.deviceType, currentSwitch.houseCode, 
-					currentSwitch.switchingUnitCode, currentSwitch.currentSceneryConfiguration.powerState);
+					currentSwitch.switchingUnitCode, currentSwitch.getSceneryConfigurationBySceneryName(roomConfig.currentScenery).powerState);
 			}
 		}
 	}

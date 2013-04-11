@@ -1,26 +1,26 @@
 package org.ambientlight.room.objects;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.ambientlight.scenery.SceneryConfiguration;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
-public abstract class  RoomItemConfiguration {
-	
-	public String name;
-	
-	public SceneryConfiguration currentSceneryConfiguration;
-	
-	public List<SceneryConfiguration> sceneryConfigurationBySzeneryName = new ArrayList<SceneryConfiguration>();
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+public abstract class RoomItemConfiguration {
 
-	public SceneryConfiguration getSceneryConfigurationBySceneryName(String sceneryName){
-		for(SceneryConfiguration current : this.sceneryConfigurationBySzeneryName){
-			if(sceneryName.equals(current.sceneryName)){
-				return current;
-			}
-		}
-		return null;
+	public String name;
+
+	public Map<String, SceneryConfiguration> sceneryConfigurationBySzeneryName = new HashMap<String, SceneryConfiguration>();
+
+	public SceneryConfiguration getSceneryConfigurationBySceneryName(String sceneryName) {
+		return sceneryConfigurationBySzeneryName.get(sceneryName);
+	}
+
+	@JsonIgnore
+	public Set<String> getSupportedSceneries(){
+		return sceneryConfigurationBySzeneryName.keySet();
 	}
 }
