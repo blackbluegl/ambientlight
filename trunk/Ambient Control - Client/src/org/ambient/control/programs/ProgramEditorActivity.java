@@ -25,6 +25,7 @@ public class ProgramEditorActivity extends Activity {
 
     private String roomServer;
 	private String lightObject;
+	private String scenery;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class ProgramEditorActivity extends Activity {
         if (values == null) {
           return;
         }
+        scenery = values.getString("scenery");
         lightObject = values.getString("lightObject");
         roomServer = values.getString("roomServer");
 
@@ -67,7 +69,7 @@ public class ProgramEditorActivity extends Activity {
 				sc.setR(Color.red(color));
 				sc.setG(Color.green(color));
 				sc.setB(Color.blue(color));
-				RestClient.setProgramForLightObject(roomServer,lightObject,sc);
+				RestClient.setProgramForLightObject(roomServer,scenery,lightObject,sc);
 			}
 		});
     

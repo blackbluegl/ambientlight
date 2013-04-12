@@ -21,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ProgramChooser extends Activity {
+public class ProgramChooserActivity extends Activity {
 
     String lightObject = null;
     String roomServer = null;
@@ -46,7 +46,7 @@ public class ProgramChooser extends Activity {
 
         ListIconArrayAdapter adapter = new ListIconArrayAdapter(this, valuesMap.keySet().toArray(new String[0]));
         listView.setAdapter(adapter);
-        final ProgramChooser myself = this;
+        final ProgramChooserActivity myself = this;
         listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override

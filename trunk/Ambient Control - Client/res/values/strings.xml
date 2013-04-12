@@ -19,5 +19,6 @@
     <string name="title_activity_program_editor">ProgramEditorActivity</string>
     <string name="prefOK">OK</string>
     <string name="button_apply">Anwenden</string>
+    <string name="home_context_bypass">Sperren</string>
 
 </resources>

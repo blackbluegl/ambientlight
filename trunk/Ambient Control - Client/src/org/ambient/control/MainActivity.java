@@ -26,9 +26,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	String selectedScenario;
 
-	public void setSelectedScenario(String selectedScenario) {
-		this.selectedScenario = selectedScenario;
-	}
 
 	ViewPager viewPager;
 
@@ -161,5 +158,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 	public void updateHome(String sceneryName) throws InterruptedException, ExecutionException {
 		homeFragment.refreshRoomContent(getSelectedRoomServer());
+	}
+
+
+	public String getSelectedScenario() {
+		return selectedScenario;
+	}
+
+	public void setSelectedScenario(String selectedScenario) {
+		this.selectedScenario = selectedScenario;
 	}
 }

@@ -59,32 +59,31 @@ public class RenderingProgrammFactory implements
 	}
 
 	
-	public void updatePowerStateForLightObject(Renderer renderer,
-			LightObject lightObject, Boolean powerState) {
+	public void updatePowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
 		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
 
-		if(lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery).powerState==powerState){
-			System.out.println("RenderingProgrammFactory: lightObject"+ lightObject.getConfiguration().name+"already set to: "+powerState);
+		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery).powerState == powerState) {
+			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.getConfiguration().name + "already set to: "
+					+ powerState);
 			return;
 		}
-		
+
 		lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery).powerState = powerState;
 		if (powerState == false) {
 
 			// set fadeout effect
-			RenderingEffect effect = effectFactory
-					.getFadeOutEffect(lightObject);
-			RenderingProgramm renderProgram = renderer
-					.getProgramForLightObject(lightObject);
+			RenderingEffect effect = effectFactory.getFadeOutEffect(lightObject);
+			RenderingProgramm renderProgram = renderer.getProgramForLightObject(lightObject);
 			renderProgram.addEffect(effect);
 			renderer.setRenderTaskForLightObject(lightObject, renderProgram);
 
 			// and set to deletion queue after effect has finished rendering
 			this.queueDeleteLightObjects.add(lightObject);
 		} else {
-			//maybe the light should be asyncrounously removed. we will keep the light and remove it from the deletion list.
+			// maybe the light should be asyncrounously removed. we will keep
+			// the light and remove it from the deletion list.
 			this.queueDeleteLightObjects.remove(lightObject);
-			this.addLightObjectToRender(renderer, lightObject,effectFactory.getFadeInEffect(lightObject));
+			this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
 		}
 	}
 
