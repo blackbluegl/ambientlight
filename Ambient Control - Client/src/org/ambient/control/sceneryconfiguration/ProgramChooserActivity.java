@@ -1,4 +1,4 @@
-package org.ambient.control.programs;
+package org.ambient.control.sceneryconfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,6 @@ import org.ambient.control.R;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -55,11 +54,11 @@ public class ProgramChooserActivity extends Activity {
 			TextView result = (TextView) view.findViewById(R.id.textViewSceneryChooserEntryLabel);	
 			int resourceId = valuesMap.get(result.getText());
 			
-		   	Intent i = new Intent(myself, ProgramEditorActivity.class);
-        	i.putExtra("roomServer", roomServer);
-        	i.putExtra("lightObject", lightObject); 
-        	i.putExtra("programResourceId", resourceId);
-        	startActivity(i);
+//		   	Intent i = new Intent(myself, ProgramEditorActivity.class);
+//        	i.putExtra("roomServer", roomServer);
+//        	i.putExtra("lightObject", lightObject); 
+//        	i.putExtra("programResourceId", resourceId);
+//        	startActivity(i);
 			
 			}
 		});
