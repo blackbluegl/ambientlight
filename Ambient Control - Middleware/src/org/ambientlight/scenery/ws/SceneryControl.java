@@ -56,7 +56,7 @@ public class SceneryControl {
 	public RoomConfiguration getRoomConfiguration() {
 		return AmbientControlMW.getRoomConfig();
 	}
-
+	
 	
 	@PUT
 	@Path("/control/room/lightObjects/{lightObjectName}/program")
@@ -65,25 +65,28 @@ public class SceneryControl {
 	public Response setLightObjectRenderingConfigForCurrentScenery(@PathParam("lightObjectName") String lightObjectName,
 			SceneryConfiguration newConfig) {
 
+		RoomItemConfiguration itemConfiguration = this.getRoomConfiguration().getRoomItemConfigurationByName(lightObjectName);
+
 		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
-		
-		System.out.println("SceneryControlWS:  setting config for " + lightObjectName + " to "
-				+ newConfig.getClass().getName());
-		
-		//update renderer
-		LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(
-				lightObjectName);
 
-		AmbientControlMW.getRenderProgrammFactory().updateRenderingConfigurationForLightObject(
-						AmbientControlMW.getRenderer(), newConfig, lightObject);
+		System.out.println("SceneryControlWS:  setting config for " + lightObjectName + " to " + newConfig.getClass().getName());
 
-		//update model
-		RoomItemConfiguration modelConfig = AmbientControlMW.getRoomConfig()
-				.getRoomItemConfigurationByName(lightObjectName);
-		
+		if (itemConfiguration instanceof LightObjectConfiguration) {
+			// update renderer
+			LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(lightObjectName);
+
+			AmbientControlMW.getRenderProgrammFactory().updateRenderingConfigurationForLightObject(
+					AmbientControlMW.getRenderer(), newConfig, lightObject);
+		} else {
+			return Response.status(500).build();
+		}
+
+		// update model
+		RoomItemConfiguration modelConfig = AmbientControlMW.getRoomConfig().getRoomItemConfigurationByName(lightObjectName);
+
 		modelConfig.sceneryConfigurationBySzeneryName.remove(currentScenery);
 		modelConfig.sceneryConfigurationBySzeneryName.put(currentScenery, newConfig);
-		
+
 		return Response.status(200).build();
 	}
 
@@ -129,45 +132,26 @@ public class SceneryControl {
 	@Path("/config/room/sceneries/{sceneryName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateScenery(@PathParam( "sceneryName" )String sceneryName,
+	public Response createOrUpdateScenery(@PathParam("sceneryName") String sceneryName,
 			List<RenderingProgrammConfigurationLightObjectNameMapper> configList) {
-		
+
 		System.out.println("SceneryControlWS:  saving as scenery with name: " + sceneryName);
 
-		// update all lightobjects
-		for (RoomItemConfiguration currentOldLightObjectConfiguration : AmbientControlMW.getRoomConfig().roomItemConfigurations) {
-			if(currentOldLightObjectConfiguration instanceof LightObjectConfiguration){
-			//extract configuration for the current lightobject
-			SceneryConfiguration newConfig = null;
-			for(RenderingProgrammConfigurationLightObjectNameMapper possibleCurrentConfig : configList ){
-				if(possibleCurrentConfig.lightObjectName.equals(currentOldLightObjectConfiguration.name)){
-					newConfig=possibleCurrentConfig.config;
+		// update all roomItems in model
+		for (RoomItemConfiguration existingRoomItemConfiguration : AmbientControlMW.getRoomConfig().roomItemConfigurations) {
+
+			// extract configuration for the current lightobject
+			SceneryConfiguration newSceneryConfig = null;
+			for (RenderingProgrammConfigurationLightObjectNameMapper possibleCurrentConfig : configList) {
+				if (possibleCurrentConfig.lightObjectName.equals(existingRoomItemConfiguration.name)) {
+					newSceneryConfig = possibleCurrentConfig.config;
 					break;
 				}
 			}
-			
-			//remove old config if existing
-			SceneryConfiguration existingRenderingProgramConfiguration = currentOldLightObjectConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
-			
-			//udating lightobject
-			LightObject currentLightObject = AmbientControlMW.getRoom().getLightObjectByName(currentOldLightObjectConfiguration.name);
-
-			if(existingRenderingProgramConfiguration != null){
-				//remove from model
-				currentOldLightObjectConfiguration.sceneryConfigurationBySzeneryName.remove(sceneryName);
-				//remove from instantiated lightobject
-				currentLightObject.getConfiguration().sceneryConfigurationBySzeneryName.remove(sceneryName);
-			}
-			
-			//update in config
-			currentOldLightObjectConfiguration.sceneryConfigurationBySzeneryName.put(sceneryName, newConfig);
-			// update real objects
-			currentLightObject.getConfiguration().sceneryConfigurationBySzeneryName.put(sceneryName, newConfig);
-			}
+			// update model
+			existingRoomItemConfiguration.sceneryConfigurationBySzeneryName.put(sceneryName, newSceneryConfig);
 		}
 
-		AmbientControlMW.getRoomConfig().currentScenery=sceneryName;
-		
 		// save config model to file
 		try {
 			AmbientControlMW.getRoomFactory().saveRoomConfiguration(AmbientControlMW.getRoomConfig(), "default");
@@ -176,10 +160,10 @@ public class SceneryControl {
 			Response.status(500).build();
 		}
 
-		System.out.println("SceneryControlWS:  saving as scenery with name: " + sceneryName + " done");
+		System.out.println("SceneryControlWS:  saved as scenery with name: " + sceneryName + " done");
 
 		return Response.status(200).build();
-	}
+	}	
 	
 	
 	@PUT
