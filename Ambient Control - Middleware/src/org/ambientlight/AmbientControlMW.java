@@ -7,79 +7,89 @@ import java.util.Timer;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.objects.LightObjectConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
-import org.ambientlight.room.objects.SwitchObjectConfiguration;
 import org.ambientlight.scenery.entities.Room;
+import org.ambientlight.scenery.entities.RoomConfigurationFactory;
 import org.ambientlight.scenery.entities.RoomFactory;
 import org.ambientlight.scenery.rendering.Renderer;
 import org.ambientlight.scenery.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.scenery.rendering.programms.RenderingProgrammFactory;
+import org.ambientlight.scenery.ws.SceneryControl;
 
 public class AmbientControlMW {
 
 	static RoomConfiguration roomConfig;
 
 	static RenderingProgrammFactory renderProgrammFactory;
-	
+
 	static Renderer renderer;
-	
+
 	static Room room;
-	
+
 	static RoomFactory roomFactory;
 
 	static int FREQUENCY = 25;
-	
+
 	static boolean debug = false;
-	
+
 	static String bindingAdressAndPort = "0.0.0.0:9998";
 
-	
-	public void initSzene() throws InterruptedException, UnknownHostException,
-			IOException {
+	public static void main(String[] args) throws InterruptedException, UnknownHostException, IOException {
+
+		parseArguments(args);
+
+		initModel();
+
+		initComponents();
+
+		// start rendering but only if there is something to render
+		if (doesALightObjectExist(getRoomConfig())) {
+			Timer timer = new Timer();
+			timer.schedule(new RenderingTask(), 0, 1000 / FREQUENCY);
+		}
+
+		SceneryControl sc = new SceneryControl();
+		sc.changeRoomToScenery(getRoomConfig().currentScenery);
+		
+		new WebserviceTask().start();
+
+		// wait for external signal to stop
+		while (true) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	private static void initComponents() throws InterruptedException, UnknownHostException, IOException {
 		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
 		roomFactory = new RoomFactory(deviceFactory);
 
-		RoomConfiguration roomConfig = roomFactory
-				.getRoomConfigByName("default");
-		AmbientControlMW.setRoomConfig(roomConfig);
+		room = roomFactory.initRoom("default", getRoomConfig());
 
+		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
+		RenderingProgrammFactory renderProgrammFactory = new RenderingProgrammFactory(effectFactory);
+
+		renderer = new Renderer(room, renderProgrammFactory);
+
+		AmbientControlMW.setRenderProgrammFactory(renderProgrammFactory);
+	}
+
+	private static void initModel() {
 		try {
-			room = roomFactory.loadRoom("default");
+			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName("default"));
 		} catch (Exception e) {
 			System.out.println("error reading config file.");
 			System.out.println(e.getMessage());
 			System.exit(1);
 		}
-
-		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
-		RenderingProgrammFactory renderProgrammFactory = new RenderingProgrammFactory(
-				effectFactory);
-		
-		renderer = new Renderer(room, renderProgrammFactory);
-		
-		AmbientControlMW.setRenderProgrammFactory(renderProgrammFactory);
-		
-		renderProgrammFactory.addAllLightObjectsInRoomToRenderer(renderer,
-				room.getLightObjectsInRoom());
-
-		//restore state of switchingUnits 
-		for(RoomItemConfiguration currentItem: AmbientControlMW.getRoomConfig().roomItemConfigurations){
-			if(currentItem instanceof SwitchObjectConfiguration){
-				SwitchObjectConfiguration currentSwitch = (SwitchObjectConfiguration) currentItem;
-			System.out.println("restoring switchingPowerState for: "+currentSwitch.name+"to: "+currentSwitch.getSceneryConfigurationBySceneryName(roomConfig.currentScenery).powerState);
-			AmbientControlMW.getRoom().getSwitchingDevice().writeData(currentSwitch.deviceType, currentSwitch.houseCode, 
-					currentSwitch.switchingUnitCode, currentSwitch.getSceneryConfigurationBySceneryName(roomConfig.currentScenery).powerState);
-			}
-		}
 	}
 
-	public static void main(String[] args) throws InterruptedException,
-			UnknownHostException, IOException {
-
-		AmbientControlMW ambientLight = new AmbientControlMW();
-		
-		//parse arguments
-		if(args.length>0){
+	private static void parseArguments(String[] args) {
+		// parse arguments
+		if (args.length > 0) {
 			for (String currentArg : args) {
 				if (currentArg.contains("debug")) {
 					StringTokenizer st = new StringTokenizer(currentArg, "=");
@@ -93,29 +103,17 @@ public class AmbientControlMW {
 				}
 			}
 		}
-		
-		//init scene and restoring switching units state
-		ambientLight.initSzene();
-		
-		//start rendering - only if there is something todo
-		if(AmbientControlMW.getRoomConfig().roomItemConfigurations.size()>0){
-			Timer timer = new Timer();
-			timer.schedule(new RenderingTask(), 0, 1000 / FREQUENCY);
-		}
-		
-		//start Webservice in own thread
-		WebserviceTask webservice = new WebserviceTask();
-		webservice.start();
-		
-		// wait for external signal to stop
-	        while (true) {
-	            try {
-	                Thread.sleep(1000);
-	            } catch (InterruptedException e){
-	            }
-	        }
 	}
-	
+
+	private static boolean doesALightObjectExist(RoomConfiguration rc) {
+		for (RoomItemConfiguration current : rc.roomItemConfigurations) {
+			if (current instanceof LightObjectConfiguration) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static RoomFactory getRoomFactory() {
 		return roomFactory;
 	}
@@ -144,8 +142,7 @@ public class AmbientControlMW {
 		return renderProgrammFactory;
 	}
 
-	public static void setRenderProgrammFactory(
-			RenderingProgrammFactory renderProgrammFactory) {
+	public static void setRenderProgrammFactory(RenderingProgrammFactory renderProgrammFactory) {
 		AmbientControlMW.renderProgrammFactory = renderProgrammFactory;
 	}
 
