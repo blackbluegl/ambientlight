@@ -18,11 +18,14 @@ import android.widget.TextView;
 
 public class NewSceneryDialogFragment extends DialogFragment {
 
+	public static String BUNDLE_SCENERY_NAME = "sceneryName";
+	
 	AlertDialog dialog;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+		
 		final LinearLayout dialogLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(
 				R.layout.layout_sceneries_new_dialog, null);
 
@@ -31,12 +34,16 @@ public class NewSceneryDialogFragment extends DialogFragment {
 		builder.setView(dialogLayout);
 		builder.setTitle(R.string.title_new_scenery_name);
 		
+		String sceneryName = getArguments().getString(BUNDLE_SCENERY_NAME);
+		TextView textView = (TextView) dialogLayout.findViewById(R.id.editTextNewSceneryName);
+		textView.setText(sceneryName);
+		
 		builder.setPositiveButton(R.string.button_new, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				TextView textView = (TextView) dialogLayout.findViewById(R.id.editTextNewSceneryName);
 				
 				try {
-					RestClient.createSceneryFromCurrent(((MainActivity) getActivity()).getSelectedRoomServer(), textView
+					RestClient.createOrUpdateSceneryFromCurrentScenery(((MainActivity) getActivity()).getSelectedRoomServer(), textView
 							.getText().toString());
 				} catch (Exception e) {
 					e.printStackTrace();

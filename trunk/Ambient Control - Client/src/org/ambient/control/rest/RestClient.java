@@ -46,16 +46,16 @@ public  class RestClient {
 			task.execute(hostName,lightObject,config);
 	}
 
-	public static void createSceneryFromCurrent(String hostName,String newSceneryName) throws InterruptedException, ExecutionException {
-		RoomConfiguration currentRoomConfig = RestClient.getRoom(hostName);
+	public static void createOrUpdateSceneryFromCurrentScenery(String hostName,String newSceneryName) throws InterruptedException, ExecutionException {
+		RoomConfiguration existingRoomConfiguration = RestClient.getRoom(hostName);
 		
 		List<RenderingProgrammConfigurationLightObjectNameMapper> newLightObjectConfigForScenery = new ArrayList<RenderingProgrammConfigurationLightObjectNameMapper>();
 		
-		for(RoomItemConfiguration currentRoomItemConfiguration : currentRoomConfig.roomItemConfigurations){
+		for(RoomItemConfiguration currentRoomItemConfiguration : existingRoomConfiguration.roomItemConfigurations){
 			RenderingProgrammConfigurationLightObjectNameMapper newConfigMapper = new RenderingProgrammConfigurationLightObjectNameMapper();
 			
 			newConfigMapper.lightObjectName=currentRoomItemConfiguration.name;
-			newConfigMapper.config=currentRoomItemConfiguration.getSceneryConfigurationBySceneryName(newSceneryName);
+			newConfigMapper.config=currentRoomItemConfiguration.getSceneryConfigurationBySceneryName(existingRoomConfiguration.currentScenery);
 			
 			newLightObjectConfigForScenery.add(newConfigMapper);
 		}

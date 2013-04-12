@@ -104,6 +104,9 @@ public class HomeFragment extends Fragment {
 		
 		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 
+		//for the scenery save dialog to auto fill the current scenery name on startup
+		((MainActivity) getActivity()).setSelectedScenario(roomConfig.currentScenery);
+		
 		//create the room container
 		final View roomContainerView = (View) inflater.inflate(R.layout.layout_room_item, null);
 		
@@ -273,6 +276,9 @@ public class HomeFragment extends Fragment {
 		this.configuredlightObjects.removeAll(removeMappers);
 
 		RoomConfiguration roomConfiguration = RestClient.getRoom(roomServerName);
+		
+		//for the scenery save dialog to auto fill the current scenery name on scenery change
+		((MainActivity) getActivity()).setSelectedScenario(roomConfiguration.currentScenery);
 
 		for (AbstractRoomItemViewMapper currentToRefresh : removeMappers) {
 			RoomItemConfiguration currentConfig = roomConfiguration.getRoomItemConfigurationByName(currentToRefresh.getItemName());

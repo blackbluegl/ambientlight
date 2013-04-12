@@ -7,12 +7,11 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Ambient Control</string>
     <string name="title_activity_sceneries">Szenerien</string>
-    <string name="button_create">Neues Scenario</string>
     <string name="button_new">Neu</string>
     <string name="button_home">zur Haussteuerung</string>
     <string name="button_save">Speichern</string>
     <string name="button_abort">Abbrechen</string>
-    <string name="title_new_scenery_name">Neues Szenario</string>
+    <string name="title_new_scenery_name">Szenario</string>
     <string name="title_activity_sceneries_chooser">SceneriesChooser</string>
     <string name="program_simple_color">Farbe auswählen</string>
     <string name="home_context_edit_program">Program editieren</string>

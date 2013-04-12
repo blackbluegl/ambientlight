@@ -74,6 +74,8 @@ public class SceneriesFragment extends Fragment {
 				public void onItemClick(AdapterView<?> adapterView, View v, int position, long arg3) {
 					String scenery = sceneryNames[position];
 					RestClient.setSceneryActive(((MainActivity) getActivity()).getSelectedRoomServer(), scenery);
+					//for the scenery save dialog to auto fill the current scenery name on scenery change
+					((MainActivity) getActivity()).setSelectedScenario(scenery);
 					try {
 						((MainActivity) getActivity()).updateHome(scenery);
 					} catch (Exception e) {

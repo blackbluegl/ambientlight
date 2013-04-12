@@ -23,6 +23,12 @@ import android.view.MenuItem;
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
 	String selectedRoomServer;
+	
+	String selectedScenario;
+
+	public void setSelectedScenario(String selectedScenario) {
+		this.selectedScenario = selectedScenario;
+	}
 
 	ViewPager viewPager;
 
@@ -124,15 +130,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		switch (item.getItemId()) {
 		case R.id.menu_save:
-			// RestClient.saveScenery();
-
-			return true;
-		case R.id.menu_create:
 			FragmentManager fm = getSupportFragmentManager();
 			NewSceneryDialogFragment newSceneriesDialog = new NewSceneryDialogFragment();
+			Bundle args = new Bundle();
+			args.putString(NewSceneryDialogFragment.BUNDLE_SCENERY_NAME, this.selectedScenario);
+			newSceneriesDialog.setArguments(args);
 			newSceneriesDialog.show(fm, "new Scenery Title");
-
 			return true;
+
 		default:
 			return super.onOptionsItemSelected(item);
 		}
