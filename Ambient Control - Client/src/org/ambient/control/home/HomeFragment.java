@@ -9,9 +9,11 @@ import org.ambient.control.R;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
-import org.ambient.control.programs.ProgramChooser;
+import org.ambient.control.programs.ProgramChooserActivity;
 import org.ambient.control.programs.ProgramEditorActivity;
+import org.ambient.control.programs.SimpleColorEditDialog;
 import org.ambient.control.rest.RestClient;
+import org.ambient.control.sceneries.NewSceneryDialogFragment;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
@@ -22,6 +24,7 @@ import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -310,17 +313,44 @@ public class HomeFragment extends Fragment {
 		
 		String roomServer = mapper.getServerName();
 		String lightObjectName = mapper.getItemName();
-		
+		String scenery = ((MainActivity) getActivity()).getSelectedScenario();
 		switch (item.getItemId()) {
+		
+		case R.id.lightobject_context_bypass:
+			try {
+				RoomConfiguration rc = RestClient.getRoom(roomServer);
+				RoomItemConfiguration roomItem = rc.getRoomItemConfigurationByName(lightObjectName);
+				SceneryConfiguration sc = roomItem.getSceneryConfigurationBySceneryName(scenery);
+				sc.bypassOnSceneryChange=!sc.bypassOnSceneryChange;
+				RestClient.setProgramForLightObject(roomServer, scenery, lightObjectName, sc);
+				mapper.setBypassSceneryChangeState(sc.bypassOnSceneryChange);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return true;
+		
 		case R.id.lightobject_context_edit:
-			Intent i = new Intent(getActivity(), ProgramEditorActivity.class);
-			i.putExtra("roomServer", roomServer);
-			i.putExtra("lightObject", lightObjectName);
-			startActivity(i);
+//			Intent i = new Intent(getActivity(), ProgramEditorActivity.class);
+//			i.putExtra("roomServer", roomServer);
+//			i.putExtra("lightObject", lightObjectName);
+//			i.putExtra("scenery",scenery);
+//			startActivity(i);
+			
+			
+			FragmentManager fm = getActivity().getSupportFragmentManager();
+			SimpleColorEditDialog newSceneriesDialog = new SimpleColorEditDialog();
+			Bundle args = new Bundle();
+			args.putString("roomServer", roomServer);
+			args.putString("lightObject", lightObjectName);
+			args.putString("scenery",scenery);
+			newSceneriesDialog.setArguments(args);
+			newSceneriesDialog.show(fm, "new Scenery Title");
+			
 			return true;
 		case R.id.lightobject_context_new:
 
-			Intent i2 = new Intent(getActivity(), ProgramChooser.class);
+			Intent i2 = new Intent(getActivity(), ProgramChooserActivity.class);
 			i2.putExtra("roomServer", roomServer);
 			i2.putExtra("lightObject", lightObjectName);
 			startActivity(i2);

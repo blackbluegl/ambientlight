@@ -56,46 +56,13 @@ public class SceneryControl {
 	public RoomConfiguration getRoomConfiguration() {
 		return AmbientControlMW.getRoomConfig();
 	}
-	
-	
-	@PUT
-	@Path("/control/room/lightObjects/{lightObjectName}/program")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response setLightObjectRenderingConfigForCurrentScenery(@PathParam("lightObjectName") String lightObjectName,
-			SceneryConfiguration newConfig) {
-
-		RoomItemConfiguration itemConfiguration = this.getRoomConfiguration().getRoomItemConfigurationByName(lightObjectName);
-
-		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
-
-		System.out.println("SceneryControlWS:  setting config for " + lightObjectName + " to " + newConfig.getClass().getName());
-
-		if (itemConfiguration instanceof LightObjectConfiguration) {
-			// update renderer
-			LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(lightObjectName);
-
-			AmbientControlMW.getRenderProgrammFactory().updateRenderingConfigurationForLightObject(
-					AmbientControlMW.getRenderer(), newConfig, lightObject);
-		} else {
-			return Response.status(500).build();
-		}
-
-		// update model
-		RoomItemConfiguration modelConfig = AmbientControlMW.getRoomConfig().getRoomItemConfigurationByName(lightObjectName);
-
-		modelConfig.sceneryConfigurationBySzeneryName.remove(currentScenery);
-		modelConfig.sceneryConfigurationBySzeneryName.put(currentScenery, newConfig);
-
-		return Response.status(200).build();
-	}
 
 	
 	@PUT
 	@Path("/control/room/sceneries")
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setSceneryActive(String sceneryName) {
+	public Response changeRoomToScenery(String sceneryName) {
 		System.out.println("SceneryControlWS:  activating scenery: " + sceneryName);
 		
 		//first set current Scenery to new one for submethods otherwise they may use the old ScenerySettings
@@ -114,25 +81,43 @@ public class SceneryControl {
 				newSceneryConfig.powerState=oldPowerState;
 				continue;
 			}
-			
-			if(currentItemConfiguration instanceof LightObjectConfiguration){
-				//updating rendering program
-				this.setLightObjectRenderingConfigForCurrentScenery(currentItemConfiguration.name, newSceneryConfig);
-			}
-			if(currentItemConfiguration instanceof SwitchObjectConfiguration){
-				this.setPowerStateForItem(currentItemConfiguration.name, newSceneryConfig.powerState);
-			}
+
+			this.changeItemToScenery(sceneryName, currentItemConfiguration.name);
 		}
 
 		return Response.status(200).build();
 	}
 
+
+	@PUT
+	@Path("/control/room/sceneries/{sceneryName}/items")
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response changeItemToScenery(@PathParam("sceneryName") String sceneryName, String itemName) {
+		RoomItemConfiguration itemConfiguration = this.getRoomConfiguration().getRoomItemConfigurationByName(itemName);
+		SceneryConfiguration newSceneryConfig = itemConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
+
+		if (itemConfiguration instanceof LightObjectConfiguration) {
+			// update renderer
+			LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(itemName);
+
+			AmbientControlMW.getRenderProgrammFactory().updateRenderingConfigurationForLightObject(
+					AmbientControlMW.getRenderer(), newSceneryConfig, lightObject);
+		} else if (itemConfiguration instanceof SwitchObjectConfiguration) {
+			// simply update the powerstate
+			this.setPowerStateForItem(itemName, newSceneryConfig.powerState);
+		} else {
+			return Response.status(500).build();
+		}
+		return Response.status(200).build();
+	}
+	
 	
 	@PUT
 	@Path("/config/room/sceneries/{sceneryName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateScenery(@PathParam("sceneryName") String sceneryName,
+	public Response createOrUpdateSceneryConfigurationForRoom(@PathParam("sceneryName") String sceneryName,
 			List<RenderingProgrammConfigurationLightObjectNameMapper> configList) {
 
 		System.out.println("SceneryControlWS:  saving as scenery with name: " + sceneryName);
@@ -164,6 +149,23 @@ public class SceneryControl {
 
 		return Response.status(200).build();
 	}	
+	
+	
+	@PUT
+	@Path("/config/room/sceneries/{sceneryName}/items/{itemName}/program")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createOrUpdateSceneryConfigurationForItem(@PathParam("sceneryName") String sceneryName, @PathParam("itemName") String itemName,
+			SceneryConfiguration newSceneryConfig) {
+
+		System.out.println("SceneryControlWS:  setting config for " + itemName + " to " + newSceneryConfig.getClass().getName());
+
+		// update model
+		RoomItemConfiguration roomItemConfiguration = AmbientControlMW.getRoomConfig().getRoomItemConfigurationByName(itemName);
+		roomItemConfiguration.sceneryConfigurationBySzeneryName.put(sceneryName, newSceneryConfig);
+
+		return Response.status(200).build();
+	}
 	
 	
 	@PUT

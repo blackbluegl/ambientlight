@@ -40,10 +40,9 @@ public  class RestClient {
 		task.execute(hostName,sceneryName);
 	}
 
-	public static void setProgramForLightObject(String hostName,
-			String lightObject, SceneryConfiguration config) {
-			SetLightObjectConfigurationTask task = new SetLightObjectConfigurationTask();
-			task.execute(hostName,lightObject,config);
+	public static void setProgramForLightObject(String hostName, String sceneryName, String itemName, SceneryConfiguration config) {
+		SetLightObjectConfigurationTask task = new SetLightObjectConfigurationTask();
+		task.execute(hostName, sceneryName, itemName, config);
 	}
 
 	public static void createOrUpdateSceneryFromCurrentScenery(String hostName,String newSceneryName) throws InterruptedException, ExecutionException {
