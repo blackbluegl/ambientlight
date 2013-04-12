@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".programs.ProgramChooser"
+            android:name="org.ambient.control.sceneryconfiguration.ProgramChooser"
             android:label="@string/title_activity_sceneries_chooser" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".programs.ProgramEditorActivity"
+            android:name="org.ambient.control.sceneryconfiguration.ProgramEditorActivity"
             android:label="@string/title_activity_program_editor" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
