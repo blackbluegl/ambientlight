@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.ambient.control.home.HomeRefreshCallback;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
 import org.ambientlight.scenery.SceneryConfiguration;
@@ -35,9 +36,9 @@ public  class RestClient {
 	}
 
 	public static void setSceneryActive(String hostName,
-			String sceneryName) {
+			String sceneryName, HomeRefreshCallback callback) {
 		SetSceneryActiveForRoomTask task = new SetSceneryActiveForRoomTask();
-		task.execute(hostName,sceneryName);
+		task.execute(hostName,sceneryName,callback);
 	}
 
 	public static void setProgramForLightObject(String hostName, String sceneryName, String itemName, SceneryConfiguration config) {

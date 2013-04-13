@@ -21,7 +21,7 @@ public class RoomFactory {
 		this.deviceFactory = deviceFactory;
 	}
 
-	public Room initRoom(String roomName, RoomConfiguration roomConfig) throws UnknownHostException, IOException {
+	public Room initRoom(RoomConfiguration roomConfig) throws UnknownHostException, IOException {
 		Room room = new Room();
 
 		// initialize Pixelmap

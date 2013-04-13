@@ -40,7 +40,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 	public static final String BUNDLE_HOST_LIST = "hosts";
 	public static final String BUNDLE_SELECTED_ROOM_SERVER = "selectedRoomServer";
@@ -88,7 +88,12 @@ public class HomeFragment extends Fragment {
 		masterButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				for (String currentServerName : roomServers) {
+				for (String currentServerName : roomServers) {					
+					try {
+						RestClient.setPowerStateForRoom(currentServerName, false);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					setPowerStateForAllLightObjectsInRoom(false, currentServerName);
 					updateRoomPowerSwitchState(currentServerName);
 					updateRoomBackground(currentServerName);
@@ -187,6 +192,17 @@ public class HomeFragment extends Fragment {
 					e.printStackTrace();
 				}
 
+				//set all roomlabels inactive
+				for(String currentRoomServer : roomServers){
+					setRoomLabelSelected(currentRoomServer, false);
+				}
+
+				//activate current roomlabel
+				setRoomLabelSelected(serverName, true);
+				if (serverName.equals(((MainActivity) getActivity()).getSelectedRoomServer()) == false) {
+					((MainActivity) getActivity()).updateSceneriesForSelectedRoomServer(serverName);
+				}
+				
 				updateRoomPowerSwitchState(serverName);
 				updateRoomBackground(serverName);
 				updateMasterSwitchState();
@@ -216,6 +232,18 @@ public class HomeFragment extends Fragment {
 					RestClient.setPowerStateForRoomItem(roomItemMapper.getServerName(),
 							roomItemMapper.getItemName(), !roomItemMapper.getPowerState());
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
+					
+					//set all roomlabels inactive
+					for(String currentRoomServer : roomServers){
+						setRoomLabelSelected(currentRoomServer, false);
+					}
+
+					//activate current roomlabel
+					setRoomLabelSelected(serverName, true);
+					if (serverName.equals(((MainActivity) getActivity()).getSelectedRoomServer()) == false) {
+						((MainActivity) getActivity()).updateSceneriesForSelectedRoomServer(serverName);
+					}
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -264,6 +292,11 @@ public class HomeFragment extends Fragment {
 	}
 
 
+	
+	/* (non-Javadoc)
+	 * @see org.ambient.control.home.HomeRefreshCallback#refreshRoomContent(java.lang.String)
+	 */
+	@Override
 	public void refreshRoomContent(String roomServerName) throws InterruptedException, ExecutionException {
 
 		List<AbstractRoomItemViewMapper> removeMappers = new ArrayList<AbstractRoomItemViewMapper>();

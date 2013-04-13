@@ -17,7 +17,7 @@ import android.widget.ListView;
 public class SceneriesFragment extends Fragment {
 
 	public static final String BUNDLE_SELECTED_ROOM_SERVER = "selectedRoomServer";
-	
+
 	ArrayAdapter<String> sceneriesAdapter;
 
 	private ListView sceneriesListView;
@@ -35,15 +35,15 @@ public class SceneriesFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+
 		String selectedRoomServer = getArguments().getString(BUNDLE_SELECTED_ROOM_SERVER);
 
 		final String[] sceneryNames = getSceneryNames(selectedRoomServer);
-		
+
 		View sceneriesContainerView = inflater.inflate(R.layout.layout_sceneries_main, container, false);
-		
+
 		sceneriesListView = (ListView) sceneriesContainerView.findViewById(R.id.listViewSceneries);
-		
+
 		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
 		sceneriesListView.setAdapter(sceneriesAdapter);
 
@@ -51,41 +51,29 @@ public class SceneriesFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View v, int position, long arg3) {
 				String scenery = sceneryNames[position];
-				RestClient.setSceneryActive(((MainActivity) getActivity()).getSelectedRoomServer(), scenery);
-				try {
-					((MainActivity) getActivity()).updateHome(scenery);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				RestClient.setSceneryActive(((MainActivity) getActivity()).getSelectedRoomServer(), scenery,
+						((MainActivity) getActivity()).getHomeRefreshCallback());
 			}
 		});
 
 		return sceneriesContainerView;
 	}
 
-	
 	public void updateSceneriesList(String roomServer) {
-			final String[] sceneryNames = getSceneryNames(((MainActivity) getActivity()).getSelectedRoomServer());
-			sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
-			this.sceneriesListView.setAdapter(sceneriesAdapter);
-			
-			sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> adapterView, View v, int position, long arg3) {
-					String scenery = sceneryNames[position];
-					RestClient.setSceneryActive(((MainActivity) getActivity()).getSelectedRoomServer(), scenery);
-					//for the scenery save dialog to auto fill the current scenery name on scenery change
-					((MainActivity) getActivity()).setSelectedScenario(scenery);
-					try {
-						((MainActivity) getActivity()).updateHome(scenery);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
+		final String[] sceneryNames = getSceneryNames(((MainActivity) getActivity()).getSelectedRoomServer());
+		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
+		this.sceneriesListView.setAdapter(sceneriesAdapter);
+
+		sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View v, int position, long arg3) {
+				String scenery = sceneryNames[position];
+				RestClient.setSceneryActive(((MainActivity) getActivity()).getSelectedRoomServer(), scenery,
+						((MainActivity) getActivity()).getHomeRefreshCallback());
+			}
+		});
 	}
-	
-	
+
 	private String[] getSceneryNames(String roomServer) {
 		String[] items = null;
 		try {

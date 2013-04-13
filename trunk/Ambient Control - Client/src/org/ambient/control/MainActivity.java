@@ -1,9 +1,10 @@
 package org.ambient.control;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
+import java.util.Arrays;
 
 import org.ambient.control.home.HomeFragment;
+import org.ambient.control.home.HomeRefreshCallback;
 import org.ambient.control.rest.URLUtils;
 import org.ambient.control.sceneries.NewSceneryDialogFragment;
 import org.ambient.control.sceneries.SceneriesFragment;
@@ -25,7 +26,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	String selectedRoomServer;
 	
 	String selectedScenario;
-
 
 	ViewPager viewPager;
 
@@ -142,8 +142,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 	// TODO this here should discover real servers in future
 	public ArrayList<String> getAllRoomServers() {
-		ArrayList<String> result = new ArrayList<String>();
-		result.add(URLUtils.ANDROID_ADT_HOSTNAME);
+		ArrayList<String> result = new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
 		return result;
 	}
 
@@ -156,16 +155,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		sceneriesFragment.updateSceneriesList(hostName);
 	}
 
-	public void updateHome(String sceneryName) throws InterruptedException, ExecutionException {
-		homeFragment.refreshRoomContent(getSelectedRoomServer());
-	}
-
-
 	public String getSelectedScenario() {
 		return selectedScenario;
 	}
 
 	public void setSelectedScenario(String selectedScenario) {
 		this.selectedScenario = selectedScenario;
+	}
+	
+	public HomeRefreshCallback getHomeRefreshCallback(){
+		return this.homeFragment;
 	}
 }

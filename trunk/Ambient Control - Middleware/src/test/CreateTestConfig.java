@@ -4,14 +4,13 @@ import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
-import org.ambientlight.device.drivers.DummySwitchDeviceConfiguration;
+import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.device.stripe.StripeConfiguration;
 import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.LightObjectConfiguration;
 import org.ambientlight.room.objects.SwitchObjectConfiguration;
 import org.ambientlight.scenery.entities.RoomConfigurationFactory;
-import org.ambientlight.scenery.entities.RoomFactory;
 import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 
@@ -23,7 +22,6 @@ public class CreateTestConfig {
 	 */
 	public static void main(String[] args) throws IOException {
 		DeviceDriverFactory df = new DeviceDriverFactory();
-		RoomFactory rf = new RoomFactory(df);
 		CreateTestConfig test = new CreateTestConfig();
 
 		RoomConfigurationFactory.saveRoomConfiguration(test.getTestRoom(),"backup");
@@ -34,7 +32,7 @@ public class CreateTestConfig {
 		
 		SwitchObjectConfiguration sw1 = new SwitchObjectConfiguration();
 		sw1.deviceType="ELRO";
-		sw1.houseCode=31;
+		sw1.houseCode=15;
 		sw1.switchingUnitCode=3;
 		sw1.name="kleine Stehlampe";
 		this.createSceneryMappingForSwitch(rc, sw1);
@@ -42,14 +40,14 @@ public class CreateTestConfig {
 		
 		SwitchObjectConfiguration sw2 = new SwitchObjectConfiguration();
 		sw2.deviceType="ELRO";
-		sw2.houseCode=31;
+		sw2.houseCode=15;
 		sw2.switchingUnitCode=2;
 		sw2.name="große Stehlampe";
 		this.createSceneryMappingForSwitch(rc, sw2);
 		
 		SwitchObjectConfiguration sw3 = new SwitchObjectConfiguration();
 		sw3.deviceType="ELRO";
-		sw3.houseCode=31;
+		sw3.houseCode=15;
 		sw3.switchingUnitCode=1;
 		sw3.name="blaue Lampe";
 		this.createSceneryMappingForSwitch(rc, sw3);
@@ -79,12 +77,12 @@ public class CreateTestConfig {
 //		dc.hostName="192.168.1.36";
 //		dc.port=2002;
 		
-//		SwitchDeviceOverEthernetConfiguration switchingBridge = new SwitchDeviceOverEthernetConfiguration();
-//		switchingBridge.hostName="192.168.1.36";
-//		switchingBridge.port=2003;
+		SwitchDeviceOverEthernetConfiguration switchingBridge = new SwitchDeviceOverEthernetConfiguration();
+		switchingBridge.hostName="localhost";
+		switchingBridge.port=2003;
 
 		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
-		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
+//		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
 		
 		rc.deviceConfigurations.add(switchingBridge);
 		rc.deviceConfigurations.add(dc);

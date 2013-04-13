@@ -77,7 +77,7 @@ public class SceneryControl {
 		// configurations and save different configurations the user played with
 		// but never wanted them to be saved.
 		try {
-			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName("default"));
+			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName(AmbientControlMW.getRoomConfigFileName()));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -103,7 +103,7 @@ public class SceneryControl {
 
 		// save config model to file
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(), "default");
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(), AmbientControlMW.getRoomConfigFileName());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -162,7 +162,7 @@ public class SceneryControl {
 
 		// save config model to file
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(), "default");
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(), AmbientControlMW.getRoomConfigFileName());
 		} catch (IOException e) {
 			e.printStackTrace();
 			Response.status(500).build();
