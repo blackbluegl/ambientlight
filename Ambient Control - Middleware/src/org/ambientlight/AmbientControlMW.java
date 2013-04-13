@@ -19,6 +19,12 @@ import org.ambientlight.scenery.ws.SceneryControl;
 
 public class AmbientControlMW {
 
+	static String roomConfigFileName = "default";
+	
+	public static String getRoomConfigFileName() {
+		return roomConfigFileName;
+	}
+
 	static RoomConfiguration roomConfig;
 
 	static RenderingProgrammFactory renderProgrammFactory;
@@ -48,7 +54,11 @@ public class AmbientControlMW {
 			Timer timer = new Timer();
 			timer.schedule(new RenderingTask(), 0, 1000 / FREQUENCY);
 		}
+		else{
+			System.out.println("disabled the renderer because there are no lightObjects that need to be rendered");
+		}
 
+		//start scenery via SceneryControl
 		SceneryControl sc = new SceneryControl();
 		sc.changeRoomToScenery(getRoomConfig().currentScenery);
 		
@@ -67,7 +77,7 @@ public class AmbientControlMW {
 		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
 		roomFactory = new RoomFactory(deviceFactory);
 
-		room = roomFactory.initRoom("default", getRoomConfig());
+		room = roomFactory.initRoom(getRoomConfig());
 
 		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
 		RenderingProgrammFactory renderProgrammFactory = new RenderingProgrammFactory(effectFactory);
@@ -79,7 +89,7 @@ public class AmbientControlMW {
 
 	private static void initModel() {
 		try {
-			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName("default"));
+			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName(roomConfigFileName));
 		} catch (Exception e) {
 			System.out.println("error reading config file.");
 			System.out.println(e.getMessage());
@@ -100,6 +110,11 @@ public class AmbientControlMW {
 					StringTokenizer st = new StringTokenizer(currentArg, "=");
 					st.nextToken();
 					AmbientControlMW.bindingAdressAndPort = st.nextToken();
+				}
+				if(currentArg.contains("config")){
+					StringTokenizer st = new StringTokenizer(currentArg, "=");
+					st.nextToken();
+					AmbientControlMW.roomConfigFileName = st.nextToken();
 				}
 			}
 		}

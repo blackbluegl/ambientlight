@@ -10,9 +10,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -61,37 +58,6 @@ public class NewSceneryDialogFragment extends DialogFragment {
 		});
 		
 		dialog = builder.create();
-
-		// disable the positive button on show
-		dialog.setOnShowListener(new OnShowListener() {
-
-			@Override
-			public void onShow(DialogInterface dialog) {
-				((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-			}
-		});
-
-		// disable/enable the positive button according the text amount
-		EditText edit = (EditText) dialogLayout.findViewById(R.id.editTextNewSceneryName);
-		edit.addTextChangedListener(new TextWatcher() {
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (count > 0) {
-					((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-				} else {
-					((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-				}
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-		});
 
 		return dialog;
 	}
