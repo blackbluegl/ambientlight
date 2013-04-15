@@ -17,6 +17,7 @@ import org.ambientlight.room.objects.SwitchObjectConfiguration;
 import org.ambientlight.scenery.SceneryConfiguration;
 import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.scenery.rendering.programms.configuration.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 
 import com.thoughtworks.xstream.XStream;
@@ -69,6 +70,7 @@ public class RoomConfigurationFactory {
 		xstream.processAnnotations(SimpleColorRenderingProgramConfiguration.class);
 		xstream.processAnnotations(SunSetRenderingProgrammConfiguration.class);
 		xstream.processAnnotations(SwitchingConfiguration.class);
+		xstream.processAnnotations(TronRenderingProgrammConfiguration.class);
 		return xstream;
 	}
 }

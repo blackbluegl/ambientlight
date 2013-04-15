@@ -12,6 +12,7 @@ import org.ambientlight.scenery.rendering.effects.RenderingEffect;
 import org.ambientlight.scenery.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.scenery.rendering.effects.transitions.FadeInTransition;
 import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.rendering.util.ImageUtil;
 
 public class RenderingProgrammFactory implements
@@ -34,8 +35,9 @@ public class RenderingProgrammFactory implements
 			return;
 		}
 
-		// create SimpleColor
 		RenderingProgramm renderProgram = null;
+		
+		// create SimpleColor
 		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery) instanceof SimpleColorRenderingProgramConfiguration) {
 			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject
 					.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery);
@@ -43,7 +45,15 @@ public class RenderingProgrammFactory implements
 					config.getB());
 			renderProgram = new SimpleColor(simpleColor);
 		}
-
+		
+		// create Tron
+		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery) instanceof TronRenderingProgrammConfiguration) {
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject
+					.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery);
+			renderProgram = new Tron(lightObject,config.getSpeed(),config.getLightPointAmount());
+		}
+		
+		
 		renderProgram.addEffect(transition);
 
 		renderer.setRenderTaskForLightObject(lightObject, renderProgram);
