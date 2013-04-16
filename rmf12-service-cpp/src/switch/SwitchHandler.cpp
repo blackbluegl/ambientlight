@@ -80,9 +80,9 @@ void SwitchHandler::sendPowerCode(int code) {
 void SwitchHandler::sendHouseCode(int housecode) {
 	char houseCodeBitMask = housecode;
 	//the housecode is only 5 bits long. so we ignore the first 3.
-	for (int i = 3; i < 8; i++) {
+	for (int i = 4; i >=0 ; i--) {
 		//test the current bit if it is set or not
-		if (houseCodeBitMask & (1 << i)) {
+		if (houseCodeBitMask & (1 << (i))) {
 			sendF();
 		} else {
 			send0();
