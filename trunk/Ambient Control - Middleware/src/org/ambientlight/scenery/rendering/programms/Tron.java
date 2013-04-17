@@ -18,19 +18,16 @@ import org.ambientlight.scenery.rendering.util.ImageUtil;
 import org.ambientlight.scenery.rendering.util.StripeUtil;
 
 
-/*
- * list of all lanes within a lightobject. no crosses within a lane are allowed. each lane has only one startpoint and one endpoint
- * startx starty vs. endx and endy
- * for cross calculation of a stripe a pixel threshold has to be defined
- * there is a list of crosses -> every cross contains a number of lanes. info wether its the start or the end, and has to deliver information how much the moving direction is changed in degrees.
- * 
- * there is a defined amount of lightpoint. they have a glow length and a speed, they will move with a given speed number. 
- * they try move on crosses with an max given angle. 
- * after a couple of cylcles the lightpoint dies and a new one will be created instead.
- */
 public class Tron extends RenderingProgramm {
 
-	int speed = 1;
+	int r=150;
+	int g=150;
+	int b=150;
+	
+	int lightImpact=40;
+	int fadeOutRate =5;
+	
+	double speed = 1;
 	int tokensAmount = 3;
 
 	int lightObjectXOffset=0;
@@ -54,6 +51,7 @@ public class Tron extends RenderingProgramm {
 		}
 
 		Velocity velocity;
+		List<CrossWay> lasTakenCrossWays = new ArrayList<Tron.CrossWay>();
 		double xPosition;
 		double yPosition;
 		StripePartConfiguration myCurrentLane;
@@ -83,12 +81,24 @@ public class Tron extends RenderingProgramm {
 		}
 	}
 
-	List<StripePartConfiguration> lanes = new ArrayList<StripePartConfiguration>();
+	public class Lane{
+		List<Color> pixels;
+		StripePartConfiguration stripePart;
+		
+		public Lane(StripePartConfiguration stripePart){
+			this.stripePart=stripePart;
+			this.pixels= new ArrayList<Color>();
+		}
+	}
+	
+	List<Lane> lanes = new ArrayList<Lane>();
+	
+	
 	List<Token> tokens = new ArrayList<Tron.Token>();
 	List<CrossWay> crossWays = new ArrayList<Tron.CrossWay>();
 
 
-	public Tron(LightObject lightObject, int speed, int tokensAmount) {
+	public Tron(LightObject lightObject, double speed, int tokensAmount) {
 		
 		this.lightObjectXOffset=lightObject.getConfiguration().xOffsetInRoom;
 		this.lightObjectYOffset=lightObject.getConfiguration().yOffsetInRoom;
@@ -101,23 +111,23 @@ public class Tron extends RenderingProgramm {
 
 		for (StripePart currentStripePart : allStripeParts) {
 			if (StripeUtil.isStripePartInLightObject(currentStripePart, lightObject.getConfiguration())) {
-				this.lanes.add(currentStripePart.configuration);
+				this.lanes.add(new Lane(currentStripePart.configuration));
 			}
 		}
 
 		// find crossways out of the given stripeparts - walk through stripe and
 		// search for crossways
 
-		for (StripePartConfiguration stripePartToWalkThrough : lanes) {
-			for (StripePartConfiguration stripePartToCompareWith : lanes) {
+		for (Lane stripePartToWalkThrough : lanes) {
+			for (Lane stripePartToCompareWith : lanes) {
 				if (stripePartToWalkThrough == stripePartToCompareWith) {
 					continue;
 				}
-				if (doStripesXCross(stripePartToWalkThrough, stripePartToCompareWith) == false) {
+				if (doStripesXCross(stripePartToWalkThrough.stripePart, stripePartToCompareWith.stripePart) == false) {
 					continue;
 				}
-				CrossWay possibleCrossWay = this.calculateCrossWay(stripePartToWalkThrough,
-						stripePartToCompareWith);
+				CrossWay possibleCrossWay = this.calculateCrossWay(stripePartToWalkThrough.stripePart,
+						stripePartToCompareWith.stripePart);
 				// the crossway may exist already. if so check the
 				// stripePartConfigs and add missing
 				boolean crossWayAlreadyExists = false;
@@ -140,6 +150,15 @@ public class Tron extends RenderingProgramm {
 		}
 	}
 
+	private void renderLanes(BufferedImage pixelMap) {
+		pixelMap = ImageUtil.getBlackImage(pixelMap);
+		Graphics g = pixelMap.getGraphics();
+		for(Token token : tokens){
+			g.setColor(Color.RED);
+			g.drawOval((int)token.xPosition-this.lightObjectXOffset, (int)token.yPosition-this.lightObjectYOffset, 3, 3);	
+		}
+	}
+	
 
 	private CrossWay calculateCrossWay(StripePartConfiguration configuration, StripePartConfiguration configuration2) {
 		Point position = intersection(configuration.startXPositionInRoom, configuration.startYPositionInRoom,
@@ -156,26 +175,15 @@ public class Tron extends RenderingProgramm {
 
 	@Override
 	public BufferedImage renderLightObject(LightObject lightObject) {
-		
-		handleTokens();
-		for(Token current : tokens){
-			current.lifetime--;
+		for (int i = 0; i < this.speed; i++) {
+			handleTokens();
+			renderLanes(lightObject.getPixelMap());
 		}
-		
-		renderLanes(lightObject.getPixelMap());
-		
 		return lightObject.getPixelMap();
 	}
 
 
-	private void renderLanes(BufferedImage pixelMap) {
-		pixelMap = ImageUtil.getBlackImage(pixelMap);
-		Graphics g = pixelMap.getGraphics();
-		for(Token token : tokens){
-			g.setColor(Color.RED);
-			g.drawOval((int)token.xPosition-this.lightObjectXOffset, (int)token.yPosition-this.lightObjectYOffset, 3, 3);	
-		}
-	}
+	
 
 
 	private void handleTokens() {
@@ -190,41 +198,62 @@ public class Tron extends RenderingProgramm {
 
 		// create new Tokens to keep amount stable
 		for (int i = tokens.size(); tokens.size() < tokensAmount; i++) {
-			tokens.add(createNewToken());
+			//if speed is greater 1 we speed up the rendering cycles. so we get shure that never ever one pixel on the rendered image is missed out.
+			if(this.speed<1){
+				tokens.add(createNewToken(this.speed));
+			}else{
+				tokens.add(createNewToken(1));	
+			}
+			
 		}
 		
 		//now move Token
 		for(Token current : tokens){
 			moveToken(current);
 		}
-
+		
+		for(Token current : tokens){
+			current.lifetime--;
+		}
 	}
 
 
 	private void moveToken(Token token) {
 		// is a cross within one step reachable?
 		for (CrossWay possibleCrossWay : crossWays) {
-			if (possibleCrossWay.stripeParts.contains(token.myCurrentLane)) {
-				if (this.getDistance(token.xPosition, possibleCrossWay.xPosition, token.yPosition, possibleCrossWay.yPosition) <= token.velocity.distancePerStep) {
-					// do we want to take that cross?
-					if (Math.random() > 0.5) {
-						// yes case
-						if (handleTokenTakesCrossway(token, possibleCrossWay) == false) {
-							continue; // we wanted to take an new lane but there
-										// was not enough space on it. so it
-										// does not make sence
-						}
-						return;
-					} else {
-						// do nothing here there might be other crossways
-						// reachable to take.
-					}
+			if (possibleCrossWay.stripeParts.contains(token.myCurrentLane) == false) {
+				continue;
+			}
+			
+			if (this.getDistance(token.xPosition, possibleCrossWay.xPosition, token.yPosition, possibleCrossWay.yPosition) > token.velocity.distancePerStep) {
+				continue;
+			}
+			
+			// is that cross behind us? if yes continue. maybe we left it out in
+			// last step or took this cross already
+			if (isCrossWayBehindToken(token, possibleCrossWay)) {
+				continue;
+			}
+
+			//remember not to take that cross again in next step.
+			token.lasTakenCrossWays.add(possibleCrossWay);
+			
+			// do we want to take that cross?
+			if (Math.random() > 0.5) {
+				// yes case
+				if (handleTokenTakesCrossway(token, possibleCrossWay) == false) {
+					continue; // we wanted to take an new lane but there
+								// was not enough space on it. so it
+								// does not make sence
+				}else{
+					return;	
 				}
 			}
 		}
+		
+		token.lasTakenCrossWays.clear();
 		// if there where no crossways available or we did not chose to take
 		// one. just move on
-		
 		double velocityX = token.velocity.xVelocity;
 		double velocityY = token.velocity.yVelocity;
 		if(token.moveForward==false){
@@ -235,6 +264,17 @@ public class Tron extends RenderingProgramm {
 		token.yPosition=token.yPosition+velocityY;
 
 		token.velocity.distanceTakenInLane = token.velocity.distanceTakenInLane+token.velocity.distancePerStep;
+	}
+
+
+	private boolean isCrossWayBehindToken(Token token, CrossWay crossWay) {
+	
+		if(token.lasTakenCrossWays.contains(crossWay)){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 
@@ -268,6 +308,7 @@ public class Tron extends RenderingProgramm {
 		
 			//decide the prefered direction, forward or backward
 			boolean forward= Math.random() >0.5 ? true : false;
+			
 			if( forward&& forwardPossible == false){
 				forward = false;
 			}
@@ -282,7 +323,7 @@ public class Tron extends RenderingProgramm {
 			return false;
 		}
 		
-		//now move the token
+		//now move the token to a new random lane
 		int laneNumberChoosen = (int) (Math.random()*(lanesReadyToTake.size()-1));
 		StripePartConfiguration newLane =  (StripePartConfiguration) lanesReadyToTake.keySet().toArray()[laneNumberChoosen];
 		
@@ -291,11 +332,16 @@ public class Tron extends RenderingProgramm {
 		token.xPosition=crossWay.xPosition;
 		token.yPosition=crossWay.yPosition;
 		
-		token.velocity = token.getVelocityForToken(newLane, speed);
-		
-		double distanceLeftInPercent = 1-(distanceToCrossway/token.velocity.distancePerStep);
+		if(this.speed>=1){
+			token.velocity = token.getVelocityForToken(newLane, 1);
+		}
+		else{
+			token.velocity = token.getVelocityForToken(newLane, this.speed);
+		}
+		double distanceLeftInPercent = distanceToCrossway/token.velocity.distancePerStep;
 		double velocityX = token.velocity.xVelocity*distanceLeftInPercent;
 		double velocityY = token.velocity.yVelocity*distanceLeftInPercent;
+		
 		if(token.moveForward==false){
 			velocityX=-velocityX;
 			velocityY=-velocityY;
@@ -314,9 +360,8 @@ public class Tron extends RenderingProgramm {
 			startX = token.myCurrentLane.endXPositionInRoom;
 			startY = token.myCurrentLane.endYPositionInRoom;
 		}
-		double offsetInLane = token.velocity.distancePerStep-distanceToCrossway;
-		double distanceTakenInLane = this.getDistance(startX, crossWay.xPosition, startY, crossWay.yPosition)+offsetInLane;
-		token.velocity.distanceTakenInLane = distanceTakenInLane;
+
+		token.velocity.distanceTakenInLane = this.getDistance(startX, crossWay.xPosition, startY, crossWay.yPosition)+distanceToCrossway;
 		
 		return true;
 	}
@@ -328,11 +373,11 @@ public class Tron extends RenderingProgramm {
 	}
 
 
-	private Token createNewToken() {
+	private Token createNewToken(double speed) {
 		// get any lane
-		StripePartConfiguration randomStripePart = this.lanes.get((int) ((Math.random() * this.lanes.size())));
+		StripePartConfiguration randomStripePart = this.lanes.get((int) ((Math.random() * this.lanes.size()))).stripePart;
 		// get randomPosition on that StripePart
-		Token result = new Token(randomStripePart, this.speed);
+		Token result = new Token(randomStripePart, speed);
 
 		double maxDistaneInLane = Math.sqrt((randomStripePart.endXPositionInRoom - randomStripePart.startXPositionInRoom)
 				* (randomStripePart.endXPositionInRoom - randomStripePart.startXPositionInRoom)
@@ -349,9 +394,14 @@ public class Tron extends RenderingProgramm {
 			result.xPosition = randomStripePart.startXPositionInRoom + xOffset;
 			result.yPosition = randomStripePart.startYPositionInRoom + yOffset;
 		}
+		if(result.moveForward){
 		result.velocity.distanceTakenInLane = getDistance(randomStripePart.startXPositionInRoom, result.xPosition,
 				randomStripePart.startYPositionInRoom, result.yPosition);
-
+		}
+		else{
+			result.velocity.distanceTakenInLane = getDistance(randomStripePart.endXPositionInRoom, result.xPosition,
+					randomStripePart.endYPositionInRoom, result.yPosition);
+		}
 		return result;
 	}
 
