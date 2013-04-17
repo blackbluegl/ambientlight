@@ -77,15 +77,16 @@ void SwitchHandler::sendPowerCode(int code) {
 	}
 }
 
+
 void SwitchHandler::sendHouseCode(int housecode) {
 	char houseCodeBitMask = housecode;
 	//the housecode is only 5 bits long. so we ignore the first 3.
 	for (int i = 4; i >=0 ; i--) {
-		//test the current bit if it is set or not
+		//test the current bit if it is set or not. remark: if a dip switch is set to on it represents 0 state.
 		if (houseCodeBitMask & (1 << (i))) {
-			sendF();
-		} else {
 			send0();
+		} else {
+			sendF();
 		}
 	}
 }
