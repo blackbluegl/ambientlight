@@ -15,6 +15,6 @@ public class TestRFMOEDevice {
 		config.port=2003;
 		device.setConfiguration(config);
 		
-			device.writeData("ELRO",0,4,true);
+			device.writeData("ELRO",15,1,true);
 	}
 }
