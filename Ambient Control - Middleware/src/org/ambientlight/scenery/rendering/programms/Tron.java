@@ -14,22 +14,39 @@ import org.ambientlight.AmbientControlMW;
 import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.scenery.entities.LightObject;
 import org.ambientlight.scenery.entities.StripePart;
-import org.ambientlight.scenery.rendering.util.ImageUtil;
 import org.ambientlight.scenery.rendering.util.StripeUtil;
 
 
 public class Tron extends RenderingProgramm {
 
-	int r=150;
-	int g=150;
-	int b=150;
+	//TODO these values should be customizeable by user
+	int r=20;
+	int g=20;
+	int b=70;
 	
-	int lightImpact=40;
-	int fadeOutRate =5;
+	double lightImpact=0.9;
+	double tailLength =0.4;
+	
+	double sparkleStrength = 0.2;
+	double sparkleSize = 0.1;
 	
 	double speed = 1;
 	int tokensAmount = 3;
 
+
+	
+	
+	
+	
+	Map<Point, PixelColorMapping> pixelMapping = new HashMap<Point, PixelColorMapping>();
+	
+	private class PixelColorMapping{
+		int r;
+		int g;
+		int b;
+		int lifetime;
+	}
+		
 	int lightObjectXOffset=0;
 	int lightObjectYOffset=0;
 	
@@ -151,14 +168,84 @@ public class Tron extends RenderingProgramm {
 	}
 
 	private void renderLanes(BufferedImage pixelMap) {
-		pixelMap = ImageUtil.getBlackImage(pixelMap);
-		Graphics g = pixelMap.getGraphics();
+		
+		int lightImpactAbsolut = (int) ((255)*this.lightImpact);
+		
+		int lengthOfTailInPixel = (int) (this.tailLength*(pixelMap.getWidth()+pixelMap.getHeight()));
+	
 		for(Token token : tokens){
-			g.setColor(Color.RED);
-			g.drawOval((int)token.xPosition-this.lightObjectXOffset, (int)token.yPosition-this.lightObjectYOffset, 3, 3);	
+			Point point = new Point((int)token.xPosition,(int)token.yPosition);
+			PixelColorMapping pc =  new PixelColorMapping();
+				pc.lifetime=lengthOfTailInPixel;
+				pc.r=lightImpactAbsolut;
+				pc.g=lightImpactAbsolut;
+				pc.b=lightImpactAbsolut;
+				this.pixelMapping.put(point, pc);
 		}
+
+		//kill pixels which have no lifetime anymore left
+		List<Point> removePixels = new ArrayList<Point>();
+		for(Point p : pixelMapping.keySet()){
+			if(pixelMapping.get(p).lifetime==0){
+				removePixels.add(p);
+			}
+		}
+		for(Point p : removePixels){
+			pixelMapping.remove(p);
+		}
+		
+		// draw the pixels on background
+		for (Point p : this.pixelMapping.keySet()) {
+			PixelColorMapping pc = this.pixelMapping.get(p);
+			
+			double sparkleLength= this.sparkleSize*(lengthOfTailInPixel);
+			
+			double sparcle = this.sparkleStrength*Math.random();
+			if(Math.random()>0.5){
+				sparcle = -sparcle;
+			}
+
+			
+			pc.r = this.getColorValue(this.r+lightImpactAbsolut, this.r, pc.lifetime, sparkleLength,lengthOfTailInPixel,sparcle);
+			pc.g = this.getColorValue(this.g+lightImpactAbsolut, this.g, pc.lifetime, sparkleLength,lengthOfTailInPixel,sparcle);
+			pc.b = this.getColorValue(this.b+lightImpactAbsolut, this.b, pc.lifetime, sparkleLength,lengthOfTailInPixel,sparcle );
+
+			
+			if(speed >1 && pc.lifetime % (int)this.speed == 0){
+				drawOnPixelMap(pixelMap, p, pc);	
+			}
+			pc.lifetime--;
+		}		
+	}
+
+	private void drawOnPixelMap(BufferedImage pixelMap, Point p, PixelColorMapping pc) {
+		Graphics g = pixelMap.getGraphics();
+		Color drawColor = new Color(pc.r, pc.g, pc.b);
+		g.setColor(drawColor);
+		g.fillRect((int) p.x - this.lightObjectXOffset, (int) p.y - this.lightObjectYOffset, 2, 2);
 	}
 	
+
+	private int getColorValue(int lightPointColor, int backgroundColor, int lifetime, double sparkleSize, int lengthOfTailInPixel, double sparcle) {
+		int colorValue = 0;
+		if(lifetime>=lengthOfTailInPixel-sparkleSize){
+			double lightDifference = lightPointColor+(lightPointColor*sparcle);
+			colorValue = (int) lightDifference;
+		}
+		else{
+		double impactCoefficent = (double)lifetime/lengthOfTailInPixel;
+		//TODO use negative part of e function. dont forget to use fadeoutrate. or remove it!
+		colorValue = backgroundColor+(int)(impactCoefficent*lightPointColor);
+		colorValue = (int) ((int) colorValue+(colorValue*sparcle));
+		}
+		if(colorValue>255){
+			colorValue = 255;
+		}
+		if(colorValue<0){
+			colorValue=0;
+		}
+		return colorValue;
+	}
 
 	private CrossWay calculateCrossWay(StripePartConfiguration configuration, StripePartConfiguration configuration2) {
 		Point position = intersection(configuration.startXPositionInRoom, configuration.startYPositionInRoom,

@@ -1,5 +1,6 @@
 package org.ambientlight.scenery.rendering;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class Renderer {
 
 		BufferedImage roomCanvas = room.getRoomBitMap();
 		// reset color of background to black
-		roomCanvas = ImageUtil.getBlackImage(roomCanvas);
+		roomCanvas = ImageUtil.getPaintedImage(roomCanvas,Color.black);
 	}
 
 
@@ -81,7 +82,7 @@ public class Renderer {
 	private void mergeLightObjectsToRoomCanvas() {
 		BufferedImage roomCanvas = room.getRoomBitMap();
 		// reset color of background to black
-		roomCanvas = ImageUtil.getBlackImage(roomCanvas);
+		roomCanvas = ImageUtil.getPaintedImage(roomCanvas,Color.black);
 
 		// boolean imageReseted = false;
 
