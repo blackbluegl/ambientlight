@@ -40,6 +40,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+
 public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 	public static final String BUNDLE_HOST_LIST = "hosts";
@@ -86,9 +87,10 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		masterButton.setTag("masterButton");
 		updateMasterSwitchState();
 		masterButton.setOnClickListener(new OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
-				for (String currentServerName : roomServers) {					
+				for (String currentServerName : roomServers) {
 					try {
 						RestClient.setPowerStateForRoom(currentServerName, false);
 					} catch (Exception e) {
@@ -101,71 +103,74 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 				updateMasterSwitchState();
 			}
 		});
-		
+
 		return myHomeView;
 	}
 
-	
-	private View initRoomView(LayoutInflater inflater, final String serverName,  boolean isCurrentRoomServerSelected) throws InterruptedException, ExecutionException {
-		
+
+	private View initRoomView(LayoutInflater inflater, final String serverName, boolean isCurrentRoomServerSelected)
+			throws InterruptedException, ExecutionException {
+
 		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 
-		//for the scenery save dialog to auto fill the current scenery name on startup
+		// for the scenery save dialog to auto fill the current scenery name on
+		// startup
 		((MainActivity) getActivity()).setSelectedScenario(roomConfig.currentScenery);
-		
-		//create the room container
+
+		// create the room container
 		final View roomContainerView = (View) inflater.inflate(R.layout.layout_room_item, null);
-		
+
 		TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
 		roomContent.setTag("roomContent" + serverName);
 
 		TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
 		roomLabel.setText(roomConfig.roomName);
-		roomLabel.setTag(serverName+"roomLabel");
-		if(isCurrentRoomServerSelected){
+		roomLabel.setTag(serverName + "roomLabel");
+		if (isCurrentRoomServerSelected) {
 			roomLabel.setTextAppearance(this.getActivity(), R.style.boldRoomLabel);
-		}else{
+		} else {
 			roomLabel.setTextAppearance(this.getActivity(), R.style.normalRoomLabel);
 		}
-		
+
 		// a click on any element in the room informs the sceneryChooser to load
 		// the corresponding scenery list for that room
 		roomContainerView.setOnClickListener(new OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
-				//first set all roomlabels inactive
-				for(String currentRoomServer : roomServers){
+				// first set all roomlabels inactive
+				for (String currentRoomServer : roomServers) {
 					setRoomLabelSelected(currentRoomServer, false);
 				}
 
-				//activate current roomlabel
+				// activate current roomlabel
 				setRoomLabelSelected(serverName, true);
 				if (serverName.equals(((MainActivity) getActivity()).getSelectedRoomServer()) == false) {
 					((MainActivity) getActivity()).updateSceneriesForSelectedRoomServer(serverName);
 				}
 			}
-		});		
-		
+		});
+
 		TextView sceneryLabel = (TextView) roomContainerView.findViewById(R.id.textViewSceneryName);
 		sceneryLabel.setText(roomConfig.currentScenery);
-		sceneryLabel.setTag(serverName+"sceneryLabel");
-		
-		//init dynamically the clickable light object icons
+		sceneryLabel.setTag(serverName + "sceneryLabel");
+
+		// init dynamically the clickable light object icons
 		int amountPerRow = getLightObjectAmountPerRow();
-		
+
 		TableRow row = new TableRow(roomContent.getContext());
 		row.setGravity(Gravity.CENTER);
 		roomContent.addView(row);
 
 		for (int i = 0; i < roomConfig.roomItemConfigurations.size(); i++) {
-			
-			//create a new row if last one is full
+
+			// create a new row if last one is full
 			if (i % amountPerRow == 0) {
 				row = new TableRow(roomContent.getContext());
 				row.setGravity(Gravity.CENTER);
 				roomContent.addView(row);
 			}
-			
+
 			View lightObject = (View) inflater.inflate(R.layout.layout_room_lightobject, null);
 			RoomItemConfiguration currentRoomItemConfiguration = roomConfig.roomItemConfigurations.get(i);
 			initRoomItemIconView(serverName, roomConfig.currentScenery, currentRoomItemConfiguration, lightObject);
@@ -192,58 +197,61 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 					e.printStackTrace();
 				}
 
-				//set all roomlabels inactive
-				for(String currentRoomServer : roomServers){
+				// set all roomlabels inactive
+				for (String currentRoomServer : roomServers) {
 					setRoomLabelSelected(currentRoomServer, false);
 				}
 
-				//activate current roomlabel
+				// activate current roomlabel
 				setRoomLabelSelected(serverName, true);
 				if (serverName.equals(((MainActivity) getActivity()).getSelectedRoomServer()) == false) {
 					((MainActivity) getActivity()).updateSceneriesForSelectedRoomServer(serverName);
 				}
-				
+
 				updateRoomPowerSwitchState(serverName);
 				updateRoomBackground(serverName);
 				updateMasterSwitchState();
 			}
 		});
-		
+
 		return roomContainerView;
 	}
 
-	
-	private void initRoomItemIconView(final String serverName, String sceneryName, final RoomItemConfiguration currentConfig, View lightObjectView) {
 
-		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon
-				(serverName,sceneryName, currentConfig, lightObjectView);
-		
+	private void initRoomItemIconView(final String serverName, String sceneryName, final RoomItemConfiguration currentConfig,
+			View lightObjectView) {
+
+		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon(serverName, sceneryName,
+				currentConfig, lightObjectView);
+
 		this.configuredlightObjects.add(roomItemMapper);
-		
-		ImageViewWithContextMenuInfo icon = (ImageViewWithContextMenuInfo) lightObjectView.findViewById(R.id.imageViewLightObject);
+
+		ImageViewWithContextMenuInfo icon = (ImageViewWithContextMenuInfo) lightObjectView
+				.findViewById(R.id.imageViewLightObject);
 		icon.setTag(roomItemMapper);
 		registerForContextMenu(icon);
 
-		//a click on an icon toggles the powerstate on the server
+		// a click on an icon toggles the powerstate on the server
 		icon.setOnClickListener(new OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
 				try {
-					RestClient.setPowerStateForRoomItem(roomItemMapper.getServerName(),
-							roomItemMapper.getItemName(), !roomItemMapper.getPowerState());
+					RestClient.setPowerStateForRoomItem(roomItemMapper.getServerName(), roomItemMapper.getItemName(),
+							!roomItemMapper.getPowerState());
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
-					
-					//set all roomlabels inactive
-					for(String currentRoomServer : roomServers){
+
+					// set all roomlabels inactive
+					for (String currentRoomServer : roomServers) {
 						setRoomLabelSelected(currentRoomServer, false);
 					}
 
-					//activate current roomlabel
+					// activate current roomlabel
 					setRoomLabelSelected(serverName, true);
 					if (serverName.equals(((MainActivity) getActivity()).getSelectedRoomServer()) == false) {
 						((MainActivity) getActivity()).updateSceneriesForSelectedRoomServer(serverName);
 					}
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -256,28 +264,28 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	}
 
 
-	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final String serverName,  String sceneryName,
+	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final String serverName, String sceneryName,
 			final RoomItemConfiguration currentConfig, View lightObjectView) {
 		AbstractRoomItemViewMapper result = null;
 
 		SceneryConfiguration sceneryConfig = currentConfig.getSceneryConfigurationBySceneryName(sceneryName);
-		
-		if ( sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
+
+		if (sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
 			result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.name, serverName,
 					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
-		
-		if( sceneryConfig instanceof SwitchingConfiguration){
-			result = new SwitchItemViewMapper(lightObjectView, currentConfig.name, serverName,
-					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
+
+		if (sceneryConfig instanceof SwitchingConfiguration) {
+			result = new SwitchItemViewMapper(lightObjectView, currentConfig.name, serverName, sceneryConfig.powerState,
+					sceneryConfig.bypassOnSceneryChange);
 		}
-		
+
 		result.setBypassSceneryChangeState(sceneryConfig.bypassOnSceneryChange);
-		
+
 		return result;
 	}
 
-	
+
 	private int getLightObjectAmountPerRow() {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -292,9 +300,12 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	}
 
 
-	
-	/* (non-Javadoc)
-	 * @see org.ambient.control.home.HomeRefreshCallback#refreshRoomContent(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.home.HomeRefreshCallback#refreshRoomContent(java.
+	 * lang.String)
 	 */
 	@Override
 	public void refreshRoomContent(String roomServerName) throws InterruptedException, ExecutionException {
@@ -310,49 +321,54 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		this.configuredlightObjects.removeAll(removeMappers);
 
 		RoomConfiguration roomConfiguration = RestClient.getRoom(roomServerName);
-		
-		//for the scenery save dialog to auto fill the current scenery name on scenery change
+
+		// for the scenery save dialog to auto fill the current scenery name on
+		// scenery change
 		((MainActivity) getActivity()).setSelectedScenario(roomConfiguration.currentScenery);
 
 		for (AbstractRoomItemViewMapper currentToRefresh : removeMappers) {
-			RoomItemConfiguration currentConfig = roomConfiguration.getRoomItemConfigurationByName(currentToRefresh.getItemName());
-			this.initRoomItemIconView(roomServerName, roomConfiguration.currentScenery, currentConfig, currentToRefresh.getLightObjectView());
+			RoomItemConfiguration currentConfig = roomConfiguration
+					.getRoomItemConfigurationByName(currentToRefresh.getItemName());
+			this.initRoomItemIconView(roomServerName, roomConfiguration.currentScenery, currentConfig,
+					currentToRefresh.getLightObjectView());
 		}
 
 		updateRoomPowerSwitchState(roomServerName);
 		updateRoomBackground(roomServerName);
 		updateMasterSwitchState();
-		
-		TextView sceneryLabel = (TextView) this.myHomeView.findViewWithTag(roomServerName+"sceneryLabel");
+
+		TextView sceneryLabel = (TextView) this.myHomeView.findViewWithTag(roomServerName + "sceneryLabel");
 		sceneryLabel.setText(roomConfiguration.currentScenery);
 	}
-	
+
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
-		inflater.inflate(R.menu.layout_room_item, menu);		
+		inflater.inflate(R.menu.layout_room_item, menu);
 	}
+
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		
-		ImageViewWithContextMenuInfo.ImageViewContextMenuInfo menuInfo = (ImageViewWithContextMenuInfo.ImageViewContextMenuInfo) item.getMenuInfo();  
-	    ImageViewWithContextMenuInfo img = (ImageViewWithContextMenuInfo) menuInfo.targetView;  
+
+		ImageViewWithContextMenuInfo.ImageViewContextMenuInfo menuInfo = (ImageViewWithContextMenuInfo.ImageViewContextMenuInfo) item
+				.getMenuInfo();
+		ImageViewWithContextMenuInfo img = (ImageViewWithContextMenuInfo) menuInfo.targetView;
 		AbstractRoomItemViewMapper mapper = (AbstractRoomItemViewMapper) img.getTag();
-		
+
 		String roomServer = mapper.getServerName();
 		String lightObjectName = mapper.getItemName();
 		String scenery = ((MainActivity) getActivity()).getSelectedScenario();
 		switch (item.getItemId()) {
-		
+
 		case R.id.lightobject_context_bypass:
 			try {
 				RoomConfiguration rc = RestClient.getRoom(roomServer);
 				RoomItemConfiguration roomItem = rc.getRoomItemConfigurationByName(lightObjectName);
 				SceneryConfiguration sc = roomItem.getSceneryConfigurationBySceneryName(scenery);
-				sc.bypassOnSceneryChange=!sc.bypassOnSceneryChange;
+				sc.bypassOnSceneryChange = !sc.bypassOnSceneryChange;
 				RestClient.setProgramForLightObject(roomServer, scenery, lightObjectName, sc);
 				mapper.setBypassSceneryChangeState(sc.bypassOnSceneryChange);
 			} catch (Exception e) {
@@ -360,24 +376,24 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 				e.printStackTrace();
 			}
 			return true;
-		
+
 		case R.id.lightobject_context_edit:
-//			Intent i = new Intent(getActivity(), ProgramEditorActivity.class);
-//			i.putExtra("roomServer", roomServer);
-//			i.putExtra("lightObject", lightObjectName);
-//			i.putExtra("scenery",scenery);
-//			startActivity(i);
-			
-			
+			// Intent i = new Intent(getActivity(),
+			// ProgramEditorActivity.class);
+			// i.putExtra("roomServer", roomServer);
+			// i.putExtra("lightObject", lightObjectName);
+			// i.putExtra("scenery",scenery);
+			// startActivity(i);
+
 			FragmentManager fm = getActivity().getSupportFragmentManager();
 			SimpleColorEditDialog newSceneriesDialog = new SimpleColorEditDialog();
 			Bundle args = new Bundle();
 			args.putString("roomServer", roomServer);
 			args.putString("lightObject", lightObjectName);
-			args.putString("scenery",scenery);
+			args.putString("scenery", scenery);
 			newSceneriesDialog.setArguments(args);
 			newSceneriesDialog.show(fm, "new Scenery Title");
-			
+
 			return true;
 		case R.id.lightobject_context_new:
 
@@ -390,6 +406,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			return super.onContextItemSelected(item);
 		}
 	}
+
 
 	private void updateMasterSwitchState() {
 
@@ -404,10 +421,12 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		masterSwitch.setImageResource(R.drawable.ic_power_disabled);
 	}
 
+
 	private void updateRoomPowerSwitchState(String serverName) {
 		Switch powerStateSwitch = (Switch) this.myHomeView.findViewWithTag("powerStateSwitch" + serverName);
 		powerStateSwitch.setChecked(this.getPowerStateForAllLightObjectsInRoom(serverName));
 	}
+
 
 	private void updateRoomBackground(String serverName) {
 		Switch powerStateSwitch = (Switch) this.myHomeView.findViewWithTag("powerStateSwitch" + serverName);
@@ -429,6 +448,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		}
 	}
 
+
 	private void setPowerStateForAllLightObjectsInRoom(boolean isActive, String serverName) {
 		for (AbstractRoomItemViewMapper current : this.configuredlightObjects) {
 			if (current.getServerName().equals(serverName)) {
@@ -436,6 +456,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			}
 		}
 	}
+
 
 	private boolean getPowerStateForAllLightObjectsInRoom(String serverName) {
 		for (AbstractRoomItemViewMapper current : this.configuredlightObjects) {
@@ -445,13 +466,14 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		}
 		return false;
 	}
-	
+
+
 	private void setRoomLabelSelected(String serverName, boolean selected) {
-		TextView roomLabel = (TextView)this.myHomeView.findViewWithTag(serverName+"roomLabel");
-		
-		if(selected){
+		TextView roomLabel = (TextView) this.myHomeView.findViewWithTag(serverName + "roomLabel");
+
+		if (selected) {
 			roomLabel.setTextAppearance(this.getActivity(), R.style.boldRoomLabel);
-		}else{
+		} else {
 			roomLabel.setTextAppearance(this.getActivity(), R.style.normalRoomLabel);
 		}
 	}
