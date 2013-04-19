@@ -113,8 +113,8 @@ public class RenderingProgrammFactory implements
 			LightObject lightObject) {
 		if (this.queueDeleteLightObjects.contains(lightObject)) {
 			renderer.removeRenderTaskForLightObject(lightObject);
-			lightObject.setPixelMap(ImageUtil.getBlackImage(lightObject
-					.getPixelMap()));
+			lightObject.setPixelMap(ImageUtil.getPaintedImage(lightObject
+					.getPixelMap(),Color.black));
 			this.queueDeleteLightObjects.remove(lightObject);
 		}
 	}

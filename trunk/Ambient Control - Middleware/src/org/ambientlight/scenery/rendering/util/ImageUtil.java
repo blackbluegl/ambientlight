@@ -19,8 +19,7 @@ public class ImageUtil {
 		}
 
 	
-	public static BufferedImage getBlackImage(BufferedImage input){
-		Color color = Color.black;
+	public static BufferedImage getPaintedImage(BufferedImage input, Color color){
 		Graphics2D    graphics = input.createGraphics();
 		graphics.setPaint (color);
 		graphics.fillRect ( 0, 0, input.getWidth(), input.getHeight() );
