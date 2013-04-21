@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:id="@+id/layoutSimpleColorEdit">
+
+    <ScrollView
+        android:id="@+id/scrollVoewSimpleColorEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <de.devmil.common.ui.color.ColorSelectorView
+                android:id="@+id/colorSelectorView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="-2dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="2dp"
+                android:gravity="center_vertical|center_horizontal|center" >
+
+            </de.devmil.common.ui.color.ColorSelectorView>
+
+            <Button
+                android:id="@+id/buttonProgramEditorApply"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/button_apply" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
