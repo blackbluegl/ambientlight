@@ -12,121 +12,128 @@ import org.ambientlight.scenery.entities.RoomConfigurationFactory;
 import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 
+
 public class CreateTronTestConfig {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		DeviceDriverFactory df = new DeviceDriverFactory();
 		CreateTronTestConfig test = new CreateTronTestConfig();
 
-		RoomConfigurationFactory.saveRoomConfiguration(test.getTestRoom(),"backup");
+		RoomConfigurationFactory.saveRoomConfiguration(test.getTestRoom(), "backup");
 	}
 
-	public RoomConfiguration getTestRoom(){
+
+	public RoomConfiguration getTestRoom() {
 		RoomConfiguration rc = new RoomConfiguration();
-		
+
 		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
 		rc.deviceConfigurations.add(dc);
-		
+
 		StripeConfiguration sc = new StripeConfiguration();
-		sc.pixelAmount=128;
-		sc.port=0;
-	
+		sc.pixelAmount = 128;
+		sc.port = 0;
+
 		StripePartConfiguration spLo1S1 = new StripePartConfiguration();
-		spLo1S1.endXPositionInRoom=240;
-		spLo1S1.endYPositionInRoom=5;
-		spLo1S1.offsetInStripe=0;
-		spLo1S1.pixelAmount=20;
-		spLo1S1.startXPositionInRoom=5;
-		spLo1S1.startYPositionInRoom=5;
+		spLo1S1.endXPositionInRoom = 240;
+		spLo1S1.endYPositionInRoom = 5;
+		spLo1S1.offsetInStripe = 0;
+		spLo1S1.pixelAmount = 20;
+		spLo1S1.startXPositionInRoom = 5;
+		spLo1S1.startYPositionInRoom = 5;
 		sc.stripeParts.add(spLo1S1);
-		
+
 		StripePartConfiguration spLo1S2 = new StripePartConfiguration();
-		spLo1S2.startXPositionInRoom=240;
-		spLo1S2.startYPositionInRoom=5;
-		spLo1S2.endXPositionInRoom=240;
-		spLo1S2.endYPositionInRoom=240;
-		spLo1S2.offsetInStripe=20;
-		spLo1S2.pixelAmount=20;
+		spLo1S2.startXPositionInRoom = 240;
+		spLo1S2.startYPositionInRoom = 5;
+		spLo1S2.endXPositionInRoom = 240;
+		spLo1S2.endYPositionInRoom = 240;
+		spLo1S2.offsetInStripe = 20;
+		spLo1S2.pixelAmount = 20;
 		sc.stripeParts.add(spLo1S2);
-		
+
 		StripePartConfiguration spLo1S3 = new StripePartConfiguration();
-		spLo1S3.startXPositionInRoom=240;
-		spLo1S3.startYPositionInRoom=240;
-		spLo1S3.endXPositionInRoom=5;
-		spLo1S3.endYPositionInRoom=240;
-		spLo1S3.offsetInStripe=40;
-		spLo1S3.pixelAmount=20;		
+		spLo1S3.startXPositionInRoom = 240;
+		spLo1S3.startYPositionInRoom = 240;
+		spLo1S3.endXPositionInRoom = 5;
+		spLo1S3.endYPositionInRoom = 240;
+		spLo1S3.offsetInStripe = 40;
+		spLo1S3.pixelAmount = 20;
 		sc.stripeParts.add(spLo1S3);
 
 		StripePartConfiguration spLo1S4 = new StripePartConfiguration();
-		spLo1S4.startXPositionInRoom=5;
-		spLo1S4.startYPositionInRoom=240;
-		spLo1S4.endXPositionInRoom=5;
-		spLo1S4.endYPositionInRoom=5;
-		spLo1S4.offsetInStripe=60;
-		spLo1S4.pixelAmount=20;
+		spLo1S4.startXPositionInRoom = 5;
+		spLo1S4.startYPositionInRoom = 240;
+		spLo1S4.endXPositionInRoom = 5;
+		spLo1S4.endYPositionInRoom = 5;
+		spLo1S4.offsetInStripe = 60;
+		spLo1S4.pixelAmount = 20;
 		sc.stripeParts.add(spLo1S4);
-		
+
 		StripePartConfiguration spLo1S5 = new StripePartConfiguration();
-		spLo1S5.startXPositionInRoom=6;
-		spLo1S5.startYPositionInRoom=120;
-		spLo1S5.endXPositionInRoom=240;
-		spLo1S5.endYPositionInRoom=120;
-		spLo1S5.offsetInStripe=80;
-		spLo1S5.pixelAmount=20;
+		spLo1S5.startXPositionInRoom = 6;
+		spLo1S5.startYPositionInRoom = 120;
+		spLo1S5.endXPositionInRoom = 240;
+		spLo1S5.endYPositionInRoom = 120;
+		spLo1S5.offsetInStripe = 80;
+		spLo1S5.pixelAmount = 20;
 		sc.stripeParts.add(spLo1S5);
-		
+
 		dc.configuredStripes.add(sc);
-		
+
 		LightObjectConfiguration background = new LightObjectConfiguration();
-		background.name="background";
+		background.name = "background";
 		LightObjectConfiguration lo = new LightObjectConfiguration();
-		lo.name="Schrank";
-				
+		lo.name = "Schrank";
+
 		this.createSceneryMapping(rc, lo);
-		lo.height=250;
-		lo.layerNumber=2;
-		lo.width=250;
-		lo.xOffsetInRoom=5;
-		lo.yOffsetInRoom=5;
-		
+		lo.height = 250;
+		lo.layerNumber = 2;
+		lo.width = 250;
+		lo.xOffsetInRoom = 5;
+		lo.yOffsetInRoom = 5;
+
 		SimpleColorRenderingProgramConfiguration simpleColor = new SimpleColorRenderingProgramConfiguration();
-		simpleColor.powerState=true;
+		simpleColor.powerState = true;
 		simpleColor.setB(20);
 		simpleColor.setR(20);
 		simpleColor.setG(20);
 		background.sceneryConfigurationBySzeneryName.put("scene1", simpleColor);
-		background.height=200;
-		background.layerNumber=1;
-		background.width=200;
-		background.xOffsetInRoom=2;
-		background.yOffsetInRoom=2;
-		
-		
+		background.height = 200;
+		background.layerNumber = 1;
+		background.width = 200;
+		background.xOffsetInRoom = 2;
+		background.yOffsetInRoom = 2;
+
 		rc.roomItemConfigurations.add(lo);
 		rc.roomItemConfigurations.add(background);
-		
-		
-		rc.height=400;
-		rc.width=400;
-		rc.roomName="testRoom";
-		rc.currentScenery="scene1";
+
+		rc.height = 400;
+		rc.width = 400;
+		rc.roomName = "testRoom";
+		rc.currentScenery = "scene1";
 
 		return rc;
 	}
-	
-	private void createSceneryMapping(RoomConfiguration rc, LightObjectConfiguration lc){
-		
-		TronRenderingProgrammConfiguration scL01 = new TronRenderingProgrammConfiguration();
-		scL01.setLightPointAmount(1);
-		scL01.setSpeed(1);
-		scL01.powerState=true;		
-		lc.sceneryConfigurationBySzeneryName.put("scene1", scL01);
+
+
+	private void createSceneryMapping(RoomConfiguration rc, LightObjectConfiguration lc) {
+
+		TronRenderingProgrammConfiguration config = new TronRenderingProgrammConfiguration();
+		config.setLightPointAmount(1);
+		config.setSpeed(1);
+		config.powerState = true;
+		config.setR(20);
+		config.setG(20);
+		config.setB(60);
+		config.setLightImpact(0.8);
+		config.setSparkleSize(0.1);
+		config.setSparkleStrength(0.3);
+		config.setTailLength(0.2);
+		lc.sceneryConfigurationBySzeneryName.put("scene1", config);
 	}
-	
-		
+
 }
