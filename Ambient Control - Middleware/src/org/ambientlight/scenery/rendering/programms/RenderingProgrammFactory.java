@@ -48,9 +48,11 @@ public class RenderingProgrammFactory implements
 		
 		// create Tron
 		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery) instanceof TronRenderingProgrammConfiguration) {
-			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject
-					.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery);
-			renderProgram = new Tron(lightObject,config.getSpeed(),config.getLightPointAmount());
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.getConfiguration()
+					.getSceneryConfigurationBySceneryName(currentScenery);
+			Color color = new Color(config.getR(), config.getG(), config.getB());
+			renderProgram = new Tron(lightObject, color, config.getLightImpact(), config.getTailLength(),
+					config.getSparkleSize(), config.getSparkleSize(), config.getSpeed(), config.getLightPointAmount());
 		}
 		
 		
