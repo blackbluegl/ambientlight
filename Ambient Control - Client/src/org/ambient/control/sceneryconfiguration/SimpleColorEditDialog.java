@@ -42,7 +42,7 @@ public class SimpleColorEditDialog extends DialogFragment {
 			color = Color.rgb(config.getR(), config.getG(), config.getB());
 			oldColor = Color.rgb(config.getR(), config.getG(), config.getB());
 
-			LinearLayout contentView = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.activity_program_editor,
+			LinearLayout contentView = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.activity_program_simplecolor,
 					null);
 
 			builder.setView(contentView);

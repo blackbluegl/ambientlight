@@ -9,18 +9,22 @@ import org.ambient.control.R;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
+import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.control.rest.RestClient;
 import org.ambient.control.sceneryconfiguration.ProgramChooserActivity;
 import org.ambient.control.sceneryconfiguration.SimpleColorEditDialog;
+import org.ambient.control.sceneryconfiguration.TronEditDialog;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
 import org.ambientlight.scenery.SceneryConfiguration;
 import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
@@ -275,6 +279,11 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
 
+		if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
+			result = new  TronLightItemViewMapper(lightObjectView, currentConfig.name, serverName,
+					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
+		}
+		
 		if (sceneryConfig instanceof SwitchingConfiguration) {
 			result = new SwitchItemViewMapper(lightObjectView, currentConfig.name, serverName, sceneryConfig.powerState,
 					sceneryConfig.bypassOnSceneryChange);
@@ -378,22 +387,22 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			return true;
 
 		case R.id.lightobject_context_edit:
-			// Intent i = new Intent(getActivity(),
-			// ProgramEditorActivity.class);
-			// i.putExtra("roomServer", roomServer);
-			// i.putExtra("lightObject", lightObjectName);
-			// i.putExtra("scenery",scenery);
-			// startActivity(i);
 
 			FragmentManager fm = getActivity().getSupportFragmentManager();
-			SimpleColorEditDialog newSceneriesDialog = new SimpleColorEditDialog();
+			DialogFragment dialog = null;
+			if(mapper instanceof SimpleColorLightItemViewMapper){
+				dialog = new SimpleColorEditDialog();
+			}
+			if(mapper instanceof TronLightItemViewMapper){
+				dialog = new TronEditDialog();
+			}
+			
 			Bundle args = new Bundle();
 			args.putString("roomServer", roomServer);
 			args.putString("lightObject", lightObjectName);
 			args.putString("scenery", scenery);
-			newSceneriesDialog.setArguments(args);
-			newSceneriesDialog.show(fm, "new Scenery Title");
-
+			dialog.setArguments(args);
+			dialog.show(fm, "new Scenery Title");
 			return true;
 		case R.id.lightobject_context_new:
 
