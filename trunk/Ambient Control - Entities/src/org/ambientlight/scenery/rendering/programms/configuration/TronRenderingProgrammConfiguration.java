@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("TronRenderingProgram")
-public class TronRenderingProgrammConfiguration extends SceneryConfiguration {
+public class TronRenderingProgrammConfiguration extends SceneryConfiguration implements Cloneable{
 
 	int r;
 	int g;
@@ -106,5 +106,15 @@ public class TronRenderingProgrammConfiguration extends SceneryConfiguration {
 
 	public void setSpeed(double speed) {
 		this.speed = speed;
+	}
+	
+	public TronRenderingProgrammConfiguration clone(){
+		try {
+			return (TronRenderingProgrammConfiguration) super.clone();
+		} catch (CloneNotSupportedException e) {
+			//this should not happen
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

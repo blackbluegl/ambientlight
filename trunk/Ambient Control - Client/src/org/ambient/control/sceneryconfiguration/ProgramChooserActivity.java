@@ -42,7 +42,8 @@ public class ProgramChooserActivity extends Activity {
         final Resources res = getResources();
         final Map<String,Integer> valuesMap = new HashMap<String,Integer>();
         valuesMap.put(res.getString(R.string.program_simple_color), R.string.program_simple_color);
-
+        valuesMap.put(res.getString(R.string.program_tron), R.string.program_tron);
+        
         ListIconArrayAdapter adapter = new ListIconArrayAdapter(this, valuesMap.keySet().toArray(new String[0]));
         listView.setAdapter(adapter);
         final ProgramChooserActivity myself = this;
