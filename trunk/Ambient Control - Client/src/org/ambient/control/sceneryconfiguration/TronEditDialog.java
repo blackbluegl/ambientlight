@@ -1,9 +1,12 @@
 package org.ambient.control.sceneryconfiguration;
 
+import java.util.concurrent.ExecutionException;
+
 import org.ambient.control.R;
 import org.ambient.control.rest.RestClient;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
+import org.ambientlight.scenery.SceneryConfiguration;
 import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 
 import android.app.AlertDialog;
@@ -20,12 +23,18 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import de.devmil.common.ui.color.ColorSelectorView;
+import de.devmil.common.ui.color.ColorSelectorView.OnColorChangedListener;
 
 
 public class TronEditDialog extends DialogFragment {
 
 	AlertDialog dialog;
 	
+	String scenery;
+	String lightObject;
+	String roomServer;
+	SceneryConfiguration config;
+	SceneryConfiguration oldConfig;
 
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +44,7 @@ public class TronEditDialog extends DialogFragment {
 			return null;	
 		}
 		else{
+			this.extractFromBundle(savedInstanceState);
 			return this.getView(inflater, container, savedInstanceState);
 		}
 	}
@@ -42,16 +52,18 @@ public class TronEditDialog extends DialogFragment {
 	
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        
+        this.extractFromBundle(savedInstanceState);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(this.getView(getActivity().getLayoutInflater(), null, savedInstanceState));
 		builder.setPositiveButton(R.string.button_new, new DialogInterface.OnClickListener() {
-
+			
 			public void onClick(DialogInterface dialog, int id) {
+				RestClient.setProgramForLightObject(roomServer, scenery, lightObject, config);
 			}
 		});
 		
 		builder.setNeutralButton(R.string.button_apply, new DialogInterface.OnClickListener() {
+			//will be overwritten in onResume
 			public void onClick(DialogInterface dialog, int id) {
 			}
 		});
@@ -60,7 +72,7 @@ public class TronEditDialog extends DialogFragment {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				
+				RestClient.setProgramForLightObject(roomServer, scenery, lightObject, oldConfig);
 			}
 		});
 
@@ -77,10 +89,33 @@ public class TronEditDialog extends DialogFragment {
 
 			@Override
 			public void onClick(View v) {
-			//	RestClient.setProgramForLightObject(roomServer, scenery, lightObject, sc);
+				RestClient.setProgramForLightObject(roomServer, scenery, lightObject, config);
 			}
 			
 		});
+    }
+    
+    private void extractFromBundle(Bundle savedInstanceState){
+    	this.scenery = getArguments().getString("scenery");
+		this.lightObject = getArguments().getString("lightObject");
+		this.roomServer = getArguments().getString("roomServer");
+		
+		RoomConfiguration room;
+		try {
+			room = RestClient.getRoom(roomServer);
+			RoomItemConfiguration current = room.getRoomItemConfigurationByName(lightObject);
+			this.config = current.getSceneryConfigurationBySceneryName(room.currentScenery);
+			// preserve old values
+			this.oldConfig = (TronRenderingProgrammConfiguration) this.getCloneOfConfig(config);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    private SceneryConfiguration getCloneOfConfig(SceneryConfiguration config){
+		return ((TronRenderingProgrammConfiguration)config).clone();    	
     }
     
     private View getView(LayoutInflater inflater, ViewGroup container,
@@ -88,23 +123,22 @@ public class TronEditDialog extends DialogFragment {
         // Inflate the layout to use as dialog or embedded fragment
 		LinearLayout contentView = (LinearLayout) inflater.inflate(R.layout.activity_program_tron, container, false);
   
-		final String scenery = getArguments().getString("scenery");
-		final String lightObject = getArguments().getString("lightObject");
-		final String roomServer = getArguments().getString("roomServer");
+		
 
 		try {
-			// get config
-			RoomConfiguration room = RestClient.getRoom(roomServer);
-			RoomItemConfiguration current = room.getRoomItemConfigurationByName(lightObject);
-			final TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) current
-					.getSceneryConfigurationBySceneryName(room.currentScenery);
-
-			// preserve old values
-			final TronRenderingProgrammConfiguration oldConfig = (TronRenderingProgrammConfiguration) config.clone();
-
 			// background color
+			final TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) this.config;
 			final ColorSelectorView colorPicker = (ColorSelectorView) contentView.findViewById(R.id.colorSelectorView);
 			colorPicker.setColor(Color.rgb(config.getR(), config.getG(), config.getB()));
+			colorPicker.setOnColorChangedListener(new OnColorChangedListener() {
+				
+				@Override
+				public void colorChanged(int color) {
+					config.setR(Color.red(color));
+					config.setG(Color.green(color));
+					config.setB(Color.blue(color));
+				}
+			});
 
 			// lightpoint amount
 			SeekBar seekBarLightPointAmount = (SeekBar) contentView.findViewById(R.id.seekBarTronLightPointAmount);
