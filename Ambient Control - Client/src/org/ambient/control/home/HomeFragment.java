@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.ambient.control.DialogHolder;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
@@ -27,6 +28,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -51,6 +53,8 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	public static final String BUNDLE_SELECTED_ROOM_SERVER = "selectedRoomServer";
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
 
+	private boolean mIsLargeLayout;
+	
 	/*
 	 * list of all roomServers which will be represented by a roomContainer
 	 * within this fragment. The initialization is handled by a bundle.
@@ -69,11 +73,12 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mIsLargeLayout = getResources().getBoolean(R.bool.large_layout);
+
 		String selectedRoomServer = getArguments().getString(BUNDLE_SELECTED_ROOM_SERVER);
 		roomServers = getArguments().getStringArrayList(BUNDLE_HOST_LIST);
 
 		this.myHomeView = (ViewGroup) inflater.inflate(R.layout.layout_home_main, container, false);
-
 		LinearLayout roomList = (LinearLayout) myHomeView.findViewById(R.id.listHomeRooms);
 
 		for (String currentRoomServer : roomServers) {
@@ -280,10 +285,10 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		}
 
 		if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
-			result = new  TronLightItemViewMapper(lightObjectView, currentConfig.name, serverName,
-					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
+			result = new TronLightItemViewMapper(lightObjectView, currentConfig.name, serverName, sceneryConfig.powerState,
+					sceneryConfig.bypassOnSceneryChange);
 		}
-		
+
 		if (sceneryConfig instanceof SwitchingConfiguration) {
 			result = new SwitchItemViewMapper(lightObjectView, currentConfig.name, serverName, sceneryConfig.powerState,
 					sceneryConfig.bypassOnSceneryChange);
@@ -390,19 +395,39 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 			FragmentManager fm = getActivity().getSupportFragmentManager();
 			DialogFragment dialog = null;
-			if(mapper instanceof SimpleColorLightItemViewMapper){
+			if (mapper instanceof SimpleColorLightItemViewMapper) {
 				dialog = new SimpleColorEditDialog();
 			}
-			if(mapper instanceof TronLightItemViewMapper){
+			if (mapper instanceof TronLightItemViewMapper) {
 				dialog = new TronEditDialog();
 			}
-			
 			Bundle args = new Bundle();
 			args.putString("roomServer", roomServer);
 			args.putString("lightObject", lightObjectName);
 			args.putString("scenery", scenery);
 			dialog.setArguments(args);
-			dialog.show(fm, "new Scenery Title");
+
+			// dialog.show(fm, "new Scenery Title");
+			if (mIsLargeLayout) {
+				// The device is using a large layout, so show the fragment as a
+				// dialog
+				dialog.show(fm, "Anpassen");
+			} else {
+				// The device is smaller, so show the fragment fullscreen
+//				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				// For a little polish, specify a transition animation
+//				transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				// To make it fullscreen, use the 'content' root view as the
+				// container
+				// for the fragment, which is always the root view for the
+				// activity
+//				transaction.add(R.id.LayoutMain, dialog).addToBackStack(null).commit();
+				Intent i = new Intent(getActivity(),DialogHolder.class);
+				i.putExtras(args);
+				i.putExtra("dialog",mapper.getClass().getSimpleName());
+				startActivity(i);
+			}
+
 			return true;
 		case R.id.lightobject_context_new:
 

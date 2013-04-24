@@ -65,7 +65,7 @@ public class SimpleColorEditDialog extends DialogFragment {
 				}
 			});
 
-			builder.setPositiveButton(R.string.button_new, new DialogInterface.OnClickListener() {
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 				}
 			});

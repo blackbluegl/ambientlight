@@ -14,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+
 public class SceneriesFragment extends Fragment {
 
 	public static final String BUNDLE_SELECTED_ROOM_SERVER = "selectedRoomServer";
@@ -22,16 +23,19 @@ public class SceneriesFragment extends Fragment {
 
 	private ListView sceneriesListView;
 
+
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 	}
+
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 
 		super.onActivityCreated(savedInstanceState);
 	}
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,6 +52,7 @@ public class SceneriesFragment extends Fragment {
 		sceneriesListView.setAdapter(sceneriesAdapter);
 
 		sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
+
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View v, int position, long arg3) {
 				String scenery = sceneryNames[position];
@@ -59,12 +64,14 @@ public class SceneriesFragment extends Fragment {
 		return sceneriesContainerView;
 	}
 
+
 	public void updateSceneriesList(String roomServer) {
 		final String[] sceneryNames = getSceneryNames(((MainActivity) getActivity()).getSelectedRoomServer());
 		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
 		this.sceneriesListView.setAdapter(sceneriesAdapter);
 
 		sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
+
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View v, int position, long arg3) {
 				String scenery = sceneryNames[position];
@@ -73,6 +80,7 @@ public class SceneriesFragment extends Fragment {
 			}
 		});
 	}
+
 
 	private String[] getSceneryNames(String roomServer) {
 		String[] items = null;

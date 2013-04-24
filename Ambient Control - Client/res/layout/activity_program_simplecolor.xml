@@ -3,36 +3,44 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" 
-    android:id="@+id/layoutSimpleColorEdit">
+    android:id="@+id/layoutMainLarge">
 
-    <ScrollView
-        android:id="@+id/scrollVoewSimpleColorEdit"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent" >
 
-        <LinearLayout
+        <ScrollView
+            android:id="@+id/scrollVoewSimpleColorEdit"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonProgramEditorApply"
+            android:layout_alignParentTop="true" >
 
-            <de.devmil.common.ui.color.ColorSelectorView
-                android:id="@+id/colorSelectorView"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginBottom="-2dp"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="2dp"
-                android:gravity="center_vertical|center_horizontal|center" >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
 
-            </de.devmil.common.ui.color.ColorSelectorView>
+                <de.devmil.common.ui.color.ColorSelectorView
+                    android:id="@+id/colorSelectorView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="-2dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="2dp"
+                    android:gravity="center_vertical|center_horizontal|center" >
+                </de.devmil.common.ui.color.ColorSelectorView>
+            </LinearLayout>
+        </ScrollView>
 
-            <Button
-                android:id="@+id/buttonProgramEditorApply"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/button_apply" />
+        <Button
+            android:id="@+id/buttonProgramEditorApply"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:text="@string/button_apply" />
 
-        </LinearLayout>
-    </ScrollView>
+    </RelativeLayout>
 
 </LinearLayout>
