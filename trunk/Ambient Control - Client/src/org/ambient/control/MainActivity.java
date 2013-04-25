@@ -8,6 +8,7 @@ import org.ambient.control.home.HomeRefreshCallback;
 import org.ambient.control.rest.URLUtils;
 import org.ambient.control.sceneries.NewSceneryDialogFragment;
 import org.ambient.control.sceneries.SceneriesFragment;
+import org.ambient.util.GuiUtils;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -23,27 +24,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
 	String selectedRoomServer;
-	
+
 	String selectedScenario;
 
 	ViewPager viewPager;
 
 	SceneriesFragment sceneriesFragment;
 	HomeFragment homeFragment;
-	
-	private boolean mIsLargeLayout;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		 mIsLargeLayout = getResources().getBoolean(R.bool.large_layout);
 
 		this.selectedRoomServer = getAllRoomServers().get(0);
 
-		if (mIsLargeLayout == false || getResources().getConfiguration().orientation==Configuration.ORIENTATION_PORTRAIT) {
+		Bundle argsSceneries = new Bundle();
+		argsSceneries.putString(SceneriesFragment.BUNDLE_SELECTED_ROOM_SERVER, this.selectedRoomServer);
+		sceneriesFragment = new SceneriesFragment();
+		sceneriesFragment.setArguments(argsSceneries);
+
+		Bundle argsHome = new Bundle();
+		argsHome.putStringArrayList(HomeFragment.BUNDLE_HOST_LIST, getAllRoomServers());
+		argsHome.putString(HomeFragment.BUNDLE_SELECTED_ROOM_SERVER, this.selectedRoomServer);
+		homeFragment = new HomeFragment();
+		homeFragment.setArguments(argsHome);
+
+		// for small screens use viewpager
+		if (GuiUtils.isLargeLayout(this) == false
+				|| getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			setContentView(R.layout.activity_main);
 			viewPager = (ViewPager) findViewById(R.id.pager);
 			viewPager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
@@ -60,24 +73,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 			getActionBar().addTab(getActionBar().newTab().setText(R.string.title_section_home).setTabListener(this));
 			getActionBar().addTab(getActionBar().newTab().setText(R.string.title_activity_sceneries).setTabListener(this));
-		}
-		
-		Bundle argsSceneries = new Bundle();
-		argsSceneries.putString(SceneriesFragment.BUNDLE_SELECTED_ROOM_SERVER, this.selectedRoomServer);
-		sceneriesFragment = new SceneriesFragment();
-		sceneriesFragment.setArguments(argsSceneries);
-
-		Bundle argsHome = new Bundle();
-		argsHome.putStringArrayList(HomeFragment.BUNDLE_HOST_LIST, getAllRoomServers());
-		argsHome.putString(HomeFragment.BUNDLE_SELECTED_ROOM_SERVER, this.selectedRoomServer);
-		homeFragment = new HomeFragment();
-		homeFragment.setArguments(argsHome);
-		if (mIsLargeLayout && getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE) {
+		} else {
 			setContentView(R.layout.activity_main_large);
 			LinearLayout home = (LinearLayout) findViewById(R.id.layoutMainLargeHome);
 			LinearLayout sceneries = (LinearLayout) findViewById(R.id.LayoutMainLargeSceneries);
 
-			//since we add the fragments programmatically get shure that they do not will be recreated if screen is rotating
+			// since we add the fragments programmatically get shure that they
+			// do not will be recreated if screen is rotating
 			if (getSupportFragmentManager().findFragmentById(home.getId()) == null) {
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.add(home.getId(), homeFragment);
@@ -100,6 +102,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			super(fm);
 		}
 
+
 		@Override
 		public Fragment getItem(int i) {
 			switch (i) {
@@ -113,10 +116,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			return null;
 		}
 
+
 		@Override
 		public int getCount() {
 			return 2;
 		}
+
 
 		@Override
 		public CharSequence getPageTitle(int position) {
@@ -129,6 +134,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			return null;
 		}
 	}
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -148,47 +154,56 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		}
 	}
 
+
 	// TODO this here should discover real servers in future
 	public ArrayList<String> getAllRoomServers() {
 		ArrayList<String> result = new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
 		return result;
 	}
 
+
 	public String getSelectedRoomServer() {
 		return selectedRoomServer;
 	}
+
 
 	public void updateSceneriesForSelectedRoomServer(String hostName) {
 		this.selectedRoomServer = hostName;
 		sceneriesFragment.updateSceneriesList(hostName);
 	}
 
+
 	public String getSelectedScenario() {
 		return selectedScenario;
 	}
 
+
 	public void setSelectedScenario(String selectedScenario) {
 		this.selectedScenario = selectedScenario;
 	}
-	
-	public HomeRefreshCallback getHomeRefreshCallback(){
+
+
+	public HomeRefreshCallback getHomeRefreshCallback() {
 		return this.homeFragment;
 	}
+
 
 	@Override
 	public void onTabReselected(Tab arg0, android.app.FragmentTransaction arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 
 	@Override
 	public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
-		viewPager.setCurrentItem(tab.getPosition());		
+		viewPager.setCurrentItem(tab.getPosition());
 	}
+
 
 	@Override
 	public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

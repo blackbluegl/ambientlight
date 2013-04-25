@@ -6,44 +6,52 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public abstract class AbstractRoomItemViewMapper{
 
-	private boolean powerState  = false;
+public abstract class AbstractRoomItemViewMapper {
+
+	private boolean powerState = false;
 	private String serverName;
 	private View itemView;
 	private String itemName;
+	private int resourceId;
 
-	
-	public AbstractRoomItemViewMapper(View itemView, String itemName, String serverName, boolean powerState, boolean bypassSceneryChange) {
-		this.itemView=itemView;
+
+	public AbstractRoomItemViewMapper(View itemView, String itemName, int resourceId, String serverName, boolean powerState,
+			boolean bypassSceneryChange) {
+		this.itemView = itemView;
 
 		TextView labelView = (TextView) itemView.findViewById(R.id.textLightObjectName);
 		labelView.setText(itemName);
-		
-		this.itemName=itemName;
-		
-		this.serverName=serverName;
-		
+
+		this.itemName = itemName;
+
+		this.resourceId = resourceId;
+
+		this.serverName = serverName;
+
 		ImageView icon = (ImageView) itemView.findViewById(R.id.imageViewLightObject);
-		if(powerState==false){
+		if (powerState == false) {
 			icon.setImageResource(this.getDisabledIcon());
-			this.powerState=false;
-		}
-		else{
+			this.powerState = false;
+		} else {
 			icon.setImageResource(this.getActiveIcon());
-			this.powerState=true;
+			this.powerState = true;
 		}
-		
+
 		this.setBypassSceneryChangeState(bypassSceneryChange);
 	}
-	
-	
+
+
+	public int getResourceId() {
+		return resourceId;
+	}
+
+
 	public void setBypassSceneryChangeState(boolean bypassSceneryChange) {
 		ImageView byPassSceneryIcon = (ImageView) itemView.findViewById(R.id.imageViewLightObjectSceneryDecoupled);
-		if(bypassSceneryChange){
+		if (bypassSceneryChange) {
 			byPassSceneryIcon.setAlpha(0.5f);
-		}
-		else{
+		} else {
 			byPassSceneryIcon.setAlpha(0.0f);
 		}
 	}
@@ -53,34 +61,35 @@ public abstract class AbstractRoomItemViewMapper{
 		return serverName;
 	}
 
-	
-	public String getItemName(){
+
+	public String getItemName() {
 		return itemName;
 	}
 
-	
+
 	public View getLightObjectView() {
 		return itemView;
 	}
 
 
-	public void setPowerState(boolean isActive){
-		this.powerState=isActive;
+	public void setPowerState(boolean isActive) {
+		this.powerState = isActive;
 		ImageView icon = (ImageView) itemView.findViewById(R.id.imageViewLightObject);
-		if(isActive){
+		if (isActive) {
 			icon.setImageResource(this.getActiveIcon());
-		}
-		else{
+		} else {
 			icon.setImageResource(this.getDisabledIcon());
 		}
 	}
-	
-	
-	public boolean getPowerState(){
+
+
+	public boolean getPowerState() {
 		return powerState;
 	}
-	
-	
+
+
 	protected abstract int getActiveIcon();
+
+
 	protected abstract int getDisabledIcon();
 }

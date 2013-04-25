@@ -20,9 +20,11 @@
     <string name="home_context_new_program">neues Program auswählen</string>
     <string name="title_activity_program_editor">ProgramEditorActivity</string>
     <string name="button_ok">OK</string>
+    <string name="button_finish">Fertig</string>
     <string name="button_apply">Anwenden</string>
-    <string name="home_context_bypass">Sperren</string>
+    <string name="home_context_bypass">Entkoppeln</string>
     <string name="title_activity_dialog_holder">DialogHolder</string>
+    <string name="title_edit_tron">Tron Eigenschaften</string>
     <string name="action_settings">Settings</string>
 
 </resources>

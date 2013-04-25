@@ -35,13 +35,13 @@ public class NewSceneryDialogFragment extends DialogFragment {
 		TextView textView = (TextView) dialogLayout.findViewById(R.id.editTextNewSceneryName);
 		textView.setText(sceneryName);
 		
-		builder.setPositiveButton(R.string.button_new, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.button_finish , new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				TextView textView = (TextView) dialogLayout.findViewById(R.id.editTextNewSceneryName);
 				
 				try {
 					RestClient.createOrUpdateSceneryFromCurrentScenery(((MainActivity) getActivity()).getSelectedRoomServer(), textView
-							.getText().toString());
+							.getText().toString(), getActivity().getApplicationContext());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

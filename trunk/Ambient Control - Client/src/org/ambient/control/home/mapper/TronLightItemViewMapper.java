@@ -6,9 +6,9 @@ import android.view.View;
 
 public class TronLightItemViewMapper extends AbstractRoomItemViewMapper{
 
-	public TronLightItemViewMapper(View lightObject, String label, String serverName,
+	public TronLightItemViewMapper(View lightObject, String label, int resourceId, String serverName,
 			boolean powerState, boolean bypassSceneryChange) {
-		super(lightObject, label, serverName, powerState, bypassSceneryChange);
+		super(lightObject, label, resourceId, serverName, powerState, bypassSceneryChange);
 	}
 
 	@Override

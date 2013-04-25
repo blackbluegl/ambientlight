@@ -6,9 +6,9 @@ import android.view.View;
 
 public class SimpleColorLightItemViewMapper extends AbstractRoomItemViewMapper{
 
-	public SimpleColorLightItemViewMapper(View lightObject, String label, String serverName,
+	public SimpleColorLightItemViewMapper(View lightObject, String label, int resourceId, String serverName,
 			boolean powerState, boolean bypassSceneryChange) {
-		super(lightObject, label, serverName, powerState, bypassSceneryChange);
+		super(lightObject, label, resourceId, serverName, powerState, bypassSceneryChange);
 	}
 
 	@Override

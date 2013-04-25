@@ -7,7 +7,7 @@ import android.view.View;
 public class SwitchItemViewMapper extends AbstractRoomItemViewMapper {
 
 	public SwitchItemViewMapper(View itemView, String itemName, String serverName, boolean powerState, boolean bypassSceneryChange) {
-		super(itemView, itemName, serverName, powerState, bypassSceneryChange);
+		super(itemView, itemName,0, serverName, powerState, bypassSceneryChange);
 	}
 
 	@Override

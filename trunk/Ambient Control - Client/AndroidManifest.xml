@@ -2,11 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ambient.control"
     android:versionCode="1"
-    android:versionName="1.0" >
-
+    android:versionName="1.0" android:installLocation="auto">
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+  
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="15" />
+        android:minSdkVersion="10"
+        android:targetSdkVersion="17" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -17,17 +19,14 @@
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="org.ambient.control.sceneryconfiguration.ProgramChooser"
+            android:name="org.ambient.control.sceneryconfiguration.SceneryProgramChooserActivity"
             android:label="@string/title_activity_sceneries_chooser" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -36,16 +35,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="org.ambient.control.DialogHolder"
+            android:name="org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder"
             android:label="@string/title_activity_dialog_holder" >
         </activity>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" >
-    </uses-permission>
+
 
 </manifest>

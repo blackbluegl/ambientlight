@@ -5,18 +5,26 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.ambient.control.home.HomeRefreshCallback;
+import org.ambient.util.GuiUtils;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
 import org.ambientlight.scenery.SceneryConfiguration;
 import org.ambientlight.ws.container.RenderingProgrammConfigurationLightObjectNameMapper;
 
+import android.content.Context;
+
 
 public class RestClient {
 
-	public static RoomConfiguration getRoom(String hostName) throws InterruptedException, ExecutionException {
-		GetRoomTask task = new GetRoomTask();
-		task.execute(hostName);
-		return task.get();
+	public static RoomConfiguration getRoom(String hostName, Context ct) throws Exception {
+		try {
+			GetRoomTask task = new GetRoomTask();
+			task.execute(hostName);
+			return task.get();
+		} catch (Exception e) {
+			GuiUtils.toastCause(e, ct);
+			throw e;
+		}
 	}
 
 
@@ -52,9 +60,9 @@ public class RestClient {
 	}
 
 
-	public static void createOrUpdateSceneryFromCurrentScenery(String hostName, String newSceneryName)
-			throws InterruptedException, ExecutionException {
-		RoomConfiguration existingRoomConfiguration = RestClient.getRoom(hostName);
+	public static void createOrUpdateSceneryFromCurrentScenery(String hostName, String newSceneryName, Context ct)
+			throws Exception {
+		RoomConfiguration existingRoomConfiguration = RestClient.getRoom(hostName, ct);
 
 		List<RenderingProgrammConfigurationLightObjectNameMapper> newLightObjectConfigForScenery = new ArrayList<RenderingProgrammConfigurationLightObjectNameMapper>();
 
