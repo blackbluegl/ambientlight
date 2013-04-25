@@ -1,10 +1,9 @@
 package org.ambient.control.home;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import org.ambient.control.DialogHolder;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
@@ -12,9 +11,11 @@ import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
 import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.control.rest.RestClient;
-import org.ambient.control.sceneryconfiguration.ProgramChooserActivity;
-import org.ambient.control.sceneryconfiguration.SimpleColorEditDialog;
-import org.ambient.control.sceneryconfiguration.TronEditDialog;
+import org.ambient.control.sceneryconfiguration.AbstractSceneryConfigEditDialogFragment;
+import org.ambient.control.sceneryconfiguration.SceneryProgramChooserActivity;
+import org.ambient.control.sceneryconfiguration.SceneryConfigDialogFragmentFactory;
+import org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder;
+import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
@@ -25,10 +26,8 @@ import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -53,8 +52,6 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	public static final String BUNDLE_SELECTED_ROOM_SERVER = "selectedRoomServer";
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
 
-	private boolean mIsLargeLayout;
-	
 	/*
 	 * list of all roomServers which will be represented by a roomContainer
 	 * within this fragment. The initialization is handled by a bundle.
@@ -73,7 +70,6 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		mIsLargeLayout = getResources().getBoolean(R.bool.large_layout);
 
 		String selectedRoomServer = getArguments().getString(BUNDLE_SELECTED_ROOM_SERVER);
 		roomServers = getArguments().getStringArrayList(BUNDLE_HOST_LIST);
@@ -118,9 +114,9 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 
 	private View initRoomView(LayoutInflater inflater, final String serverName, boolean isCurrentRoomServerSelected)
-			throws InterruptedException, ExecutionException {
+			throws Exception {
 
-		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
+		final RoomConfiguration roomConfig = RestClient.getRoom(serverName, getActivity().getApplicationContext());
 
 		// for the scenery save dialog to auto fill the current scenery name on
 		// startup
@@ -280,13 +276,13 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		SceneryConfiguration sceneryConfig = currentConfig.getSceneryConfigurationBySceneryName(sceneryName);
 
 		if (sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
-			result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.name, serverName,
-					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
+			result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.name, R.string.program_simple_color,
+					serverName, sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
 
 		if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
-			result = new TronLightItemViewMapper(lightObjectView, currentConfig.name, serverName, sceneryConfig.powerState,
-					sceneryConfig.bypassOnSceneryChange);
+			result = new TronLightItemViewMapper(lightObjectView, currentConfig.name, R.string.program_tron, serverName,
+					sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
 
 		if (sceneryConfig instanceof SwitchingConfiguration) {
@@ -322,7 +318,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	 * lang.String)
 	 */
 	@Override
-	public void refreshRoomContent(String roomServerName) throws InterruptedException, ExecutionException {
+	public void refreshRoomContent(String roomServerName) throws Exception {
 
 		List<AbstractRoomItemViewMapper> removeMappers = new ArrayList<AbstractRoomItemViewMapper>();
 
@@ -334,7 +330,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 		this.configuredlightObjects.removeAll(removeMappers);
 
-		RoomConfiguration roomConfiguration = RestClient.getRoom(roomServerName);
+		RoomConfiguration roomConfiguration = RestClient.getRoom(roomServerName, getActivity().getApplicationContext());
 
 		// for the scenery save dialog to auto fill the current scenery name on
 		// scenery change
@@ -360,7 +356,13 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getActivity().getMenuInflater();
-		inflater.inflate(R.menu.layout_room_item, menu);
+
+		AbstractRoomItemViewMapper mapper = (AbstractRoomItemViewMapper) v.getTag();
+		if (mapper instanceof SwitchItemViewMapper) {
+			inflater.inflate(R.menu.layout_switch_object, menu);
+		} else {
+			inflater.inflate(R.menu.layout_light_object, menu);
+		}
 	}
 
 
@@ -375,18 +377,23 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		String roomServer = mapper.getServerName();
 		String lightObjectName = mapper.getItemName();
 		String scenery = ((MainActivity) getActivity()).getSelectedScenario();
+
+		Bundle args = new Bundle();
+		args.putString("roomServer", roomServer);
+		args.putString("lightObject", lightObjectName);
+		args.putString("scenery", scenery);
+
 		switch (item.getItemId()) {
 
 		case R.id.lightobject_context_bypass:
 			try {
-				RoomConfiguration rc = RestClient.getRoom(roomServer);
+				RoomConfiguration rc = RestClient.getRoom(roomServer, getActivity().getApplicationContext());
 				RoomItemConfiguration roomItem = rc.getRoomItemConfigurationByName(lightObjectName);
 				SceneryConfiguration sc = roomItem.getSceneryConfigurationBySceneryName(scenery);
 				sc.bypassOnSceneryChange = !sc.bypassOnSceneryChange;
 				RestClient.setProgramForLightObject(roomServer, scenery, lightObjectName, sc);
 				mapper.setBypassSceneryChangeState(sc.bypassOnSceneryChange);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return true;
@@ -394,48 +401,32 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		case R.id.lightobject_context_edit:
 
 			FragmentManager fm = getActivity().getSupportFragmentManager();
-			DialogFragment dialog = null;
-			if (mapper instanceof SimpleColorLightItemViewMapper) {
-				dialog = new SimpleColorEditDialog();
-			}
-			if (mapper instanceof TronLightItemViewMapper) {
-				dialog = new TronEditDialog();
-			}
-			Bundle args = new Bundle();
-			args.putString("roomServer", roomServer);
-			args.putString("lightObject", lightObjectName);
-			args.putString("scenery", scenery);
-			dialog.setArguments(args);
+			AbstractSceneryConfigEditDialogFragment editSceneryConfigFragment = SceneryConfigDialogFragmentFactory
+					.getByStringResource(mapper.getResourceId());
 
-			// dialog.show(fm, "new Scenery Title");
-			if (mIsLargeLayout) {
+			editSceneryConfigFragment.setArguments(args);
+
+			if (GuiUtils.isLargeLayout(getActivity())) {
 				// The device is using a large layout, so show the fragment as a
 				// dialog
-				dialog.show(fm, "Anpassen");
+				editSceneryConfigFragment.show(fm, null);
 			} else {
-				// The device is smaller, so show the fragment fullscreen
-//				FragmentTransaction transaction = getFragmentManager().beginTransaction();
-				// For a little polish, specify a transition animation
-//				transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-				// To make it fullscreen, use the 'content' root view as the
-				// container
-				// for the fragment, which is always the root view for the
+				// The screen is smaller, so show the fragment in a fullscreen
 				// activity
-//				transaction.add(R.id.LayoutMain, dialog).addToBackStack(null).commit();
-				Intent i = new Intent(getActivity(),DialogHolder.class);
+				Intent i = new Intent(getActivity(), SceneryConfigEditDialogHolder.class);
 				i.putExtras(args);
-				i.putExtra("dialog",mapper.getClass().getSimpleName());
+				i.putExtra("resourceId", mapper.getResourceId());
 				startActivity(i);
 			}
-
 			return true;
+
 		case R.id.lightobject_context_new:
 
-			Intent i2 = new Intent(getActivity(), ProgramChooserActivity.class);
-			i2.putExtra("roomServer", roomServer);
-			i2.putExtra("lightObject", lightObjectName);
-			startActivity(i2);
+			Intent i = new Intent(getActivity(), SceneryProgramChooserActivity.class);
+			i.putExtras(args);
+			startActivity(i);
 			return true;
+
 		default:
 			return super.onContextItemSelected(item);
 		}
