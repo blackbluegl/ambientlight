@@ -24,7 +24,7 @@ public class SimpleColorEditDialog extends AbstractSceneryConfigEditDialogFragme
 
 	@Override
 	protected View getView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		final SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) this.config;
+		final SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) this.getConfig();
 
 		LinearLayout contentView = (LinearLayout) inflater.inflate(R.layout.activity_program_simplecolor, container, false);
 		final ColorSelectorView colorPicker = (ColorSelectorView) contentView.findViewById(R.id.colorSelectorView);
@@ -46,5 +46,11 @@ public class SimpleColorEditDialog extends AbstractSceneryConfigEditDialogFragme
 	@Override
 	public int getTitle() {
 		return R.string.program_simple_color;
+	}
+
+
+	@Override
+	protected SceneryConfiguration getNewSceneryConfig() {
+		return new SimpleColorRenderingProgramConfiguration();
 	}
 }

@@ -38,6 +38,8 @@ public class SceneryProgramChooserActivity extends FragmentActivity {
 		if (values == null) {
 			return;
 		}
+		values.putBoolean("editAsNew", true);
+		
 		final boolean isLargeLayout = GuiUtils.isLargeLayout(this);
 		// lightObject = values.getString("lightObject");
 		// roomServer = values.getString("roomServer");
