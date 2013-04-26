@@ -1,6 +1,5 @@
 package org.ambient.control.home;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +11,9 @@ import org.ambient.control.home.mapper.SwitchItemViewMapper;
 import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.control.rest.RestClient;
 import org.ambient.control.sceneryconfiguration.AbstractSceneryConfigEditDialogFragment;
-import org.ambient.control.sceneryconfiguration.SceneryProgramChooserActivity;
 import org.ambient.control.sceneryconfiguration.SceneryConfigDialogFragmentFactory;
 import org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder;
+import org.ambient.control.sceneryconfiguration.SceneryProgramChooserActivity;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.room.RoomConfiguration;
@@ -369,6 +368,11 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 
+		//no room item clicked. there is nothing todo here for us
+		if(item.getMenuInfo() instanceof ImageViewWithContextMenuInfo.ImageViewContextMenuInfo == false){
+		    return super.onContextItemSelected(item); 	
+		}
+		
 		ImageViewWithContextMenuInfo.ImageViewContextMenuInfo menuInfo = (ImageViewWithContextMenuInfo.ImageViewContextMenuInfo) item
 				.getMenuInfo();
 		ImageViewWithContextMenuInfo img = (ImageViewWithContextMenuInfo) menuInfo.targetView;
@@ -426,10 +430,9 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			i.putExtras(args);
 			startActivity(i);
 			return true;
-
-		default:
-			return super.onContextItemSelected(item);
 		}
+		
+	    return super.onContextItemSelected(item); 
 	}
 
 
