@@ -6,13 +6,18 @@ import org.ambient.control.rest.RestClient;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 
 public class SceneriesFragment extends Fragment {
@@ -50,7 +55,7 @@ public class SceneriesFragment extends Fragment {
 
 		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
 		sceneriesListView.setAdapter(sceneriesAdapter);
-
+		registerForContextMenu(sceneriesListView);
 		sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -69,7 +74,6 @@ public class SceneriesFragment extends Fragment {
 		final String[] sceneryNames = getSceneryNames(((MainActivity) getActivity()).getSelectedRoomServer());
 		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
 		this.sceneriesListView.setAdapter(sceneriesAdapter);
-
 		sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -91,4 +95,30 @@ public class SceneriesFragment extends Fragment {
 		}
 		return items;
 	}
+
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		if (v.getId() == R.id.listViewSceneries) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			if (((TextView) info.targetView).getText().equals(((MainActivity) getActivity()).getSelectedScenario()) == false) {
+				menu.setHeaderTitle("Was ist zu tun?");
+				menu.add(Menu.NONE, 0, 0, "löschen");
+			}
+		}
+	}
+
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		int menuItemIndex = item.getItemId();
+		if (menuItemIndex == 0) {
+			RestClient.deleteScenarioFromRoom(((MainActivity) getActivity()).getSelectedRoomServer(),
+					(String) ((TextView) info.targetView).getText());
+			updateSceneriesList(((MainActivity) getActivity()).getSelectedRoomServer());
+		}
+		return true;
+	}
+
 }
