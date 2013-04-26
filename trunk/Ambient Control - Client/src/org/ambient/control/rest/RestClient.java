@@ -27,6 +27,10 @@ public class RestClient {
 		}
 	}
 
+	public static void deleteScenarioFromRoom(String hostName, String sceneryName){
+		DeleteSceneryTask task = new DeleteSceneryTask();
+		task.execute(hostName, sceneryName);
+	}
 
 	public static String[] getSceneriesForRoom(String hostName) throws InterruptedException, ExecutionException {
 		GetSceneriesTask task = new GetSceneriesTask();
