@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -26,14 +27,16 @@ import org.ambientlight.scenery.entities.LightObject;
 import org.ambientlight.scenery.entities.RoomConfigurationFactory;
 import org.ambientlight.ws.container.RenderingProgrammConfigurationLightObjectNameMapper;
 
+
 @Path("/sceneryControl")
 public class SceneryControl {
 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getInfo() {
-		return "AmbientLight:0.9.4";
+		return "AmbientLight:0.9.5";
 	}
+
 
 	@GET
 	@Path("/config/room/sceneries")
@@ -50,6 +53,37 @@ public class SceneryControl {
 		return result;
 	}
 
+
+	@DELETE
+	@Path("/config/room/sceneries/{name}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteScenery(@PathParam("name") String name) {
+		System.out.println("SceneryControlWS:  deleteing scenery: " + name);
+
+		if (getRoomConfiguration().currentScenery.equals(name)) {
+			return Response.status(500).build();
+		}
+		if (getSceneries().contains(name) == false) {
+			return Response.status(404).build();
+		}
+
+		for (RoomItemConfiguration currentRoomItemConfiguration : AmbientControlMW.getRoomConfig().roomItemConfigurations) {
+			currentRoomItemConfiguration.sceneryConfigurationBySzeneryName.remove(name);
+		}
+
+		// save config model to file
+		try {
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(),
+					AmbientControlMW.getRoomConfigFileName());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
+
+		return Response.status(200).build();
+	}
+
+
 	@GET
 	@Path("/config/room")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -57,7 +91,7 @@ public class SceneryControl {
 		return AmbientControlMW.getRoomConfig();
 	}
 
-	
+
 	@PUT
 	@Path("/control/room/sceneries")
 	@Consumes(MediaType.TEXT_PLAIN)
@@ -69,15 +103,17 @@ public class SceneryControl {
 		// already restored from file
 		Map<String, Boolean> powerStates = new HashMap<String, Boolean>();
 		for (RoomItemConfiguration currentRoomItemConfiguration : getRoomConfiguration().roomItemConfigurations) {
-			powerStates.put(currentRoomItemConfiguration.name,
-					currentRoomItemConfiguration.getSceneryConfigurationBySceneryName(getRoomConfiguration().currentScenery).powerState);
+			powerStates
+					.put(currentRoomItemConfiguration.name, currentRoomItemConfiguration
+							.getSceneryConfigurationBySceneryName(getRoomConfiguration().currentScenery).powerState);
 		}
 
 		// restore configuration from storage so we do not save old unwished
 		// configurations and save different configurations the user played with
 		// but never wanted them to be saved.
 		try {
-			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName(AmbientControlMW.getRoomConfigFileName()));
+			AmbientControlMW
+					.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName(AmbientControlMW.getRoomConfigFileName()));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -90,7 +126,8 @@ public class SceneryControl {
 			SceneryConfiguration newSceneryConfig = currentItemConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
 
 			// only switch lightObjects which are not bypassed by user -
-			// therefore preserve state of the old config and copy to the new one
+			// therefore preserve state of the old config and copy to the new
+			// one
 			if (newSceneryConfig.bypassOnSceneryChange) {
 				System.out.println("SceneryControlWS:  ommiting " + currentItemConfiguration.name
 						+ " because it is is set to bypass the scenery change");
@@ -103,7 +140,8 @@ public class SceneryControl {
 
 		// save config model to file
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(), AmbientControlMW.getRoomConfigFileName());
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(),
+					AmbientControlMW.getRoomConfigFileName());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -112,7 +150,7 @@ public class SceneryControl {
 		return Response.status(200).build();
 	}
 
-	
+
 	@PUT
 	@Path("/control/room/sceneries/{sceneryName}/items")
 	@Consumes(MediaType.TEXT_PLAIN)
@@ -135,6 +173,7 @@ public class SceneryControl {
 		}
 		return Response.status(200).build();
 	}
+
 
 	@PUT
 	@Path("/config/room/sceneries/{sceneryName}")
@@ -162,7 +201,8 @@ public class SceneryControl {
 
 		// save config model to file
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(), AmbientControlMW.getRoomConfigFileName());
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoomConfig(),
+					AmbientControlMW.getRoomConfigFileName());
 		} catch (IOException e) {
 			e.printStackTrace();
 			Response.status(500).build();
@@ -172,6 +212,7 @@ public class SceneryControl {
 
 		return Response.status(200).build();
 	}
+
 
 	@PUT
 	@Path("/config/room/sceneries/{sceneryName}/items/{itemName}/program")
@@ -189,6 +230,7 @@ public class SceneryControl {
 		return Response.status(200).build();
 	}
 
+
 	@PUT
 	@Path("/control/room/state")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -202,6 +244,7 @@ public class SceneryControl {
 
 		return Response.status(200).build();
 	}
+
 
 	@PUT
 	@Path("/control/room/items/{itemName}/state")
