@@ -31,7 +31,7 @@ public class TronEditDialog extends AbstractSceneryConfigEditDialogFragment {
 
 		try {
 			// background color
-			final TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) this.config;
+			final TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) this.getConfig();
 			final ColorSelectorView colorPicker = (ColorSelectorView) contentView.findViewById(R.id.colorSelectorView);
 			colorPicker.setColor(Color.rgb(config.getR(), config.getG(), config.getB()));
 			colorPicker.setOnColorChangedListener(new OnColorChangedListener() {
@@ -203,5 +203,11 @@ public class TronEditDialog extends AbstractSceneryConfigEditDialogFragment {
 	@Override
 	public int getTitle() {
 		return R.string.title_edit_tron;
+	}
+
+
+	@Override
+	protected SceneryConfiguration getNewSceneryConfig() {
+		return new TronRenderingProgrammConfiguration();
 	}
 }

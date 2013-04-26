@@ -24,9 +24,9 @@ public abstract class AbstractSceneryConfigEditDialogFragment extends DialogFrag
 	String scenery;
 	String lightObject;
 	String roomServer;
-	SceneryConfiguration config;
-	SceneryConfiguration oldConfig;
-
+	private SceneryConfiguration config;
+	private SceneryConfiguration oldConfig;
+	private boolean editAsNew = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,15 +114,32 @@ public abstract class AbstractSceneryConfigEditDialogFragment extends DialogFrag
 		this.scenery = getArguments().getString("scenery");
 		this.lightObject = getArguments().getString("lightObject");
 		this.roomServer = getArguments().getString("roomServer");
+		this.editAsNew = getArguments().getBoolean("editAsNew");
 
 		RoomConfiguration room = RestClient.getRoom(roomServer, getActivity().getApplicationContext());
 		RoomItemConfiguration current = room.getRoomItemConfigurationByName(lightObject);
-		this.config = current.getSceneryConfigurationBySceneryName(room.currentScenery);
-		// preserve old values
-		this.oldConfig = this.getCloneOfConfig(config);
+		
+		if(editAsNew){
+			this.config = getNewSceneryConfig();
+			this.oldConfig = current.getSceneryConfigurationBySceneryName(room.currentScenery);
+		}
+		else{
+			this.config = current.getSceneryConfigurationBySceneryName(room.currentScenery);
+			this.oldConfig = this.getCloneOfConfig(config);
+		}
 	}
 
+	protected SceneryConfiguration getConfig(){
+					return this.config;
+	}
 
+	protected SceneryConfiguration getOldConfig(){
+		return this.oldConfig;
+}
+
+	
+	protected abstract SceneryConfiguration getNewSceneryConfig();
+	
 	protected abstract SceneryConfiguration getCloneOfConfig(SceneryConfiguration config);
 
 
