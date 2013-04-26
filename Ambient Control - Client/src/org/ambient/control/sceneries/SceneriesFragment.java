@@ -111,7 +111,13 @@ public class SceneriesFragment extends Fragment {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
+		
+		if(item.getMenuInfo() instanceof AdapterView.AdapterContextMenuInfo == false){
+			return super.onContextItemSelected(item); 
+		}
+		
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		
 		int menuItemIndex = item.getItemId();
 		if (menuItemIndex == 0) {
 			RestClient.deleteScenarioFromRoom(((MainActivity) getActivity()).getSelectedRoomServer(),
