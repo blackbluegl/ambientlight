@@ -72,8 +72,7 @@ void CommandSocketHandler::writeLine(int socked, string &message) {
 	send(socked, message.c_str(), message.size(), 0);
 }
 
-string CommandSocketHandler::getCommandValue(string &inputString,
-		string commandName) {
+string CommandSocketHandler::getCommandValue(string &inputString, string commandName) {
 
 	if (inputString.find(commandName) == string::npos) {
 		return NULL;
@@ -83,8 +82,7 @@ string CommandSocketHandler::getCommandValue(string &inputString,
 
 	if (valueStartPosition != string::npos) {
 
-		return inputString.substr(valueStartPosition + 1,
-				inputString.size() - 1);
+		return inputString.substr(valueStartPosition + 1, inputString.size() - 1);
 	}
 	return NULL;
 }
