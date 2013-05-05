@@ -9,6 +9,7 @@
 
 #include <map>
 #include <unistd.h>
+#include "StripePortMapping.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ class DataSocketHandling {
 public:
 	DataSocketHandling();
 	virtual ~DataSocketHandling();
-	void handleDataRequests(int &workingControlSocket, map<int,int> &stripePortMapping);
+	void handleDataRequests(int &workingControlSocket, map<int,StripePortMapping> &stripePortMapping);
 	ssize_t readData(int sockd, void *vptr, size_t maxlen);
 };
 

@@ -20,12 +20,9 @@
 using namespace std;
 
 CotrolSocketHandling::CotrolSocketHandling() {
-	// TODO Auto-generated constructor stub
-
 }
 
 CotrolSocketHandling::~CotrolSocketHandling() {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -34,10 +31,13 @@ CotrolSocketHandling::~CotrolSocketHandling() {
 
 /*the client connects to this socket. initializes the stripe ports
   and the stripe led amount and quits to send data afterwards*/
-map<int,int> CotrolSocketHandling::handleControlRequests(int workingControlSocket) {
+map<int,StripePortMapping> CotrolSocketHandling::handleControlRequests(int workingControlSocket) {
 
-	map<int,int> stripePortMapping;
+	//TODO stripeport is indirectly calulated by sequence number. this should be changed and given by the config of a stripe
+
+	map<int,StripePortMapping> stripePortMapping;
 	int stripePortForNextRequest = -1;
+	string protocollTypeForNextRequest;
 	string RESPONSE_OK = "OK\n";
 
 	while (1) {
@@ -51,16 +51,26 @@ map<int,int> CotrolSocketHandling::handleControlRequests(int workingControlSocke
 		}
 
 		//set the stripe port mapping array index - get position and keep for next value
-		int currentStripePortNumber = getCommandValue(buffer, "stripe_port");
+		int currentStripePortNumber = getCommandIntValue(buffer, "stripe_port");
 		if (currentStripePortNumber > -1) {
 			stripePortForNextRequest = currentStripePortNumber;
 			writeLine(workingControlSocket, RESPONSE_OK);
 		}
 
+		//set stripeType
+		string currentStripeType = getCommandStringValue(buffer, "protocoll_type");
+		if (currentStripeType.empty() == false) {
+			protocollTypeForNextRequest = currentStripeType;
+			writeLine(workingControlSocket, RESPONSE_OK);
+		}
+
 		//set the stripe port mapping array value
-		int currentPixelSize = getCommandValue(buffer, "pixel_size");
+		int currentPixelSize = getCommandIntValue(buffer, "pixel_size");
 		if (currentPixelSize > -1) {
-			stripePortMapping[stripePortForNextRequest]=currentPixelSize;
+			StripePortMapping mapping;
+			mapping.pixelAmount=currentPixelSize;
+			mapping.protocollType= protocollTypeForNextRequest;
+			stripePortMapping[stripePortForNextRequest]=mapping;
 
 			writeLine(workingControlSocket, RESPONSE_OK);
 		}
@@ -92,7 +102,7 @@ void CotrolSocketHandling::writeLine(int socked, string &message) {
 }
 
 
-int CotrolSocketHandling::getCommandValue(string &inputString, string commandName) {
+int CotrolSocketHandling::getCommandIntValue(string &inputString, string commandName) {
 
 	if(inputString.find(commandName) == string::npos){
 		return -1;
@@ -109,5 +119,22 @@ int CotrolSocketHandling::getCommandValue(string &inputString, string commandNam
 	}
 	return -1;
 }
+
+string CotrolSocketHandling::getCommandStringValue(string &inputString, string commandName) {
+
+	if (inputString.find(commandName) == string::npos) {
+		return string();
+	}
+
+	size_t valueStartPosition = inputString.rfind("=");
+
+	if (valueStartPosition != string::npos) {
+
+		return inputString.substr(valueStartPosition + 1, inputString.size() - 1);
+	}
+	return NULL;
+}
+
+
 
 
