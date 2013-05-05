@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include "controlsocket/CotrolSocketHandling.h"
 #include "datasocket/DataSocketHandling.h"
+#include "datasocket/StripePortMapping.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -72,8 +73,7 @@ int main(int argc, char *argv[]) {
 	servaddr.sin_port = htons(port);
 
 	/* Bind our socket addresss to the listening socket, and call listen() */
-	if (bind(listening_socket, (struct sockaddr *) &servaddr, sizeof(servaddr))
-			< 0) {
+	if (bind(listening_socket, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
 		fprintf(stderr, "mdmxoe-service: Error calling bind()\n");
 		exit(EXIT_FAILURE);
 	}
@@ -94,16 +94,15 @@ int main(int argc, char *argv[]) {
 
 		// initialize the runtime parameter - this will be closed after client continues to datahandling
 		CotrolSocketHandling cth;
-		map<int, int> stripePortMapping = cth.handleControlRequests(controlSocket);
+		map<int, StripePortMapping> stripePortMapping = cth.handleControlRequests(controlSocket);
 
 		if (stripePortMapping.size() > 0) {
-			printf(	"Accepted new client with %u configured stripes. Waiting for data.\n",stripePortMapping.size());
+			printf("Accepted new client with %u configured stripes. Waiting for data.\n", (int)stripePortMapping.size());
 			fflush(stdout);
 
 			//wait for datas to be send
-			if ((working_data_socket = accept(listening_socket, NULL, NULL))
-					< 0) {
-				fprintf(stderr,	"mdmxoe-service: Error calling accept for data\n");
+			if ((working_data_socket = accept(listening_socket, NULL, NULL)) < 0) {
+				fprintf(stderr, "mdmxoe-service: Error calling accept for data\n");
 				exit(EXIT_FAILURE);
 			}
 
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]) {
 				exit(EXIT_FAILURE);
 			}
 		} else {
-			printf(	"Client could not be accepted. Configuration handling could not be finished properly.\n");
+			printf("Client could not be accepted. Configuration handling could not be finished properly.\n");
 			fflush(stdout);
 		}
 

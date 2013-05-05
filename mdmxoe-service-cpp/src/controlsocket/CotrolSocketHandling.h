@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <string>
 #include <map>
+#include "../datasocket/StripePortMapping.h"
 
 using namespace std;
 
@@ -23,8 +24,9 @@ public:
 	CotrolSocketHandling();
 	virtual ~CotrolSocketHandling();
 	string readLine(int &socked);
-	map<int,int> handleControlRequests(int workingControlSocket);
-	int getCommandValue(string &inputString, string commandName);
+	map<int,StripePortMapping> handleControlRequests(int workingControlSocket);
+	int getCommandIntValue(string &inputString, string commandName);
+	string getCommandStringValue(string &inputString, string commandName);
 	void writeLine(int socked, string &message);
 };
 #endif /* COTROLSOCKETHANDLING_H_ */
