@@ -41,6 +41,19 @@
             android:name="org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder"
             android:label="@string/title_activity_dialog_holder" >
         </activity>
+        
+        <receiver android:name="org.ambient.widgets.RoomSwitchesWidgetProvider" >
+            <intent-filter >
+                <action 
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidgetprovider" />
+        </receiver>
+        
+    <service android:name="org.ambient.widgets.UpdateWidgetService"></service> 
     </application>
 
 

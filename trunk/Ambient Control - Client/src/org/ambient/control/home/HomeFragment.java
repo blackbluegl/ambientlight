@@ -10,8 +10,7 @@ import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
 import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.control.rest.RestClient;
-import org.ambient.control.sceneryconfiguration.AbstractSceneryConfigEditDialogFragment;
-import org.ambient.control.sceneryconfiguration.SceneryConfigDialogFragmentFactory;
+import org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogFragment;
 import org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder;
 import org.ambient.control.sceneryconfiguration.SceneryProgramChooserActivity;
 import org.ambient.util.GuiUtils;
@@ -386,6 +385,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		args.putString("roomServer", roomServer);
 		args.putString("lightObject", lightObjectName);
 		args.putString("scenery", scenery);
+		args.putString("title", "Eigenschaften");
 
 		switch (item.getItemId()) {
 
@@ -405,8 +405,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		case R.id.lightobject_context_edit:
 
 			FragmentManager fm = getActivity().getSupportFragmentManager();
-			AbstractSceneryConfigEditDialogFragment editSceneryConfigFragment = SceneryConfigDialogFragmentFactory
-					.getByStringResource(mapper.getResourceId());
+			SceneryConfigEditDialogFragment editSceneryConfigFragment = new SceneryConfigEditDialogFragment();
 
 			editSceneryConfigFragment.setArguments(args);
 

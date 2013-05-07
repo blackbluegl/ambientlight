@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_widget_roomswitches"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_shape_background"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/defaultmargin"
+    android:paddingRight="@dimen/defaultmargin" >
+
+    <TextView
+        android:id="@+id/update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Räume"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</LinearLayout>
