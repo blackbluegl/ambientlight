@@ -19,7 +19,7 @@ import org.ambientlight.device.stripe.Stripe;
 
 public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDeviceDriver {
 
-	Map<Integer, Stripe> stripes = new HashMap<Integer, Stripe>();
+	List<Stripe> stripes = new ArrayList<Stripe>();
 
 	Socket dataSocket = null;
 	OutputStream os = null;
@@ -48,11 +48,9 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				controlSocket.getInputStream()));
 
-		for (int i = 0; i < stripes.size(); i++) {
+		for (Stripe current : stripes) {
 
-			Stripe current = stripes.get(i);
-
-			os.println("stripe_port=" + i);
+			os.println("stripe_port=" + current.configuration.port);
 
 			in = new BufferedReader(new InputStreamReader(
 					controlSocket.getInputStream()));
@@ -62,6 +60,18 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 				throw new IOException("server did not correclty respond!");
 			}
 
+			
+			os.println("protocoll_type=" + current.configuration.protocollType);
+
+			in = new BufferedReader(new InputStreamReader(
+					controlSocket.getInputStream()));
+
+			String protocollType = in.readLine();
+			if (protocollType == null || !"OK".equals(protocollType)) {
+				throw new IOException("server did not correclty respond!");
+			}
+
+			
 			os.println("pixel_size=" + current.configuration.pixelAmount);
 
 			in = new BufferedReader(new InputStreamReader(
@@ -108,20 +118,12 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 
 	@Override
 	public List<Stripe> getAllStripes() {
-		//a stripe is adressed by a port. the caller of this callback method is just interested in the stripes.
-		List<Stripe> result;
-		if (this.stripes.values() instanceof List) {
-			result = (List<Stripe>) this.stripes.values();
-		} else {
-			result = new ArrayList<Stripe>(this.stripes.values());
-		}
-		return result;
+		return this.stripes;
 	}
 
 	@Override
-	public void attachStripe(Stripe stripe, int port) {
-		this.stripes.put(port, stripe);
-
+	public void attachStripe(Stripe stripe) {
+		this.stripes.add(stripe);
 	}
 
 	@Override

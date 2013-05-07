@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Color;
 import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
@@ -89,6 +90,7 @@ public class CreateTestConfig {
 		
 		
 		StripeConfiguration sc = new StripeConfiguration();
+		sc.protocollType=StripeConfiguration.PROTOCOLL_TYPE_TM1812;
 		sc.pixelAmount=128;
 		sc.port=0;
 	
@@ -259,15 +261,14 @@ public class CreateTestConfig {
 		
 		SimpleColorRenderingProgramConfiguration scL01 = new SimpleColorRenderingProgramConfiguration();
 		int i = (int) (Math.random()*256);
-		scL01.setB(i);
-		scL01.setG(10);
-		scL01.setR(100);
+		
+		Color color = new Color(i, 10, 100);
+		scL01.rgb=color.getRGB();
 		scL01.powerState=true;
 		
 		SimpleColorRenderingProgramConfiguration scL02 = new SimpleColorRenderingProgramConfiguration();
-		scL02.setB(122);
-		scL02.setG(i);
-		scL02.setR(100);
+		Color color2 = new Color(i, 10, 100);
+		scL02.rgb=color2.getRGB();
 		scL02.powerState=true;
 		lc.sceneryConfigurationBySzeneryName.put("scene1", scL01);
 		lc.sceneryConfigurationBySzeneryName.put("scene2", scL02);

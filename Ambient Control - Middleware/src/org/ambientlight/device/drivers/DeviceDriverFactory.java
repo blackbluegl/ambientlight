@@ -25,7 +25,7 @@ public class DeviceDriverFactory {
 
 			for(StripeConfiguration currentStripeConfig : configuration.configuredStripes){
 				Stripe currentStripe = this.initializeStripeForDevice( currentStripeConfig);
-				device.attachStripe(currentStripe, currentStripeConfig.port);
+				device.attachStripe(currentStripe);
 			}
 			
 			device.connect();
@@ -58,7 +58,7 @@ public class DeviceDriverFactory {
 			
 			for(StripeConfiguration currentStripeConfig : configuration.configuredStripes){
 				Stripe currentStripe = this.initializeStripeForDevice( currentStripeConfig);
-				device.attachStripe(currentStripe, currentStripeConfig.port);
+				device.attachStripe(currentStripe);
 			}
 			
 			device.connect();

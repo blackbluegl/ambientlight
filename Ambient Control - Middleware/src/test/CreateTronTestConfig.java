@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Color;
 import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
@@ -98,9 +99,8 @@ public class CreateTronTestConfig {
 
 		SimpleColorRenderingProgramConfiguration simpleColor = new SimpleColorRenderingProgramConfiguration();
 		simpleColor.powerState = true;
-		simpleColor.setB(20);
-		simpleColor.setR(20);
-		simpleColor.setG(20);
+		Color c = new Color(20,20,20);
+		simpleColor.rgb=c.getRGB();
 		background.sceneryConfigurationBySzeneryName.put("scene1", simpleColor);
 		background.height = 200;
 		background.layerNumber = 1;
@@ -123,16 +123,15 @@ public class CreateTronTestConfig {
 	private void createSceneryMapping(RoomConfiguration rc, LightObjectConfiguration lc) {
 
 		TronRenderingProgrammConfiguration config = new TronRenderingProgrammConfiguration();
-		config.setLightPointAmount(1);
-		config.setSpeed(1);
+		config.lightPointAmount=(1);
+		config.speed=(1);
 		config.powerState = true;
-		config.setR(20);
-		config.setG(20);
-		config.setB(60);
-		config.setLightImpact(0.8);
-		config.setSparkleSize(0.1);
-		config.setSparkleStrength(0.3);
-		config.setTailLength(0.2);
+		Color c = new Color(20,20,20);
+		config.rgb=c.getRGB();
+		config.lightImpact=(0.8);
+		config.sparkleSize=(0.1);
+		config.sparkleStrength=(0.3);
+		config.tailLength=(0.2);
 		lc.sceneryConfigurationBySzeneryName.put("scene1", config);
 	}
 

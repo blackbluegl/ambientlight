@@ -13,7 +13,7 @@ public interface LedStripeDeviceDriver extends DeviceDriver{
 
 	public List<Stripe> getAllStripes();
 	
-	public void attachStripe(Stripe stripe, int port);
+	public void attachStripe(Stripe stripe);
 	
 	public void connect() throws UnknownHostException, IOException;
 	
