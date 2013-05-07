@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 
 public class SceneryConfigEditDialogHolder extends FragmentActivity {
 
-	public AbstractSceneryConfigEditDialogFragment myFragment;
+	public SceneryConfigEditDialogFragment myFragment;
 
 
 	@Override
@@ -27,7 +27,7 @@ public class SceneryConfigEditDialogHolder extends FragmentActivity {
 		setContentView(R.layout.activity_dialog_holder);
 
 		Bundle values = getIntent().getExtras();
-		this.myFragment = SceneryConfigDialogFragmentFactory.getByStringResource(values.getInt("resourceId"));
+		this.myFragment = new SceneryConfigEditDialogFragment();
 		myFragment.setArguments(values);
 		setTitle(myFragment.getTitle());
 

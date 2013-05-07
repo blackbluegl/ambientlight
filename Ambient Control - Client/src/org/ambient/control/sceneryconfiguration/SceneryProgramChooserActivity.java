@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.ambient.control.R;
 import org.ambient.util.GuiUtils;
+import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 
 import android.content.Context;
 import android.content.Intent;
@@ -39,19 +41,16 @@ public class SceneryProgramChooserActivity extends FragmentActivity {
 			return;
 		}
 		values.putBoolean("editAsNew", true);
-		
+
 		final boolean isLargeLayout = GuiUtils.isLargeLayout(this);
-		// lightObject = values.getString("lightObject");
-		// roomServer = values.getString("roomServer");
-		//
 		setContentView(R.layout.activity_sceneries_chooser);
 		ListView listView = (ListView) findViewById(R.id.listViewSceneryChooser);
 
 		final Resources res = getResources();
-		final Map<String, Integer> valuesMap = new HashMap<String, Integer>();
+		final Map<String, String> valuesMap = new HashMap<String, String>();
 
-		valuesMap.put(res.getString(R.string.program_simple_color), R.string.program_simple_color);
-		valuesMap.put(res.getString(R.string.program_tron), R.string.program_tron);
+		valuesMap.put(res.getString(R.string.program_simple_color), SimpleColorRenderingProgramConfiguration.class.getName());
+		valuesMap.put(res.getString(R.string.program_tron), TronRenderingProgrammConfiguration.class.getName());
 
 		ListIconArrayAdapter adapter = new ListIconArrayAdapter(this, valuesMap.keySet().toArray(new String[0]));
 		listView.setAdapter(adapter);
@@ -61,26 +60,22 @@ public class SceneryProgramChooserActivity extends FragmentActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				TextView result = (TextView) view.findViewById(R.id.textViewSceneryChooserEntryLabel);
-				int resourceId = valuesMap.get(result.getText());
-
+				
+				values.putString("configType", valuesMap.get(result.getText()));
+				values.putString("title",result.getText().toString());
+				
 				FragmentManager fm = getSupportFragmentManager();
-				AbstractSceneryConfigEditDialogFragment editSceneryConfigFragment = SceneryConfigDialogFragmentFactory
-						.getByStringResource(resourceId);
+				SceneryConfigEditDialogFragment editSceneryConfigFragment = new SceneryConfigEditDialogFragment();
 
 				editSceneryConfigFragment.setArguments(values);
 
 				if (isLargeLayout) {
-					// The device is using a large layout, so show the fragment
-					// as a
-					// dialog
+					// The device is using a large layout, so show the fragment as a dialog
 					editSceneryConfigFragment.show(fm, null);
 				} else {
-					// The screen is smaller, so show the fragment in a
-					// fullscreen
-					// activity
+					// The screen is smaller, so show the fragment in a fullscreen activity
 					Intent i = new Intent(myself, SceneryConfigEditDialogHolder.class);
 					i.putExtras(values);
-					i.putExtra("resourceId", resourceId);
 					startActivity(i);
 				}
 
