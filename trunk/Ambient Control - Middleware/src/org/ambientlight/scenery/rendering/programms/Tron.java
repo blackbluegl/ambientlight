@@ -120,7 +120,9 @@ public class Tron extends RenderingProgramm {
 		this.tailLength = tailLength;
 		this.sparkleStrength = sparkleStrength;
 		this.sparkleSize = sparkleSize;
-		this.speed = speed;
+		// this functions helps to map values below 7 to a value slower than 1.
+		// on the other a speed of 20 will be mapped to a real speed of 40
+		this.speed = (int) Math.sqrt(speed * 8);
 		this.tokensAmount = tokensAmount;
 
 		this.lightObjectXOffset = lightObject.getConfiguration().xOffsetInRoom;

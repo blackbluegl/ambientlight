@@ -22,6 +22,7 @@ public class TestMultiStripeOEDevice {
 		StripeConfiguration sc = new StripeConfiguration();
 		sc.pixelAmount = 3;
 		sc.port = 0;
+		sc.protocollType=StripeConfiguration.PROTOCOLL_TYPE_TM1812;
 		
 		Stripe myStripe = new Stripe(sc);
 		
@@ -30,7 +31,7 @@ public class TestMultiStripeOEDevice {
 			myStripe.setPixel(i, c.getRGB());
 		}
 		
-		device.attachStripe(myStripe, 0);
+		device.attachStripe(myStripe);
 		
 		device.connect();
 

@@ -41,8 +41,7 @@ public class RenderingProgrammFactory implements
 		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery) instanceof SimpleColorRenderingProgramConfiguration) {
 			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject
 					.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery);
-			Color simpleColor = new Color(config.getR(), config.getG(),
-					config.getB());
+			Color simpleColor = new Color(config.rgb);
 			renderProgram = new SimpleColor(simpleColor);
 		}
 		
@@ -50,9 +49,9 @@ public class RenderingProgrammFactory implements
 		if (lightObject.getConfiguration().getSceneryConfigurationBySceneryName(currentScenery) instanceof TronRenderingProgrammConfiguration) {
 			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.getConfiguration()
 					.getSceneryConfigurationBySceneryName(currentScenery);
-			Color color = new Color(config.getR(), config.getG(), config.getB());
-			renderProgram = new Tron(lightObject, color, config.getLightImpact(), config.getTailLength(),
-					config.getSparkleSize(), config.getSparkleSize(), config.getSpeed(), config.getLightPointAmount());
+			Color color = new Color(config.rgb);
+			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength,
+					config.sparkleStrength, config.sparkleSize, config.speed, config.lightPointAmount);
 		}
 		
 		

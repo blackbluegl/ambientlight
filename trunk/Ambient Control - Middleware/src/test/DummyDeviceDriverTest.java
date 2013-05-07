@@ -18,7 +18,7 @@ public class DummyDeviceDriverTest {
 		
 		Stripe myStripe = new Stripe(sc);
 		
-		dummy.attachStripe(myStripe, 0);
+		dummy.attachStripe(myStripe);
 		
 		dummy.connect();
 		while(true){

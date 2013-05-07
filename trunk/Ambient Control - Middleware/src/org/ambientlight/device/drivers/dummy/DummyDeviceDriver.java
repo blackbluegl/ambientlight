@@ -25,7 +25,7 @@ public class DummyDeviceDriver implements LedStripeDeviceDriver {
 	}
 
 	@Override
-	public void attachStripe(Stripe stripe, int port) {
+	public void attachStripe(Stripe stripe) {
 		
 		this.myStripes.add(stripe);
 		
