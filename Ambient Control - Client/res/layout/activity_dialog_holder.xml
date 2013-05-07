@@ -21,13 +21,14 @@
         android:layout_above="@+id/buttonDialogHolderApply"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="@dimen/defaultmargin" >
+        android:layout_alignParentTop="true" >
 
         <LinearLayout
             android:id="@+id/linearLayoutDialogContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/defaultmargin"
+            android:layout_marginRight="@dimen/defaultmargin"
             android:orientation="vertical" >
 
         </LinearLayout>
