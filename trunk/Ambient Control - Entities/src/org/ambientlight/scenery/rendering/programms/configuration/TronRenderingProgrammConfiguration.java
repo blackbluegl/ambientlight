@@ -1,5 +1,8 @@
 package org.ambientlight.scenery.rendering.programms.configuration;
 
+import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.Presentation;
+import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.scenery.SceneryConfiguration;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -7,106 +10,33 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("TronRenderingProgram")
 public class TronRenderingProgrammConfiguration extends SceneryConfiguration implements Cloneable{
-
-	int r;
-	int g;
-	int b;
-	double lightImpact;
-	double tailLength;
-	double sparkleStrength;
-	double sparkleSize;
-	int lightPointAmount;
-	double speed;
-
-
-	public int getR() {
-		return r;
-	}
-
-
-	public void setR(int r) {
-		this.r = r;
-	}
-
-
-	public int getG() {
-		return g;
-	}
-
-
-	public void setG(int g) {
-		this.g = g;
-	}
-
-
-	public int getB() {
-		return b;
-	}
-
-
-	public void setB(int b) {
-		this.b = b;
-	}
-
-
-	public double getLightImpact() {
-		return lightImpact;
-	}
-
-
-	public void setLightImpact(double lightImpact) {
-		this.lightImpact = lightImpact;
-	}
-
-
-	public double getTailLength() {
-		return tailLength;
-	}
-
-
-	public void setTailLength(double tailLength) {
-		this.tailLength = tailLength;
-	}
-
-
-	public double getSparkleStrength() {
-		return sparkleStrength;
-	}
-
-
-	public void setSparkleStrength(double sparkleStrength) {
-		this.sparkleStrength = sparkleStrength;
-	}
-
-
-	public double getSparkleSize() {
-		return sparkleSize;
-	}
-
-
-	public void setSparkleSize(double sparkleSize) {
-		this.sparkleSize = sparkleSize;
-	}
-
-
-	public int getLightPointAmount() {
-		return lightPointAmount;
-	}
-
-
-	public void setLightPointAmount(int lightPointAmount) {
-		this.lightPointAmount = lightPointAmount;
-	}
-
-
-	public double getSpeed() {
-		return speed;
-	}
-
-
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
+	@Presentation(position="0",name="Anzahl der Lichtpunkte")
+	@TypeDef(min="1",max="10")
+	public int lightPointAmount;
+	
+	@Presentation(position="1",name="Helligkeit der Lichtpunkte")
+	@TypeDef(min="0.0",max="1.0")
+	public double lightImpact;
+	
+	@Presentation(position="2",name="Länge der Lichtpunkte")
+	@TypeDef(min="0.0",max="1.0")
+	public double tailLength;
+	
+	@Presentation(position="3",name="Helligkeit des Funkeln")
+	@TypeDef(min="0.0",max="1.0")
+	public double sparkleStrength;
+	
+	@Presentation(position="4",name="Länge des Funkeln")
+	@TypeDef(min="0.0",max="1.0")
+	public double sparkleSize;
+	
+	@Presentation(position="5",name="Geschwindigkeit")
+	@TypeDef(min="0.0",max="20.0")
+	public double speed;
+	
+	@Presentation(position="6",name="Hintergrundfarbe")
+	@TypeDef(fieldType=FieldType.COLOR)
+	public int rgb;
 	
 	public TronRenderingProgrammConfiguration clone(){
 		try {
