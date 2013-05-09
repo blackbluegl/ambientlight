@@ -53,7 +53,12 @@
                 android:resource="@xml/appwidgetprovider" />
         </receiver>
         
-    <service android:name="org.ambient.widgets.UpdateWidgetService"></service> 
+    <service android:name="org.ambient.widgets.UpdateWidgetService">
+        <intent-filter >
+                <action 
+                    android:name="Test" />
+            </intent-filter>
+    </service> 
     </application>
 
 
