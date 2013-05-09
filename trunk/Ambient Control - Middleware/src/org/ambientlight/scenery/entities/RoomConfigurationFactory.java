@@ -14,11 +14,11 @@ import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.LightObjectConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
 import org.ambientlight.room.objects.SwitchObjectConfiguration;
-import org.ambientlight.scenery.SceneryConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
-import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRenderingProgrammConfiguration;
+import org.ambientlight.scenery.actor.switching.configuration.SwitchingConfiguration;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -63,7 +63,7 @@ public class RoomConfigurationFactory {
 		xstream.processAnnotations(LightObjectConfiguration.class);
 		xstream.processAnnotations(SwitchObjectConfiguration.class);
 		xstream.processAnnotations(RoomItemConfiguration.class);
-		xstream.processAnnotations(SceneryConfiguration.class);
+		xstream.processAnnotations(EntitiyConfiguration.class);
 		xstream.processAnnotations(StripeConfiguration.class);
 		xstream.processAnnotations(DeviceConfiguration.class);
 		xstream.processAnnotations(SwitchDeviceOverEthernetConfiguration.class);

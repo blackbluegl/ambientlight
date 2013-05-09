@@ -22,7 +22,7 @@ import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.LightObjectConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
 import org.ambientlight.room.objects.SwitchObjectConfiguration;
-import org.ambientlight.scenery.SceneryConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
 import org.ambientlight.scenery.entities.LightObject;
 import org.ambientlight.scenery.entities.RoomConfigurationFactory;
 import org.ambientlight.ws.container.RenderingProgrammConfigurationLightObjectNameMapper;
@@ -123,7 +123,7 @@ public class SceneryControl {
 
 		for (RoomItemConfiguration currentItemConfiguration : this.getRoomConfiguration().roomItemConfigurations) {
 
-			SceneryConfiguration newSceneryConfig = currentItemConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
+			EntitiyConfiguration newSceneryConfig = currentItemConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
 
 			// only switch lightObjects which are not bypassed by user -
 			// therefore preserve state of the old config and copy to the new
@@ -157,7 +157,7 @@ public class SceneryControl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response changeItemToScenery(@PathParam("sceneryName") String sceneryName, String itemName) {
 		RoomItemConfiguration itemConfiguration = this.getRoomConfiguration().getRoomItemConfigurationByName(itemName);
-		SceneryConfiguration newSceneryConfig = itemConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
+		EntitiyConfiguration newSceneryConfig = itemConfiguration.getSceneryConfigurationBySceneryName(sceneryName);
 
 		if (itemConfiguration instanceof LightObjectConfiguration) {
 			// update renderer
@@ -188,7 +188,7 @@ public class SceneryControl {
 		for (RoomItemConfiguration existingRoomItemConfiguration : AmbientControlMW.getRoomConfig().roomItemConfigurations) {
 
 			// extract configuration for the current lightobject
-			SceneryConfiguration newSceneryConfig = null;
+			EntitiyConfiguration newSceneryConfig = null;
 			for (RenderingProgrammConfigurationLightObjectNameMapper possibleCurrentConfig : configList) {
 				if (possibleCurrentConfig.lightObjectName.equals(existingRoomItemConfiguration.name)) {
 					newSceneryConfig = possibleCurrentConfig.config;
@@ -219,7 +219,7 @@ public class SceneryControl {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createOrUpdateSceneryConfigurationForItem(@PathParam("sceneryName") String sceneryName,
-			@PathParam("itemName") String itemName, SceneryConfiguration newSceneryConfig) {
+			@PathParam("itemName") String itemName, EntitiyConfiguration newSceneryConfig) {
 
 		System.out.println("SceneryControlWS:  setting config for " + itemName + " to " + newSceneryConfig.getClass().getName());
 
