@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.ambientlight.scenery.SceneryConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
@@ -13,9 +13,9 @@ public abstract class RoomItemConfiguration {
 
 	public String name;
 
-	public Map<String, SceneryConfiguration> sceneryConfigurationBySzeneryName = new HashMap<String, SceneryConfiguration>();
+	public Map<String, EntitiyConfiguration> sceneryConfigurationBySzeneryName = new HashMap<String, EntitiyConfiguration>();
 
-	public SceneryConfiguration getSceneryConfigurationBySceneryName(String sceneryName) {
+	public EntitiyConfiguration getSceneryConfigurationBySceneryName(String sceneryName) {
 		return sceneryConfigurationBySzeneryName.get(sceneryName);
 	}
 
