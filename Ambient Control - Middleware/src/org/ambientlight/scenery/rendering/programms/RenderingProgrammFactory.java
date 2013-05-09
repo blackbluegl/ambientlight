@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.scenery.SceneryConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.entities.LightObject;
 import org.ambientlight.scenery.rendering.Renderer;
 import org.ambientlight.scenery.rendering.effects.RenderingEffect;
 import org.ambientlight.scenery.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.scenery.rendering.effects.transitions.FadeInTransition;
-import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.rendering.util.ImageUtil;
 
 public class RenderingProgrammFactory implements
@@ -100,7 +100,7 @@ public class RenderingProgrammFactory implements
 
 	
 	public void updateRenderingConfigurationForLightObject(Renderer renderer,
-			SceneryConfiguration newConfig, LightObject lightObject) {
+			EntitiyConfiguration newConfig, LightObject lightObject) {
 		String currentScenery = AmbientControlMW.getRoomConfig().currentScenery;
 		renderer.removeRenderTaskForLightObject(lightObject);
 		lightObject.getConfiguration().sceneryConfigurationBySzeneryName.remove(currentScenery);

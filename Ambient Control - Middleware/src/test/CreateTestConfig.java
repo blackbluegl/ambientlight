@@ -11,9 +11,9 @@ import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.LightObjectConfiguration;
 import org.ambientlight.room.objects.SwitchObjectConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.switching.configuration.SwitchingConfiguration;
 import org.ambientlight.scenery.entities.RoomConfigurationFactory;
-import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
 
 public class CreateTestConfig {
 

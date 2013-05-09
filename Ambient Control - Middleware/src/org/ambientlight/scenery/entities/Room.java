@@ -68,6 +68,7 @@ public class Room {
 		return result;
 	}
 
+	
 	public SwtichDeviceDriver getSwitchingDevice() {
 		// TODO actually we use the first found device. later a correlation between the device and the switches could be possible
 		for(DeviceDriver currentDevice : this.devices){

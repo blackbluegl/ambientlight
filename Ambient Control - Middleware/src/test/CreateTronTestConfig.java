@@ -9,9 +9,9 @@ import org.ambientlight.device.stripe.StripeConfiguration;
 import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.LightObjectConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.entities.RoomConfigurationFactory;
-import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 
 
 public class CreateTronTestConfig {
