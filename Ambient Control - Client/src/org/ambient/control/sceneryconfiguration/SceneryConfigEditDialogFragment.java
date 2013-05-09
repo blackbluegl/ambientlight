@@ -2,6 +2,7 @@ package org.ambient.control.sceneryconfiguration;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,7 +13,7 @@ import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
-import org.ambientlight.scenery.SceneryConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,8 +40,8 @@ public class SceneryConfigEditDialogFragment extends DialogFragment {
 	String lightObject;
 	String roomServer;
 	String title;
-	private SceneryConfiguration config;
-	private SceneryConfiguration oldConfig;
+	private EntitiyConfiguration config;
+	private EntitiyConfiguration oldConfig;
 	private boolean editAsNew = false;
 
 
@@ -143,27 +144,27 @@ public class SceneryConfigEditDialogFragment extends DialogFragment {
 
 		if (editAsNew) {
 			String configType = getArguments().getString("configType");
-			this.config = (SceneryConfiguration) Class.forName(configType).newInstance();
+			this.config = (EntitiyConfiguration) Class.forName(configType).newInstance();
 			this.oldConfig = current.getSceneryConfigurationBySceneryName(room.currentScenery);
 		} else {
 			this.config = current.getSceneryConfigurationBySceneryName(room.currentScenery);
 			Method cloneMethod = config.getClass().getMethod("clone");
-			this.oldConfig = (SceneryConfiguration) cloneMethod.invoke(config);
+			this.oldConfig = (EntitiyConfiguration) cloneMethod.invoke(config);
 		}
 	}
 
 
-	protected SceneryConfiguration getConfig() {
+	protected EntitiyConfiguration getConfig() {
 		return this.config;
 	}
 
 
-	protected SceneryConfiguration getOldConfig() {
+	protected EntitiyConfiguration getOldConfig() {
 		return this.oldConfig;
 	}
 
 
-	public View createViewByConfig(final SceneryConfiguration config) throws IllegalArgumentException, IllegalAccessException {
+	public View createViewByConfig(final EntitiyConfiguration config) throws IllegalArgumentException, IllegalAccessException {
 
 		LinearLayout content = new LinearLayout(this.getActivity());
 		content.setOrientation(LinearLayout.VERTICAL);
@@ -190,7 +191,7 @@ public class SceneryConfigEditDialogFragment extends DialogFragment {
 	}
 
 
-	private void addFieldToView(final SceneryConfiguration config, LinearLayout content, final Field field, String name)
+	private void addFieldToView(final EntitiyConfiguration config, LinearLayout content, final Field field, String name)
 			throws IllegalAccessException {
 		TypeDef description = field.getAnnotation(TypeDef.class);
 		TextView label = new TextView(content.getContext());

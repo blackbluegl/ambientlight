@@ -1,13 +1,18 @@
 package org.ambient.widgets;
 
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 import org.ambient.control.R;
+import org.ambient.control.rest.RestClient;
+import org.ambient.control.rest.URLUtils;
+import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.objects.RoomItemConfiguration;
 
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,48 +23,74 @@ public class UpdateWidgetService extends Service {
 
 	private static final String LOG = "de.vogella.android.widget.example";
 
-
 	@Override
-	public void onStart(Intent intent, int startId) {
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		
+		
+		String switchRoom = intent.getExtras().getString("switchClicked");
+		boolean powerState = intent.getExtras().getBoolean("powerState", false);
+		if (switchRoom != null) {
+			try {
+				RestClient.setPowerStateForRoom(switchRoom, powerState);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+		
+		
 		Log.i(LOG, "Called");
-		// Create some random data
-
+		String[] serverNames = URLUtils.ANDROID_ADT_SERVERS;
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.getApplicationContext());
 
 		int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
 
-		ComponentName thisWidget = new ComponentName(getApplicationContext(), RoomSwitchesWidgetProvider.class);
-		int[] allWidgetIds2 = appWidgetManager.getAppWidgetIds(thisWidget);
-		Log.w(LOG, "From Intent" + String.valueOf(allWidgetIds.length));
-		Log.w(LOG, "Direct" + String.valueOf(allWidgetIds2.length));
-
 		for (int widgetId : allWidgetIds) {
-			// Create some random data
-			int number = (new Random().nextInt(100));
 
 			RemoteViews remoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),
 					R.layout.widget_roomscenery_switch);
-			Log.w("WidgetExample", String.valueOf(number));
-			// Set the text
-			remoteViews.setTextViewText(R.id.update, "Random: " + String.valueOf(number));
+			remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
+			for (String room : serverNames) {
+				try {
+					RoomConfiguration roomConfig = RestClient.getRoom(room, this.getApplicationContext());
+					boolean switchOn = false;
+					for (RoomItemConfiguration current : roomConfig.roomItemConfigurations) {
+						if (current.getSceneryConfigurationBySceneryName(roomConfig.currentScenery).powerState == true) {
+							switchOn = true;
+							break;
+						}
+					}
+					RemoteViews switchIcon = new RemoteViews(this.getApplicationContext().getPackageName(),
+							R.layout.widget_icon_switch);
+					if (switchOn) {
+						switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_active);
+					} else {
+						switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_disabled);
+					}
+					switchIcon.setTextViewText(R.id.textViewWidgetSwitch, roomConfig.roomName);
+					remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
 
-			RemoteViews switchIcon = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.widget_icon_switch);
-			remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
-			RemoteViews switchIcon2 = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.widget_icon_switch);
-			remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon2);
+					// Register an onClickListener
+					Intent clickIntent = new Intent(this.getApplicationContext(), RoomSwitchesWidgetProvider.class);
+					
+					clickIntent.setAction("Test");
+					clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+					clickIntent.putExtra("switchClicked", room);
+					clickIntent.putExtra("powerState", !switchOn);
 
-			// Register an onClickListener
-			Intent clickIntent = new Intent(this.getApplicationContext(), UpdateWidgetService.class);
+					PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
+							PendingIntent.FLAG_UPDATE_CURRENT);
+					switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
-			clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-			clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setOnClickPendingIntent(R.id.update, pendingIntent);
 			appWidgetManager.updateAppWidget(widgetId, remoteViews);
 		}
-		stopSelf();
+		return START_STICKY;
 	}
 
 

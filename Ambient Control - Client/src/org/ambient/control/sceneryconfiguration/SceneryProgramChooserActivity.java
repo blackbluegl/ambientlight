@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.ambient.control.R;
 import org.ambient.util.GuiUtils;
-import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRenderingProgrammConfiguration;
 
 import android.content.Context;
 import android.content.Intent;

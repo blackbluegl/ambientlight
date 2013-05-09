@@ -8,7 +8,7 @@ import org.ambient.control.home.HomeRefreshCallback;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
-import org.ambientlight.scenery.SceneryConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
 import org.ambientlight.ws.container.RenderingProgrammConfigurationLightObjectNameMapper;
 
 import android.content.Context;
@@ -58,7 +58,7 @@ public class RestClient {
 	}
 
 
-	public static void setProgramForLightObject(String hostName, String sceneryName, String itemName, SceneryConfiguration config) {
+	public static void setProgramForLightObject(String hostName, String sceneryName, String itemName, EntitiyConfiguration config) {
 		SetLightObjectConfigurationTask task = new SetLightObjectConfigurationTask();
 		task.execute(hostName, sceneryName, itemName, config);
 	}

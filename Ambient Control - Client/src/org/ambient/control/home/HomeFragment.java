@@ -17,10 +17,10 @@ import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.objects.RoomItemConfiguration;
-import org.ambientlight.scenery.SceneryConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.rendering.programms.configuration.TronRenderingProgrammConfiguration;
-import org.ambientlight.scenery.switching.configuration.SwitchingConfiguration;
+import org.ambientlight.scenery.EntitiyConfiguration;
+import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRenderingProgrammConfiguration;
+import org.ambientlight.scenery.actor.switching.configuration.SwitchingConfiguration;
+
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -271,9 +271,9 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			final RoomItemConfiguration currentConfig, View lightObjectView) {
 		AbstractRoomItemViewMapper result = null;
 
-		SceneryConfiguration sceneryConfig = currentConfig.getSceneryConfigurationBySceneryName(sceneryName);
+		EntitiyConfiguration sceneryConfig = currentConfig.getSceneryConfigurationBySceneryName(sceneryName);
 
-		if (sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
+		if (sceneryConfig instanceof org.ambientlight.scenery.actor.rendering.programms.configuration.SimpleColorRenderingProgramConfiguration) {
 			result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.name, R.string.program_simple_color,
 					serverName, sceneryConfig.powerState, sceneryConfig.bypassOnSceneryChange);
 		}
@@ -393,7 +393,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			try {
 				RoomConfiguration rc = RestClient.getRoom(roomServer, getActivity().getApplicationContext());
 				RoomItemConfiguration roomItem = rc.getRoomItemConfigurationByName(lightObjectName);
-				SceneryConfiguration sc = roomItem.getSceneryConfigurationBySceneryName(scenery);
+				EntitiyConfiguration sc = roomItem.getSceneryConfigurationBySceneryName(scenery);
 				sc.bypassOnSceneryChange = !sc.bypassOnSceneryChange;
 				RestClient.setProgramForLightObject(roomServer, scenery, lightObjectName, sc);
 				mapper.setBypassSceneryChangeState(sc.bypassOnSceneryChange);
