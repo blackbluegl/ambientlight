@@ -17,7 +17,7 @@ class Tmp1812SPI {
 public:
 	Tmp1812SPI();
 	virtual ~Tmp1812SPI();
-	int setup();
+	int setup(int port);
 	int sendData(int channel, unsigned char *buffer, int sizeOfBuffer);
 private:
 	string convertByteToTm1812Word(unsigned char byte);

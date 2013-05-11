@@ -25,19 +25,16 @@ CotrolSocketHandling::CotrolSocketHandling() {
 CotrolSocketHandling::~CotrolSocketHandling() {
 }
 
-
 #define MAX_PAYLOAD (6000)
 
-
 /*the client connects to this socket. initializes the stripe ports
-  and the stripe led amount and quits to send data afterwards*/
-map<int,StripePortMapping> CotrolSocketHandling::handleControlRequests(int workingControlSocket) {
+ and the stripe led amount and quits to send data afterwards*/
+map<int, StripePortMapping> CotrolSocketHandling::handleControlRequests(int workingControlSocket) {
 
 	//TODO stripeport is indirectly calulated by sequence number. this should be changed and given by the config of a stripe
 
-	map<int,StripePortMapping> stripePortMapping;
-	int stripePortForNextRequest = -1;
-	string protocollTypeForNextRequest;
+	map<int, StripePortMapping> stripePortMapping;
+
 	string RESPONSE_OK = "OK\n";
 
 	while (1) {
@@ -45,96 +42,107 @@ map<int,StripePortMapping> CotrolSocketHandling::handleControlRequests(int worki
 		string buffer;
 
 		/* end if client closed connection or a failure did occour */
-		buffer=readLine(workingControlSocket);
+		buffer = readLine(workingControlSocket);
 		if (buffer.empty()) {
 			return stripePortMapping;
 		}
 
-		//set the stripe port mapping array index - get position and keep for next value
-		int currentStripePortNumber = getCommandIntValue(buffer, "stripe_port");
-		if (currentStripePortNumber > -1) {
-			stripePortForNextRequest = currentStripePortNumber;
-			writeLine(workingControlSocket, RESPONSE_OK);
-		}
+		std::string::size_type prevPos = 0, pos = 0;
 
-		//set stripeType
-		string currentStripeType = getCommandStringValue(buffer, "protocoll_type");
-		if (currentStripeType.empty() == false) {
-			protocollTypeForNextRequest = currentStripeType;
-			writeLine(workingControlSocket, RESPONSE_OK);
-		}
+		pos = buffer.find('|', pos);
+		string portString(buffer.substr(prevPos, pos - prevPos));
+		prevPos = ++pos;
 
-		//set the stripe port mapping array value
-		int currentPixelSize = getCommandIntValue(buffer, "pixel_size");
-		if (currentPixelSize > -1) {
-			StripePortMapping mapping;
-			mapping.pixelAmount=currentPixelSize;
-			mapping.protocollType= protocollTypeForNextRequest;
-			stripePortMapping[stripePortForNextRequest]=mapping;
+		pos = buffer.find('|', pos);
+		string typeString(buffer.substr(prevPos, pos - prevPos));
+		prevPos = ++pos;
 
-			writeLine(workingControlSocket, RESPONSE_OK);
-		}
+		pos = buffer.find('|', pos);
+		string pixelAmountString(buffer.substr(prevPos, pos - prevPos));
+		prevPos = ++pos;
+
+		StripePortMapping mapping;
+		mapping.pixelAmount = atoi(pixelAmountString.c_str());
+		mapping.port = atoi(portString.c_str());
+		mapping.protocollType = typeString;
+
+		stripePortMapping[mapping.port] = mapping;
+
+		writeLine(workingControlSocket, RESPONSE_OK);
 	}
 	return stripePortMapping;
 }
-
 
 string CotrolSocketHandling::readLine(int &socked) {
 	ssize_t rc;
 	char c;
 	string buffer = "";
 
-	do{
+	do {
 		if ((rc = read(socked, &c, +1)) == 1) {
 			buffer.append(&c);
 			if (c == '\n') {
 				break;
 			}
 		}
-	}
-	while(rc>0);
+	} while (rc > 0);
 	return buffer;
 }
 
-
 void CotrolSocketHandling::writeLine(int socked, string &message) {
-	send(socked,message.c_str(),message.size(),0);
+	send(socked, message.c_str(), message.size(), 0);
 }
 
-
 int CotrolSocketHandling::getCommandIntValue(string &inputString, string commandName) {
+	printf("int called %s.\n", inputString.c_str());
+	fflush(stdout);
+	printf("and command name is %s.\n", commandName.c_str());
+	fflush(stdout);
 
-	if(inputString.find(commandName) == string::npos){
+	if (inputString.find(commandName) == string::npos) {
+		printf("no int found\n");
+		fflush(stdout);
 		return -1;
 	}
 
 	size_t valueStartPosition = inputString.rfind("=");
 
 	if (valueStartPosition != string::npos) {
-
-		string stringResult = inputString.substr (valueStartPosition+1,inputString.size()-1);
+		printf("int found\n");
+		fflush(stdout);
+		string stringResult = inputString.substr(valueStartPosition + 1, inputString.size() - 1);
+		printf("int result is %s.\n", stringResult.c_str());
+		fflush(stdout);
 
 		int result = atoi(stringResult.c_str());
 		return result;
 	}
+	printf("no int found at end\n");
+	fflush(stdout);
 	return -1;
 }
 
 string CotrolSocketHandling::getCommandStringValue(string &inputString, string commandName) {
 
+	printf("string called %s .\n", inputString.c_str());
+	fflush(stdout);
+
 	if (inputString.find(commandName) == string::npos) {
+		printf("nothing found\n");
+		fflush(stdout);
 		return string();
 	}
 
 	size_t valueStartPosition = inputString.rfind("=");
 
 	if (valueStartPosition != string::npos) {
-
+		printf("something found\n");
+		fflush(stdout);
 		return inputString.substr(valueStartPosition + 1, inputString.size() - 1);
 	}
+	printf("string called returned NUL");
+	fflush(stdout);
+
 	return NULL;
 }
-
-
-
 

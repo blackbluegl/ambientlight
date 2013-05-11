@@ -17,7 +17,7 @@ class DirectSPI {
 public:
 	DirectSPI();
 	virtual ~DirectSPI();
-	int setup();
+	int setup(int port);
 	int sendData(int channel, unsigned char *buffer, int sizeOfBuffer);
 };
 

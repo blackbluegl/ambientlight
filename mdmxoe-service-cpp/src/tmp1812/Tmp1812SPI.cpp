@@ -28,10 +28,10 @@ Tmp1812SPI::~Tmp1812SPI() {
 	// TODO Auto-generated destructor stub
 }
 
-int Tmp1812SPI::setup() {
+int Tmp1812SPI::setup(int port) {
 	piHiPri(99);
 
-	if (wiringPiSPISetup (0, 2000000) < 0){
+	if (wiringPiSPISetup (port, 2000000) < 0){
 	  fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
 	  return -1;
 	}
