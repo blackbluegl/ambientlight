@@ -34,6 +34,23 @@ void DataSocketHandling::handleDataRequests(int &workingControlSocket, map<int, 
 
 	map<int, StripePortMapping>::iterator p;
 
+	for (p = stripePortMapping.begin(); p != stripePortMapping.end(); p++) {
+		//later this may be needed to send data to the right port!
+		int portNumber = p->first;
+		StripePortMapping mapping = p->second;
+		string protocoll = mapping.protocollType;
+
+		if (strcmp(protocoll.c_str(), TM1812) == 0) {
+			Tmp1812SPI spiDataSend;
+			spiDataSend.setup(portNumber);
+		}
+
+		if (strcmp(protocoll.c_str(), DIRECT_SPI) == 0) {
+			DirectSPI spiDataSend;
+			spiDataSend.setup(portNumber);
+		}
+	}
+
 	do {
 		for (p = stripePortMapping.begin(); p != stripePortMapping.end(); p++) {
 			//later this may be needed to send data to the right port!
@@ -50,13 +67,11 @@ void DataSocketHandling::handleDataRequests(int &workingControlSocket, map<int, 
 
 			if (strcmp(protocoll.c_str(), TM1812) == 0) {
 				Tmp1812SPI spiDataSend;
-				spiDataSend.setup();
 				spiDataSend.sendData(portNumber, data, 3 * pixelAmount);
 			}
 
 			if (strcmp(protocoll.c_str(), DIRECT_SPI) == 0) {
 				DirectSPI spiDataSend;
-				spiDataSend.setup();
 				spiDataSend.sendData(portNumber, data, 3 * pixelAmount);
 			}
 
