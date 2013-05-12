@@ -14,82 +14,88 @@ import org.ambientlight.device.stripe.StripeConfiguration;
 import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.scenery.entities.StripePart;
 
+
 public class DeviceDriverFactory {
 
-	public DeviceDriver createByName(DeviceConfiguration dc) throws UnknownHostException, IOException{
-		
-		if(dc instanceof DummyLedStripeDeviceConfiguration){
+	public DeviceDriver createByName(DeviceConfiguration dc) throws UnknownHostException, IOException {
+
+		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("init DummyLedDeviceDriver device");
 			DummyDeviceDriver device = new DummyDeviceDriver();
 			DummyLedStripeDeviceConfiguration configuration = (DummyLedStripeDeviceConfiguration) dc;
 
-			for(StripeConfiguration currentStripeConfig : configuration.configuredStripes){
-				Stripe currentStripe = this.initializeStripeForDevice( currentStripeConfig);
+			for (StripeConfiguration currentStripeConfig : configuration.configuredStripes) {
+				Stripe currentStripe = this.initializeStripeForDevice(currentStripeConfig);
 				device.attachStripe(currentStripe);
 			}
-			
+
 			device.connect();
-			
+
 			return device;
 		}
-		
-		if(dc instanceof DummySwitchDeviceConfiguration){
+
+		if (dc instanceof DummySwitchDeviceConfiguration) {
 			System.out.println("init DummySwitchingDeviceDriver device");
-			
+
 			return new DummySwitchingDeviceDriver();
 		}
-		
-		if(dc instanceof SwitchDeviceOverEthernetConfiguration){
+
+		if (dc instanceof SwitchDeviceOverEthernetConfiguration) {
 			System.out.println("init SwitchDeviceOverEthernetDriver device");
 			SwitchDeviceOverEthernetConfiguration config = (SwitchDeviceOverEthernetConfiguration) dc;
 			SwitchDeviceOverEthernetDriver device = new SwitchDeviceOverEthernetDriver();
 			device.setConfiguration(config);
-			
+
 			return device;
 		}
-		
-		if(dc instanceof MultiStripeOverEthernetClientDeviceConfiguration){
+
+		if (dc instanceof MultiStripeOverEthernetClientDeviceConfiguration) {
 			System.out.println("init MultistripeOverEthernetClientDeviceDriver device");
-			
+
 			MultiStripeOverEthernetClientDeviceConfiguration configuration = (MultiStripeOverEthernetClientDeviceConfiguration) dc;
-			
+
 			MultistripeOverEthernetClientDeviceDriver device = new MultistripeOverEthernetClientDeviceDriver();
 			device.setConfiguration(configuration);
-			
-			for(StripeConfiguration currentStripeConfig : configuration.configuredStripes){
-				Stripe currentStripe = this.initializeStripeForDevice( currentStripeConfig);
+
+			for (StripeConfiguration currentStripeConfig : configuration.configuredStripes) {
+				Stripe currentStripe = this.initializeStripeForDevice(currentStripeConfig);
 				device.attachStripe(currentStripe);
 			}
-			
-			device.connect();
-			
-			return  device;
+			try {
+				device.connect();
+			} catch (Exception e) {
+				System.out
+						.println("connect of MultistripeOverEthernetClientDeviceDriver device failed. Maybe the device comes up later: "
+								+ e.getMessage());
+			}
+			return device;
 		}
-		
+
 		return null;
 	}
-	
-	private Stripe initializeStripeForDevice(StripeConfiguration stripeConfig){
-		
+
+
+	private Stripe initializeStripeForDevice(StripeConfiguration stripeConfig) {
+
 		Stripe stripe = new Stripe(stripeConfig);
-		
+
 		List<StripePart> stripeParts = new ArrayList<StripePart>();
-		for(StripePartConfiguration currentStripePartConfig : stripeConfig.stripeParts){
+		for (StripePartConfiguration currentStripePartConfig : stripeConfig.stripeParts) {
 			StripePart currentStripePart = this.initializeStripePartForStripe(currentStripePartConfig, stripe);
 			stripeParts.add(currentStripePart);
 		}
-		
-		stripe.setStripeParts(stripeParts);	
+
+		stripe.setStripeParts(stripeParts);
 
 		return stripe;
 	}
 
-	
+
 	private StripePart initializeStripePartForStripe(StripePartConfiguration stripePartConfig, Stripe stripe) {
 		StripePart stripePart = new StripePart();
 		stripePart.configuration = stripePartConfig;
 		stripePart.stripe = stripe;
-		
+
 		return stripePart;
 	}
 }

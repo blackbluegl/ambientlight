@@ -9,38 +9,44 @@ import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEt
 import org.ambientlight.device.stripe.Stripe;
 import org.ambientlight.device.stripe.StripeConfiguration;
 
+
 public class TestMultiStripeOEDevice {
 
-	public static void main(String[] args) throws UnknownHostException, IOException{
+	public static void main(String[] args) throws UnknownHostException, IOException {
 		MultistripeOverEthernetClientDeviceDriver device = new MultistripeOverEthernetClientDeviceDriver();
 		MultiStripeOverEthernetClientDeviceConfiguration config = new MultiStripeOverEthernetClientDeviceConfiguration();
-		config.hostName="127.0.0.1";
-		config.port=2002;
+		config.hostName = "192.168.1.44";
+		//config.hostName = "localhost";
+		config.port = 2002;
 		device.setConfiguration(config);
-		
-		
+
 		StripeConfiguration sc = new StripeConfiguration();
-		sc.pixelAmount = 3;
+		sc.pixelAmount = 64;
 		sc.port = 0;
-		sc.protocollType=StripeConfiguration.PROTOCOLL_TYPE_TM1812;
-		
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
+
 		Stripe myStripe = new Stripe(sc);
-		
-		for(int i=0;i<sc.pixelAmount;i++){
-			Color c = new Color(i,0,0);
-			myStripe.setPixel(i, c.getRGB());
-		}
-		
 		device.attachStripe(myStripe);
-		
+
 		device.connect();
 
-		for (int i =0;i<256;i++){
-			Color c = new Color(myStripe.getOutputResult().get(0));
-			Color c2 = new Color(c.getRed(),i,c.getBlue());
-			myStripe.setPixel(0, c2.getRGB());
-			device.writeData();
+		for(int z=0;z<10000;z++){
+			for (int i = 0; i < 25500; i++) {
+				Color c2 = new Color(i/100, 100, i/100);
+				for(int g=0;g<sc.pixelAmount;g++){
+				myStripe.setPixel(g, c2.getRGB());
+				}
+				device.writeData();
+				System.out.println("sent data");
+			}
+			try {
+				Thread.currentThread().sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		device.closeConnection();
+
 	}
 }

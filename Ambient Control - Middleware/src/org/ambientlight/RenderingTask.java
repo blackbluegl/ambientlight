@@ -23,7 +23,7 @@ class RenderingTask extends TimerTask {
 				currentDevice.connect();
 				System.out.println("resetting connection ok");
 			} catch (Exception e) {
-				System.out.println("resetting connection not ok");
+				System.out.println("resetting connection not ok:"+e.getMessage());
 				e.printStackTrace();
 			}
 

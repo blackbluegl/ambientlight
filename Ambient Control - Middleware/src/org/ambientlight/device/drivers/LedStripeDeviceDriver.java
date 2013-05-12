@@ -17,7 +17,7 @@ public interface LedStripeDeviceDriver extends DeviceDriver{
 	
 	public void connect() throws UnknownHostException, IOException;
 	
-	public void closeConnection() throws IOException;
+	public void closeConnection();
 	
 	void writeData() throws IOException;
 }
