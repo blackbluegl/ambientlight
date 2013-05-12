@@ -114,7 +114,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	private View initRoomView(LayoutInflater inflater, final String serverName, boolean isCurrentRoomServerSelected)
 			throws Exception {
 
-		final RoomConfiguration roomConfig = RestClient.getRoom(serverName, getActivity().getApplicationContext());
+		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 
 		// for the scenery save dialog to auto fill the current scenery name on
 		// startup
@@ -328,7 +328,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 		this.configuredlightObjects.removeAll(removeMappers);
 
-		RoomConfiguration roomConfiguration = RestClient.getRoom(roomServerName, getActivity().getApplicationContext());
+		RoomConfiguration roomConfiguration = RestClient.getRoom(roomServerName);
 
 		// for the scenery save dialog to auto fill the current scenery name on
 		// scenery change
@@ -391,7 +391,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 		case R.id.lightobject_context_bypass:
 			try {
-				RoomConfiguration rc = RestClient.getRoom(roomServer, getActivity().getApplicationContext());
+				RoomConfiguration rc = RestClient.getRoom(roomServer);
 				RoomItemConfiguration roomItem = rc.getRoomItemConfigurationByName(lightObjectName);
 				EntitiyConfiguration sc = roomItem.getSceneryConfigurationBySceneryName(scenery);
 				sc.bypassOnSceneryChange = !sc.bypassOnSceneryChange;

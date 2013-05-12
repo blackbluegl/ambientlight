@@ -4,6 +4,6 @@
     android:minHeight="40dp"
     android:minWidth="40dp"
     android:updatePeriodMillis="180000"
-    android:widgetCategory="keyguard|home_screen" android:resizeMode="horizontal">
+    android:widgetCategory="keyguard|home_screen" android:resizeMode="horizontal|">
 
 </appwidget-provider>

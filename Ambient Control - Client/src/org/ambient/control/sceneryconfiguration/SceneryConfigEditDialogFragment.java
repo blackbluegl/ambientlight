@@ -139,7 +139,7 @@ public class SceneryConfigEditDialogFragment extends DialogFragment {
 
 		this.title = getArguments().getString("title");
 
-		RoomConfiguration room = RestClient.getRoom(roomServer, getActivity().getApplicationContext());
+		RoomConfiguration room = RestClient.getRoom(roomServer);
 		RoomItemConfiguration current = room.getRoomItemConfigurationByName(lightObject);
 
 		if (editAsNew) {

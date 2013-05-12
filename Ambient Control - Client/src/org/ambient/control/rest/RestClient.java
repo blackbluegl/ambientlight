@@ -16,15 +16,10 @@ import android.content.Context;
 
 public class RestClient {
 
-	public static RoomConfiguration getRoom(String hostName, Context ct) throws Exception {
-		try {
+	public static RoomConfiguration getRoom(String hostName) throws Exception {
 			GetRoomTask task = new GetRoomTask();
 			task.execute(hostName);
 			return task.get();
-		} catch (Exception e) {
-			GuiUtils.toastCause(e, ct);
-			throw e;
-		}
 	}
 
 	public static void deleteScenarioFromRoom(String hostName, String sceneryName){
@@ -66,7 +61,7 @@ public class RestClient {
 
 	public static void createOrUpdateSceneryFromCurrentScenery(String hostName, String newSceneryName, Context ct)
 			throws Exception {
-		RoomConfiguration existingRoomConfiguration = RestClient.getRoom(hostName, ct);
+		RoomConfiguration existingRoomConfiguration = RestClient.getRoom(hostName);
 
 		List<RenderingProgrammConfigurationLightObjectNameMapper> newLightObjectConfigForScenery = new ArrayList<RenderingProgrammConfigurationLightObjectNameMapper>();
 
