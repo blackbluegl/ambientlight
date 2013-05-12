@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
+import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
+import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver;
 import org.ambientlight.device.stripe.StripeConfiguration;
 import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.room.RoomConfiguration;
@@ -31,10 +33,15 @@ public class CreateTronTestConfig {
 	public RoomConfiguration getTestRoom() {
 		RoomConfiguration rc = new RoomConfiguration();
 
-		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
+		MultiStripeOverEthernetClientDeviceConfiguration dc = new MultiStripeOverEthernetClientDeviceConfiguration();
+		dc.port=2002;
+		dc.hostName="192.168.1.44";
+		
+	//	DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
 		rc.deviceConfigurations.add(dc);
 
 		StripeConfiguration sc = new StripeConfiguration();
+		sc.protocollType=sc.PROTOCOLL_TYPE_TM1812;
 		sc.pixelAmount = 128;
 		sc.port = 0;
 
@@ -42,7 +49,7 @@ public class CreateTronTestConfig {
 		spLo1S1.endXPositionInRoom = 240;
 		spLo1S1.endYPositionInRoom = 5;
 		spLo1S1.offsetInStripe = 0;
-		spLo1S1.pixelAmount = 20;
+		spLo1S1.pixelAmount = 128;
 		spLo1S1.startXPositionInRoom = 5;
 		spLo1S1.startYPositionInRoom = 5;
 		sc.stripeParts.add(spLo1S1);

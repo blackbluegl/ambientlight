@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
+import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.device.stripe.StripeConfiguration;
 import org.ambientlight.device.stripe.StripePartConfiguration;
@@ -74,15 +75,15 @@ public class CreateTestConfig {
 		rc.roomItemConfigurations.add(sw4);
 		rc.roomItemConfigurations.add(sw5);
 		
-//		MultiStripeOverEthernetClientDeviceConfiguration dc = new MultiStripeOverEthernetClientDeviceConfiguration();
-//		dc.hostName="192.168.1.36";
-//		dc.port=2002;
+		MultiStripeOverEthernetClientDeviceConfiguration dc = new MultiStripeOverEthernetClientDeviceConfiguration();
+		dc.hostName="192.168.1.44";
+		dc.port=2002;
 		
 		SwitchDeviceOverEthernetConfiguration switchingBridge = new SwitchDeviceOverEthernetConfiguration();
 		switchingBridge.hostName="localhost";
 		switchingBridge.port=2003;
 
-		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
+//		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
 //		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
 		
 		rc.deviceConfigurations.add(switchingBridge);
@@ -90,7 +91,7 @@ public class CreateTestConfig {
 		
 		
 		StripeConfiguration sc = new StripeConfiguration();
-		sc.protocollType=StripeConfiguration.PROTOCOLL_TYPE_TM1812;
+		sc.protocollType=StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
 		sc.pixelAmount=128;
 		sc.port=0;
 	
