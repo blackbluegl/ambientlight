@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
-	String selectedRoomServer;
+	public String selectedRoomServer;
 
 	String selectedScenario;
 

@@ -7,10 +7,11 @@ import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
 
-public class ToggleRoomPowerStateTask extends
-		AsyncTask<Object, Void, RoomConfiguration> {
+
+public class ToggleRoomPowerStateTask extends AsyncTask<Object, Void, RoomConfiguration> {
 
 	private final String URL = "/sceneryControl/control/room/state";
+
 
 	@Override
 	protected RoomConfiguration doInBackground(Object... params) {
@@ -19,13 +20,16 @@ public class ToggleRoomPowerStateTask extends
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
-		
-	//	RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(
-				new MappingJacksonHttpMessageConverter());
+
+		// RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 
 		// restTemplate.postForEntity(url, params[1], Void.class);
-		restTemplate.put(url, params[1]);
+		try {
+			restTemplate.put(url, params[1]);
+		} catch (Exception e) {
+
+		}
 		return null;
 	}
 }

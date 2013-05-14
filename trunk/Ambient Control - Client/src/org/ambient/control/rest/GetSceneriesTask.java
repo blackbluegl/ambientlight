@@ -23,9 +23,12 @@ public class GetSceneriesTask  extends AsyncTask<String,Void, String[]>{
 			// Add the String message converter
 			restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 			// Make the HTTP GET request, marshaling the response to a String
-			@SuppressWarnings("unchecked")
-			Set<String> response = restTemplate.getForObject(url, Set.class, "SpringSource");
-			
+			Set<String> response = null;
+			try{
+				response = restTemplate.getForObject(url, Set.class, "SpringSource");
+			}catch(Exception e){
+				return null;
+			}
 			String[] result = new String[response.size()];
 			int i=0;
 			for(String current : response){

@@ -48,13 +48,13 @@ public class SceneriesFragment extends Fragment {
 		String selectedRoomServer = getArguments().getString(BUNDLE_SELECTED_ROOM_SERVER);
 
 		final String[] sceneryNames = getSceneryNames(selectedRoomServer);
+		
 
 		View sceneriesContainerView = inflater.inflate(R.layout.layout_sceneries_main, container, false);
 
 		sceneriesListView = (ListView) sceneriesContainerView.findViewById(R.id.listViewSceneries);
 
-		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
-		sceneriesListView.setAdapter(sceneriesAdapter);
+		
 		registerForContextMenu(sceneriesListView);
 		sceneriesListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -65,7 +65,17 @@ public class SceneriesFragment extends Fragment {
 						((MainActivity) getActivity()).getHomeRefreshCallback());
 			}
 		});
-
+		
+		
+		if(sceneryNames == null){
+			return sceneriesContainerView;
+		}
+		
+		sceneriesAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, sceneryNames);
+		sceneriesListView.setAdapter(sceneriesAdapter);
+		
+		
+		
 		return sceneriesContainerView;
 	}
 

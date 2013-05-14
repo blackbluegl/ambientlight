@@ -12,29 +12,6 @@ public class RoomSwitchesWidgetProvider extends AppWidgetProvider {
 
 	private static final String LOG = "widgetProvider";
 
-
-//	@Override
-//	public void onEnabled(Context context) {
-//		Log.w(LOG, "onenabled method called");
-//		Intent intentToService = new Intent(context, UpdateWidgetService.class);
-//		intentToService.setAction(null);
-//
-//		// Update the widgets via the service
-//		context.startService(intentToService);
-//	}
-
-
-//	@Override
-//	public void onDeleted(Context context, int[] appWidgetIds) {
-//		Log.w(LOG, "onDeleted method called");
-//		Intent intentToService = new Intent(context, UpdateWidgetService.class);
-//		intentToService.setAction(null);
-//		// Update the widgets via the service
-//		AppWidgetManager appWidgetManager=AppWidgetManager.getInstance(context);
-//		context.stopService(intentToService);
-//	}
-
-
 	@Override
 	public void onDisabled(Context context) {
 		Log.w(LOG, "onDisabled method called");
