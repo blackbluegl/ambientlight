@@ -75,17 +75,27 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		this.myHomeView = (ViewGroup) inflater.inflate(R.layout.layout_home_main, container, false);
 		LinearLayout roomList = (LinearLayout) myHomeView.findViewById(R.id.listHomeRooms);
 
+		
+		List<String> roomServersToDelete = new ArrayList<String>();
 		for (String currentRoomServer : roomServers) {
 			try {
+				
 				boolean isCurrentRoomSelected = currentRoomServer.equals(selectedRoomServer);
 				View result = this.initRoomView(inflater, currentRoomServer, isCurrentRoomSelected);
-				roomList.addView(result);
+				if(result !=null){
+					roomList.addView(result);
+					((MainActivity)this.getActivity()).selectedRoomServer=currentRoomServer;
+				}
+				else{
+					roomServersToDelete.add(currentRoomServer);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				// for now just ignore the room if it could not be build
-			}
+			}	
 		}
-
+		this.roomServers.removeAll(roomServersToDelete);
+		
 		ImageView masterButton = (ImageView) myHomeView.findViewById(R.id.imageViewMasterSwitch);
 		masterButton.setTag("masterButton");
 		updateMasterSwitchState();
@@ -115,7 +125,11 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			throws Exception {
 
 		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
-
+		
+		if(roomConfig == null){
+			return null;
+		}
+		
 		// for the scenery save dialog to auto fill the current scenery name on
 		// startup
 		((MainActivity) getActivity()).setSelectedScenario(roomConfig.currentScenery);

@@ -19,7 +19,7 @@ public class RestClient {
 	public static RoomConfiguration getRoom(String hostName) throws Exception {
 			GetRoomTask task = new GetRoomTask();
 			task.execute(hostName);
-			return task.get();
+			return (RoomConfiguration) task.get();
 	}
 
 	public static void deleteScenarioFromRoom(String hostName, String sceneryName){
