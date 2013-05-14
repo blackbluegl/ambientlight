@@ -87,8 +87,13 @@ public class UpdateWidgetService extends Service {
 		Log.i(LOG, "Called onStartCommand"); 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.getApplicationContext());
 
-		if(intent == null|| intent.getAction()==null || this.isConnectedToWifi(getApplicationContext())== false){
-			Log.i(LOG, "onStartCommand: No wifi available or no intent sent. Disableing the widget.");
+		if(intent == null|| intent.getAction()==null){
+			Log.i(LOG, "onStartCommand: no intent sent. do not do anything.");
+			return START_STICKY;
+		}
+		
+		if(this.isConnectedToWifi(getApplicationContext())== false){
+			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget.");
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
 		}
