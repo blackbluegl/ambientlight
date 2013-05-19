@@ -16,6 +16,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.util.Log;
@@ -32,34 +34,104 @@ public class UpdateWidgetService extends Service {
 	 */
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
+		private static final String LOG = "UpdateWidgetService.BroadCastReceiver";
+
+
+		private void updateWidget(Context context, Intent intent, int[] allWidgetIds) {
+			Intent updateIntent = new Intent(context, UpdateWidgetService.class);
+			updateIntent.setAction("updateWidget");
+			updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+			context.startService(updateIntent);
+		}
+
+
+		private void disableWidget(Context context, Intent intent, int[] allWidgetIds) {
+			Intent updateIntent = new Intent(context, UpdateWidgetService.class);
+			updateIntent.setAction("disableWidget");
+			updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+			context.startService(updateIntent);
+		}
+
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(LOG, "onReceived Called");
+//			Log.i(LOG, "Broadcast received.");
+//			if (intent != null && intent.getAction() != null) {
+//				Log.i(LOG, "Intent was: " + intent.getAction());
+//			}
+
 			String action = intent.getAction();
+
 			ComponentName thisWidget = new ComponentName(context, RoomSwitchesWidgetProvider.class);
 			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 			int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
 			if (action.equals(Intent.ACTION_USER_PRESENT)) {
-				Intent updateIntent = new Intent(context, UpdateWidgetService.class);
-				updateIntent.setAction("updateWidget");
-				updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-				context.startService(updateIntent);
+				Log.i(LOG, " updateWidget because of ACTION_USER_PRESENT");
+				updateWidget(context, intent, allWidgetIds);
 			}
 
-			if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
-				if (intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
-					Intent updateIntent = new Intent(context, UpdateWidgetService.class);
-					updateIntent.setAction("updateWidget");
-					updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-					context.startService(updateIntent);
-				} else {
-					Intent updateIntent = new Intent(context, UpdateWidgetService.class);
-					updateIntent.setAction("disableWidget");
-					updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-					context.startService(updateIntent);
+			
+//			if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
+//				if (isConnectedToWifi(context)) {
+//					Log.i(LOG, " updateWidget because of SUPPLICANT_CONNECTION_CHANGE_ACTION and isConnected=true");
+//					updateWidget(context, intent, allWidgetIds);
+//				}
+//				else{
+//					Log.i(LOG, " disableWidget because of SUPPLICANT_CONNECTION_CHANGE_ACTION and isConnected=false");
+//					disableWidget(context, intent, allWidgetIds);
+//				}
+//			}
+//			
+			
+			//wlan on, wlan reset
+			if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+				if (isConnectedToWifi(context)) {
+					Log.i(LOG, " updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
+					updateWidget(context, intent, allWidgetIds);
 				}
+//				//wlan off,
+//				else{
+//					Log.i(LOG, " disableWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=false");
+//					disableWidget(context, intent, allWidgetIds);
+//				}
 			}
+
+			
+			if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+				//fm off, wlan off, wlan lost
+				if (!isConnectedToWifi(context)) {
+					Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
+					disableWidget(context, intent, allWidgetIds);
+				}
+//				//fm on, wlan on, wlan reset (several times)
+//				else{
+//					Log.i(LOG, " updateWidget because of CONNECTIVITY_ACTION and isConnected=true");
+//					updateWidget(context, intent, allWidgetIds);
+//				}
+			}
+
+//			if (action.equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+//				SupplicantState supState;
+//				WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//				WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//				supState = wifiInfo.getSupplicantState();
+//				//wlan reset(two times)
+//				if (supState.equals(SupplicantState.COMPLETED)) {
+//					Log.i(LOG, " updateWidget because of SUPPLICANT_STATE_CHANGED_ACTION and SupplicantState.COMPLETED");
+//					Intent updateIntent = new Intent(context, UpdateWidgetService.class);
+//					updateIntent.setAction("updateWidget");
+//					updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+//					context.startService(updateIntent);
+//					// determine if this is ever called
+//				} else if (supState.equals(SupplicantState.DISCONNECTED)) {
+//					Log.i(LOG, " disable because of SUPPLICANT_STATE_CHANGED_ACTION and SupplicantState.DISCONNECTED");
+//					Intent updateIntent = new Intent(context, UpdateWidgetService.class);
+//					updateIntent.setAction("disableWidget");
+//					updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+//					context.startService(updateIntent);
+//				}
+//			}
 		}
 	};
 
@@ -67,9 +139,13 @@ public class UpdateWidgetService extends Service {
 	@Override
 	public void onCreate() {
 		Log.i(LOG, "onCreated Called");
+		// TODO remove unused filters and privileges
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_USER_PRESENT);
-		filter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+//		filter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+//		filter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+		filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(receiver, filter);
 	}
 
@@ -83,31 +159,42 @@ public class UpdateWidgetService extends Service {
 
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {		
-		Log.i(LOG, "Called onStartCommand"); 
+	public int onStartCommand(Intent intent, int flags, int startId) {
+
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.getApplicationContext());
 
-		if(intent == null|| intent.getAction()==null){
+		if (intent == null || intent.getAction() == null) {
 			Log.i(LOG, "onStartCommand: no intent sent. do not do anything.");
 			return START_STICKY;
 		}
-		
-		if(this.isConnectedToWifi(getApplicationContext())== false){
-			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget.");
+		if (intent.getAction() != null) {
+			Log.i(LOG, "Called onStartCommand with action: " + intent.getAction());
+		} else {
+			Log.i(LOG, "Called onStartCommand with intent but without action");
+		}
+
+		if (intent.getAction().equals("disableWidget")) {
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
 		}
-		
+
+		// TODO check if this stetement is now obsolete
+		if (this.isConnectedToWifi(getApplicationContext()) == false) {
+			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
+			setWidgetToDisabledView(intent, appWidgetManager);
+			return START_STICKY;
+		}
+
 		if (intent.getAction().contains("SWITCH")) {
 			switchRoom(intent, appWidgetManager);
+			return START_STICKY;
 		}
 
 		if (intent.getAction().equals("updateWidget")) {
 			updateWidget(intent, appWidgetManager);
+			return START_STICKY;
 		}
-		if (intent.getAction().equals("disableWidget")) {
-			setWidgetToDisabledView(intent, appWidgetManager);
-		}
+
 		return START_STICKY;
 	}
 
@@ -223,8 +310,8 @@ public class UpdateWidgetService extends Service {
 		NetworkInfo info = cm.getActiveNetworkInfo();
 		return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
 	}
-	
-	
+
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
