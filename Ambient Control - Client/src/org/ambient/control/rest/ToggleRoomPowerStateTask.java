@@ -1,6 +1,6 @@
 package org.ambient.control.rest;
 
-import org.ambientlight.room.RoomConfiguration;
+import org.ambient.control.home.HomeRefreshCallback;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -8,14 +8,21 @@ import org.springframework.web.client.RestTemplate;
 import android.os.AsyncTask;
 
 
-public class ToggleRoomPowerStateTask extends AsyncTask<Object, Void, RoomConfiguration> {
+public class ToggleRoomPowerStateTask extends AsyncTask<Object, Void, Void> {
 
 	private final String URL = "/sceneryControl/control/room/state";
 
 
-	@Override
-	protected RoomConfiguration doInBackground(Object... params) {
+	private HomeRefreshCallback callback;
+	private String serverName;
 
+
+	@Override
+	protected Void doInBackground(Object... params) {
+
+		this.callback = (HomeRefreshCallback) params[2];
+		this.serverName = (String) params[0];
+		
 		String url = URLUtils.getBaseUrl((String) params[0]) + URL;
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -31,5 +38,17 @@ public class ToggleRoomPowerStateTask extends AsyncTask<Object, Void, RoomConfig
 
 		}
 		return null;
+	}
+	
+
+	@Override
+	protected void onPostExecute(Void result) {
+		try {
+			if(callback != null){
+				callback.refreshRoomContent(serverName);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

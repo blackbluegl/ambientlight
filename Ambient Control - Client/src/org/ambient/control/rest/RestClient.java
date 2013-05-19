@@ -34,13 +34,13 @@ public class RestClient {
 	}
 
 
-	public static void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException, ExecutionException {
+	public static void setPowerStateForRoom(String hostName, Boolean state, HomeRefreshCallback callback) throws InterruptedException, ExecutionException {
 		ToggleRoomPowerStateTask task = new ToggleRoomPowerStateTask();
-		task.execute(hostName, state);
+		task.execute(hostName, state, callback);
 	}
 
 
-	public static void setPowerStateForRoomItem(String hostName, String itemName, Boolean state) throws InterruptedException,
+	public static void setPowerStateForRoomItem(String hostName, String itemName, Boolean state ) throws InterruptedException,
 			ExecutionException {
 		ToggleRoomItemPowerStateTask task = new ToggleRoomItemPowerStateTask();
 		task.execute(hostName, itemName, state);

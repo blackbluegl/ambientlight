@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-
+     
     <TableLayout
         android:id="@+id/roomContent"
         android:layout_width="fill_parent"
@@ -24,9 +24,17 @@
             android:layout_marginLeft="5dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:typeface="normal" />
-
     </TableLayout>
-
+    
+       <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_room_disabled"
+        android:visibility="gone" />
+    
     <LinearLayout
         android:id="@+id/roomBottomBar"
         android:layout_width="match_parent"
@@ -40,7 +48,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
     </LinearLayout>
 
 </LinearLayout>
