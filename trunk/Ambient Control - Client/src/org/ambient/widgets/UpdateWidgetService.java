@@ -16,8 +16,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.util.Log;
@@ -29,8 +27,8 @@ public class UpdateWidgetService extends Service {
 	private static final String LOG = "UpdateWidgetService";
 
 	/**
-	 * used for receiving USER_PRESENT and wifi Events and update the icon after
-	 * user unlocks the screen.
+	 * used for receiving USER_PRESENT- and WIFI- events and updates the icon after
+	 * user unlocks the screen or wlan is present
 	 */
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -55,10 +53,6 @@ public class UpdateWidgetService extends Service {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//			Log.i(LOG, "Broadcast received.");
-//			if (intent != null && intent.getAction() != null) {
-//				Log.i(LOG, "Intent was: " + intent.getAction());
-//			}
 
 			String action = intent.getAction();
 
@@ -71,67 +65,17 @@ public class UpdateWidgetService extends Service {
 				updateWidget(context, intent, allWidgetIds);
 			}
 
-			
-//			if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
-//				if (isConnectedToWifi(context)) {
-//					Log.i(LOG, " updateWidget because of SUPPLICANT_CONNECTION_CHANGE_ACTION and isConnected=true");
-//					updateWidget(context, intent, allWidgetIds);
-//				}
-//				else{
-//					Log.i(LOG, " disableWidget because of SUPPLICANT_CONNECTION_CHANGE_ACTION and isConnected=false");
-//					disableWidget(context, intent, allWidgetIds);
-//				}
-//			}
-//			
-			
-			//wlan on, wlan reset
-			if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
-				if (isConnectedToWifi(context)) {
-					Log.i(LOG, " updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
-					updateWidget(context, intent, allWidgetIds);
-				}
-//				//wlan off,
-//				else{
-//					Log.i(LOG, " disableWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=false");
-//					disableWidget(context, intent, allWidgetIds);
-//				}
+			// wlan on, wlan reset, fm of
+			if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION) && isConnectedToWifi(context)) {
+				Log.i(LOG, " updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
+				updateWidget(context, intent, allWidgetIds);
 			}
 
-			
-			if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-				//fm off, wlan off, wlan lost
-				if (!isConnectedToWifi(context)) {
-					Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
-					disableWidget(context, intent, allWidgetIds);
-				}
-//				//fm on, wlan on, wlan reset (several times)
-//				else{
-//					Log.i(LOG, " updateWidget because of CONNECTIVITY_ACTION and isConnected=true");
-//					updateWidget(context, intent, allWidgetIds);
-//				}
+			// fm off, wlan off, wlan lost
+			if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !isConnectedToWifi(context)) {
+				Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
+				disableWidget(context, intent, allWidgetIds);
 			}
-
-//			if (action.equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
-//				SupplicantState supState;
-//				WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//				WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-//				supState = wifiInfo.getSupplicantState();
-//				//wlan reset(two times)
-//				if (supState.equals(SupplicantState.COMPLETED)) {
-//					Log.i(LOG, " updateWidget because of SUPPLICANT_STATE_CHANGED_ACTION and SupplicantState.COMPLETED");
-//					Intent updateIntent = new Intent(context, UpdateWidgetService.class);
-//					updateIntent.setAction("updateWidget");
-//					updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-//					context.startService(updateIntent);
-//					// determine if this is ever called
-//				} else if (supState.equals(SupplicantState.DISCONNECTED)) {
-//					Log.i(LOG, " disable because of SUPPLICANT_STATE_CHANGED_ACTION and SupplicantState.DISCONNECTED");
-//					Intent updateIntent = new Intent(context, UpdateWidgetService.class);
-//					updateIntent.setAction("disableWidget");
-//					updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-//					context.startService(updateIntent);
-//				}
-//			}
 		}
 	};
 
@@ -139,11 +83,8 @@ public class UpdateWidgetService extends Service {
 	@Override
 	public void onCreate() {
 		Log.i(LOG, "onCreated Called");
-		// TODO remove unused filters and privileges
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_USER_PRESENT);
-//		filter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-//		filter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
 		filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(receiver, filter);
@@ -167,24 +108,19 @@ public class UpdateWidgetService extends Service {
 			Log.i(LOG, "onStartCommand: no intent sent. do not do anything.");
 			return START_STICKY;
 		}
-		if (intent.getAction() != null) {
-			Log.i(LOG, "Called onStartCommand with action: " + intent.getAction());
-		} else {
-			Log.i(LOG, "Called onStartCommand with intent but without action");
-		}
 
+		// first handle events or cases that leads to a disabled widget so we do
+		// not run into exceptions because of inconsistent states
 		if (intent.getAction().equals("disableWidget")) {
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
-		}
-
-		// TODO check if this stetement is now obsolete
-		if (this.isConnectedToWifi(getApplicationContext()) == false) {
+		} else if (this.isConnectedToWifi(getApplicationContext()) == false) {
 			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
 		}
 
+		// event handling
 		if (intent.getAction().contains("SWITCH")) {
 			switchRoom(intent, appWidgetManager);
 			return START_STICKY;
@@ -262,7 +198,7 @@ public class UpdateWidgetService extends Service {
 		setWidgetToRefreshView(intent, appWidgetManager);
 
 		try {
-			RestClient.setPowerStateForRoom(switchRoom, powerState);
+			RestClient.setPowerStateForRoom(switchRoom, powerState,null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

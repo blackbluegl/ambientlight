@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 public abstract class AbstractRoomItemViewMapper {
 
+	private boolean eventListenerDisabled = false;
+
 	private boolean powerState = false;
 	private String serverName;
 	private View itemView;
@@ -69,6 +71,16 @@ public abstract class AbstractRoomItemViewMapper {
 
 	public View getLightObjectView() {
 		return itemView;
+	}
+
+
+	public boolean isEventListenerDisabled() {
+		return eventListenerDisabled;
+	}
+
+
+	public void setEventListenerDisabled(boolean eventListenerDisabled) {
+		this.eventListenerDisabled = eventListenerDisabled;
 	}
 
 

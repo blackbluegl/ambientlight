@@ -22,6 +22,7 @@ import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRend
 import org.ambientlight.scenery.actor.switching.configuration.SwitchingConfiguration;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -75,13 +77,14 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		this.myHomeView = (ViewGroup) inflater.inflate(R.layout.layout_home_main, container, false);
 		LinearLayout roomList = (LinearLayout) myHomeView.findViewById(R.id.listHomeRooms);
 
+		final HomeRefreshCallback callback = this;
 		
 		List<String> roomServersToDelete = new ArrayList<String>();
 		for (String currentRoomServer : roomServers) {
 			try {
 				
 				boolean isCurrentRoomSelected = currentRoomServer.equals(selectedRoomServer);
-				View result = this.initRoomView(inflater, currentRoomServer, isCurrentRoomSelected);
+				View result = this.initRoomView(inflater, currentRoomServer, isCurrentRoomSelected, callback);
 				if(result !=null){
 					roomList.addView(result);
 					((MainActivity)this.getActivity()).selectedRoomServer=currentRoomServer;
@@ -105,7 +108,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			public void onClick(View v) {
 				for (String currentServerName : roomServers) {
 					try {
-						RestClient.setPowerStateForRoom(currentServerName, false);
+						RestClient.setPowerStateForRoom(currentServerName, false, callback);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -121,7 +124,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 	}
 
 
-	private View initRoomView(LayoutInflater inflater, final String serverName, boolean isCurrentRoomServerSelected)
+	private View initRoomView(LayoutInflater inflater, final String serverName, boolean isCurrentRoomServerSelected, final HomeRefreshCallback callback)
 			throws Exception {
 
 		final RoomConfiguration roomConfig = RestClient.getRoom(serverName);
@@ -136,7 +139,7 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 		// create the room container
 		final View roomContainerView = (View) inflater.inflate(R.layout.layout_room_item, null);
-
+		roomContainerView.setTag("roomContainer"+serverName);
 		TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
 		roomContent.setTag("roomContent" + serverName);
 
@@ -208,8 +211,10 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			public void onClick(View v) {
 				Switch powerButton = (Switch) v;
 				try {
-					RestClient.setPowerStateForRoom(serverName, powerButton.isChecked());
-					setPowerStateForAllLightObjectsInRoom(powerButton.isChecked(), serverName);
+					disableEventListener(serverName);
+					RestClient.setPowerStateForRoom(serverName, powerButton.isChecked(), callback);
+					//setPowerStateForAllLightObjectsInRoom(powerButton.isChecked(), serverName);
+					//refreshRoomContent(serverName);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -225,9 +230,9 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 					((MainActivity) getActivity()).updateSceneriesForSelectedRoomServer(serverName);
 				}
 
-				updateRoomPowerSwitchState(serverName);
-				updateRoomBackground(serverName);
-				updateMasterSwitchState();
+//				updateRoomPowerSwitchState(serverName);
+//				updateRoomBackground(serverName);
+//				updateMasterSwitchState();
 			}
 		});
 
@@ -253,9 +258,15 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 			@Override
 			public void onClick(View v) {
+				//while updateing the roomContent the Icons will be disabled
+				if(roomItemMapper.isEventListenerDisabled()){
+					return;
+				}
+				
 				try {
 					RestClient.setPowerStateForRoomItem(roomItemMapper.getServerName(), roomItemMapper.getItemName(),
 							!roomItemMapper.getPowerState());
+					//updateing the icon
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
 
 					// set all roomlabels inactive
@@ -361,6 +372,8 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 
 		TextView sceneryLabel = (TextView) this.myHomeView.findViewWithTag(roomServerName + "sceneryLabel");
 		sceneryLabel.setText(roomConfiguration.currentScenery);
+		
+		this.enableEventListener(roomServerName);
 	}
 
 
@@ -516,6 +529,38 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 			roomLabel.setTextAppearance(this.getActivity(), R.style.boldRoomLabel);
 		} else {
 			roomLabel.setTextAppearance(this.getActivity(), R.style.normalRoomLabel);
+		}
+	}
+	
+	private void disableEventListener(String serverName){
+		LinearLayout roomList = (LinearLayout) myHomeView.findViewById(R.id.listHomeRooms);
+		View room = roomList.findViewWithTag("roomContainer"+serverName);
+		ProgressBar bar = (ProgressBar) room.findViewById(R.id.progressBar);
+		bar.setVisibility(ProgressBar.VISIBLE);
+		TableLayout roomContent = (TableLayout) room.findViewWithTag("roomContent" + serverName);
+		roomContent.setVisibility(TableLayout.GONE);
+		
+		Switch powerStateSwitch = (Switch) room.findViewWithTag("powerStateSwitch" + serverName);
+		powerStateSwitch.setVisibility(Switch.INVISIBLE);
+		for(AbstractRoomItemViewMapper mapper : configuredlightObjects){
+			mapper.setEventListenerDisabled(true);
+		}
+	}
+	
+	private void enableEventListener(String serverName){
+		LinearLayout roomList = (LinearLayout) myHomeView.findViewById(R.id.listHomeRooms);
+		View room = roomList.findViewWithTag("roomContainer"+serverName);
+		ProgressBar bar = (ProgressBar) room.findViewById(R.id.progressBar);
+		bar.setVisibility(ProgressBar.GONE);
+		
+		TableLayout roomContent = (TableLayout) room.findViewWithTag("roomContent" + serverName);
+		roomContent.setVisibility(TableLayout.VISIBLE);
+		
+		Switch powerStateSwitch = (Switch) room.findViewWithTag("powerStateSwitch" + serverName);
+		powerStateSwitch.setVisibility(Switch.VISIBLE);
+		
+		for(AbstractRoomItemViewMapper mapper : configuredlightObjects){
+			mapper.setEventListenerDisabled(false);
 		}
 	}
 }
