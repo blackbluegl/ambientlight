@@ -11,6 +11,7 @@ import android.util.Log;
 public class RoomSwitchesWidgetProvider extends AppWidgetProvider {
 
 	private static final String LOG = "widgetProvider";
+	public static final String ACTION_UPDATE_FROM_ACTIVITY = "ambientcontrol.UPDATE_WIDGETS";
 
 	@Override
 	public void onDisabled(Context context) {
@@ -33,6 +34,15 @@ public class RoomSwitchesWidgetProvider extends AppWidgetProvider {
 			intentToService.setAction(intent.getAction());
 			context.startService(intentToService);
 		}
+		
+		//handle update intents from activities
+		if (intent.getAction().contains(ACTION_UPDATE_FROM_ACTIVITY) == true) {
+			Intent intentToService = new Intent(context, UpdateWidgetService.class);
+			intentToService.putExtras(intent.getExtras());
+			intentToService.setAction("updateWidget");
+			context.startService(intentToService);
+		}
+		
 		super.onReceive(context, intent);
 	}
 
