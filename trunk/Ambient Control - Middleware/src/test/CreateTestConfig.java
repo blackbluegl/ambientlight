@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
+import org.ambientlight.device.drivers.DummySwitchDeviceConfiguration;
 import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.device.stripe.StripeConfiguration;
@@ -75,16 +76,16 @@ public class CreateTestConfig {
 		rc.roomItemConfigurations.add(sw4);
 		rc.roomItemConfigurations.add(sw5);
 		
-		MultiStripeOverEthernetClientDeviceConfiguration dc = new MultiStripeOverEthernetClientDeviceConfiguration();
-		dc.hostName="192.168.1.44";
-		dc.port=2002;
-		
-		SwitchDeviceOverEthernetConfiguration switchingBridge = new SwitchDeviceOverEthernetConfiguration();
-		switchingBridge.hostName="localhost";
-		switchingBridge.port=2003;
+//		MultiStripeOverEthernetClientDeviceConfiguration dc = new MultiStripeOverEthernetClientDeviceConfiguration();
+//		dc.hostName="192.168.1.44";
+//		dc.port=2002;
+//		
+//		SwitchDeviceOverEthernetConfiguration switchingBridge = new SwitchDeviceOverEthernetConfiguration();
+//		switchingBridge.hostName="localhost";
+//		switchingBridge.port=2003;
 
-//		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
-//		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
+		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
+		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
 		
 		rc.deviceConfigurations.add(switchingBridge);
 		rc.deviceConfigurations.add(dc);
