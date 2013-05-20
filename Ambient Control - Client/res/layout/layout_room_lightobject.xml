@@ -1,0 +1,40 @@
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="85dp"
+            android:layout_height="85dp"
+            android:layout_marginTop="5dp" >
+
+            <org.ambient.views.ImageViewWithContextMenuInfo
+                android:id="@+id/imageViewLightObject"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:src="@drawable/ic_power_disabled" />
+
+            <ImageView
+                android:id="@+id/imageViewLightObjectSceneryDecoupled"
+                android:layout_width="20dp"
+                android:layout_height="25dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:contentDescription="bypass Scenery"
+                android:src="@drawable/ic_bp_scenery" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/textLightObjectName"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:scrollHorizontally="false"
+            android:text="Unknown" />
+
+    </LinearLayout>
