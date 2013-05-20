@@ -34,7 +34,7 @@ public class SceneryControl {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getInfo() {
-		return "AmbientLight:0.9.5";
+		return "Version:0.9.6\nProtocoll:0.9.0";
 	}
 
 
@@ -238,8 +238,12 @@ public class SceneryControl {
 	public Response setPowerStateForRoom(Boolean powerState) {
 		System.out.println("SceneryControlWS:  setting power state for room to " + powerState);
 
-		for (RoomItemConfiguration current : this.getRoomConfiguration().roomItemConfigurations) {
-			this.setPowerStateForItem(current.name, powerState);
+		if (powerState == false) {
+			for (RoomItemConfiguration current : this.getRoomConfiguration().roomItemConfigurations) {
+				this.setPowerStateForItem(current.name, powerState);
+			}
+		} else {
+			changeRoomToScenery(AmbientControlMW.getRoomConfig().currentScenery);
 		}
 
 		return Response.status(200).build();
