@@ -114,11 +114,13 @@ public class UpdateWidgetService extends Service {
 		if (intent.getAction().equals("disableWidget")) {
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
-		} else if (this.isConnectedToWifi(getApplicationContext()) == false) {
-			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
-			setWidgetToDisabledView(intent, appWidgetManager);
-			return START_STICKY;
-		}
+		} 
+		
+//		else if (this.isConnectedToWifi(getApplicationContext()) == false) {
+//			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
+//			setWidgetToDisabledView(intent, appWidgetManager);
+//			return START_STICKY;
+//		}
 
 		// event handling
 		if (intent.getAction().contains("SWITCH")) {
@@ -182,6 +184,7 @@ public class UpdateWidgetService extends Service {
 							PendingIntent.FLAG_UPDATE_CURRENT);
 					switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
 				} catch (Exception e) {
+					//Do nothing here. just try the next server and display an icon if this one is reachable
 					e.printStackTrace();
 				}
 			}
