@@ -23,6 +23,7 @@ import org.ambientlight.scenery.actor.rendering.programms.configuration.TronRend
 import org.ambientlight.scenery.actor.switching.configuration.SwitchingConfiguration;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -330,7 +331,14 @@ public class HomeFragment extends Fragment implements HomeRefreshCallback {
 		float dp = getResources().getDisplayMetrics().widthPixels;
 
 		final float scale = getResources().getDisplayMetrics().density;
-		int containerSize = (int) (dp / scale + 0.5f);
+		int containerSize = 0;
+		if (GuiUtils.isLargeLayout(getActivity()) == false
+				|| getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			containerSize = ((int) (dp / scale + 0.5f));
+		}
+		else{
+			containerSize = (int) ((int) (dp / scale + 0.5f)*0.66f);
+		}
 
 		int amountPerRow = containerSize / this.LIGHT_OBJECT_SIZE_DP;
 		return amountPerRow;
