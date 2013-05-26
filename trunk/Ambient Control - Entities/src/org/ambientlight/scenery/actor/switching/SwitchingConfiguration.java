@@ -1,4 +1,4 @@
-package org.ambientlight.scenery.actor.switching.configuration;
+package org.ambientlight.scenery.actor.switching;
 
 import org.ambientlight.scenery.actor.ActorConfiguration;
 
