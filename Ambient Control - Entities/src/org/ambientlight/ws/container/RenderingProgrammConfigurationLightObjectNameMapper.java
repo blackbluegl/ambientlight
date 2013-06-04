@@ -1,9 +1,9 @@
 package org.ambientlight.ws.container;
 
-import org.ambientlight.scenery.EntitiyConfiguration;
+import org.ambientlight.scenery.actor.ActorConductConfiguration;
 
 
 public class RenderingProgrammConfigurationLightObjectNameMapper {
-	public EntitiyConfiguration config;
+	public ActorConductConfiguration config;
 	public String lightObjectName;
 }
