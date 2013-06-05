@@ -37,8 +37,8 @@ import com.sun.jersey.api.json.JSONConfiguration;
  * <p>
  * 
  * You can provide two parameters <code>binding=[ip]:[port]</code> and
- * <code>server=[serverNameOrIP]:[port]</code> Use
- * <code>0.0.0.0<code> for a binding to all local ip addresses.
+ * <code>server=[serverNameOrIP]:[port]</code>. Use <code>0.0.0.0</code> for a
+ * binding to all local ip addresses.
  * <p>
  * 
  * example: <code>java -jar lk35rest.jar binding=0.0.0.0:1234
