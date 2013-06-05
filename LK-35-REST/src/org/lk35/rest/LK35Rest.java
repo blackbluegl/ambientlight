@@ -1,6 +1,7 @@
 package org.lk35.rest;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -10,9 +11,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.lk35.LK35ColorHandler;
-import org.lk35.LK35ColorHandlerImpl;
 import org.lk35.LK35StandaloneHTTP;
+import org.lk35.api.LK35ColorHandler;
+import org.lk35.api.LK35ColorHandlerImpl;
 
 
 /*  Copyright 2013 Florian Bornkessel
@@ -31,6 +32,17 @@ import org.lk35.LK35StandaloneHTTP;
  */
 
 /**
+ * This rest handler wraps all methods of the LK35ColorHandler. Have a look at
+ * the api documentation for details. All parameters will be mapped by
+ * Query-Parameters. Several parameters with the same name will be treated as
+ * ArrayList. The basepath is:
+ * <code>http://[ip]:[port]/rest/LK35ColorHandler</code>
+ * <p>
+ * 
+ * Example:
+ * <code>http://localhost:8899/rest/LK35ColorHandler/color/rgb?zone
+ * =1&zone=2&r=222&g=222&b=0</code>
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -45,98 +57,378 @@ public class LK35Rest {
 	}
 
 
+	/**
+	 * Path: /color/rgb
+	 * 
+	 * @param zones
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	@GET
 	@Path("/color/rgb")
 	@Produces(MediaType.TEXT_HTML)
 	public Response setRGB(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "r") int r,
 			@QueryParam(value = "g") int g, @QueryParam(value = "b") int b) throws IOException, InterruptedException {
-		api.setRGB(zones, r, g, b);
-		return Response.status(200).build();
+		try {
+			api.setRGB(zones, r, g, b);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void setHSV(@QueryParam(value = "zone") List<Integer> zones, int h, int s, int v) throws IOException,
-	InterruptedException {
-		api.setHSV(zones, h, s, v);
+	/**
+	 * Path: /color/hsv
+	 * 
+	 * @param zones
+	 * @param h
+	 * @param s
+	 * @param v
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/color/hsv")
+	@Produces(MediaType.TEXT_HTML)
+	public Response setHSV(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "h") int h,
+			@QueryParam(value = "s") int s, @QueryParam(value = "v") int v) throws IOException, InterruptedException {
+		try {
+			api.setHSV(zones, h, s, v);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
+	/**
+	 * Path: /color/rgbw
+	 * 
+	 * @param zones
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @param maxBrightness
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	@GET
 	@Path("/color/rgbw")
 	@Produces(MediaType.TEXT_HTML)
 	public Response setRGBWithWhiteChannel(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "r") int r,
 			@QueryParam(value = "g") int g, @QueryParam(value = "b") int b,
 			@QueryParam(value = "maxBrightness") boolean maxBrightness) throws IOException, InterruptedException {
-		api.setRGBWithWhiteChannel(zones, r, g, b, maxBrightness);
-		return Response.status(200).build();
+		try {
+			api.setRGBWithWhiteChannel(zones, r, g, b, maxBrightness);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void setHSVwithWihiteChannel(@QueryParam(value = "zone") List<Integer> zones, int h, int s, int v,
-			boolean maxBrightness) throws IOException,
-	InterruptedException {
-		api.setHSVwithWihiteChannel(zones, h, s, v, maxBrightness);
+	/**
+	 * Path: /color/hsvw
+	 * 
+	 * @param zones
+	 * @param h
+	 * @param s
+	 * @param v
+	 * @param maxBrightness
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/color/hsvw")
+	@Produces(MediaType.TEXT_HTML)
+	public Response setHSVwithWihiteChannel(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "h") int h,
+			@QueryParam(value = "s") int s, @QueryParam(value = "v") int v,
+			@QueryParam(value = "maxBrightness") boolean maxBrightness) throws IOException, InterruptedException {
+		try {
+			api.setHSVwithWihiteChannel(zones, h, s, v, maxBrightness);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void setR(@QueryParam(value = "zone") List<Integer> zones, int value) throws IOException, InterruptedException {
-		api.setR(zones, value);
+	/**
+	 * Path: color/r
+	 * 
+	 * @param zones
+	 * @param value
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/color/r")
+	@Produces(MediaType.TEXT_HTML)
+	public Response setR(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+			throws IOException, InterruptedException {
+		try {
+			api.setR(zones, value);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void setG(@QueryParam(value = "zone") List<Integer> zones, int value) throws InterruptedException, IOException {
-		api.setG(zones, value);
+	/**
+	 * Path: /color/g
+	 * 
+	 * @param zones
+	 * @param value
+	 * @return http status 200
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/color/g")
+	@Produces(MediaType.TEXT_HTML)
+	public Response setG(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+			throws InterruptedException, IOException {
+		try {
+			api.setG(zones, value);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void setB(@QueryParam(value = "zone") List<Integer> zones, int value) throws InterruptedException, IOException {
-		api.setB(zones, value);
+	/**
+	 * Path: /color/b
+	 * 
+	 * @param zones
+	 * @param value
+	 * @return http status 200
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/color/b")
+	@Produces(MediaType.TEXT_HTML)
+	public Response setB(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+			throws InterruptedException, IOException {
+		try {
+			api.setB(zones, value);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
+
 	}
 
 
+	/**
+	 * Path: /color/w
+	 * 
+	 * @param zones
+	 * @param value
+	 * @return http status 200
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
 	@GET
 	@Path("/color/w")
 	@Produces(MediaType.TEXT_HTML)
 	public Response setW(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
 			throws InterruptedException, IOException {
-		api.setW(zones, value);
-		return Response.status(200).build();
+		try {
+			api.setW(zones, value);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void resetColor(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
-		api.resetColor(zones);
+	/**
+	 * Path: /control/reset
+	 * 
+	 * @param zones
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/control/reset")
+	@Produces(MediaType.TEXT_HTML)
+	public Response resetColor(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+		try {
+			api.resetColor(zones);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void togglePower(boolean powerState) throws IOException {
-		api.togglePower(powerState);
+	/**
+	 * Path: /control/togglePower
+	 * 
+	 * @param powerState
+	 * @return http status 200
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/control/togglePower")
+	@Produces(MediaType.TEXT_HTML)
+	public Response togglePower(@QueryParam(value = "powerState") boolean powerState) throws IOException {
+		try {
+			api.togglePower(powerState);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void togglePower(@QueryParam(value = "zone") List<Integer> zones, boolean powerState) {
-		api.togglePower(zones, powerState);
+	/**
+	 * Path: /control/togglePowerForZone
+	 * 
+	 * @param zones
+	 * @param powerState
+	 * @return http status 200
+	 */
+	@GET
+	@Path("/control/togglePowerForZone")
+	@Produces(MediaType.TEXT_HTML)
+	public Response togglePower(@QueryParam(value = "zone") List<Integer> zones,
+			@QueryParam(value = "powerState") boolean powerState) {
+		// try {
+		// api.togglePower(zones, powerState);
+		// return Response.status(200).build();
+		// } catch (SocketException e) {
+		// System.out.println("connection to LK35 lost. trying to reconnect");
+		// LK35StandaloneHTTP.connect(true);
+		return Response.status(500).build();
+		// }
 	}
 
 
-	public void setBrightness(@QueryParam(value = "zone") List<Integer> zones, int value) throws InterruptedException,
-	IOException {
-		api.setBrightness(zones, value);
+	/**
+	 * Path: /color/brightness
+	 * 
+	 * @param zones
+	 * @param value
+	 * @return http status 200
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	@GET
+	@Path("/color/brightness")
+	@Produces(MediaType.TEXT_HTML)
+	public Response setBrightness(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+			throws InterruptedException, IOException {
+		try {
+			api.setBrightness(zones, value);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void toggleColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
-		api.toggleColorFader(zones);
+	/**
+	 * Path: /control/toggleColorFader
+	 * 
+	 * @param zones
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/control/toggleColorFader")
+	@Produces(MediaType.TEXT_HTML)
+	public Response toggleColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+		try {
+			api.toggleColorFader(zones);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void speedUpColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
-		api.speedUpColorFader(zones);
+	/**
+	 * Path: /control/speedUpColorFader
+	 * 
+	 * @param zones
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/control/speedUpColorFader")
+	@Produces(MediaType.TEXT_HTML)
+	public Response speedUpColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+		try {
+			api.speedUpColorFader(zones);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
-	public void speedDownColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
-		api.speedDownColorFader(zones);
+	/**
+	 * Path: /control/speedDownColorFader
+	 * 
+	 * @param zones
+	 * @return http status 200
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@GET
+	@Path("/control/speedDownColorFader")
+	@Produces(MediaType.TEXT_HTML)
+	public Response speedDownColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+		try {
+			api.speedDownColorFader(zones);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 }
