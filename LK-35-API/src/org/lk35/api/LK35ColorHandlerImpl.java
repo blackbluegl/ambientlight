@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.lk35;
+package org.lk35.api;
 
 import java.awt.Color;
 import java.io.IOException;

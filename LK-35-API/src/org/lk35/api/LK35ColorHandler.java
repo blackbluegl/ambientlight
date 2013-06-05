@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.lk35;
+package org.lk35.api;
 
 import java.io.IOException;
 import java.util.List;
