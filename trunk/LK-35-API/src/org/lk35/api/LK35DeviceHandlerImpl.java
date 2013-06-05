@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.lk35;
+package org.lk35.api;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,9 +62,11 @@ public class LK35DeviceHandlerImpl implements LK35DeviceHandler {
 	 */
 	@Override
 	public void disconnect() throws IOException {
-		os.close();
-		os = null;
-		lkSocket.close();
-		lkSocket = null;
+		if (os != null) {
+			os.close();
+			os = null;
+			lkSocket.close();
+			lkSocket = null;
+		}
 	}
 }
