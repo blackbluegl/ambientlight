@@ -219,8 +219,9 @@ public interface LK35ColorHandler {
 	 * @param powerState
 	 *            if set to false, the color is faded to black. if set to true,
 	 *            the last state will be restored.
+	 * @throws IOException
 	 */
-	public void togglePower(List<Integer> zones, boolean powerState);
+	public void togglePower(List<Integer> zones, boolean powerState) throws IOException;
 
 
 	/**
@@ -273,4 +274,18 @@ public interface LK35ColorHandler {
 	 * @throws InterruptedException
 	 */
 	public void speedDownColorFader(List<Integer> zones) throws IOException, InterruptedException;
+
+
+	/**
+	 * save current color in given zones to a slotnumber(1... 5) in the
+	 * controller
+	 * 
+	 * @param zones
+	 *            value int, value between 0 and 8
+	 * @param slot
+	 *            slotnumber from 1 to 5
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public void saveCurrentColor(List<Integer> zones, int slot) throws IOException, InterruptedException;
 }
