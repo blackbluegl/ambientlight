@@ -87,7 +87,10 @@ public class LK35StandaloneHTTP {
 
 		// Start Webservice
 		final String BASE_URI = "http://" + binding + "/rest";
+		// final ResourceConfig rc = new
+		// PackagesResourceConfig("org.lk35.rest");
 		final ResourceConfig rc = new PackagesResourceConfig("org.lk35.rest");
+
 		rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
 		rc.getFeatures().put("com.sun.jersey.config.feature.Trace", true);
 

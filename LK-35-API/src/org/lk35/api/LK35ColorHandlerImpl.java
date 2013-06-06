@@ -126,6 +126,7 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 
 
 	/*
+	 * 
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lk35.LK35ColorHandler#setHSVwithWihiteChannel(int[], int, int,
@@ -224,8 +225,20 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 	 * @see org.lk35.LK35ColorHandler#togglePower(int[], boolean)
 	 */
 	@Override
-	public void togglePower(List<Integer> zones, boolean powerState) {
-		// TODO Auto-generated method stub
+	public void togglePower(List<Integer> zones, boolean powerState) throws IOException {
+		for(int zone : zones){
+			byte zoneKey = (byte) (0x09 + zone);
+			if(powerState){
+				os.write(this.getMessage(zone, CATEGORY_GLOBAL, zoneKey, 0x1c));
+			}
+			else{
+				os.write(this.getMessage(zone, CATEGORY_GLOBAL, zoneKey, 0x19));
+			}
+		}
+		// TODO this code does not match :-(
+		// 55 70 c6 4f 02 01 02 0a 19 a1 aa aa 00 00 00 (Zone 1 aus)
+		//
+		// 55 70 c6 4f 02 01 02 0a 1c a2 aa aa 00 00 00 (Zone 1 ein)
 
 	}
 
@@ -314,6 +327,22 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 
 
 	/**
+	 * see {@link #getMessage(List, byte, byte, int)}
+	 * 
+	 * @param zone
+	 * @param category
+	 * @param channel
+	 * @param value
+	 * @return
+	 */
+	private byte[] getMessage(int zone, byte category, byte channel, int value) {
+		ArrayList<Integer> zoneArray = new ArrayList<Integer>();
+		zoneArray.add(zone);
+		return this.getMessage(zoneArray, category, channel, value);
+	}
+
+
+	/**
 	 * create message for LK35.
 	 * 
 	 * @param zones
@@ -367,6 +396,21 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 		if (input > 255) {
 			input = 255;
 		}
+		if (input < 0) {
+			input = 0;
+		}
 		return (int) (input * ((float) MAX_RGB_VALUE / 255));
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.lk35.api.LK35ColorHandler#saveCurrentColor(java.util.List, int)
+	 */
+	@Override
+	public void saveCurrentColor(List<Integer> zones, int slot) throws IOException, InterruptedException {
+		// TODO Auto-generated method stub
+
 	}
 }

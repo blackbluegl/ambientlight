@@ -321,20 +321,21 @@ public class LK35Rest {
 	 * @param zones
 	 * @param powerState
 	 * @return http status 200
+	 * @throws IOException
 	 */
 	@GET
 	@Path("/control/togglePowerForZone")
 	@Produces(MediaType.TEXT_HTML)
 	public Response togglePower(@QueryParam(value = "zone") List<Integer> zones,
-			@QueryParam(value = "powerState") boolean powerState) {
-		// try {
-		// api.togglePower(zones, powerState);
-		// return Response.status(200).build();
-		// } catch (SocketException e) {
-		// System.out.println("connection to LK35 lost. trying to reconnect");
-		// LK35StandaloneHTTP.connect(true);
-		return Response.status(500).build();
-		// }
+			@QueryParam(value = "powerState") boolean powerState) throws IOException {
+		try {
+			api.togglePower(zones, powerState);
+			return Response.status(200).build();
+		} catch (SocketException e) {
+			System.out.println("connection to LK35 lost. trying to reconnect");
+			LK35StandaloneHTTP.connect(true);
+			return Response.status(500).build();
+		}
 	}
 
 
