@@ -19,10 +19,9 @@ public class RenderingEffectFactory {
 
 	public FadeInTransition getFadeInEffect(LightObject lightObject) {
 
-		BufferedImage background = ImageUtil.crop(room.getRoomBitMap(), lightObject.getConfiguration().xOffsetInRoom, 
-				lightObject.getConfiguration().yOffsetInRoom, lightObject.getConfiguration().width, 
-				lightObject.getConfiguration().height);
-		
+		BufferedImage background = ImageUtil.crop(room.getRoomBitMap(), lightObject.configuration.xOffsetInRoom,
+				lightObject.configuration.yOffsetInRoom, lightObject.configuration.width, lightObject.configuration.height);
+
 		SimpleFadeInTransitionImpl fader = new SimpleFadeInTransitionImpl(background);
 		return fader;
 	}
@@ -33,11 +32,11 @@ public class RenderingEffectFactory {
 		SimpleFadeOutTransitionImpl fader = new SimpleFadeOutTransitionImpl(background);
 		return fader;
 	}
-	
+
 	public FadeInTransition getFadeEffect(LightObject lightObject) {
 
 		BufferedImage background = lightObject.getPixelMapAfterEffect();
-		
+
 		SimpleFadeInTransitionImpl fader = new SimpleFadeInTransitionImpl(background);
 		return fader;
 	}

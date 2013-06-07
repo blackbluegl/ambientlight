@@ -125,15 +125,15 @@ public class Tron extends RenderingProgramm {
 		this.speed = (int) Math.sqrt(speed * 8);
 		this.tokensAmount = tokensAmount;
 
-		this.lightObjectXOffset = lightObject.getConfiguration().xOffsetInRoom;
-		this.lightObjectYOffset = lightObject.getConfiguration().yOffsetInRoom;
+		this.lightObjectXOffset = lightObject.configuration.xOffsetInRoom;
+		this.lightObjectYOffset = lightObject.configuration.yOffsetInRoom;
 
 		List<StripePart> allStripeParts = AmbientControlMW.getRoom().getAllStripePartsInRoom();
 
 		// determine stripeParts within lightobject
 
 		for (StripePart currentStripePart : allStripeParts) {
-			if (StripeUtil.isStripePartInLightObject(currentStripePart, lightObject.getConfiguration())) {
+			if (StripeUtil.isStripePartInLightObject(currentStripePart, lightObject.configuration)) {
 				this.lanes.add(new Lane(currentStripePart.configuration));
 			}
 		}
@@ -234,7 +234,7 @@ public class Tron extends RenderingProgramm {
 		Graphics g = pixelMap.getGraphics();
 		Color drawColor = new Color(pc.r, pc.g, pc.b);
 		g.setColor(drawColor);
-		g.fillRect((int) p.x - this.lightObjectXOffset, (int) p.y - this.lightObjectYOffset, 2, 2);
+		g.fillRect(p.x - this.lightObjectXOffset, p.y - this.lightObjectYOffset, 2, 2);
 	}
 
 
@@ -244,14 +244,14 @@ public class Tron extends RenderingProgramm {
 		if (lifetime >= lengthOfTailInPixel - sparkleSize && lifetime > 1) {
 			double lightDifference = lightPointColor + (lightPointColor * sparcle);
 			colorValue = (int) lightDifference;
-		} else if (lifetime <= 1) {
+		} else if (lifetime <= 1)
 			return backgroundColor;
-		} else {
+		else {
 			double impactCoefficent = (double) lifetime / lengthOfTailInPixel;
 			// TODO use negative part of e function. dont forget to use
 			// fadeoutrate. or remove it!
 			colorValue = backgroundColor + (int) (impactCoefficent * lightPointColor);
-			colorValue = (int) ((int) colorValue + (colorValue * sparcle));
+			colorValue = (int) (colorValue + (colorValue * sparcle));
 		}
 		if (colorValue > 255) {
 			colorValue = 255;
@@ -297,7 +297,7 @@ public class Tron extends RenderingProgramm {
 		tokens.removeAll(tokensToRemove);
 
 		// create new Tokens to keep amount stable
-		for (int i = tokens.size(); tokens.size() < tokensAmount; i++) {
+		while (tokens.size() < tokensAmount) {
 			// if speed is greater 1 we speed up the rendering cycles. so we get
 			// shure that never ever one pixel on the rendered image is missed
 			// out.
@@ -344,11 +344,10 @@ public class Tron extends RenderingProgramm {
 				// yes case
 				if (handleTokenTakesCrossway(token, possibleCrossWay) == false) {
 					continue; // we wanted to take an new lane but there
-								// was not enough space on it. so it
-								// does not make sence
-				} else {
+					// was not enough space on it. so it
+					// does not make sence
+				} else
 					return;
-				}
 			}
 		}
 
@@ -370,11 +369,10 @@ public class Tron extends RenderingProgramm {
 
 	private boolean isCrossWayBehindToken(Token token, CrossWay crossWay) {
 
-		if (token.lasTakenCrossWays.contains(crossWay)) {
+		if (token.lasTakenCrossWays.contains(crossWay))
 			return true;
-		} else {
+		else
 			return false;
-		}
 	}
 
 
@@ -422,9 +420,8 @@ public class Tron extends RenderingProgramm {
 			lanesReadyToTake.put(possibleLane, forward);
 		}
 
-		if (lanesReadyToTake.size() == 0) {
+		if (lanesReadyToTake.size() == 0)
 			return false;
-		}
 
 		// now move the token to a new random lane
 		int laneNumberChoosen = (int) (Math.random() * (lanesReadyToTake.size() - 1));
