@@ -1,9 +1,10 @@
 package org.ambientlight.process.events;
 
-import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
+import org.ambientlight.process.trigger.EventTriggerConfiguration;
 
 
 public interface IEventListener {
 
-	public void handleEvent(EventGeneratorConfiguration configuration);
+	public void handleEvent(EventTriggerConfiguration alarm, String eventGeneratorName);
+
 }

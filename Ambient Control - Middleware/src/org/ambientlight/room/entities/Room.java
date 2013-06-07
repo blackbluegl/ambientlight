@@ -9,6 +9,7 @@ import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
 import org.ambientlight.device.stripe.Stripe;
+import org.ambientlight.process.events.AlarmGenerator;
 import org.ambientlight.room.entities.triggers.EventTrigger;
 
 /**
@@ -18,8 +19,10 @@ import org.ambientlight.room.entities.triggers.EventTrigger;
  */
 public class Room {
 
+	public AlarmGenerator alarmManager;
+
 	private Map<String, EventTrigger> eventTrigger;
-	
+
 	private List<DeviceDriver> devices;
 
 	private List<LightObject> lightObjects;
@@ -45,12 +48,11 @@ public class Room {
 	public List<LightObject> getLightObjectsInRoom() {
 		return lightObjects;
 	}
-	
+
 	public LightObject getLightObjectByName(String name){
 		for (LightObject current : this.lightObjects){
-			if(name.equals(current.getConfiguration().getName())){
+			if (name.equals(current.configuration.getName()))
 				return current;
-			}
 		}
 		return null;
 	}
@@ -72,15 +74,14 @@ public class Room {
 		return result;
 	}
 
-	
+
 	public SwtichDeviceDriver getSwitchingDevice() {
 		// TODO actually we use the first found device. later a correlation between the device and the switches could be possible
 		for(DeviceDriver currentDevice : this.devices){
-			if(currentDevice instanceof SwtichDeviceDriver){
+			if(currentDevice instanceof SwtichDeviceDriver)
 				return (SwtichDeviceDriver) currentDevice;
-			}
 		}
-		
+
 		return null;
 	}
 
@@ -92,10 +93,10 @@ public class Room {
 				result.add((LedStripeDeviceDriver)currentDevice);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	public EventTrigger getEventTriggerByName(String name){
 		return this.eventTrigger.get(name);
 	}

@@ -15,14 +15,25 @@
 
 package org.ambientlight.process.events;
 
-import org.ambientlight.process.trigger.EventTriggerConfiguration;
+import org.ambientlight.process.trigger.SceneryEntryEventConfiguration;
+import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
+ * 
  */
-public interface IEventManagerClient {
+public class SceneryEventGenerator {
 
-	public abstract void onEvent(EventTriggerConfiguration event, String eventGeneratorName);
+	public SceneryEventGeneratorConfiguration config;
+
+	IEventManagerClient eventManager;
+
+
+	public void sceneryEntryEventOccured(String sceneryName){
+		SceneryEntryEventConfiguration entryConfig = new SceneryEntryEventConfiguration();
+		entryConfig.sceneryName = sceneryName;
+		eventManager.onEvent(entryConfig, config.name);
+	}
 }

@@ -38,7 +38,7 @@ public class Renderer {
 		return hadDirtyRegionInLastRun;
 	}
 
-	private Map<LightObject, RenderingProgramm> renderLightObjectMapping = new ConcurrentHashMap<LightObject, RenderingProgramm>();
+	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new ConcurrentHashMap<LightObject, RenderingProgramm>();
 
 
 	public Renderer(Room room, ITransitionEffectFinishedListener transitionFinishedListener) {
@@ -90,8 +90,8 @@ public class Renderer {
 
 		int maxLayer = 0;
 		for (LightObject current : lightObjects) {
-			if (current.getConfiguration().layerNumber > maxLayer) {
-				maxLayer = current.getConfiguration().layerNumber;
+			if (current.configuration.layerNumber > maxLayer) {
+				maxLayer = current.configuration.layerNumber;
 			}
 		}
 
@@ -101,7 +101,7 @@ public class Renderer {
 			// layer to merge
 			for (LightObject currentLightObject : lightObjects) {
 
-				if (currentLightObject.getConfiguration().layerNumber == currentLayer) {
+				if (currentLightObject.configuration.layerNumber == currentLayer) {
 					// TODO this here could be done in several threads
 
 					BufferedImage result = renderLightObjectCanvas(currentLightObject);
@@ -109,8 +109,8 @@ public class Renderer {
 					// merge to room
 					if (result != null) {
 						Graphics2D g2d = room.getRoomBitMap().createGraphics();
-						g2d.drawImage(result, null, currentLightObject.getConfiguration().xOffsetInRoom,
-								currentLightObject.getConfiguration().yOffsetInRoom);
+						g2d.drawImage(result, null, currentLightObject.configuration.xOffsetInRoom,
+								currentLightObject.configuration.yOffsetInRoom);
 						g2d.dispose();
 					}
 				}
@@ -135,9 +135,8 @@ public class Renderer {
 
 			// after the last step of a fadeout the background should be
 			// rendered.
-			if (effect instanceof FadeOutTransition) {
+			if (effect instanceof FadeOutTransition)
 				return null;
-			}
 		}
 
 		// if no effect exists (anymore) render in quick mode
@@ -151,9 +150,8 @@ public class Renderer {
 		}
 
 		// init effect before the lightobject value was changed
-		BufferedImage background = room.getRoomBitMap().getSubimage(lightObject.getConfiguration().xOffsetInRoom,
-				lightObject.getConfiguration().yOffsetInRoom, lightObject.getConfiguration().width,
-				lightObject.getConfiguration().height);
+		BufferedImage background = room.getRoomBitMap().getSubimage(lightObject.configuration.xOffsetInRoom,
+				lightObject.configuration.yOffsetInRoom, lightObject.configuration.width, lightObject.configuration.height);
 		effect.beforeRendering(background, lightObject.getPixelMap());
 		// render the lightObjectvalue
 		currentRenderProgramm.renderLightObject(lightObject);
