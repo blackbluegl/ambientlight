@@ -15,8 +15,8 @@ import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.StartNodeConfiguration;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
-import org.ambientlight.process.trigger.SceneryEntryEventConfiguration;
-import org.ambientlight.process.trigger.SwitchEventConfiguration;
+import org.ambientlight.process.trigger.SceneryEntryEventTriggerConfiguration;
+import org.ambientlight.process.trigger.SwitchEventTriggerConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -99,7 +99,7 @@ public class CreateTestConfig {
 		rc.actorConfigurations.put(lo.getName(),lo);
 		rc.actorConfigurations.put(background.getName(),background);
 		
-		SwitchEventConfiguration triggerMainSwitch = new SwitchEventConfiguration();
+		SwitchEventTriggerConfiguration triggerMainSwitch = new SwitchEventTriggerConfiguration();
 		triggerMainSwitch.name="RoomSwitch";
 		triggerMainSwitch.setPowerState(false);
 		rc.eventTriggerConfigurations.put(triggerMainSwitch.getName(),triggerMainSwitch);
@@ -153,7 +153,7 @@ public class CreateTestConfig {
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id=0;
 		
-		SceneryEntryEventConfiguration triggerSceneryChange = new SceneryEntryEventConfiguration();
+		SceneryEntryEventTriggerConfiguration triggerSceneryChange = new SceneryEntryEventTriggerConfiguration();
 		triggerSceneryChange.name = "triggerScenarioEntry-"+userScenario.id;
 		triggerSceneryChange.sceneryId=userScenario.id;
 		rc.eventTriggerConfigurations.put(triggerSceneryChange.name, triggerSceneryChange);

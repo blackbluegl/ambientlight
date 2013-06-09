@@ -9,9 +9,18 @@ import java.util.List;
 import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.process.events.EventManager;
+import org.ambientlight.process.events.generator.AlarmGenerator;
+import org.ambientlight.process.events.generator.EventGenerator;
+import org.ambientlight.process.events.generator.SceneryEventGenerator;
+import org.ambientlight.process.events.generator.SwitchEventGenerator;
 import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
+import org.ambientlight.room.actors.LightObjectConfiguration;
+import org.ambientlight.room.eventgenerator.AlarmEventGeneratorConfiguration;
+import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
+import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
+import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
 public class RoomFactory {
 
@@ -37,13 +46,31 @@ public class RoomFactory {
 
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
-		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations) {
-			if (currentItemConfiguration instanceof LightObjectConfiguration)
+		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations.values()) {
+			if (currentItemConfiguration instanceof LightObjectConfiguration) {
 				lightObjects.add(this.initializeLightObject((LightObjectConfiguration) currentItemConfiguration,
 						room.getAllStripePartsInRoom()));
+			}
 		}
 		room.setLightObjectsInRoom(lightObjects);
 
+		// initialize eventGenerators
+		room.eventManager = new EventManager();
+
+		for(EventGeneratorConfiguration currentConfig : roomConfig.eventGeneratorConfigurations){
+			EventGenerator generator = null;
+			if (currentConfig instanceof AlarmEventGeneratorConfiguration) {
+				generator = new AlarmGenerator();
+			}
+			if (currentConfig instanceof SwitchEventGeneratorConfiguration) {
+				generator = new SwitchEventGenerator();
+			}
+			if (currentConfig instanceof SceneryEventGeneratorConfiguration) {
+				generator = new SceneryEventGenerator();
+			}
+			generator.config = currentConfig;
+			room.eventGenerators.put(generator.config.name, generator);
+		}
 		return room;
 	}
 

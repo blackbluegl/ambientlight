@@ -2,12 +2,10 @@ package org.ambientlight;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Timer;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.process.events.IEventManager;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -22,7 +20,7 @@ import org.ambientlight.scenery.ws.SceneryControl;
 public class AmbientControlMW {
 
 	static String roomConfigFileName = "default";
-	
+
 	public static String getRoomConfigFileName() {
 		return roomConfigFileName;
 	}
@@ -36,11 +34,6 @@ public class AmbientControlMW {
 	static Room room;
 
 	static RoomFactory roomFactory;
-	
-	static IEventManager eventManager;
-
-	
-	
 
 	static int FREQUENCY = 25;
 
@@ -68,7 +61,7 @@ public class AmbientControlMW {
 		//start scenery via SceneryControl
 		SceneryControl sc = new SceneryControl();
 		sc.changeRoomToScenery(getRoomConfig().currentScenery);
-		
+
 		new WebserviceTask().start();
 
 		// wait for external signal to stop
@@ -130,9 +123,8 @@ public class AmbientControlMW {
 	private static boolean doAnyLightObjectsExist(RoomConfiguration rc) {
 		for (String currentActor : rc.actorConfigurations.keySet()) {
 			ActorConfiguration current = rc.actorConfigurations.get(currentActor);
-			if (current instanceof LightObjectConfiguration) {
+			if (current instanceof LightObjectConfiguration)
 				return true;
-			}
 		}
 		return false;
 	}
@@ -175,14 +167,5 @@ public class AmbientControlMW {
 
 	public static void setRoomConfig(RoomConfiguration roomConfig) {
 		AmbientControlMW.roomConfig = roomConfig;
-	}
-	
-	public static IEventManager getEventManager() {
-		return eventManager;
-	}
-
-	
-	public static void setEventManager(IEventManager eventManager) {
-		AmbientControlMW.eventManager = eventManager;
 	}
 }

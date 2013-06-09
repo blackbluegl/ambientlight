@@ -9,8 +9,8 @@ import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
 import org.ambientlight.device.stripe.Stripe;
-import org.ambientlight.process.events.AlarmGenerator;
-import org.ambientlight.room.entities.triggers.EventTrigger;
+import org.ambientlight.process.events.EventManager;
+import org.ambientlight.process.events.generator.EventGenerator;
 
 /**
  * 
@@ -19,9 +19,9 @@ import org.ambientlight.room.entities.triggers.EventTrigger;
  */
 public class Room {
 
-	public AlarmGenerator alarmManager;
+	public EventManager eventManager;
 
-	private Map<String, EventTrigger> eventTrigger;
+	public Map<String, EventGenerator> eventGenerators;
 
 	private List<DeviceDriver> devices;
 
@@ -96,10 +96,4 @@ public class Room {
 
 		return result;
 	}
-
-	public EventTrigger getEventTriggerByName(String name){
-		return this.eventTrigger.get(name);
-	}
-
-
 }

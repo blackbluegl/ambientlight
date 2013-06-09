@@ -1,16 +1,20 @@
 package org.ambientlight.process.events;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.trigger.AlarmEventConfiguration;
+import org.ambientlight.process.events.event.Event;
+import org.ambientlight.process.events.generator.AlarmGenerator;
+import org.ambientlight.process.trigger.AlarmEventTriggerConfiguration;
 import org.ambientlight.process.trigger.EventTriggerConfiguration;
 
 
 public class EventManager implements IEventManager, IEventManagerClient {
 
-	Map<EventTriggerConfiguration, IEventListener> eventMap = new HashMap<EventTriggerConfiguration, IEventListener>();
+	Map<EventTriggerConfiguration, List<IEventListener>> eventMap = new HashMap<EventTriggerConfiguration, List<IEventListener>>();
 
 
 	/*
@@ -24,10 +28,17 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	@Override
 	public void register(final IEventListener eventListener, final EventTriggerConfiguration triggerConfig) {
 
-		if (triggerConfig instanceof AlarmEventConfiguration) {
-			AmbientControlMW.getRoom().alarmManager.createAlarm(this, (AlarmEventConfiguration) triggerConfig);
-			eventMap.put(triggerConfig, eventListener);
+		if (triggerConfig instanceof AlarmEventTriggerConfiguration) {
+			((AlarmGenerator) AmbientControlMW.getRoom().eventGenerators.get(triggerConfig.eventGeneratorName))
+			.createAlarm((AlarmEventTriggerConfiguration) triggerConfig);
 		}
+
+		List<IEventListener> eventListenerList = eventMap.get(triggerConfig);
+		if (eventListenerList == null) {
+			eventListenerList = new ArrayList<IEventListener>();
+			eventMap.put(triggerConfig, eventListenerList);
+		}
+		eventListenerList.add(eventListener);
 	}
 
 
@@ -39,9 +50,13 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 * .process.trigger.EventTriggerConfiguration, java.lang.String)
 	 */
 	@Override
-	public void onEvent(EventTriggerConfiguration event, String eventGeneratorName) {
-		IEventListener eventListener = this.eventMap.get(event);
-		eventListener.handleEvent(event, eventGeneratorName);
+	public void onEvent(Event event, EventTriggerConfiguration correlation) {
 
+		List<IEventListener> eventListeners = this.eventMap.get(correlation);
+		if (eventListeners != null) {
+			for (IEventListener currentListener : eventListeners) {
+				currentListener.handleEvent(event, correlation);
+			}
+		}
 	}
 }

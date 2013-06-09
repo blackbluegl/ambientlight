@@ -13,27 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
-
-import org.ambientlight.process.trigger.SceneryEntryEventConfiguration;
-import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
+package org.ambientlight.process.events.event;
 
 
 /**
  * @author Florian Bornkessel
- * 
- * 
+ *
  */
-public class SceneryEventGenerator {
+public class SceneryEvent extends Event {
 
-	public SceneryEventGeneratorConfiguration config;
-
-	IEventManagerClient eventManager;
-
-
-	public void sceneryEntryEventOccured(String sceneryName){
-		SceneryEntryEventConfiguration entryConfig = new SceneryEntryEventConfiguration();
-		entryConfig.sceneryName = sceneryName;
-		eventManager.onEvent(entryConfig, config.name);
-	}
+	public String sceneryName;
 }
