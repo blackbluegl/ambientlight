@@ -13,33 +13,33 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.process.events.generator;
 
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.ambientlight.process.trigger.AlarmEventConfiguration;
-import org.ambientlight.room.eventgenerator.AlarmEventGeneratorConfiguration;
+import org.ambientlight.process.events.event.AlarmEvent;
+import org.ambientlight.process.trigger.AlarmEventTriggerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class AlarmGenerator {
+public class AlarmGenerator extends EventGenerator {
 
-	public AlarmEventGeneratorConfiguration config;
 	/**
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	public void createAlarm(final IEventManagerClient eventManager, final AlarmEventConfiguration triggerConfig) {
+	public void createAlarm(final AlarmEventTriggerConfiguration triggerConfig) {
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
-				eventManager.onEvent(triggerConfig, config.name);
+				AlarmEvent event = new AlarmEvent();
+				eventManager.onEvent(event, triggerConfig);
 			}
 		};
 

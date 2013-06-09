@@ -13,22 +13,21 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.process.events.generator;
 
-import org.ambientlight.process.trigger.EventTriggerConfiguration;
+import org.ambientlight.process.events.event.SwitchEvent;
+import org.ambientlight.process.trigger.SwitchEventTriggerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface IEventManager {
+public class SwitchEventGenerator extends EventGenerator {
 
-
-
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, EventTriggerConfiguration triggerConfig);
+	public void switchEventOccured(SwitchEvent event) {
+		SwitchEventTriggerConfiguration correlation = new SwitchEventTriggerConfiguration();
+		correlation.eventGeneratorName = config.name;
+		eventManager.onEvent(event, correlation);
+	}
 }

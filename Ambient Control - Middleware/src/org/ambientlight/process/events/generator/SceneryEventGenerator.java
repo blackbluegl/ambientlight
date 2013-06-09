@@ -13,22 +13,26 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.process.events.generator;
 
-import org.ambientlight.process.trigger.EventTriggerConfiguration;
+import org.ambientlight.process.events.event.SceneryEvent;
+import org.ambientlight.process.trigger.SceneryEntryEventTriggerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
+ * 
  */
-public interface IEventManager {
+public class SceneryEventGenerator extends EventGenerator {
 
 
+	public void sceneryEntryEventOccured(SceneryEvent event) {
 
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, EventTriggerConfiguration triggerConfig);
+		SceneryEntryEventTriggerConfiguration correlation = new SceneryEntryEventTriggerConfiguration();
+		correlation.eventGeneratorName = config.name;
+		correlation.sceneryName = event.sceneryName;
+
+		eventManager.onEvent(event, correlation);
+	}
 }

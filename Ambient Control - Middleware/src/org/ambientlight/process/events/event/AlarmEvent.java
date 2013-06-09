@@ -13,22 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.process.events.event;
 
-import org.ambientlight.process.trigger.EventTriggerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface IEventManager {
+public class AlarmEvent extends Event {
 
-
-
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, EventTriggerConfiguration triggerConfig);
 }

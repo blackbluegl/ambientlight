@@ -15,7 +15,9 @@
 
 package org.ambientlight.process.events;
 
+import org.ambientlight.process.events.event.Event;
 import org.ambientlight.process.trigger.EventTriggerConfiguration;
+
 
 
 /**
@@ -24,5 +26,12 @@ import org.ambientlight.process.trigger.EventTriggerConfiguration;
  */
 public interface IEventManagerClient {
 
-	public abstract void onEvent(EventTriggerConfiguration event, String eventGeneratorName);
+	/**
+	 * @param eventGeneratorName
+	 * @param event
+	 * @param correlation
+	 *            the eventTriggerConfiguration from Client as Correlation
+	 */
+	void onEvent(Event event, EventTriggerConfiguration correlation);
+
 }
