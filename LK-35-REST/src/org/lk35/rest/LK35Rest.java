@@ -40,8 +40,7 @@ import org.lk35.api.LK35ColorHandlerImpl;
  * <p>
  * 
  * Example:
- * <code>http://localhost:8899/rest/LK35ColorHandler/color/rgb?zone
- * =1&zone=2&r=222&g=222&b=0</code>
+ * <code>http://localhost:8899/rest/LK35ColorHandler/color/rgb?zones=1&zones=2&r=222&g=222&b=0</code>
  * 
  * @author Florian Bornkessel
  * 
