@@ -13,13 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events.event;
+package org.ambientlight.process.handler.event;
+
+import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public abstract class Event {
-
+public class EventToBooleanHandlerConfiguration extends AbstractActionHandlerConfiguration {
 }

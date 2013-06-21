@@ -7,6 +7,7 @@ import java.util.Timer;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.entities.ProcessFactory;
+import org.ambientlight.process.events.event.SwitchEvent;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -16,6 +17,7 @@ import org.ambientlight.room.entities.RoomFactory;
 import org.ambientlight.scenery.rendering.RenderControl;
 import org.ambientlight.scenery.rendering.Renderer;
 import org.ambientlight.scenery.rendering.effects.RenderingEffectFactory;
+import org.ambientlight.scenery.ws.EventReceiver;
 
 public class AmbientControlMW {
 
@@ -57,6 +59,11 @@ public class AmbientControlMW {
 		}
 
 		new WebserviceTask().start();
+
+		EventReceiver events = new EventReceiver();
+		SwitchEvent sEvent = new SwitchEvent();
+		sEvent.powerState = true;
+		events.handleEvent(sEvent, "RoomSwitch");
 
 		// wait for external signal to stop
 		while (true) {

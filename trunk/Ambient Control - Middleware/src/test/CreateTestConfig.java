@@ -14,6 +14,10 @@ import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
+import org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration;
+import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration;
+import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
+import org.ambientlight.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.process.trigger.SceneryEntryEventTriggerConfiguration;
 import org.ambientlight.process.trigger.SwitchEventTriggerConfiguration;
 import org.ambientlight.room.RoomConfiguration;
@@ -24,7 +28,6 @@ import org.ambientlight.room.entities.RoomConfigurationFactory;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.UserSceneryConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 
 public class CreateTestConfig {
 
@@ -111,27 +114,48 @@ public class CreateTestConfig {
 		userScenario.id="scenario1";
 		rc.sceneries.add(userScenario);
 		rc.currentSceneryConfig = userScenario;
+
 		ProcessConfiguration roomSwitchProcess = new ProcessConfiguration();
 		roomSwitchProcess.id = "roomSwitch";
-		NodeConfiguration startNode = new NodeConfiguration();
-		startNode.id=0;
+		rc.processes.add(roomSwitchProcess);
 		SwitchEventTriggerConfiguration triggerConf = new SwitchEventTriggerConfiguration();
 		triggerConf.eventGeneratorName = triggerMainSwitch.name;
 		roomSwitchProcess.eventTriggerConfiguration = triggerConf;
 
-		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		powerstatehandler.nextNodeId=1;
-		powerstatehandler.powerStateConfiguration.put(sw1.getName(), true);
-		powerstatehandler.powerStateConfiguration.put(lo.getName(), true);
-		startNode.actionHandler=powerstatehandler;
+		NodeConfiguration eventMapperNode = new NodeConfiguration();
+		eventMapperNode.id = 0;
+		EventToBooleanHandlerConfiguration eventMapper = new EventToBooleanHandlerConfiguration();
+		eventMapper.nextNodeId = 1;
+		eventMapperNode.actionHandler = eventMapper;
+		roomSwitchProcess.nodes.put(0, eventMapperNode);
 
-		NodeConfiguration termination = new NodeConfiguration();
-		termination.id=1;
-		termination.actionHandler=null;
+		NodeConfiguration decissionNode = new NodeConfiguration();
+		decissionNode.id = 1;
+		DecisionHandlerConfiguration decission = new DecisionHandlerConfiguration();
+		decission.nextNodeId = 2;
+		decission.nextAlternativeNodeId = 3;
+		ExpressionConfiguration expression = new ExpressionConfiguration();
+		decission.expression = expression;
+		expression.expression = "#{tokenValue}==1.0";
+		decissionNode.actionHandler = decission;
+		roomSwitchProcess.nodes.put(1, decissionNode);
 
-		roomSwitchProcess.nodes.put(0,startNode);
-		roomSwitchProcess.nodes.put(1,termination);
-		rc.processes.add(roomSwitchProcess);
+		NodeConfiguration turnOnNode = new NodeConfiguration();
+		turnOnNode.id = 2;
+		PowerstateHandlerConfiguration powerOnHandler = new PowerstateHandlerConfiguration();
+		powerOnHandler.nextNodeId = null;
+		powerOnHandler.powerStateConfiguration.put(sw1.getName(), true);
+		powerOnHandler.powerStateConfiguration.put(lo.getName(), true);
+		turnOnNode.actionHandler = powerOnHandler;
+		roomSwitchProcess.nodes.put(2, turnOnNode);
+
+		NodeConfiguration turnOffNode = new NodeConfiguration();
+		turnOffNode.id = 3;
+		SimplePowerStateHandlerConfiguration powerDownHandler = new SimplePowerStateHandlerConfiguration();
+		powerDownHandler.powerState = false;
+		powerDownHandler.nextNodeId = null;
+		turnOffNode.actionHandler = powerDownHandler;
+		roomSwitchProcess.nodes.put(3, turnOffNode);
 
 		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
 		changeConfigFor.add(background);
@@ -153,10 +177,8 @@ public class CreateTestConfig {
 		startNode.id=0;
 
 		SceneryEntryEventTriggerConfiguration triggerSceneryChange = new SceneryEntryEventTriggerConfiguration();
-		triggerSceneryChange.name = "triggerScenarioEntry-"+userScenario.id;
-		triggerSceneryChange.sceneryId=userScenario.id;
-		rc.eventTriggerConfigurations.put(triggerSceneryChange.name, triggerSceneryChange);
-		process.eventTriggerName=triggerSceneryChange.name;
+		triggerSceneryChange.sceneryName = "triggerScenarioEntry-" + userScenario.id;
+		process.eventTriggerConfiguration = triggerSceneryChange;
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
 		cHandler.nextNodeId=1;
@@ -169,21 +191,16 @@ public class CreateTestConfig {
 		switchNode.id=1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		powerstatehandler.nextNodeId=2;
+		powerstatehandler.nextNodeId = null;
 		for( ActorConfiguration current : itemsToPutOn){
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler=powerstatehandler;
 
-		NodeConfiguration termination = new NodeConfiguration();
-		termination.id=2;
-		termination.actionHandler=null;
 		process.nodes.put(0, startNode);
 		process.nodes.put(1, switchNode);
-		process.nodes.put(2, termination);
 
 		rc.processes.add(process);
-		userScenario.processIds.add(process.id);
 	}
 
 
@@ -196,11 +213,5 @@ public class CreateTestConfig {
 		Color color = new Color(i, 10, 100);
 		scL01.rgb=color.getRGB();			
 		return scL01;
-	}
-
-
-	private SwitchingConfiguration createSceneryMappingForSwitch(){
-		SwitchingConfiguration config = new SwitchingConfiguration();
-		return config;
 	}
 }

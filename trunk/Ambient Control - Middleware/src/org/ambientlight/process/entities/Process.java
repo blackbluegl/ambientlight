@@ -1,38 +1,45 @@
 package org.ambientlight.process.entities;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.events.EventManager;
 import org.ambientlight.process.events.IEventListener;
 import org.ambientlight.process.events.event.Event;
-import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.trigger.EventTriggerConfiguration;
 
 
-public class Process implements IEventListener{
+public class Process implements IEventListener {
+
 	ProcessConfiguration config;
-	Map<Integer,Node> nodes;
+	EventManager eventManager;
+	Map<Integer, Node> nodes = new HashMap<Integer, Node>();
 	Token token;
-	AbstractActionHandler handler;
 
-
-	public void start(){
-		//wait until event happens
-		AmbientControlMW.getRoom().eventManager.register(this, config.eventTriggerConfiguration);
+	public void start() {
+		// wait until event happens
+		eventManager.register(this, config.eventTriggerConfiguration);
 	}
+
 
 	@Override
 	public void handleEvent(Event event, EventTriggerConfiguration correlation) {
 
 		token.valueType = TokenValueType.EVENT;
 		token.data = event;
-		handler.performAction(token);
 
-		//Start action here until token nextNode is empty
-		while(token.nextNodeId!=null){
-			Node currentNode = nodes.get(token.nextNodeId); 
-			currentNode.performAction(token);
+		Node currentNode = null;
+		try {
+			// Start action here until token nextNode is empty
+			while (token.nextNodeId != null) {
+				currentNode = nodes.get(token.nextNodeId);
+				System.out.println("Process: " + config.id + " performes action of node: " + currentNode.config.id);
+				currentNode.performAction(token);
+			}
+		} catch (Exception e) {
+			System.out.println("Process: " + config.id + " stopped during an error in node: " + currentNode.config.id);
+			System.out.println(e);
 		}
 	}
 }

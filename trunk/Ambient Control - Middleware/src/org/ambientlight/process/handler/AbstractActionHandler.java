@@ -12,5 +12,5 @@ public abstract class AbstractActionHandler {
 	}
 
 
-	public abstract void performAction(Token token);
+	public abstract void performAction(Token token) throws ActionHandlerException;
 }
