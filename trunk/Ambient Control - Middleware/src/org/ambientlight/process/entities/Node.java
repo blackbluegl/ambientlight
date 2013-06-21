@@ -9,7 +9,7 @@ public class Node {
 	AbstractActionHandler handler;
 
 	public void performAction(Token token) {
-		handler.performAction(token.data);
+		handler.performAction(token);
 		token.nextNodeId=handler.getNextNodeId();
 	}
 }

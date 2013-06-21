@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.process.entities.ProcessFactory;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -15,7 +16,6 @@ import org.ambientlight.room.entities.RoomFactory;
 import org.ambientlight.scenery.rendering.RenderControl;
 import org.ambientlight.scenery.rendering.Renderer;
 import org.ambientlight.scenery.rendering.effects.RenderingEffectFactory;
-import org.ambientlight.scenery.ws.SceneryControl;
 
 public class AmbientControlMW {
 
@@ -24,8 +24,6 @@ public class AmbientControlMW {
 	public static String getRoomConfigFileName() {
 		return roomConfigFileName;
 	}
-
-	static RoomConfiguration roomConfig;
 
 	static RenderControl renderProgrammFactory;
 
@@ -45,22 +43,18 @@ public class AmbientControlMW {
 
 		parseArguments(args);
 
-		initModel();
+		RoomConfiguration roomConfiguration = initModel();
 
-		initComponents();
+		initComponents(roomConfiguration);
 
 		// start rendering but only if there is something to render
-		if (doAnyLightObjectsExist(getRoomConfig())) {
+		if (doAnyLightObjectsExist(roomConfiguration)) {
 			Timer timer = new Timer();
 			timer.schedule(new RenderingTask(), 0, 1000 / FREQUENCY);
 		}
 		else{
 			System.out.println("disabled the renderer because there are no lightObjects that need to be rendered");
 		}
-
-		//start scenery via SceneryControl
-		SceneryControl sc = new SceneryControl();
-		sc.changeRoomToScenery(getRoomConfig().currentScenery);
 
 		new WebserviceTask().start();
 
@@ -73,11 +67,14 @@ public class AmbientControlMW {
 		}
 	}
 
-	private static void initComponents() throws InterruptedException, UnknownHostException, IOException {
-		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
-		roomFactory = new RoomFactory(deviceFactory);
 
-		room = roomFactory.initRoom(getRoomConfig());
+	private static void initComponents(RoomConfiguration roomConfiguration) throws InterruptedException, UnknownHostException,
+	IOException {
+		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
+		ProcessFactory processFactory = new ProcessFactory();
+		roomFactory = new RoomFactory(deviceFactory, processFactory);
+
+		room = roomFactory.initRoom(roomConfiguration);
 
 		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
 		RenderControl renderProgrammFactory = new RenderControl(effectFactory);
@@ -87,13 +84,14 @@ public class AmbientControlMW {
 		AmbientControlMW.setRenderProgrammFactory(renderProgrammFactory);
 	}
 
-	private static void initModel() {
+
+	private static RoomConfiguration initModel() {
 		try {
-			AmbientControlMW.setRoomConfig(RoomConfigurationFactory.getRoomConfigByName(roomConfigFileName));
+			return RoomConfigurationFactory.getRoomConfigByName(roomConfigFileName);
 		} catch (Exception e) {
 			System.out.println("error reading config file.");
 			System.out.println(e.getMessage());
-			System.exit(1);
+			return null;
 		}
 	}
 
@@ -159,13 +157,5 @@ public class AmbientControlMW {
 
 	public static void setRenderProgrammFactory(RenderControl renderProgrammFactory) {
 		AmbientControlMW.renderProgrammFactory = renderProgrammFactory;
-	}
-
-	public static RoomConfiguration getRoomConfig() {
-		return roomConfig;
-	}
-
-	public static void setRoomConfig(RoomConfiguration roomConfig) {
-		AmbientControlMW.roomConfig = roomConfig;
 	}
 }

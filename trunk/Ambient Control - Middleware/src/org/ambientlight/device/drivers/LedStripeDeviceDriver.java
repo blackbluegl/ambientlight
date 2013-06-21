@@ -8,16 +8,16 @@ import org.ambientlight.device.stripe.Stripe;
 
 
 public interface LedStripeDeviceDriver extends DeviceDriver{
-	
-	public void setConfiguration(MultiStripeOverEthernetClientDeviceConfiguration configuration);
+
+	public void setConfiguration(RemoteHostConfiguration configuration);
 
 	public List<Stripe> getAllStripes();
-	
+
 	public void attachStripe(Stripe stripe);
-	
+
 	public void connect() throws UnknownHostException, IOException;
-	
+
 	public void closeConnection();
-	
+
 	void writeData() throws IOException;
 }
