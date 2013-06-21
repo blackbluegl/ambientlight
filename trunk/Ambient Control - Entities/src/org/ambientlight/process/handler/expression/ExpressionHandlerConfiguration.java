@@ -4,5 +4,6 @@ import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
 public class ExpressionHandlerConfiguration extends AbstractActionHandlerConfiguration {
-	ExpressionConfiguration expression;
+
+	public ExpressionConfiguration expression;
 }

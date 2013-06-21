@@ -4,6 +4,7 @@ import java.util.List;
 
 
 public class ExpressionConfiguration {
-	String expression;
-	List<Integer> sensorIds;
+
+	public String expression;
+	public List<String> sensorNames;
 }

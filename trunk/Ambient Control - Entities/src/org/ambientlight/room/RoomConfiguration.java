@@ -16,7 +16,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("room")
 public class RoomConfiguration {
 	public String roomName;
-	public String currentScenery;
+	public AbstractSceneryConfiguration currentSceneryConfig;
 	public int width;
 	public int height;
 	public Map<String,ActorConfiguration> actorConfigurations = new HashMap<String,ActorConfiguration>();
