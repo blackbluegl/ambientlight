@@ -9,6 +9,7 @@ import java.util.List;
 import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.process.entities.ProcessFactory;
 import org.ambientlight.process.events.EventManager;
 import org.ambientlight.process.events.generator.AlarmGenerator;
 import org.ambientlight.process.events.generator.EventGenerator;
@@ -22,16 +23,23 @@ import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
+
 public class RoomFactory {
 
 	DeviceDriverFactory deviceFactory;
+	ProcessFactory processFactory;
 
-	public RoomFactory(DeviceDriverFactory deviceFactory) {
+
+	public RoomFactory(DeviceDriverFactory deviceFactory, ProcessFactory processFactory) {
 		this.deviceFactory = deviceFactory;
+		this.processFactory = processFactory;
 	}
+
 
 	public Room initRoom(RoomConfiguration roomConfig) throws UnknownHostException, IOException {
 		Room room = new Room();
+
+		room.config = roomConfig;
 
 		// initialize Pixelmap
 		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);
@@ -54,10 +62,23 @@ public class RoomFactory {
 		}
 		room.setLightObjectsInRoom(lightObjects);
 
+		createEventGenerators(roomConfig, room);
+
+		room.processes = this.processFactory.initProcesses(roomConfig);
+
+		return room;
+	}
+
+
+	/**
+	 * @param roomConfig
+	 * @param room
+	 */
+	public void createEventGenerators(RoomConfiguration roomConfig, Room room) {
 		// initialize eventGenerators
 		room.eventManager = new EventManager();
 
-		for(EventGeneratorConfiguration currentConfig : roomConfig.eventGeneratorConfigurations){
+		for (EventGeneratorConfiguration currentConfig : roomConfig.eventGeneratorConfigurations) {
 			EventGenerator generator = null;
 			if (currentConfig instanceof AlarmEventGeneratorConfiguration) {
 				generator = new AlarmGenerator();
@@ -71,8 +92,8 @@ public class RoomFactory {
 			generator.config = currentConfig;
 			room.eventGenerators.put(generator.config.name, generator);
 		}
-		return room;
 	}
+
 
 	private LightObject initializeLightObject(LightObjectConfiguration lightObjectConfig, List<StripePart> allStripePartsInRoom) {
 		List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
@@ -80,6 +101,7 @@ public class RoomFactory {
 
 		return new LightObject(lightObjectConfig, stripePartsInLightObject);
 	}
+
 
 	private List<StripePart> getStripePartsFromRoomForLightObject(List<StripePart> stripesInRoom,
 			LightObjectConfiguration configuration) {
@@ -108,6 +130,7 @@ public class RoomFactory {
 
 		return result;
 	}
+
 
 	private DeviceDriver initializeDevice(DeviceConfiguration deviceConfig) throws UnknownHostException, IOException {
 

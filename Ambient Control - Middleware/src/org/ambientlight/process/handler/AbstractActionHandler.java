@@ -1,14 +1,16 @@
 package org.ambientlight.process.handler;
 
-import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
+import org.ambientlight.process.entities.Token;
 
 
 public abstract class AbstractActionHandler {
-	protected AbstractActionHandlerConfiguration config;
-	
+
+	public AbstractActionHandlerConfiguration config;
+
 	public int getNextNodeId(){
 		return config.nextNodeId;
 	}
 
-	public abstract void performAction(Object data);
+
+	public abstract void performAction(Token token);
 }

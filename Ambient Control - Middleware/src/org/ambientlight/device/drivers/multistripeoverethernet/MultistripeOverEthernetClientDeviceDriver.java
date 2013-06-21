@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
+import org.ambientlight.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.device.stripe.Stripe;
 
 
@@ -57,9 +58,8 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 			in = new BufferedReader(new InputStreamReader(controlSocket.getInputStream()));
 
 			String stripePortResult = in.readLine();
-			if (stripePortResult == null || !"OK".equals(stripePortResult)) {
+			if (stripePortResult == null || !"OK".equals(stripePortResult))
 				throw new IOException("server did not correclty respond!");
-			}
 		}
 		in.close();
 		controlSocket.close();
@@ -85,9 +85,8 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 	@Override
 	public void writeData() throws IOException {
 
-		if (os == null) {
+		if (os == null)
 			throw new IOException("Outputwriter was not prepared. Cannot write Data to device!");
-		}
 
 		for (int i = 0; i < stripes.size(); i++) {
 			Stripe current = stripes.get(i);
@@ -119,8 +118,8 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 
 
 	@Override
-	public void setConfiguration(MultiStripeOverEthernetClientDeviceConfiguration configuration) {
-		this.configuration = configuration;
+	public void setConfiguration(RemoteHostConfiguration configuration) {
+		this.configuration = (MultiStripeOverEthernetClientDeviceConfiguration) configuration;
 
 	}
 }

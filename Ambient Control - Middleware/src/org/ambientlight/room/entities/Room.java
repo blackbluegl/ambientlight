@@ -9,8 +9,10 @@ import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
 import org.ambientlight.device.stripe.Stripe;
+import org.ambientlight.process.entities.Process;
 import org.ambientlight.process.events.EventManager;
 import org.ambientlight.process.events.generator.EventGenerator;
+import org.ambientlight.room.RoomConfiguration;
 
 /**
  * 
@@ -28,6 +30,10 @@ public class Room {
 	private List<LightObject> lightObjects;
 
 	private BufferedImage roomBitMap;
+
+	public RoomConfiguration config;
+
+	public List<Process> processes;
 
 	public BufferedImage getRoomBitMap() {
 		return roomBitMap;
