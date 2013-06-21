@@ -20,7 +20,7 @@ public class DeviceDriverFactory {
 	public DeviceDriver createByName(DeviceConfiguration dc) throws UnknownHostException, IOException {
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
-			System.out.println("init DummyLedDeviceDriver device");
+			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");
 			DummyDeviceDriver device = new DummyDeviceDriver();
 			DummyLedStripeDeviceConfiguration configuration = (DummyLedStripeDeviceConfiguration) dc;
 
@@ -35,13 +35,13 @@ public class DeviceDriverFactory {
 		}
 
 		if (dc instanceof DummySwitchDeviceConfiguration) {
-			System.out.println("init DummySwitchingDeviceDriver device");
+			System.out.println("DeviceDriverFactory: init DummySwitchingDeviceDriver device");
 
 			return new DummySwitchingDeviceDriver();
 		}
 
 		if (dc instanceof SwitchDeviceOverEthernetConfiguration) {
-			System.out.println("init SwitchDeviceOverEthernetDriver device");
+			System.out.println("DeviceDriverFactory: init SwitchDeviceOverEthernetDriver device");
 			SwitchDeviceOverEthernetConfiguration config = (SwitchDeviceOverEthernetConfiguration) dc;
 			SwitchDeviceOverEthernetDriver device = new SwitchDeviceOverEthernetDriver();
 			device.setConfiguration(config);
@@ -50,7 +50,7 @@ public class DeviceDriverFactory {
 		}
 
 		if (dc instanceof MultiStripeOverEthernetClientDeviceConfiguration) {
-			System.out.println("init MultistripeOverEthernetClientDeviceDriver device");
+			System.out.println("DeviceDriverFactory: init MultistripeOverEthernetClientDeviceDriver device");
 
 			MultiStripeOverEthernetClientDeviceConfiguration configuration = (MultiStripeOverEthernetClientDeviceConfiguration) dc;
 
@@ -65,8 +65,8 @@ public class DeviceDriverFactory {
 				device.connect();
 			} catch (Exception e) {
 				System.out
-						.println("connect of MultistripeOverEthernetClientDeviceDriver device failed. Maybe the device comes up later: "
-								+ e.getMessage());
+				.println("connect of MultistripeOverEthernetClientDeviceDriver device failed. Maybe the device comes up later: "
+						+ e.getMessage());
 			}
 			return device;
 		}

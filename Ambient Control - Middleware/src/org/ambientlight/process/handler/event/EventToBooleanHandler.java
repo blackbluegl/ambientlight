@@ -13,19 +13,21 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler.process;
+package org.ambientlight.process.handler.event;
 
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.entities.TokenValueType;
+import org.ambientlight.process.events.event.AlarmEvent;
+import org.ambientlight.process.events.event.SceneryEvent;
 import org.ambientlight.process.events.event.SwitchEvent;
 import org.ambientlight.process.handler.AbstractActionHandler;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class EventMappingHandler extends AbstractActionHandler {
+public class EventToBooleanHandler extends AbstractActionHandler {
 
 	/*
 	 * (non-Javadoc)
@@ -39,10 +41,13 @@ public class EventMappingHandler extends AbstractActionHandler {
 		if (token.valueType.equals(TokenValueType.EVENT)) {
 			if (token.data instanceof SwitchEvent) {
 				SwitchEvent event = (SwitchEvent) token.data;
-				token.data = event.powerState;
+				token.data = event.powerState ? 1.0 : 0.0;
+				token.valueType = TokenValueType.BOOLEAN;
+			}
+			if (token.data instanceof AlarmEvent || token.data instanceof SceneryEvent) {
+				token.data = 1.0;
 				token.valueType = TokenValueType.BOOLEAN;
 			}
 		}
 	}
-
 }

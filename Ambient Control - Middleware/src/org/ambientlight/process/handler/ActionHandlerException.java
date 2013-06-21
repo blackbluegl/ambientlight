@@ -1,4 +1,5 @@
 /*  Copyright 2013 Florian Bornkessel
+ * 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,13 +14,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events.event;
+package org.ambientlight.process.handler;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public abstract class Event {
+public class ActionHandlerException extends Exception {
 
+	public ActionHandlerException(Throwable source) {
+		super(source);
+	}
 }

@@ -20,15 +20,19 @@ import java.util.List;
 
 import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandler;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.process.handler.actor.PowerStateHandler;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.process.handler.process.EventMappingHandler;
-import org.ambientlight.process.handler.process.ForkActionHandler;
-import org.ambientlight.process.handler.process.ForkHandlerConfiguration;
+import org.ambientlight.process.handler.event.EventToBooleanHandler;
+import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration;
+import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
+import org.ambientlight.process.handler.expression.DecissionActionHandler;
+import org.ambientlight.process.handler.expression.ExpressionActionHandler;
+import org.ambientlight.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 
 
@@ -38,10 +42,12 @@ import org.ambientlight.room.RoomConfiguration;
  */
 public class ProcessFactory {
 
-	public List<Process> initProcesses(RoomConfiguration roomConfig) {
+	public List<Process> initProcesses(RoomConfiguration roomConfig, EventManager eventManager) {
 		List<Process> processes = new ArrayList<Process>();
 		for (ProcessConfiguration processConfig : roomConfig.processes) {
+			System.out.println("ProcessFactory: Building process: " + processConfig.id);
 			Process process = createProcess(processConfig);
+			process.eventManager = eventManager;
 			processes.add(process);
 			process.start();
 		}
@@ -55,21 +61,20 @@ public class ProcessFactory {
 	 */
 	private Process createProcess(ProcessConfiguration processConfig) {
 		Process result = new Process();
+		result.config = processConfig;
 		result.token = new Token();
-		result.handler = new EventMappingHandler();
-		result.handler.config.nextNodeId = 0;
-		createNodes(processConfig, result, 0);
+		createNodes(result, 0);
 		return result;
 	}
 
 
 	/**
 	 * @param processConfig
-	 * @param result
+	 * @param process
 	 * @param i
 	 */
-	private void createNodes(ProcessConfiguration processConfig, Process result, int i) {
-		NodeConfiguration nodeConfig = processConfig.nodes.get(i);
+	private void createNodes(Process process, int i) {
+		NodeConfiguration nodeConfig = process.config.nodes.get(i);
 		Node node = new Node();
 		node.config = nodeConfig;
 
@@ -86,25 +91,26 @@ public class ProcessFactory {
 			handler = new PowerStateHandler();
 		}
 
-		if (nodeConfig.actionHandler instanceof ForkHandlerConfiguration) {
-			handler = new ForkActionHandler();
-			if (nodeConfig.actionHandler.nextNodeId != null) {
-				{
-					createNodes(processConfig, result,
-							((ForkHandlerConfiguration) nodeConfig.actionHandler).nextNodeIdAlternative);
-				}
-			}
+		if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
+			handler = new DecissionActionHandler();
+			createNodes(process, ((DecisionHandlerConfiguration) nodeConfig.actionHandler).nextAlternativeNodeId);
+		}
 
-			handler.config = nodeConfig.actionHandler;
-			node.handler = handler;
+		if (nodeConfig.actionHandler instanceof ExpressionHandlerConfiguration) {
+			handler = new ExpressionActionHandler();
+		}
 
-			result.nodes.put(node.config.id, node);
+		if (nodeConfig.actionHandler instanceof EventToBooleanHandlerConfiguration) {
+			handler = new EventToBooleanHandler();
+		}
 
-			if (nodeConfig.actionHandler.nextNodeId == null)
-				return;
-			else {
-				createNodes(processConfig, result, nodeConfig.actionHandler.nextNodeId);
-			}
+		handler.config = nodeConfig.actionHandler;
+		node.handler = handler;
+
+		process.nodes.put(node.config.id, node);
+
+		if (nodeConfig.actionHandler.nextNodeId != null) {
+			createNodes(process, nodeConfig.actionHandler.nextNodeId);
 		}
 	}
 }

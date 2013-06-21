@@ -23,6 +23,8 @@ public class Room {
 
 	public EventManager eventManager;
 
+	public Map<String, Sensor> sensors;
+
 	public Map<String, EventGenerator> eventGenerators;
 
 	private List<DeviceDriver> devices;

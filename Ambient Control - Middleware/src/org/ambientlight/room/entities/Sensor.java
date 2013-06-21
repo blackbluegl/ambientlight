@@ -13,13 +13,20 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events.event;
+package org.ambientlight.room.entities;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public abstract class Event {
+// TODO implement Sensors here. They will not be part of the process but will
+// spend values for processing to the actionhandlers
+public interface Sensor {
+
+	/**
+	 * @return
+	 */
+	Object getValue();
 
 }

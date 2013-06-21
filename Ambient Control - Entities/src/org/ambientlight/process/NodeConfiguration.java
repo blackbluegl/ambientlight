@@ -4,6 +4,7 @@ import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
 public class NodeConfiguration {
+
 	public int id;
 
 	/*

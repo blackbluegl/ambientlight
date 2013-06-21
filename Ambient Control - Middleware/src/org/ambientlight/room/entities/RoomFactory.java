@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.ambientlight.device.drivers.DeviceConfiguration;
@@ -52,6 +53,9 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
+		// init sensors
+		room.sensors = new HashMap<String, Sensor>();
+
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
 		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations.values()) {
@@ -62,9 +66,11 @@ public class RoomFactory {
 		}
 		room.setLightObjectsInRoom(lightObjects);
 
-		createEventGenerators(roomConfig, room);
+		room.eventManager = new EventManager();
 
-		room.processes = this.processFactory.initProcesses(roomConfig);
+		createEventGenerators(room, room.eventManager);
+
+		room.processes = this.processFactory.initProcesses(roomConfig, room.eventManager);
 
 		return room;
 	}
@@ -74,11 +80,11 @@ public class RoomFactory {
 	 * @param roomConfig
 	 * @param room
 	 */
-	public void createEventGenerators(RoomConfiguration roomConfig, Room room) {
+	public void createEventGenerators(Room room, EventManager eventManager) {
 		// initialize eventGenerators
-		room.eventManager = new EventManager();
+		room.eventGenerators = new HashMap<String, EventGenerator>();
 
-		for (EventGeneratorConfiguration currentConfig : roomConfig.eventGeneratorConfigurations) {
+		for (EventGeneratorConfiguration currentConfig : room.config.eventGeneratorConfigurations) {
 			EventGenerator generator = null;
 			if (currentConfig instanceof AlarmEventGeneratorConfiguration) {
 				generator = new AlarmGenerator();
@@ -90,6 +96,7 @@ public class RoomFactory {
 				generator = new SceneryEventGenerator();
 			}
 			generator.config = currentConfig;
+			generator.eventManager = eventManager;
 			room.eventGenerators.put(generator.config.name, generator);
 		}
 	}
