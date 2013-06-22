@@ -46,12 +46,12 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 
 		evaluator.putVariable("tokenValue", token.data.toString());
 
-		for (String dataproviderName : getConfig().expression.sensorNames) {
+		for (String dataproviderName : getConfig().expressionConfiguration.sensorNames) {
 			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
 			evaluator.putVariable(dataproviderName, dataprovider.getValue().toString());
 		}
 		try {
-			String resultString = evaluator.evaluate(this.getConfig().expression.expression);
+			String resultString = evaluator.evaluate(this.getConfig().expressionConfiguration.expression);
 			token.data = Double.parseDouble(resultString);
 			token.valueType = TokenValueType.NUMERIC;
 		} catch (EvaluationException e) {

@@ -23,7 +23,6 @@ import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.entities.TokenValueType;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.room.entities.Sensor;
 
 
@@ -33,7 +32,7 @@ import org.ambientlight.room.entities.Sensor;
  */
 public class DecissionActionHandler extends AbstractActionHandler {
 
-	boolean takeAlternativeNode = false;
+	boolean takeDefaultTransition = true;
 
 
 	/*
@@ -49,13 +48,13 @@ public class DecissionActionHandler extends AbstractActionHandler {
 
 		evaluator.putVariable("tokenValue", token.data.toString());
 
-		for (String dataproviderName : getConfig().expression.sensorNames) {
+		for (String dataproviderName : getConfig().expressionConfiguration.sensorNames) {
 			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
 			evaluator.putVariable(dataproviderName, dataprovider.getValue().toString());
 		}
 		try {
-			boolean takeAlternativeNode = evaluator.getBooleanResult(this.getConfig().expression.expression);
-			token.data = takeAlternativeNode;
+			takeDefaultTransition = evaluator.getBooleanResult(this.getConfig().expressionConfiguration.expression);
+			token.data = takeDefaultTransition;
 			token.valueType = TokenValueType.BOOLEAN;
 		} catch (EvaluationException e) {
 			ActionHandlerException ae = new ActionHandlerException(e);
@@ -70,8 +69,10 @@ public class DecissionActionHandler extends AbstractActionHandler {
 
 
 	@Override
-	public int getNextNodeId() {
-		return takeAlternativeNode ? getConfig().nextAlternativeNodeId : config.nextNodeId;
+	public Integer getNextNodeId() {
+		Integer nextNodeId = takeDefaultTransition ? config.nextNodeId : getConfig().nextAlternativeNodeId;
+		System.out.println("DecissionHandler: takes transition to node: " + nextNodeId);
+		return nextNodeId;
 	}
 
 }

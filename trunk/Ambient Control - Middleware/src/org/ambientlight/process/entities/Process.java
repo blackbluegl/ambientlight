@@ -25,6 +25,8 @@ public class Process implements IEventListener {
 
 	@Override
 	public void handleEvent(Event event, EventTriggerConfiguration correlation) {
+		token = new Token();
+		token.nextNodeId = 0;
 
 		token.valueType = TokenValueType.EVENT;
 		token.data = event;
@@ -34,12 +36,14 @@ public class Process implements IEventListener {
 			// Start action here until token nextNode is empty
 			while (token.nextNodeId != null) {
 				currentNode = nodes.get(token.nextNodeId);
-				System.out.println("Process: " + config.id + " performes action of node: " + currentNode.config.id);
+				System.out.println("Process: " + config.id + " performes action by handler: "
+						+ currentNode.handler.getClass().getSimpleName() + " in node: " + currentNode.config.id);
 				currentNode.performAction(token);
 			}
+			System.out.println("Process: " + config.id + " finished.");
 		} catch (Exception e) {
-			System.out.println("Process: " + config.id + " stopped during an error in node: " + currentNode.config.id);
-			System.out.println(e);
+			System.out.println("Process: " + config.id + " stopped during an error in node: " + currentNode.config.id + ":");
+			e.printStackTrace();
 		}
 	}
 }

@@ -38,15 +38,15 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 		RenderingProgramm renderProgram = null;
 
 		// create SimpleColor
-		if (lightObject.renderingConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
-			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.renderingConfiguration;
+		if (lightObject.configuration.renderingProgramConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
+			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.configuration.renderingProgramConfiguration;
 			Color simpleColor = new Color(config.rgb);
 			renderProgram = new SimpleColor(simpleColor);
 		}
 
 		// create Tron
-		if (lightObject.renderingConfiguration instanceof TronRenderingProgrammConfiguration) {
-			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.renderingConfiguration;
+		if (lightObject.configuration.renderingProgramConfiguration instanceof TronRenderingProgrammConfiguration) {
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.configuration.renderingProgramConfiguration;
 			Color color = new Color(config.rgb);
 			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength, config.sparkleStrength,
 					config.sparkleSize, config.speed, config.lightPointAmount);
@@ -97,7 +97,7 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 	public void updateRenderingConfigurationForLightObject(Renderer renderer, RenderingProgramConfiguration newConfig,
 			LightObject lightObject) {
 		renderer.removeRenderTaskForLightObject(lightObject);
-		lightObject.renderingConfiguration = newConfig;
+		lightObject.configuration.renderingProgramConfiguration = newConfig;
 		this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
 	}
 

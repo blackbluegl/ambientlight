@@ -60,15 +60,20 @@ public class AmbientControlMW {
 
 		new WebserviceTask().start();
 
-		EventReceiver events = new EventReceiver();
-		SwitchEvent sEvent = new SwitchEvent();
-		sEvent.powerState = true;
-		events.handleEvent(sEvent, "RoomSwitch");
-
 		// wait for external signal to stop
 		while (true) {
 			try {
 				Thread.sleep(1000);
+
+				EventReceiver events = new EventReceiver();
+				SwitchEvent sEvent = new SwitchEvent();
+				sEvent.powerState = true;
+				events.handleEvent(sEvent, "RoomSwitch");
+				Thread.sleep(3500);
+
+				sEvent.powerState = false;
+				events.handleEvent(sEvent, "RoomSwitch");
+				Thread.sleep(3500);
 			} catch (InterruptedException e) {
 			}
 		}

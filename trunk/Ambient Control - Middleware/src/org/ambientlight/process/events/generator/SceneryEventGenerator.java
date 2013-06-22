@@ -15,8 +15,10 @@
 
 package org.ambientlight.process.events.generator;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.events.event.SceneryEvent;
 import org.ambientlight.process.trigger.SceneryEntryEventTriggerConfiguration;
+import org.ambientlight.scenery.UserSceneryConfiguration;
 
 
 /**
@@ -32,6 +34,10 @@ public class SceneryEventGenerator extends EventGenerator {
 		SceneryEntryEventTriggerConfiguration correlation = new SceneryEntryEventTriggerConfiguration();
 		correlation.eventGeneratorName = config.name;
 		correlation.sceneryName = event.sceneryName;
+
+		UserSceneryConfiguration currentScenery = new UserSceneryConfiguration();
+		currentScenery.id = event.sceneryName;
+		AmbientControlMW.getRoom().config.currentSceneryConfig = currentScenery;
 
 		eventManager.onEvent(event, correlation);
 	}
