@@ -58,8 +58,8 @@ public class PowerStateHandler extends AbstractActionHandler {
 			// update model
 			actorConfig.setPowerState(powerState);
 		} catch (Exception e) {
-			System.out.println("error while trying to set Powerstate for: " + currentActorName + ". Exception was: "
-					+ e.getMessage());
+			System.out.println("error while trying to set Powerstate for: " + currentActorName + ". Exception was: ");
+			e.printStackTrace();
 		}
 	}
 

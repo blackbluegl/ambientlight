@@ -4,12 +4,10 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import org.ambientlight.room.actors.LightObjectConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfiguration;
 
 
 public class LightObject {
 
-	public RenderingProgramConfiguration renderingConfiguration;
 	public LightObjectConfiguration configuration;
 	public List<StripePart> stripeParts;
 	BufferedImage pixelMap;

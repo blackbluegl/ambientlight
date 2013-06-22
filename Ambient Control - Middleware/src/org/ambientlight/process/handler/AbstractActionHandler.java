@@ -7,7 +7,8 @@ public abstract class AbstractActionHandler {
 
 	public AbstractActionHandlerConfiguration config;
 
-	public int getNextNodeId(){
+
+	public Integer getNextNodeId() {
 		return config.nextNodeId;
 	}
 

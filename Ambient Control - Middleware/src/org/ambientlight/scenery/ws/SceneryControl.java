@@ -1,9 +1,23 @@
 package org.ambientlight.scenery.ws;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.ambientlight.AmbientControlMW;
+import org.ambientlight.room.IUserRoomItem;
+import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.actors.LightObjectConfiguration;
+import org.ambientlight.room.actors.SwitchObjectConfiguration;
+import org.ambientlight.scenery.AbstractSceneryConfiguration;
 
 
 @Path("/sceneryControl")
@@ -15,21 +29,15 @@ public class SceneryControl {
 		return "Version:0.10.0\nProtocoll:0.10.0";
 	}
 
-	//
-	// @GET
-	// @Path("/config/room/sceneries")
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public List<String> getSceneries() {
-	//
-	// ArrayList<String> result = new ArrayList<String>();
-	// for (AbstractSceneryConfiguration currentScenery :
-	// Room.getRoomConfig().sceneries) {
-	// result.add(currentScenery.id);
-	// }
-	//
-	// return result;
-	// }
-	//
+
+	@GET
+	@Path("/config/room/sceneries")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<AbstractSceneryConfiguration> getSceneries() {
+		return getRoomConfiguration().sceneries;
+	}
+
+
 	//
 	// @DELETE
 	// @Path("/config/room/sceneries/{name}")
@@ -60,12 +68,14 @@ public class SceneryControl {
 	// }
 	//
 	//
-	// @GET
-	// @Path("/config/room")
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public RoomConfiguration getRoomConfiguration() {
-	// return Room.getRoomConfig();
-	// }
+	@GET
+	@Path("/config/room")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RoomConfiguration getRoomConfiguration() {
+		return AmbientControlMW.getRoom().config;
+	}
+
+
 	//
 	//
 	// @PUT
@@ -253,44 +263,36 @@ public class SceneryControl {
 	// }
 	//
 	//
-	// @PUT
-	// @Path("/control/room/items/{itemName}/state")
-	// @Consumes(MediaType.APPLICATION_JSON)
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public void setPowerStateForItem(@PathParam("itemName") String itemName,
-	// Boolean powerState) {
-	//
-	// String currentScenery = Room.getRoomConfig().currentScenery;
-	//
-	// System.out.println("SceneryControlWS:  setting power state for " +
-	// itemName + " to " + powerState);
-	//
-	// try {
-	// ActorConfiguration config =
-	// this.getRoomConfiguration().getActorConfigurationByName(itemName);
-	//
-	// if (config instanceof LightObjectConfiguration) {
-	// // update renderer
-	// AmbientControlMW.getRenderProgrammFactory().updatePowerStateForLightObject(AmbientControlMW.getRenderer(),
-	// AmbientControlMW.getRoom().getLightObjectByName(itemName), powerState);
-	// } else {
-	// // update switch device
-	// AmbientControlMW
-	// .getRoom()
-	// .getSwitchingDevice()
-	// .writeData(((SwitchObjectConfiguration) config).deviceType,
-	// ((SwitchObjectConfiguration) config).houseCode,
-	// ((SwitchObjectConfiguration) config).switchingUnitCode, powerState);
-	// }
-	//
-	// // update model
-	// Room.getRoomConfig().getActorConfigurationByName(itemName)
-	// .getSceneryConfigurationBySceneryName(currentScenery).powerState =
-	// powerState;
-	//
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// Response.status(500).build();
-	// }
-	// }
+	@PUT
+	@Path("/control/room/items/{itemName}/state")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public void setPowerStateForItem(@PathParam("itemName") String itemName, Boolean powerState) {
+
+		System.out.println("SceneryControlWS:  setting power state for " + itemName + " to " + powerState);
+
+		try {
+			IUserRoomItem config = this.getRoomConfiguration().getUserRoomItems().get(itemName);
+
+			// update model
+			config.setPowerState(powerState);
+
+			if (config instanceof LightObjectConfiguration) {
+				// update renderer
+				AmbientControlMW.getRenderProgrammFactory().updatePowerStateForLightObject(AmbientControlMW.getRenderer(),
+						AmbientControlMW.getRoom().getLightObjectByName(itemName), powerState);
+			} else {
+				// update switch device
+				AmbientControlMW
+				.getRoom()
+				.getSwitchingDevice()
+				.writeData(((SwitchObjectConfiguration) config).deviceType,
+						((SwitchObjectConfiguration) config).houseCode,
+						((SwitchObjectConfiguration) config).switchingUnitCode, powerState);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			Response.status(500).build();
+		}
+	}
 }

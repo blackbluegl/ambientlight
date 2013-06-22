@@ -12,7 +12,11 @@ public class Node {
 
 
 	public void performAction(Token token) throws ActionHandlerException {
-		handler.performAction(token);
-		token.nextNodeId=handler.getNextNodeId();
+		if (handler != null) {
+			handler.performAction(token);
+			token.nextNodeId = handler.getNextNodeId();
+		} else {
+			token.nextNodeId = null;
+		}
 	}
 }

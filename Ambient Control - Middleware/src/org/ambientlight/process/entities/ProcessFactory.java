@@ -62,7 +62,6 @@ public class ProcessFactory {
 	private Process createProcess(ProcessConfiguration processConfig) {
 		Process result = new Process();
 		result.config = processConfig;
-		result.token = new Token();
 		createNodes(result, 0);
 		return result;
 	}
@@ -81,26 +80,16 @@ public class ProcessFactory {
 		AbstractActionHandler handler = null;
 		if (nodeConfig.actionHandler instanceof ConfigurationChangeHandlerConfiguration) {
 			handler = new ConfigurationChangeHandler();
-		}
-
-		if (nodeConfig.actionHandler instanceof PowerstateHandlerConfiguration) {
+		} else if (nodeConfig.actionHandler instanceof PowerstateHandlerConfiguration) {
 			handler = new PowerStateHandler();
-		}
-
-		if (nodeConfig.actionHandler instanceof SimplePowerStateHandlerConfiguration) {
+		} else if (nodeConfig.actionHandler instanceof SimplePowerStateHandlerConfiguration) {
 			handler = new PowerStateHandler();
-		}
-
-		if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
+		} else if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
 			handler = new DecissionActionHandler();
 			createNodes(process, ((DecisionHandlerConfiguration) nodeConfig.actionHandler).nextAlternativeNodeId);
-		}
-
-		if (nodeConfig.actionHandler instanceof ExpressionHandlerConfiguration) {
+		} else if (nodeConfig.actionHandler instanceof ExpressionHandlerConfiguration) {
 			handler = new ExpressionActionHandler();
-		}
-
-		if (nodeConfig.actionHandler instanceof EventToBooleanHandlerConfiguration) {
+		} else if (nodeConfig.actionHandler instanceof EventToBooleanHandlerConfiguration) {
 			handler = new EventToBooleanHandler();
 		}
 
