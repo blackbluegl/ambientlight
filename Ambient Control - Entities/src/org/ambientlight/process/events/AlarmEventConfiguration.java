@@ -1,8 +1,8 @@
-package org.ambientlight.process.trigger;
+package org.ambientlight.process.events;
 
 
 
-public class AlarmEventTriggerConfiguration extends EventTriggerConfiguration {
+public class AlarmEventConfiguration extends EventConfiguration {
 
 	public int hour;
 	public int minute;
@@ -26,7 +26,7 @@ public class AlarmEventTriggerConfiguration extends EventTriggerConfiguration {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AlarmEventTriggerConfiguration other = (AlarmEventTriggerConfiguration) obj;
+		AlarmEventConfiguration other = (AlarmEventConfiguration) obj;
 		if (hour != other.hour)
 			return false;
 		if (minute != other.minute)

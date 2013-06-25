@@ -15,6 +15,8 @@
 
 package org.ambientlight.room.eventgenerator;
 
+import org.ambientlight.scenery.AbstractSceneryConfiguration;
+
 
 /**
  * @author Florian Bornkessel
@@ -22,4 +24,5 @@ package org.ambientlight.room.eventgenerator;
  */
 public class SceneryEventGeneratorConfiguration extends EventGeneratorConfiguration {
 
+	public AbstractSceneryConfiguration currentScenery;
 }

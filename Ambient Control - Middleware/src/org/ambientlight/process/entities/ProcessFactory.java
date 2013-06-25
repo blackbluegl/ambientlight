@@ -27,8 +27,12 @@ import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfigur
 import org.ambientlight.process.handler.actor.PowerStateHandler;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration;
+import org.ambientlight.process.handler.event.EventGeneratorSensorAdapterConfiguration;
+import org.ambientlight.process.handler.event.EventGeneratorSensorAdapterHandler;
 import org.ambientlight.process.handler.event.EventToBooleanHandler;
 import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration;
+import org.ambientlight.process.handler.event.FireEventHandler;
+import org.ambientlight.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionActionHandler;
@@ -50,6 +54,7 @@ public class ProcessFactory {
 			process.eventManager = eventManager;
 			processes.add(process);
 			process.start();
+			System.out.println("ProcessFactory: Built and setup process successfully: " + processConfig.id);
 		}
 		return processes;
 	}
@@ -73,6 +78,8 @@ public class ProcessFactory {
 	 * @param i
 	 */
 	private void createNodes(Process process, int i) {
+		System.out.println("ProcessFactory: creating Node with id: " + i + " for process: " + process.config.id);
+
 		NodeConfiguration nodeConfig = process.config.nodes.get(i);
 		Node node = new Node();
 		node.config = nodeConfig;
@@ -91,8 +98,12 @@ public class ProcessFactory {
 			handler = new ExpressionActionHandler();
 		} else if (nodeConfig.actionHandler instanceof EventToBooleanHandlerConfiguration) {
 			handler = new EventToBooleanHandler();
+		} else if (nodeConfig.actionHandler instanceof FireEventHandlerConfiguration) {
+			handler = new FireEventHandler();
+		} else if (nodeConfig.actionHandler instanceof EventGeneratorSensorAdapterConfiguration) {
+			handler = new EventGeneratorSensorAdapterHandler();
 		}
-
+		System.out.println("ProcessFactory: actionhandler for node id: " + i + " is a: " + handler.getClass().getSimpleName());
 		handler.config = nodeConfig.actionHandler;
 		node.handler = handler;
 

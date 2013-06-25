@@ -1,10 +1,10 @@
-package org.ambientlight.process.trigger;
+package org.ambientlight.process.events;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public  abstract class EventTriggerConfiguration{
+public  abstract class EventConfiguration{
 
 	public String eventGeneratorName;
 
@@ -26,7 +26,7 @@ public  abstract class EventTriggerConfiguration{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EventTriggerConfiguration other = (EventTriggerConfiguration) obj;
+		EventConfiguration other = (EventConfiguration) obj;
 		if (eventGeneratorName == null) {
 			if (other.eventGeneratorName != null)
 				return false;

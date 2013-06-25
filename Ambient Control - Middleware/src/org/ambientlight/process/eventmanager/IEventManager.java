@@ -15,7 +15,7 @@
 
 package org.ambientlight.process.eventmanager;
 
-import org.ambientlight.process.trigger.EventTriggerConfiguration;
+import org.ambientlight.process.events.EventConfiguration;
 
 
 /**
@@ -30,5 +30,5 @@ public interface IEventManager {
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	void register(IEventListener eventListener, EventTriggerConfiguration triggerConfig);
+	void register(IEventListener eventListener, EventConfiguration triggerConfig);
 }

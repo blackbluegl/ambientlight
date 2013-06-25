@@ -13,16 +13,17 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.process.handler.event;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public abstract class Event {
+public class FireEventHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
+	public EventConfiguration event;
 }

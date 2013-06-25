@@ -13,14 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.process.handler.event;
 
+import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public class AlarmEvent extends Event {
+public class EventGeneratorSensorAdapterConfiguration extends AbstractActionHandlerConfiguration {
 
+	public String eventSensorId;
 }

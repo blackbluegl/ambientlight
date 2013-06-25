@@ -18,15 +18,14 @@ package org.ambientlight.webservice;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.events.SceneryEvent;
-import org.ambientlight.process.events.SwitchEvent;
+import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.SceneryEntryEventConfiguration;
+import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.SceneryEventGenerator;
 import org.ambientlight.room.entities.SwitchEventGenerator;
@@ -40,17 +39,17 @@ import org.ambientlight.room.entities.SwitchEventGenerator;
 public class EventReceiver {
 
 	@PUT
-	@Path("/eventGenerator/{eventGenerator}/event/")
+	@Path("/eventGenerator/event/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response handleEvent(Event event, @PathParam("eventGenerator") String eventGeneratorName) {
-		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(eventGeneratorName));
-		if (event instanceof SceneryEvent) {
-			((SceneryEventGenerator) eventGen).sceneryEntryEventOccured((SceneryEvent) event);
+	public Response handleEvent(EventConfiguration event) {
+		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(event.eventGeneratorName));
+		if (event instanceof SceneryEntryEventConfiguration) {
+			((SceneryEventGenerator) eventGen).sceneryEntryEventOccured((SceneryEntryEventConfiguration) event);
 		}
 
-		if (event instanceof SwitchEvent) {
-			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEvent) event);
+		if (event instanceof SwitchEventConfiguration) {
+			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEventConfiguration) event);
 		}
 		return Response.status(200).build();
 	}
