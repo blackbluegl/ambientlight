@@ -12,19 +12,22 @@ import org.ambientlight.device.stripe.StripeConfiguration;
 import org.ambientlight.device.stripe.StripePartConfiguration;
 import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.events.SceneryEntryEventConfiguration;
+import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration;
+import org.ambientlight.process.handler.event.EventGeneratorSensorAdapterConfiguration;
 import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration;
+import org.ambientlight.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.handler.expression.ExpressionConfiguration;
-import org.ambientlight.process.trigger.SceneryEntryEventTriggerConfiguration;
-import org.ambientlight.process.trigger.SwitchEventTriggerConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.actors.SwitchObjectConfiguration;
+import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.UserSceneryConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
@@ -112,6 +115,10 @@ public class CreateTestConfig {
 		triggerMainSwitch.name = "RoomSwitch";
 		rc.eventGeneratorConfigurations.add(triggerMainSwitch);
 
+		SceneryEventGeneratorConfiguration sceneryEventGenerator = new SceneryEventGeneratorConfiguration();
+		sceneryEventGenerator.name = "RoomSceneryEventGenerator";
+		rc.eventGeneratorConfigurations.add(sceneryEventGenerator);
+
 		rc.height = 400;
 		rc.width = 400;
 		rc.roomName = "testRoom";
@@ -119,14 +126,21 @@ public class CreateTestConfig {
 		UserSceneryConfiguration userScenario = new UserSceneryConfiguration();
 		userScenario.id = "scenario1";
 		rc.sceneries.add(userScenario);
-		rc.currentSceneryConfig = userScenario;
+		sceneryEventGenerator.currentScenery = userScenario;
 
 		ProcessConfiguration roomSwitchProcess = new ProcessConfiguration();
 		roomSwitchProcess.id = "roomSwitch";
 		rc.processes.add(roomSwitchProcess);
-		SwitchEventTriggerConfiguration triggerConf = new SwitchEventTriggerConfiguration();
-		triggerConf.eventGeneratorName = triggerMainSwitch.name;
-		roomSwitchProcess.eventTriggerConfiguration = triggerConf;
+		SwitchEventConfiguration triggerConfOn = new SwitchEventConfiguration();
+		triggerConfOn.eventGeneratorName = triggerMainSwitch.name;
+		triggerConfOn.powerState = true;
+
+		SwitchEventConfiguration triggerConfOff = new SwitchEventConfiguration();
+		triggerConfOff.eventGeneratorName = triggerMainSwitch.name;
+		triggerConfOff.powerState = false;
+
+		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOn);
+		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOff);
 
 		NodeConfiguration eventMapperNode = new NodeConfiguration();
 		eventMapperNode.id = 0;
@@ -146,14 +160,21 @@ public class CreateTestConfig {
 		decissionNode.actionHandler = decission;
 		roomSwitchProcess.nodes.put(1, decissionNode);
 
-		NodeConfiguration turnOnNode = new NodeConfiguration();
-		turnOnNode.id = 2;
-		PowerstateHandlerConfiguration powerOnHandler = new PowerstateHandlerConfiguration();
-		powerOnHandler.nextNodeId = null;
-		powerOnHandler.powerStateConfiguration.put(sw1.getName(), true);
-		powerOnHandler.powerStateConfiguration.put(lo.getName(), true);
-		turnOnNode.actionHandler = powerOnHandler;
-		roomSwitchProcess.nodes.put(2, turnOnNode);
+		NodeConfiguration grabCurrentSceneryNode = new NodeConfiguration();
+		grabCurrentSceneryNode.id = 2;
+		EventGeneratorSensorAdapterConfiguration grabSceneryHandler = new EventGeneratorSensorAdapterConfiguration();
+		grabSceneryHandler.eventSensorId = "RoomSceneryEventGenerator";
+		grabSceneryHandler.nextNodeId = 4;
+		grabCurrentSceneryNode.actionHandler = grabSceneryHandler;
+		roomSwitchProcess.nodes.put(2, grabCurrentSceneryNode);
+
+		NodeConfiguration fireEventNode = new NodeConfiguration();
+		fireEventNode.id = 4;
+		FireEventHandlerConfiguration fireEventHandler = new FireEventHandlerConfiguration();
+		fireEventHandler.event = null;
+		fireEventHandler.nextNodeId = null;
+		fireEventNode.actionHandler = fireEventHandler;
+		roomSwitchProcess.nodes.put(4, fireEventNode);
 
 		NodeConfiguration turnOffNode = new NodeConfiguration();
 		turnOffNode.id = 3;
@@ -184,9 +205,9 @@ public class CreateTestConfig {
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
 
-		SceneryEntryEventTriggerConfiguration triggerSceneryChange = new SceneryEntryEventTriggerConfiguration();
+		SceneryEntryEventConfiguration triggerSceneryChange = new SceneryEntryEventConfiguration();
 		triggerSceneryChange.sceneryName = "triggerScenarioEntry-" + userScenario.id;
-		process.eventTriggerConfiguration = triggerSceneryChange;
+		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
 		cHandler.nextNodeId = 1;

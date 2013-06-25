@@ -13,14 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.events;
+package org.ambientlight.room.entities;
+
+import org.ambientlight.process.events.EventConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public class SwitchEvent extends Event {
+public interface EventSensor {
 
-	public boolean powerState;
+	public EventConfiguration getValue();
 }

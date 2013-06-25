@@ -15,39 +15,34 @@
 
 package org.ambientlight.process.handler.event;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.entities.TokenValueType;
-import org.ambientlight.process.events.AlarmEventConfiguration;
-import org.ambientlight.process.events.SceneryEntryEventConfiguration;
-import org.ambientlight.process.events.SwitchEventConfiguration;
+import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.handler.AbstractActionHandler;
+import org.ambientlight.process.handler.ActionHandlerException;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class EventToBooleanHandler extends AbstractActionHandler {
+public class FireEventHandler extends AbstractActionHandler {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.ambientlight.process.handler.AbstractActionHandler#performAction(
-	 * org.ambientlight.process.entities.TokenValueType, java.lang.Object)
+	 * org.ambientlight.process.entities.Token)
 	 */
 	@Override
-	public void performAction(Token token) {
-		if (token.valueType.equals(TokenValueType.EVENT)) {
-			if (token.data instanceof SwitchEventConfiguration) {
-				SwitchEventConfiguration event = (SwitchEventConfiguration) token.data;
-				token.data = event.powerState ? 1.0 : 0.0;
-				token.valueType = TokenValueType.BOOLEAN;
-			}
-			if (token.data instanceof AlarmEventConfiguration || token.data instanceof SceneryEntryEventConfiguration) {
-				token.data = 1.0;
-				token.valueType = TokenValueType.BOOLEAN;
-			}
+	public void performAction(Token token) throws ActionHandlerException {
+		EventConfiguration event = ((FireEventHandlerConfiguration) this.config).event;
+		if (event == null) {
+			event = (EventConfiguration) token.data;
 		}
+
+		AmbientControlMW.getRoom().eventManager.onEvent(event);
 	}
+
 }

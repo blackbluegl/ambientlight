@@ -6,15 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.trigger.AlarmEventTriggerConfiguration;
-import org.ambientlight.process.trigger.EventTriggerConfiguration;
+import org.ambientlight.process.events.AlarmEventConfiguration;
+import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.room.entities.AlarmGenerator;
 
 
 public class EventManager implements IEventManager, IEventManagerClient {
 
-	Map<EventTriggerConfiguration, List<IEventListener>> eventMap = new HashMap<EventTriggerConfiguration, List<IEventListener>>();
+	Map<EventConfiguration, List<IEventListener>> eventMap = new HashMap<EventConfiguration, List<IEventListener>>();
 
 
 	/*
@@ -26,11 +25,11 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 * org.ambientlight.process.trigger.EventTriggerConfiguration)
 	 */
 	@Override
-	public void register(final IEventListener eventListener, final EventTriggerConfiguration triggerConfig) {
+	public void register(final IEventListener eventListener, final EventConfiguration triggerConfig) {
 
-		if (triggerConfig instanceof AlarmEventTriggerConfiguration) {
+		if (triggerConfig instanceof AlarmEventConfiguration) {
 			((AlarmGenerator) AmbientControlMW.getRoom().eventGenerators.get(triggerConfig.eventGeneratorName))
-			.createAlarm((AlarmEventTriggerConfiguration) triggerConfig);
+			.createAlarm((AlarmEventConfiguration) triggerConfig);
 		}
 
 		List<IEventListener> eventListenerList = eventMap.get(triggerConfig);
@@ -50,12 +49,12 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 * .process.trigger.EventTriggerConfiguration, java.lang.String)
 	 */
 	@Override
-	public void onEvent(Event event, EventTriggerConfiguration correlation) {
+	public void onEvent(EventConfiguration event) {
 
-		List<IEventListener> eventListeners = this.eventMap.get(correlation);
+		List<IEventListener> eventListeners = this.eventMap.get(event);
 		if (eventListeners != null) {
 			for (IEventListener currentListener : eventListeners) {
-				currentListener.handleEvent(event, correlation);
+				currentListener.handleEvent(event);
 			}
 		}
 	}

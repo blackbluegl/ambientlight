@@ -11,8 +11,8 @@ import org.ambientlight.device.drivers.SwtichDeviceDriver;
 import org.ambientlight.device.stripe.Stripe;
 import org.ambientlight.process.entities.Process;
 import org.ambientlight.process.eventmanager.EventManager;
-import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.entities.EventGenerator;
+import org.ambientlight.room.entities.EventSensor;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.Sensor;
 
@@ -105,5 +105,11 @@ public class Room {
 		}
 
 		return result;
+	}
+
+
+	public EventSensor getEventSensorById(String name) {
+		EventGenerator possibleGenerator = this.eventGenerators.get(name);
+		return (possibleGenerator instanceof EventSensor ? (EventSensor) possibleGenerator : null);
 	}
 }

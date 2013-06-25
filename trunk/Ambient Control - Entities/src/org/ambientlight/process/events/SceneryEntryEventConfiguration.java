@@ -1,7 +1,7 @@
-package org.ambientlight.process.trigger;
+package org.ambientlight.process.events;
 
 
-public class SceneryEntryEventTriggerConfiguration extends EventTriggerConfiguration {
+public class SceneryEntryEventConfiguration extends EventConfiguration {
 	public String sceneryName;
 
 
@@ -22,7 +22,7 @@ public class SceneryEntryEventTriggerConfiguration extends EventTriggerConfigura
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SceneryEntryEventTriggerConfiguration other = (SceneryEntryEventTriggerConfiguration) obj;
+		SceneryEntryEventConfiguration other = (SceneryEntryEventConfiguration) obj;
 		if (sceneryName == null) {
 			if (other.sceneryName != null)
 				return false;

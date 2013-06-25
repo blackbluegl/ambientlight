@@ -1,5 +1,6 @@
 package org.ambientlight.room;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,16 +10,18 @@ import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
+import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("room")
-public class RoomConfiguration {
+public class RoomConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public String roomName;
-	public AbstractSceneryConfiguration currentSceneryConfig;
 	public int width;
 	public int height;
 	public Map<String, ActorConfiguration> actorConfigurations = new HashMap<String, ActorConfiguration>();
@@ -42,6 +45,19 @@ public class RoomConfiguration {
 			}
 		}
 
+		return result;
+	}
+
+
+	public Map<String, SwitchEventGeneratorConfiguration> getSwitchGenerators() {
+		Map<String, SwitchEventGeneratorConfiguration> result = new HashMap<String, SwitchEventGeneratorConfiguration>();
+
+		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations) {
+			if (eventGeneratorConfiguration instanceof SwitchEventGeneratorConfiguration) {
+				result.put(((SwitchEventGeneratorConfiguration) eventGeneratorConfiguration).name,
+						(SwitchEventGeneratorConfiguration) eventGeneratorConfiguration);
+			}
+		}
 		return result;
 	}
 }

@@ -15,8 +15,7 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.process.events.SwitchEvent;
-import org.ambientlight.process.trigger.SwitchEventTriggerConfiguration;
+import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
 
@@ -26,10 +25,10 @@ import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
  */
 public class SwitchEventGenerator extends EventGenerator {
 
-	public void switchEventOccured(SwitchEvent event) {
-		SwitchEventTriggerConfiguration correlation = new SwitchEventTriggerConfiguration();
+	public void switchEventOccured(SwitchEventConfiguration event) {
+		SwitchEventConfiguration correlation = new SwitchEventConfiguration();
 		correlation.eventGeneratorName = config.name;
-		eventManager.onEvent(event, correlation);
+		eventManager.onEvent(event);
 
 		((SwitchEventGeneratorConfiguration) this.config).powerState = event.powerState;
 

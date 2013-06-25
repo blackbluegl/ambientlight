@@ -19,8 +19,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.ambientlight.process.events.AlarmEvent;
-import org.ambientlight.process.trigger.AlarmEventTriggerConfiguration;
+import org.ambientlight.process.events.AlarmEventConfiguration;
 
 
 /**
@@ -33,13 +32,12 @@ public class AlarmGenerator extends EventGenerator {
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	public void createAlarm(final AlarmEventTriggerConfiguration triggerConfig) {
+	public void createAlarm(final AlarmEventConfiguration triggerConfig) {
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
-				AlarmEvent event = new AlarmEvent();
-				eventManager.onEvent(event, triggerConfig);
+				eventManager.onEvent(triggerConfig);
 			}
 		};
 
