@@ -39,7 +39,7 @@ import org.ambientlight.room.entities.SwitchEventGenerator;
 public class EventReceiver {
 
 	@PUT
-	@Path("/eventGenerator/event/")
+	@Path("/event")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response handleEvent(EventConfiguration event) {

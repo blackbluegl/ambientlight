@@ -126,6 +126,11 @@ public class CreateTestConfig {
 		UserSceneryConfiguration userScenario = new UserSceneryConfiguration();
 		userScenario.id = "scenario1";
 		rc.sceneries.add(userScenario);
+
+		UserSceneryConfiguration userScenario2 = new UserSceneryConfiguration();
+		userScenario2.id = "scenario2";
+		rc.sceneries.add(userScenario2);
+
 		sceneryEventGenerator.currentScenery = userScenario;
 
 		ProcessConfiguration roomSwitchProcess = new ProcessConfiguration();
@@ -206,7 +211,8 @@ public class CreateTestConfig {
 		startNode.id = 0;
 
 		SceneryEntryEventConfiguration triggerSceneryChange = new SceneryEntryEventConfiguration();
-		triggerSceneryChange.sceneryName = "triggerScenarioEntry-" + userScenario.id;
+		triggerSceneryChange.sceneryName = "scenario1";
+		triggerSceneryChange.eventGeneratorName = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();

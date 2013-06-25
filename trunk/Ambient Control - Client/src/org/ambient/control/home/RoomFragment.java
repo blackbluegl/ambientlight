@@ -29,6 +29,7 @@ import org.ambient.control.rest.RestClient;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambient.widgets.WidgetUtils;
+import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
@@ -255,7 +256,7 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 	public void createSwitch(final String serverName, final HomeRefreshCallback callback, LinearLayout roomBottomBarView,
 			final SwitchEventGeneratorConfiguration currentEventGenerator) {
 
-		Switch powerStateSwitch = new Switch(this.getActivity());
+		final Switch powerStateSwitch = new Switch(this.getActivity());
 		powerStateSwitch.setTag("powerStateSwitch" + currentEventGenerator.getName());
 		roomBottomBarView.addView(powerStateSwitch, 0);
 		powerStateSwitch.setChecked(currentEventGenerator.powerState);
@@ -267,7 +268,7 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 					disableEventListener();
 					SwitchEventConfiguration event = new SwitchEventConfiguration();
 					event.eventGeneratorName = currentEventGenerator.getName();
-					event.powerState = !currentEventGenerator.powerState;
+					event.powerState = powerStateSwitch.isChecked();
 					RestClient.sendEvent(serverName, event, callback);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -307,17 +308,24 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 
 		Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
 		spinner.setAdapter(adapter);
+		adapter.getPosition(getCurrentScenery().id);
+		spinner.setSelection(adapter.getPosition(getCurrentScenery().id));
 
 		final HomeRefreshCallback callback = this;
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				String scenery = (String) parent.getItemAtPosition(pos);
-				// SceneryEvent event = new SceneryEvent();
-				// event.sceneryName = scenery;
-				// RestClient.sendEvent(serverName, "RoomSceneryEventGenerator",
-				// event, callback);
+				String selectedScenery = (String) parent.getItemAtPosition(pos);
+				String currentScenery = getCurrentScenery().id;
+
+				if (!selectedScenery.equals(currentScenery)) {
+					SceneryEntryEventConfiguration event = new SceneryEntryEventConfiguration();
+					event.eventGeneratorName = "RoomSceneryEventGenerator";
+					event.sceneryName = selectedScenery;
+					RestClient.sendEvent(serverName, event, callback);
+					disableEventListener();
+				}
 			}
 
 
@@ -375,7 +383,6 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 			ActorConfiguration currentConfig = roomConfig.actorConfigurations.get(currentToRefresh.getItemName());
 			this.initRoomItemIconView(this.getCurrentScenery(), currentConfig, currentToRefresh.getLightObjectView());
 		}
-
 
 		updateRoomBackground();
 		// updateMasterSwitchState();
