@@ -5,6 +5,7 @@ import org.ambientlight.room.IUserRoomItem;
 
 public class UserEventGeneratorConfiguration extends EventGeneratorConfiguration  implements IUserRoomItem {
 	boolean powerState;
+
 	@Override
 	public boolean getPowerState() {
 		return this.powerState;

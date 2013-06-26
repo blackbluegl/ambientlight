@@ -17,8 +17,13 @@ package org.ambient.control.home;
 
 import java.util.List;
 
+import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener;
 import org.ambient.control.rest.RestClient;
+import org.ambientlight.process.events.SwitchEventConfiguration;
+import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,11 +38,7 @@ import android.widget.ImageView;
  * @author Florian Bornkessel
  * 
  */
-public class RoofTopFragment extends Fragment {
-
-	public interface RoofTopListener {
-		public void onMainPowerSwitched(boolean powerstate);
-	}
+public class RoofTopFragment extends Fragment implements RoomConfigurationUpdateListener {
 
 	public static final String BUNDLE_HOST_LIST = "hosts";
 
@@ -58,14 +59,24 @@ public class RoofTopFragment extends Fragment {
 
 		ImageView masterButton = (ImageView) myView.findViewById(R.id.imageViewMasterSwitch);
 
+		this.onRoomConfigurationChange(null, null);
+
 		masterButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				for (String currentServerName : roomServers) {
 					try {
-						RestClient.setPowerStateForRoom(currentServerName, false, (HomeRefreshCallback) getActivity());
-						((RoofTopListener) getActivity()).onMainPowerSwitched(false);
+						RoomConfiguration currentConfig = ((MainActivity) getActivity()).getRoomConfigAdapter()
+								.getRoomConfiguration(currentServerName);
+
+						for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators()
+								.values()) {
+							SwitchEventConfiguration event = new SwitchEventConfiguration();
+							event.eventGeneratorName = currentEventGenerator.getName();
+							event.powerState = false;
+							getRestClient().sendEvent(currentServerName, event);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -87,5 +98,37 @@ public class RoofTopFragment extends Fragment {
 		} else {
 			masterSwitch.setImageResource(R.drawable.ic_power_disabled);
 		}
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener
+	 * #onRoomConfigurationChange(java.lang.String,
+	 * org.ambientlight.room.RoomConfiguration)
+	 */
+	@Override
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
+		boolean anyActive = false;
+
+		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigAdapter().getAllRoomConfigurations()
+				.values()) {
+
+			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {
+				if (currentEventGenerator.getPowerState()) {
+					anyActive = true;
+					break;
+				}
+			}
+		}
+
+		this.updateMasterSwitchState(anyActive);
+	}
+
+
+	private RestClient getRestClient() {
+		return ((MainActivity) getActivity()).getRestClient();
 	}
 }

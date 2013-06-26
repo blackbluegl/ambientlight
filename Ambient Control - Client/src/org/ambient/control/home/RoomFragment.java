@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener;
 import org.ambient.control.RoomConfigurationParceable;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
@@ -68,7 +70,7 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends Fragment implements HomeRefreshCallback {
+public class RoomFragment extends Fragment implements RoomConfigurationUpdateListener {
 
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
 
@@ -93,8 +95,6 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 		serverName = getArguments().getString(BUNDLE_SERVER_NAME);
 		RoomConfigurationParceable roomConfigParceable = getArguments().getParcelable(BUNDLE_ROOM_CONFIG);
 		this.roomConfig = roomConfigParceable.roomConfiguration;
-
-		final HomeRefreshCallback callback = this;
 
 		// create the room container
 		roomContainerView = inflater.inflate(R.layout.fragment_room, null);
@@ -135,7 +135,7 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 
 		for (EventGeneratorConfiguration currentEventGenerator : roomConfig.eventGeneratorConfigurations) {
 			if (currentEventGenerator instanceof SwitchEventGeneratorConfiguration) {
-				createSwitch(serverName, callback, roomBottomBarView, (SwitchEventGeneratorConfiguration) currentEventGenerator);
+				createSwitch(serverName, roomBottomBarView, (SwitchEventGeneratorConfiguration) currentEventGenerator);
 			}
 		}
 
@@ -165,8 +165,9 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 		TableLayout roomContent = (TableLayout) roomContainerView.findViewWithTag("roomContent");
 		roomContent.setVisibility(TableLayout.INVISIBLE);
 
-		LinearLayout roomBottomBar = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
-		roomBottomBar.setVisibility(LinearLayout.INVISIBLE);
+		// LinearLayout roomBottomBar = (LinearLayout)
+		// roomContainerView.findViewById(R.id.roomBottomBar);
+		// roomBottomBar.setVisibility(LinearLayout.INVISIBLE);
 
 		for (AbstractRoomItemViewMapper mapper : configuredlightObjects) {
 			mapper.setEventListenerDisabled(true);
@@ -181,8 +182,9 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 		TableLayout roomContent = (TableLayout) roomContainerView.findViewWithTag("roomContent");
 		roomContent.setVisibility(TableLayout.VISIBLE);
 
-		LinearLayout roomBottomBar = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
-		roomBottomBar.setVisibility(LinearLayout.VISIBLE);
+		// LinearLayout roomBottomBar = (LinearLayout)
+		// roomContainerView.findViewById(R.id.roomBottomBar);
+		// roomBottomBar.setVisibility(LinearLayout.VISIBLE);
 
 		for (AbstractRoomItemViewMapper mapper : configuredlightObjects) {
 			mapper.setEventListenerDisabled(false);
@@ -233,7 +235,8 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 					return;
 
 				try {
-					RestClient.setPowerStateForRoomItem(serverName, roomItemMapper.getItemName(), !roomItemMapper.getPowerState());
+					getRestClient().setPowerStateForRoomItem(serverName, roomItemMapper.getItemName(),
+							!roomItemMapper.getPowerState());
 					// updateing the icon
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
 
@@ -253,13 +256,13 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 	 * @param roomBottomBarView
 	 * @param currentEventGenerator
 	 */
-	public void createSwitch(final String serverName, final HomeRefreshCallback callback, LinearLayout roomBottomBarView,
+	public void createSwitch(final String serverName, LinearLayout roomBottomBarView,
 			final SwitchEventGeneratorConfiguration currentEventGenerator) {
 
 		final Switch powerStateSwitch = new Switch(this.getActivity());
 		powerStateSwitch.setTag("powerStateSwitch" + currentEventGenerator.getName());
 		roomBottomBarView.addView(powerStateSwitch, 0);
-		powerStateSwitch.setChecked(currentEventGenerator.powerState);
+		powerStateSwitch.setChecked(currentEventGenerator.getPowerState());
 		powerStateSwitch.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -269,7 +272,7 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 					SwitchEventConfiguration event = new SwitchEventConfiguration();
 					event.eventGeneratorName = currentEventGenerator.getName();
 					event.powerState = powerStateSwitch.isChecked();
-					RestClient.sendEvent(serverName, event, callback);
+					getRestClient().sendEvent(serverName, event);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -311,7 +314,6 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 		adapter.getPosition(getCurrentScenery().id);
 		spinner.setSelection(adapter.getPosition(getCurrentScenery().id));
 
-		final HomeRefreshCallback callback = this;
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -323,7 +325,7 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 					SceneryEntryEventConfiguration event = new SceneryEntryEventConfiguration();
 					event.eventGeneratorName = "RoomSceneryEventGenerator";
 					event.sceneryName = selectedScenery;
-					RestClient.sendEvent(serverName, event, callback);
+					getRestClient().sendEvent(serverName, event);
 					disableEventListener();
 				}
 			}
@@ -342,7 +344,7 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 		RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
 
 		for (SwitchEventGeneratorConfiguration currentSwitch : this.roomConfig.getSwitchGenerators().values()) {
-			if (currentSwitch.powerState == true) {
+			if (currentSwitch.getPowerState() == true) {
 				powerSwitchIsChecked = true;
 				break;
 			}
@@ -363,37 +365,6 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambient.control.home.HomeRefreshCallback#refreshRoomContent(java.
-	 * lang.String)
-	 */
-	@Override
-	public void refreshRoomContent(String roomServerName) throws Exception {
-
-		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(this.configuredlightObjects);
-
-		this.configuredlightObjects.clear();
-
-		this.roomConfig = RestClient.getRoom(roomServerName);
-
-		for (AbstractRoomItemViewMapper currentToRefresh : mappersToRefresh) {
-			ActorConfiguration currentConfig = roomConfig.actorConfigurations.get(currentToRefresh.getItemName());
-			this.initRoomItemIconView(this.getCurrentScenery(), currentConfig, currentToRefresh.getLightObjectView());
-		}
-
-		updateRoomBackground();
-		// updateMasterSwitchState();
-
-		this.enableEventListener();
-
-		// update widgets
-		WidgetUtils.notifyWidgets(this.getActivity());
-	}
-
-
 	private boolean getPowerStateForAllLightObjectsInRoom() {
 		for (AbstractRoomItemViewMapper current : this.configuredlightObjects) {
 			if (current.getPowerState() == true)
@@ -410,6 +381,65 @@ public class RoomFragment extends Fragment implements HomeRefreshCallback {
 				return ((SceneryEventGeneratorConfiguration) eventGen).currentScenery;
 		}
 		return null;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener
+	 * #onRoomConfigurationChange(java.lang.String,
+	 * org.ambientlight.room.RoomConfiguration)
+	 */
+	@Override
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
+
+		if (this.serverName != serverName)
+			return;
+
+		this.roomConfig = config;
+
+		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(this.configuredlightObjects);
+
+		this.configuredlightObjects.clear();
+
+		for (AbstractRoomItemViewMapper currentToRefresh : mappersToRefresh) {
+			ActorConfiguration currentConfig = roomConfig.actorConfigurations.get(currentToRefresh.getItemName());
+			this.initRoomItemIconView(this.getCurrentScenery(), currentConfig, currentToRefresh.getLightObjectView());
+		}
+
+		// update switches
+		for (EventGeneratorConfiguration currentEventGenerator : roomConfig.eventGeneratorConfigurations) {
+			if (currentEventGenerator instanceof SwitchEventGeneratorConfiguration) {
+
+				Switch currentSwitch = (Switch) this.roomContainerView.findViewWithTag("powerStateSwitch"
+						+ currentEventGenerator.name);
+				currentSwitch.setChecked(((SwitchEventGeneratorConfiguration) currentEventGenerator).getPowerState());
+
+			}
+		}
+
+		updateRoomBackground();
+		// updateMasterSwitchState();
+
+		this.enableEventListener();
+
+		// update widgets
+		WidgetUtils.notifyWidgets(this.getActivity());
+
+	}
+
+
+	private RestClient getRestClient(){
+		return ((MainActivity) this.getActivity()).getRestClient();
+	}
+
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		this.onRoomConfigurationChange(this.serverName, this.roomConfig);
 	}
 
 }

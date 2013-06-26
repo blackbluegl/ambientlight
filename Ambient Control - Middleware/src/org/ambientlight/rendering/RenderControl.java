@@ -69,7 +69,8 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 	public void updatePowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
 
 		if (lightObject.configuration.getPowerState() == powerState) {
-			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getName() + "already set to: "
+			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getName()
+					+ " already set to: "
 					+ powerState);
 			return;
 		}

@@ -123,12 +123,14 @@ public class SceneryConfigEditDialogFragment extends DialogFragment {
 
 
 	public void applyAction() {
-		RestClient.setProgramForLightObject(roomServer, scenery, lightObject, config);
+		// RestClient.setProgramForLightObject(roomServer, scenery, lightObject,
+		// config);
 	}
 
 
 	public void cancelAction() {
-		RestClient.setProgramForLightObject(roomServer, scenery, lightObject, oldConfig);
+		// RestClient.setProgramForLightObject(roomServer, scenery, lightObject,
+		// oldConfig);
 	}
 
 

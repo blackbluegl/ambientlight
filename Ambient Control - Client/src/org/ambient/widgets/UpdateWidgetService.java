@@ -201,7 +201,7 @@ public class UpdateWidgetService extends Service {
 		setWidgetToRefreshView(intent, appWidgetManager);
 
 		try {
-			RestClient.setPowerStateForRoom(switchRoom, powerState,null);
+			// RestClient.setPowerStateForRoom(switchRoom, powerState,null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

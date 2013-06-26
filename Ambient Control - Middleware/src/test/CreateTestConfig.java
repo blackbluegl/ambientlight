@@ -22,9 +22,9 @@ import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration
 import org.ambientlight.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.handler.expression.ExpressionConfiguration;
+import org.ambientlight.room.IUserRoomItem;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.actors.SwitchObjectConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
@@ -192,9 +192,10 @@ public class CreateTestConfig {
 		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
 		changeConfigFor.add(background);
 		changeConfigFor.add(lo);
-		ArrayList<ActorConfiguration> turnLightOnFor = new ArrayList<ActorConfiguration>();
+		ArrayList<IUserRoomItem> turnLightOnFor = new ArrayList<IUserRoomItem>();
 		turnLightOnFor.add(background);
 		turnLightOnFor.add(sw1);
+		turnLightOnFor.add(triggerMainSwitch);
 
 		createUserScenario(rc, userScenario, changeConfigFor, turnLightOnFor);
 
@@ -203,7 +204,7 @@ public class CreateTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
-			List<LightObjectConfiguration> lo, List<ActorConfiguration> itemsToPutOn) {
+			List<LightObjectConfiguration> lo, List<IUserRoomItem> itemsToPutOn) {
 
 		ProcessConfiguration process = new ProcessConfiguration();
 		process.id = "process-scenario1";
@@ -227,7 +228,7 @@ public class CreateTestConfig {
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
 		powerstatehandler.nextNodeId = null;
-		for (ActorConfiguration current : itemsToPutOn) {
+		for (IUserRoomItem current : itemsToPutOn) {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;
