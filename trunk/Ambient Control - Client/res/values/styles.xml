@@ -2,7 +2,9 @@
 
     <style name="AppTheme" parent="android:Theme.Holo.Light" />
     <color name="RoomFloor">#151515</color>
-
+    <color name="RoomWall">#4d4d4d</color>
+    
+    
     <style name="boldRoomLabel">
         <item name="android:textStyle">bold|italic</item>
         <item name="android:textColor">#FFFFFF</item>

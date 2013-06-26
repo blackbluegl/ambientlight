@@ -1,9 +1,13 @@
 package org.ambientlight.process;
 
+import java.io.Serializable;
+
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
-public class NodeConfiguration {
+public class NodeConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int id;
 

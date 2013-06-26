@@ -3,7 +3,7 @@ package org.ambientlight.process.handler.actor;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.room.actors.ActorConfiguration;
+import org.ambientlight.room.IUserRoomItem;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.actors.SwitchObjectConfiguration;
 import org.ambientlight.room.entities.LightObject;
@@ -17,7 +17,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 		// if simple mode handle all actors the same way
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
-			for (ActorConfiguration actorConfig : AmbientControlMW.getRoom().config.actorConfigurations.values()) {
+			for (IUserRoomItem actorConfig : AmbientControlMW.getRoom().config.getUserRoomItems().values()) {
 				switchPowerState(actorConfig.getName(), powerState, actorConfig);
 			}
 			return;
@@ -25,7 +25,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 
 		for (String currentActorName : getConfig().powerStateConfiguration.keySet()) {
 			boolean powerState = getConfig().powerStateConfiguration.get(currentActorName);
-			ActorConfiguration actorConfig = AmbientControlMW.getRoom().config.actorConfigurations.get(currentActorName);
+			IUserRoomItem actorConfig = AmbientControlMW.getRoom().config.getUserRoomItems().get(currentActorName);
 			switchPowerState(currentActorName, powerState, actorConfig);
 		}
 	}
@@ -34,7 +34,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 	/**
 	 * @param currentActorName
 	 */
-	public void switchPowerState(String currentActorName, boolean powerState, ActorConfiguration actorConfig) {
+	public void switchPowerState(String currentActorName, boolean powerState, IUserRoomItem actorConfig) {
 		try {
 			if (actorConfig instanceof SwitchObjectConfiguration) {
 				// update switch device
@@ -45,11 +45,8 @@ public class PowerStateHandler extends AbstractActionHandler {
 						((SwitchObjectConfiguration) actorConfig).houseCode,
 						((SwitchObjectConfiguration) actorConfig).switchingUnitCode, powerState);
 
-				// update model
-				actorConfig.setPowerState(powerState);
-
 			} else if (actorConfig instanceof LightObjectConfiguration) {
-				// update renderer for light objects
+				// update renderer for light objects and update model
 				LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(currentActorName);
 				AmbientControlMW.getRenderProgrammFactory().updatePowerStateForLightObject(AmbientControlMW.getRenderer(),
 						lightObject, powerState);

@@ -1,9 +1,13 @@
 package org.ambientlight.device.stripe;
 
+import java.io.Serializable;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("stripePart")
-public class StripePartConfiguration {
+public class StripePartConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int startXPositionInRoom;
 	public int startYPositionInRoom;

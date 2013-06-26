@@ -30,7 +30,7 @@ public class SwitchEventGenerator extends EventGenerator {
 		correlation.eventGeneratorName = config.name;
 		eventManager.onEvent(event);
 
-		((SwitchEventGeneratorConfiguration) this.config).powerState = event.powerState;
+		((SwitchEventGeneratorConfiguration) this.config).setPowerState(event.powerState);
 
 	}
 }
