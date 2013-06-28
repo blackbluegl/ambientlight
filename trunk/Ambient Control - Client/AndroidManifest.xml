@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ambient.control"
+    android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="1.0" android:installLocation="auto">
-    <uses-permission android:name="android.permission.INTERNET" ></uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
-       <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
-  
+    android:versionName="1.0" >
+
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.NFC" >
+    </uses-permission>
+
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="17" />
 
     <application
+        android:allowBackup="false"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:hardwareAccelerated="true" android:allowBackup="false">
+        android:theme="@style/AppTheme" >
         <activity
             android:name="org.ambient.control.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/org.ambient.beam" />
             </intent-filter>
         </activity>
         <activity
@@ -35,27 +52,37 @@
             android:label="@string/title_activity_program_editor" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
             </intent-filter>
         </activity>
         <activity
             android:name="org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder"
             android:label="@string/title_activity_dialog_holder" >
         </activity>
-        
+
         <receiver android:name="org.ambient.widgets.RoomSwitchesWidgetProvider" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/appwidgetprovider" />
         </receiver>
-        
-    <service android:name="org.ambient.widgets.UpdateWidgetService">
-    </service> 
+
+        <service android:name="org.ambient.widgets.UpdateWidgetService" >
+        </service>
+
+        <activity
+            android:name="org.ambient.control.nfc.NFCSwitchHandlerActivity"
+            android:label="@string/title_activity_nfcswitch_handler" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/org.ambientcontrol" />
+            </intent-filter>
+        </activity>
     </application>
-
-
 
 </manifest>
