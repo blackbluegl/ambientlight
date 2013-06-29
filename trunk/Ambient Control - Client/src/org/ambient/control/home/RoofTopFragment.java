@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
-import org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener;
+import org.ambient.control.RoomConfigManager.RoomConfigurationUpdateListener;
 import org.ambient.control.rest.RestClient;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.RoomConfiguration;
@@ -67,7 +67,7 @@ public class RoofTopFragment extends Fragment implements RoomConfigurationUpdate
 			public void onClick(View v) {
 				for (String currentServerName : roomServers) {
 					try {
-						RoomConfiguration currentConfig = ((MainActivity) getActivity()).getRoomConfigAdapter()
+						RoomConfiguration currentConfig = ((MainActivity) getActivity()).getRoomConfigManager()
 								.getRoomConfiguration(currentServerName);
 
 						for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators()
@@ -113,7 +113,7 @@ public class RoofTopFragment extends Fragment implements RoomConfigurationUpdate
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
 		boolean anyActive = false;
 
-		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigAdapter().getAllRoomConfigurations()
+		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
 				.values()) {
 
 			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {

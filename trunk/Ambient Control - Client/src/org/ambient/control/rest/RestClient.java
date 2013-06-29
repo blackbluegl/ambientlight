@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.ambient.control.RoomConfigAdapter;
+import org.ambient.control.RoomConfigManager;
 import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
@@ -16,10 +16,10 @@ import android.content.Context;
 
 public class RestClient {
 
-	public RoomConfigAdapter configAdapter;
+	public RoomConfigManager configAdapter;
 
 
-	public RestClient(RoomConfigAdapter configAdapter) {
+	public RestClient(RoomConfigManager configAdapter) {
 		this.configAdapter = configAdapter;
 	}
 

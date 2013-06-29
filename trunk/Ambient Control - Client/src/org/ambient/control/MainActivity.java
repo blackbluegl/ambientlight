@@ -2,7 +2,6 @@ package org.ambient.control;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.ambient.control.home.RoofTopFragment;
 import org.ambient.control.home.RoomFragment;
@@ -34,14 +33,13 @@ public class MainActivity extends FragmentActivity {
 
 	NFCProgrammingFragment nfcProgramming;
 
-	List<RoomFragment> rooms;
-	RoomConfigAdapter roomConfigAdapter;
+	RoomConfigManager roomConfigManager;
 	ArrayList<String> fragments = new ArrayList<String>();
 	String currentDialog = null;
 
 
-	public RoomConfigAdapter getRoomConfigAdapter() {
-		return roomConfigAdapter;
+	public RoomConfigManager getRoomConfigManager() {
+		return roomConfigManager;
 	}
 
 	RestClient restClient;
@@ -67,8 +65,8 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main);
 		final LinearLayout content = (LinearLayout) findViewById(R.id.LayoutMain);
 
-		this.roomConfigAdapter = this.createRoomConfigAdapter(this.getAllRoomServers());
-		this.restClient = new RestClient(this.roomConfigAdapter);
+		this.roomConfigManager = this.createRoomConfigAdapter(this.getAllRoomServers());
+		this.restClient = new RestClient(this.roomConfigManager);
 
 		createNavigationDrawer(content);
 
@@ -85,9 +83,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	/**
-	 * @param content
-	 */
+
 	public void createNavigationDrawer(final LinearLayout content) {
 		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -116,17 +112,12 @@ public class MainActivity extends FragmentActivity {
 
 	public void createNFCProgrammingFragment(LinearLayout content) {
 		currentDialog = "NFC-Tag anlernen";
+		clearFragments();
+		roomConfigManager.removeAllListeners();
+
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-		for (String currentTag : fragments) {
-			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
-		}
-		roomConfigAdapter.listeners.clear();
-		fragments.clear();
-
-		Bundle args = new Bundle();
 		nfcProgramming = new NFCProgrammingFragment();
-		nfcProgramming.setArguments(args);
 
 		ft.add(content.getId(), nfcProgramming, "nfcProgrammingTag");
 		this.fragments.add("nfcProgrammingTag");
@@ -140,55 +131,48 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void createHomeFragment(LinearLayout content) {
 		currentDialog = "Mein Ambiente";
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		for (String currentTag : fragments) {
-			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
-		}
-		fragments.clear();
-		roomConfigAdapter.listeners.clear();
-		roomConfigAdapter.metaListeners.clear();
-		ft.commit();
 
-		ft = getSupportFragmentManager().beginTransaction();
+		clearFragments();
+		roomConfigManager.removeAllListeners();
+
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 		Bundle argsRoof = new Bundle();
-		argsRoof.putStringArrayList(RoofTopFragment.BUNDLE_HOST_LIST, this.roomConfigAdapter.getServerNames());
+		argsRoof.putStringArrayList(RoofTopFragment.BUNDLE_HOST_LIST, this.roomConfigManager.getServerNames());
 		RoofTopFragment roof = new RoofTopFragment();
 		roof.setArguments(argsRoof);
 		this.fragments.add("roof");
-		this.roomConfigAdapter.addMetaListener(roof);
+		this.roomConfigManager.addMetaListener(roof);
 		ft.add(content.getId(), roof, "roof");
 		ft.commit();
 
-		for (String currentServer : roomConfigAdapter.getServerNames()) {
+		for (String currentServer : roomConfigManager.getServerNames()) {
 			ft = getSupportFragmentManager().beginTransaction();
 			Bundle argsRoom = new Bundle();
 
 			argsRoom.putString(RoomFragment.BUNDLE_SERVER_NAME, currentServer);
-			argsRoom.putParcelable(RoomFragment.BUNDLE_ROOM_CONFIG, roomConfigAdapter.getRoomConfigAsParceable(currentServer));
+			argsRoom.putParcelable(RoomFragment.BUNDLE_ROOM_CONFIG, roomConfigManager.getRoomConfigAsParceable(currentServer));
 
 			RoomFragment roomFragment = new RoomFragment();
 			roomFragment.setArguments(argsRoom);
 			this.fragments.add("roomFragment" + currentServer);
-			this.roomConfigAdapter.addRoomConfigurationChangeListener(currentServer, roomFragment);
+			this.roomConfigManager.addRoomConfigurationChangeListener(currentServer, roomFragment);
 			ft.add(content.getId(), roomFragment, "roomFragment" + currentServer);
 			ft.commit();
 		}
 	}
 
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		// FragmentTransaction ft =
-		// getSupportFragmentManager().beginTransaction();
-		// for (Fragment current : this.fragments) {
-		// ft.remove(current);
-		// }
-		// ft.commit();
-		// fragments.clear();
-		// roomConfigAdapter.listeners.clear();
-		// roomConfigAdapter.metaListeners.clear();
+	/**
+	 * 
+	 */
+	public void clearFragments() {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		for (String currentTag : fragments) {
+			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
+		}
+		fragments.clear();
+		ft.commit();
 	}
 
 
@@ -199,8 +183,8 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	public RoomConfigAdapter createRoomConfigAdapter(ArrayList<String> servers) {
-		RoomConfigAdapter adapter = new RoomConfigAdapter();
+	public RoomConfigManager createRoomConfigAdapter(ArrayList<String> servers) {
+		RoomConfigManager adapter = new RoomConfigManager();
 		for (String currentServer : servers) {
 			try {
 				RoomConfiguration config = RestClient.getRoom(currentServer);
