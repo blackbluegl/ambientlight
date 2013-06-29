@@ -15,26 +15,29 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
 public class MainActivity extends FragmentActivity {
 
 	private static final String LOG = "MainActivity";
-	// NfcAdapter mNfcAdapter;
 
 	NFCProgrammingFragment nfcProgramming;
-	RoofTopFragment roof;
+
 	List<RoomFragment> rooms;
 	RoomConfigAdapter roomConfigAdapter;
-	List<Fragment> fragments = new ArrayList<Fragment>();
+	ArrayList<String> fragments = new ArrayList<String>();
+	String currentDialog = null;
 
 
 	public RoomConfigAdapter getRoomConfigAdapter() {
@@ -46,52 +49,88 @@ public class MainActivity extends FragmentActivity {
 
 	public RestClient getRestClient() {
 		return restClient;
+
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString("currentDialog", this.currentDialog);
+		outState.putStringArrayList("fragments", this.fragments);
 	}
 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// Log.v("testTag", "started");
-		// mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		// if (mNfcAdapter == null) {
-		// Toast.makeText(this, "NFC is not available",
-		// Toast.LENGTH_LONG).show();
-		// } else {
-		// Log.v("testTag", "register callback");
-		// mNfcAdapter.setNdefPushMessageCallback(this, this);
-		// }
-		// Register callback TODO Only if we want to write to a tag
+		setContentView(R.layout.activity_main);
+		final LinearLayout content = (LinearLayout) findViewById(R.id.LayoutMain);
 
-		this.roomConfigAdapter = this.getRoomConfigAdapter(this.getAllRoomServers());
+		this.roomConfigAdapter = this.createRoomConfigAdapter(this.getAllRoomServers());
 		this.restClient = new RestClient(this.roomConfigAdapter);
 
-		setContentView(R.layout.activity_main);
+		createNavigationDrawer(content);
 
-		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		// ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		// // Set the adapter for the list view
-		// mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-		// R.layout.drawer_list_item, mPlanetTitles));
-		// // Set the list's click listener
-		// mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		if (savedInstanceState == null) {
+			createHomeFragment(content);
+		} else {
+			this.currentDialog = savedInstanceState.getString("currentDialog");
+			this.fragments = savedInstanceState.getStringArrayList("fragments");
+			if (this.currentDialog.equals("Mein Ambiente")) {
+				createHomeFragment(content);
+			}
+		}
 
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-
-		LinearLayout content = (LinearLayout) findViewById(R.id.LayoutMain);
-
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		// createHomeFragment(content, ft);
-		createNFCProgrammingFragment(content, ft);
-		ft.commit();
 	}
 
 
-	public void createNFCProgrammingFragment(LinearLayout content, FragmentTransaction ft) {
+	/**
+	 * @param content
+	 */
+	public void createNavigationDrawer(final LinearLayout content) {
+		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+		String[] values = new String[] { "Mein Ambiente", "Mein Klima", "NFC-Tag anlernen" };
+		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		// Set the adapter for the list view
+		mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values));
+		// // Set the list's click listener
+		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+				final String item = (String) parent.getItemAtPosition(position);
+
+				if (item.equals("Mein Ambiente")) {
+					createHomeFragment(content);
+				}
+				if (item.equals("NFC-Tag anlernen")) {
+					createNFCProgrammingFragment(content);
+				}
+			}
+		});
+	}
+
+
+	public void createNFCProgrammingFragment(LinearLayout content) {
+		currentDialog = "NFC-Tag anlernen";
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		for (String currentTag : fragments) {
+			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
+		}
+		roomConfigAdapter.listeners.clear();
+		fragments.clear();
+
 		Bundle args = new Bundle();
 		nfcProgramming = new NFCProgrammingFragment();
 		nfcProgramming.setArguments(args);
-		ft.replace(content.getId(), nfcProgramming);
+
+		ft.add(content.getId(), nfcProgramming, "nfcProgrammingTag");
+		this.fragments.add("nfcProgrammingTag");
+		ft.commit();
 	}
 
 
@@ -99,16 +138,30 @@ public class MainActivity extends FragmentActivity {
 	 * @param content
 	 * @param ft
 	 */
-	public void createHomeFragment(LinearLayout content, FragmentTransaction ft) {
+	public void createHomeFragment(LinearLayout content) {
+		currentDialog = "Mein Ambiente";
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		for (String currentTag : fragments) {
+			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
+		}
+		fragments.clear();
+		roomConfigAdapter.listeners.clear();
+		roomConfigAdapter.metaListeners.clear();
+		ft.commit();
+
+		ft = getSupportFragmentManager().beginTransaction();
+
 		Bundle argsRoof = new Bundle();
 		argsRoof.putStringArrayList(RoofTopFragment.BUNDLE_HOST_LIST, this.roomConfigAdapter.getServerNames());
-		roof = new RoofTopFragment();
+		RoofTopFragment roof = new RoofTopFragment();
 		roof.setArguments(argsRoof);
-		this.fragments.add(roof);
+		this.fragments.add("roof");
 		this.roomConfigAdapter.addMetaListener(roof);
-		ft.replace(content.getId(), roof);
+		ft.add(content.getId(), roof, "roof");
+		ft.commit();
 
 		for (String currentServer : roomConfigAdapter.getServerNames()) {
+			ft = getSupportFragmentManager().beginTransaction();
 			Bundle argsRoom = new Bundle();
 
 			argsRoom.putString(RoomFragment.BUNDLE_SERVER_NAME, currentServer);
@@ -116,9 +169,10 @@ public class MainActivity extends FragmentActivity {
 
 			RoomFragment roomFragment = new RoomFragment();
 			roomFragment.setArguments(argsRoom);
-			this.fragments.add(roomFragment);
+			this.fragments.add("roomFragment" + currentServer);
 			this.roomConfigAdapter.addRoomConfigurationChangeListener(currentServer, roomFragment);
-			ft.add(content.getId(), roomFragment);
+			ft.add(content.getId(), roomFragment, "roomFragment" + currentServer);
+			ft.commit();
 		}
 	}
 
@@ -126,11 +180,15 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		for (Fragment current : this.fragments) {
-			ft.remove(current);
-		}
-		ft.commit();
+		// FragmentTransaction ft =
+		// getSupportFragmentManager().beginTransaction();
+		// for (Fragment current : this.fragments) {
+		// ft.remove(current);
+		// }
+		// ft.commit();
+		// fragments.clear();
+		// roomConfigAdapter.listeners.clear();
+		// roomConfigAdapter.metaListeners.clear();
 	}
 
 
@@ -141,7 +199,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	public RoomConfigAdapter getRoomConfigAdapter(ArrayList<String> servers) {
+	public RoomConfigAdapter createRoomConfigAdapter(ArrayList<String> servers) {
 		RoomConfigAdapter adapter = new RoomConfigAdapter();
 		for (String currentServer : servers) {
 			try {
@@ -158,6 +216,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
+
 		handleNFCIntent(intent);
 	}
 

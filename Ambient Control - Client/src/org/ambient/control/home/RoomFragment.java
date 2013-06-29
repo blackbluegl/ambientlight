@@ -242,6 +242,8 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 
 					// update widgets
 					WidgetUtils.notifyWidgets(getActivity());
+
+					updateRoomBackground();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
