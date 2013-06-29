@@ -47,6 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/defaultmargin"
+        android:layout_marginLeft="3dp"
         android:text="@string/program_nfc_learn_button"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -54,7 +55,7 @@
         android:id="@+id/buttonProgramNFC"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/defaultmargin"
+        android:layout_gravity="bottom"
         android:text="Anlernen" />
 
 </LinearLayout>
