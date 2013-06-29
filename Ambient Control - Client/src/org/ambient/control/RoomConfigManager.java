@@ -27,7 +27,7 @@ import org.ambientlight.room.RoomConfiguration;
  * @author Florian Bornkessel
  * 
  */
-public class RoomConfigAdapter {
+public class RoomConfigManager {
 
 	Map<String, RoomConfigurationUpdateListener> listeners = new HashMap<String, RoomConfigurationUpdateListener>();
 	List<RoomConfigurationUpdateListener> metaListeners = new ArrayList<RoomConfigurationUpdateListener>();
@@ -36,6 +36,11 @@ public class RoomConfigAdapter {
 		public void onRoomConfigurationChange(String serverName, RoomConfiguration config);
 	}
 
+
+	public void removeAllListeners() {
+		listeners.clear();
+		metaListeners.clear();
+	}
 
 	private final Map<String, RoomConfiguration> roomConfigurations = new HashMap<String, RoomConfiguration>();
 

@@ -1,6 +1,6 @@
 package org.ambient.control.rest;
 
-import org.ambient.control.RoomConfigAdapter;
+import org.ambient.control.RoomConfigManager;
 import org.ambientlight.room.RoomConfiguration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -13,7 +13,7 @@ public class SetSceneryActiveForRoomTask extends AsyncTask<Object, Void, Void> {
 
 	private final String URL = "/sceneryControl/control/room/sceneries/";
 
-	private RoomConfigAdapter callback;
+	private RoomConfigManager callback;
 
 	private String serverName;
 
@@ -21,7 +21,7 @@ public class SetSceneryActiveForRoomTask extends AsyncTask<Object, Void, Void> {
 	@Override
 	protected Void doInBackground(Object... params) {
 
-		this.callback = (RoomConfigAdapter) params[2];
+		this.callback = (RoomConfigManager) params[2];
 		this.serverName = (String) params[0];
 
 		String url = URLUtils.getBaseUrl((String) params[0]) + URL;

@@ -1,8 +1,10 @@
 package org.ambient.widgets;
 
 import org.ambient.control.R;
+import org.ambient.control.RoomConfigManager;
 import org.ambient.control.rest.RestClient;
 import org.ambient.control.rest.URLUtils;
+import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 
@@ -27,8 +29,8 @@ public class UpdateWidgetService extends Service {
 	private static final String LOG = "UpdateWidgetService";
 
 	/**
-	 * used for receiving USER_PRESENT- and WIFI- events and updates the icon after
-	 * user unlocks the screen or wlan is present
+	 * used for receiving USER_PRESENT- and WIFI- events and updates the icon
+	 * after user unlocks the screen or wlan is present
 	 */
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -114,13 +116,12 @@ public class UpdateWidgetService extends Service {
 		if (intent.getAction().equals("disableWidget")) {
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
-		} 
-
-		//		else if (this.isConnectedToWifi(getApplicationContext()) == false) {
-		//			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
-		//			setWidgetToDisabledView(intent, appWidgetManager);
-		//			return START_STICKY;
-		//		}
+		}
+		else if (this.isConnectedToWifi(getApplicationContext()) == false) {
+			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
+			setWidgetToDisabledView(intent, appWidgetManager);
+			return START_STICKY;
+		}
 
 		// event handling
 		if (intent.getAction().contains("SWITCH")) {
@@ -184,7 +185,8 @@ public class UpdateWidgetService extends Service {
 							PendingIntent.FLAG_UPDATE_CURRENT);
 					switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
 				} catch (Exception e) {
-					//Do nothing here. just try the next server and display an icon if this one is reachable
+					// Do nothing here. just try the next server and display an
+					// icon if this one is reachable
 					e.printStackTrace();
 				}
 			}
@@ -201,7 +203,12 @@ public class UpdateWidgetService extends Service {
 		setWidgetToRefreshView(intent, appWidgetManager);
 
 		try {
-			// RestClient.setPowerStateForRoom(switchRoom, powerState,null);
+			RoomConfigManager adapter = new RoomConfigManager();
+			RestClient rest = new RestClient(adapter);
+			SwitchEventConfiguration event = new SwitchEventConfiguration();
+			event.eventGeneratorName = "RoomSwitch";
+			event.powerState = powerState;
+			rest.sendEvent(switchRoom, event);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -220,7 +227,7 @@ public class UpdateWidgetService extends Service {
 			remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
 			RemoteViews switchIcon = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.widget_icon_switch);
 			switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_action_refresh);
-			switchIcon.setTextViewText(R.id.textViewWidgetSwitch, "please Wait");
+			switchIcon.setTextViewText(R.id.textViewWidgetSwitch, "");
 			remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
 			appWidgetManager.updateAppWidget(widgetId, remoteViews);
 		}

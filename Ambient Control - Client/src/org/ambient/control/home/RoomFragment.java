@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
-import org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener;
+import org.ambient.control.RoomConfigManager.RoomConfigurationUpdateListener;
 import org.ambient.control.RoomConfigurationParceable;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
@@ -423,7 +423,6 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		}
 
 		updateRoomBackground();
-		// updateMasterSwitchState();
 
 		this.enableEventListener();
 

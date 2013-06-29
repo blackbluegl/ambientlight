@@ -108,7 +108,7 @@ public class NFCProgrammingFragment extends Fragment {
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				// String selectedRoom = (String) parent.getItemAtPosition(pos);
 				selectedServer = serverNames.get(pos);
-				RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigAdapter().getRoomConfiguration(
+				RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
 						selectedServer);
 
 				List<String> switchNames = new ArrayList<String>();
@@ -179,10 +179,10 @@ public class NFCProgrammingFragment extends Fragment {
 
 
 	private void initRoomArrays() {
-		for (String serverName : ((MainActivity) getActivity()).getRoomConfigAdapter().getAllRoomConfigurations().keySet()) {
+		for (String serverName : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().keySet()) {
 			serverNames.add(serverName);
 			roomNames
-			.add(((MainActivity) getActivity()).getRoomConfigAdapter().getAllRoomConfigurations().get(serverName).roomName);
+			.add(((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(serverName).roomName);
 		}
 	}
 

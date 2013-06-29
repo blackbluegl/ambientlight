@@ -1,6 +1,6 @@
 package org.ambient.control.nfc;
 
-import org.ambient.control.RoomConfigAdapter;
+import org.ambient.control.RoomConfigManager;
 import org.ambient.control.rest.RestClient;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.IUserRoomItem;
@@ -77,7 +77,7 @@ public class NFCSwitchHandlerActivity extends Activity {
 		boolean powerState = true;
 
 		try {
-			RoomConfigAdapter adapter = new RoomConfigAdapter();
+			RoomConfigManager adapter = new RoomConfigManager();
 			RestClient rest = new RestClient(adapter);
 			RoomConfiguration config = RestClient.getRoom(server);
 
