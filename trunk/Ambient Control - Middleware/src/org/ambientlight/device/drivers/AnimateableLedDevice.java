@@ -13,14 +13,23 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.led;
+package org.ambientlight.device.drivers;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class LK35LedPointConfiguration extends LedPointConfiguration {
+public interface AnimateableLedDevice extends DeviceDriver {
 
-	public int zone;
+	public void connect() throws UnknownHostException, IOException;
+
+
+	public void closeConnection();
+
+
+	void writeData() throws IOException;
 }

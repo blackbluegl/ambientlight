@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.ambientlight.device.drivers.LK35CLientDeviceConfiguration;
@@ -41,7 +40,7 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 
 	LK35CLientDeviceConfiguration config = null;
 
-	LedPoint point = new LedPoint();
+	List<LedPoint> points = new ArrayList<LedPoint>();
 
 	OutputStream os = null;
 
@@ -102,28 +101,50 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 	@Override
 	public void writeData() throws IOException {
 
-		Color color = new Color(point.getOutputResult());
-		try {
+		if (os == null)
+			throw new IOException("Outputwriter was not prepared. Cannot write Data to LK35-device!");
 
-			List<Integer> zones = new ArrayList<Integer>(Arrays.asList(new Integer[]{this.config.configuredLed.zone}));
-			this.colorHandler.setRGBWithWhiteChannel(zones, color.getRed(), color.getGreen(), color.getBlue(),false);
-		} catch (InterruptedException e) {
-			// do nothing here
-			e.printStackTrace();
+		List<LedPoint> done = new ArrayList<LedPoint>();
+
+		for (LedPoint current : points) {
+			if (done.contains(current)) {
+				continue;
+			}
+			done.add(current);
+
+			List<Integer> zones = new ArrayList<Integer>();
+			zones.add(current.configuration.port);
+
+			for (LedPoint currentOther : points) {
+				if (done.contains(currentOther)) {
+					continue;
+				}
+
+				if (currentOther.getOutputResult().equals(current.getOutputResult())) {
+					zones.add(currentOther.configuration.port);
+					done.add(currentOther);
+				}
+			}
+			Color color = new Color(current.getOutputResult());
+			try {
+				this.colorHandler.setRGBWithWhiteChannel(zones, color.getRed(), color.getGreen(), color.getBlue(), false);
+			} catch (InterruptedException e) {
+				// do nothing here
+				e.printStackTrace();
+			}
 		}
 	}
-
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.device.drivers.LedPointDeviceDriver#getLedPoint()
+	 * @see org.ambientlight.device.drivers.LedPointDeviceDriver#getLedPoints()
 	 */
 	@Override
-	public LedPoint getLedPoint() {
+	public List<LedPoint> getLedPoints() {
 		// TODO Auto-generated method stub
-		return point;
+		return this.points;
 	}
 
 
@@ -131,11 +152,11 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.ambientlight.device.drivers.LedPointDeviceDriver#setLedPoint(org.
-	 * ambientlight.device.led.LedPoint)
+	 * org.ambientlight.device.drivers.LedPointDeviceDriver#attachLedPoint(org
+	 * .ambientlight.device.led.LedPoint)
 	 */
 	@Override
-	public void setLedPoint(LedPoint ledPoint) {
-		this.point = ledPoint;
+	public void attachLedPoint(LedPoint ledPoint) {
+		this.points.add(ledPoint);
 	}
 }

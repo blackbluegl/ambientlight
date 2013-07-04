@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
@@ -92,7 +93,7 @@ public class Room {
 		for (DeviceDriver currentDevice : devices) {
 			if (currentDevice instanceof LedPointDeviceDriver) {
 				LedPointDeviceDriver currentLedPointDevice = (LedPointDeviceDriver) currentDevice;
-				result.add(currentLedPointDevice.getLedPoint());
+				result.addAll(currentLedPointDevice.getLedPoints());
 			}
 		}
 		return result;
@@ -110,11 +111,11 @@ public class Room {
 	}
 
 
-	public List<LedStripeDeviceDriver> getLedStripeDevices() {
-		List<LedStripeDeviceDriver> result = new ArrayList<LedStripeDeviceDriver>();
+	public List<AnimateableLedDevice> getLedAnimateableDevices() {
+		List<AnimateableLedDevice> result = new ArrayList<AnimateableLedDevice>();
 		for(DeviceDriver currentDevice : this.devices){
-			if(currentDevice instanceof LedStripeDeviceDriver){
-				result.add((LedStripeDeviceDriver)currentDevice);
+			if (currentDevice instanceof AnimateableLedDevice) {
+				result.add((AnimateableLedDevice) currentDevice);
 			}
 		}
 

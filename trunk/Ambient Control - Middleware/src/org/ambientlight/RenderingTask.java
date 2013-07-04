@@ -8,15 +8,15 @@ import java.io.IOException;
 import java.util.TimerTask;
 
 import org.ambientlight.debug.BufferedImageDisplayOutput;
-import org.ambientlight.device.drivers.LedStripeDeviceDriver;
+import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.room.StripePart;
 
 class RenderingTask extends TimerTask {
 
 	private BufferedImageDisplayOutput debugRoomDisplay;
-	
+
 	private void resetConnection() {
-		for (LedStripeDeviceDriver currentDevice : AmbientControlMW.room.getLedStripeDevices()) {
+		for (AnimateableLedDevice currentDevice : AmbientControlMW.room.getLedAnimateableDevices()) {
 			try {
 				System.out.println("resetting connection");
 				currentDevice.closeConnection();
@@ -26,19 +26,18 @@ class RenderingTask extends TimerTask {
 				System.out.println("resetting connection not ok:"+e.getMessage());
 				e.printStackTrace();
 			}
-
 		}
 	}
 
 	@Override
 	public void run() {
 		AmbientControlMW.renderer.render();
-		
+
 		if(AmbientControlMW.debug){
 			handleDebug();
 		}
-		
-		for (LedStripeDeviceDriver currentDevice : AmbientControlMW.room.getLedStripeDevices()) {
+
+		for (AnimateableLedDevice currentDevice : AmbientControlMW.room.getLedAnimateableDevices()) {
 			try {
 				if(AmbientControlMW.renderer.hadDirtyRegionInLastRun()){
 					currentDevice.writeData();
@@ -55,14 +54,14 @@ class RenderingTask extends TimerTask {
 			this.debugRoomDisplay = new BufferedImageDisplayOutput(AmbientControlMW.room
 					.getRoomBitMap().getWidth(), AmbientControlMW.room.getRoomBitMap().getHeight(),
 					"RoomContent");
-			}
-		
+		}
+
 		Graphics2D g2d = AmbientControlMW.room.getRoomBitMap().createGraphics();
 		AlphaComposite alpha = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.6f);
 		g2d.setComposite(alpha);
 		Font font = new Font("Arial", Font.BOLD, 8);
 		g2d.setFont(font);
-		
+
 		for(StripePart current : AmbientControlMW.room.getAllStripePartsInRoom()){
 			g2d.setColor(Color.BLACK);
 			g2d.drawLine(current.configuration.startXPositionInRoom, current.configuration.startYPositionInRoom, 
@@ -73,16 +72,16 @@ class RenderingTask extends TimerTask {
 			String info = String.valueOf(current.configuration.offsetInStripe)+" "+String.valueOf(current.configuration.pixelAmount);
 			g2d.setColor(Color.WHITE);
 			int stringXPos= (current.configuration.startXPositionInRoom -current.configuration.endXPositionInRoom)/2;
-			if(stringXPos>0)
+			if(stringXPos>0) {
 				stringXPos=-stringXPos;
-			else{
+			} else{
 				stringXPos=Math.abs(stringXPos);
 			}
 			int stringYPos= (current.configuration.startYPositionInRoom -current.configuration.endYPositionInRoom)/2;
-			if(stringYPos>0)
+			if(stringYPos>0) {
 				stringYPos=-stringYPos;
-				else{
-					stringYPos=Math.abs(stringYPos);
+			} else{
+				stringYPos=Math.abs(stringYPos);
 			}
 			stringXPos=current.configuration.startXPositionInRoom+stringXPos;
 			stringYPos=current.configuration.startYPositionInRoom+stringYPos;

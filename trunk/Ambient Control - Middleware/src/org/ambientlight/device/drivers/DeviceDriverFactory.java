@@ -11,6 +11,7 @@ import org.ambientlight.device.drivers.lk35.LK35ClientDeviceDriver;
 import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver;
 import org.ambientlight.device.drivers.switchoverethernet.SwitchDeviceOverEthernetDriver;
 import org.ambientlight.device.led.LedPoint;
+import org.ambientlight.device.led.LedPointConfiguration;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.device.led.StripePartConfiguration;
@@ -78,9 +79,13 @@ public class DeviceDriverFactory {
 			LK35CLientDeviceConfiguration configuration = (LK35CLientDeviceConfiguration) dc;
 			LK35ClientDeviceDriver device = new LK35ClientDeviceDriver();
 			device.setConfiguration(configuration);
-			LedPoint ledPoint = new LedPoint();
-			ledPoint.configuration = configuration.configuredLed;
-			ledPoint.clear();
+			for (LedPointConfiguration currentLedPointConfig : configuration.configuredLeds) {
+				LedPoint ledPoint = new LedPoint();
+				ledPoint.configuration = currentLedPointConfig;
+				ledPoint.clear();
+				device.attachLedPoint(ledPoint);
+			}
+
 			try {
 				device.connect();
 			} catch (Exception e) {
@@ -90,6 +95,7 @@ public class DeviceDriverFactory {
 			return device;
 		}
 
+		// default if config name unknown
 		return null;
 	}
 
