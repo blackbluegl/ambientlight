@@ -70,7 +70,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/rgb")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setRGB(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "r") int r,
+	public Response setRGB(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "r") int r,
 			@QueryParam(value = "g") int g, @QueryParam(value = "b") int b) throws IOException, InterruptedException {
 		try {
 			api.setRGB(zones, r, g, b);
@@ -97,7 +97,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/hsv")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setHSV(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "h") int h,
+	public Response setHSV(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "h") int h,
 			@QueryParam(value = "s") int s, @QueryParam(value = "v") int v) throws IOException, InterruptedException {
 		try {
 			api.setHSV(zones, h, s, v);
@@ -125,7 +125,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/rgbw")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setRGBWithWhiteChannel(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "r") int r,
+	public Response setRGBWithWhiteChannel(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "r") int r,
 			@QueryParam(value = "g") int g, @QueryParam(value = "b") int b,
 			@QueryParam(value = "maxBrightness") boolean maxBrightness) throws IOException, InterruptedException {
 		try {
@@ -154,7 +154,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/hsvw")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setHSVwithWihiteChannel(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "h") int h,
+	public Response setHSVwithWihiteChannel(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "h") int h,
 			@QueryParam(value = "s") int s, @QueryParam(value = "v") int v,
 			@QueryParam(value = "maxBrightness") boolean maxBrightness) throws IOException, InterruptedException {
 		try {
@@ -180,7 +180,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/r")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setR(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+	public Response setR(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "value") int value)
 			throws IOException, InterruptedException {
 		try {
 			api.setR(zones, value);
@@ -205,7 +205,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/g")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setG(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+	public Response setG(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "value") int value)
 			throws InterruptedException, IOException {
 		try {
 			api.setG(zones, value);
@@ -230,7 +230,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/b")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setB(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+	public Response setB(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "value") int value)
 			throws InterruptedException, IOException {
 		try {
 			api.setB(zones, value);
@@ -256,7 +256,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/w")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setW(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+	public Response setW(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "value") int value)
 			throws InterruptedException, IOException {
 		try {
 			api.setW(zones, value);
@@ -280,7 +280,7 @@ public class LK35Rest {
 	@GET
 	@Path("/control/reset")
 	@Produces(MediaType.TEXT_HTML)
-	public Response resetColor(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+	public Response resetColor(@QueryParam(value = "zones") List<Integer> zones) throws IOException, InterruptedException {
 		try {
 			api.resetColor(zones);
 			return Response.status(200).build();
@@ -325,7 +325,7 @@ public class LK35Rest {
 	@GET
 	@Path("/control/togglePowerForZone")
 	@Produces(MediaType.TEXT_HTML)
-	public Response togglePower(@QueryParam(value = "zone") List<Integer> zones,
+	public Response togglePower(@QueryParam(value = "zones") List<Integer> zones,
 			@QueryParam(value = "powerState") boolean powerState) throws IOException {
 		try {
 			api.togglePower(zones, powerState);
@@ -350,7 +350,7 @@ public class LK35Rest {
 	@GET
 	@Path("/color/brightness")
 	@Produces(MediaType.TEXT_HTML)
-	public Response setBrightness(@QueryParam(value = "zone") List<Integer> zones, @QueryParam(value = "value") int value)
+	public Response setBrightness(@QueryParam(value = "zones") List<Integer> zones, @QueryParam(value = "value") int value)
 			throws InterruptedException, IOException {
 		try {
 			api.setBrightness(zones, value);
@@ -374,7 +374,7 @@ public class LK35Rest {
 	@GET
 	@Path("/control/toggleColorFader")
 	@Produces(MediaType.TEXT_HTML)
-	public Response toggleColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+	public Response toggleColorFader(@QueryParam(value = "zones") List<Integer> zones) throws IOException, InterruptedException {
 		try {
 			api.toggleColorFader(zones);
 			return Response.status(200).build();
@@ -397,7 +397,7 @@ public class LK35Rest {
 	@GET
 	@Path("/control/speedUpColorFader")
 	@Produces(MediaType.TEXT_HTML)
-	public Response speedUpColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+	public Response speedUpColorFader(@QueryParam(value = "zones") List<Integer> zones) throws IOException, InterruptedException {
 		try {
 			api.speedUpColorFader(zones);
 			return Response.status(200).build();
@@ -420,7 +420,8 @@ public class LK35Rest {
 	@GET
 	@Path("/control/speedDownColorFader")
 	@Produces(MediaType.TEXT_HTML)
-	public Response speedDownColorFader(@QueryParam(value = "zone") List<Integer> zones) throws IOException, InterruptedException {
+	public Response speedDownColorFader(@QueryParam(value = "zones") List<Integer> zones) throws IOException,
+			InterruptedException {
 		try {
 			api.speedDownColorFader(zones);
 			return Response.status(200).build();
