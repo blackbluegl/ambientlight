@@ -2,18 +2,17 @@ package org.ambientlight.device.drivers;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.List;
 
-import org.ambientlight.device.led.Stripe;
+import org.ambientlight.device.led.LedPoint;
 
 
-public interface LedStripeDeviceDriver extends DeviceDriver{
+public interface LedPointDeviceDriver extends DeviceDriver{
 
 	public void setConfiguration(RemoteHostConfiguration configuration);
 
-	public List<Stripe> getAllStripes();
+	public LedPoint getLedPoint();
 
-	public void attachStripe(Stripe stripe);
+	public void setLedPoint(LedPoint ledPoint);
 
 	public void connect() throws UnknownHostException, IOException;
 

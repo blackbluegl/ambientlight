@@ -6,8 +6,8 @@ import java.net.UnknownHostException;
 
 import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver;
-import org.ambientlight.device.stripe.Stripe;
-import org.ambientlight.device.stripe.StripeConfiguration;
+import org.ambientlight.device.led.Stripe;
+import org.ambientlight.device.led.StripeConfiguration;
 
 
 public class TestMultiStripeOEDevice {

@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ambientlight.device.drivers.LK35CLientDeviceConfiguration;
-import org.ambientlight.device.drivers.LedStripeDeviceDriver;
+import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.RemoteHostConfiguration;
-import org.ambientlight.device.stripe.Stripe;
+import org.ambientlight.device.led.LedPoint;
 import org.lk35.api.LK35ColorHandler;
 import org.lk35.api.LK35ColorHandlerImpl;
 import org.lk35.api.LK35DeviceHandler;
@@ -33,21 +34,21 @@ import org.lk35.api.LK35DeviceHandlerImpl;
 
 
 /**
- * @author Florian Bornkessel
- *
+ * @author Florian BornkesselStripe stripe
+ * 
  */
-// TODO zones are not stripes. zones = more than one light react to same light.
-// stripes: one stripe has several lights.
-public class LK35ClientDeviceDriver implements LedStripeDeviceDriver {
+public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 
 	LK35CLientDeviceConfiguration config = null;
 
-	List<Stripe> stripes = new ArrayList<Stripe>();
+	LedPoint point = new LedPoint();
 
 	OutputStream os = null;
 
 	LK35DeviceHandler connection;
 	LK35ColorHandler colorHandler;
+
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -60,32 +61,6 @@ public class LK35ClientDeviceDriver implements LedStripeDeviceDriver {
 	@Override
 	public void setConfiguration(RemoteHostConfiguration configuration) {
 		this.config = (LK35CLientDeviceConfiguration) configuration;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.device.drivers.LedStripeDeviceDriver#getAllStripes()
-	 */
-	@Override
-	public List<Stripe> getAllStripes() {
-		// TODO Auto-generated method stub
-		return stripes;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.device.drivers.LedStripeDeviceDriver#attachStripe(org
-	 * .ambientlight.device.stripe.Stripe)
-	 */
-	@Override
-	public void attachStripe(Stripe stripe) {
-		this.stripes.add(stripe);
 	}
 
 
@@ -116,7 +91,6 @@ public class LK35ClientDeviceDriver implements LedStripeDeviceDriver {
 			// we cannot do much here
 			e.printStackTrace();
 		}
-
 	}
 
 
@@ -127,16 +101,41 @@ public class LK35ClientDeviceDriver implements LedStripeDeviceDriver {
 	 */
 	@Override
 	public void writeData() throws IOException {
-		Stripe stripe = this.stripes.get(0);
-		for (int i = 0; i < stripe.getOutputResult().size(); i++) {
-			List<Integer> zones = new ArrayList<Integer>();
-			Color color = new Color(stripe.getOutputResult().get(i));
-			try {
-				this.colorHandler.setRGB(zones, color.getRed(), color.getGreen(), color.getBlue());
-			} catch (InterruptedException e) {
-				// do nothing here
-				e.printStackTrace();
-			}
+
+		Color color = new Color(point.getOutputResult());
+		try {
+
+			List<Integer> zones = new ArrayList<Integer>(Arrays.asList(new Integer[]{this.config.configuredLed.zone}));
+			this.colorHandler.setRGBWithWhiteChannel(zones, color.getRed(), color.getGreen(), color.getBlue(),false);
+		} catch (InterruptedException e) {
+			// do nothing here
+			e.printStackTrace();
 		}
+	}
+
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.device.drivers.LedPointDeviceDriver#getLedPoint()
+	 */
+	@Override
+	public LedPoint getLedPoint() {
+		// TODO Auto-generated method stub
+		return point;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.device.drivers.LedPointDeviceDriver#setLedPoint(org.
+	 * ambientlight.device.led.LedPoint)
+	 */
+	@Override
+	public void setLedPoint(LedPoint ledPoint) {
+		this.point = ledPoint;
 	}
 }
