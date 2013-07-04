@@ -13,18 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.drivers;
-
-import org.ambientlight.device.led.LK35LedPointConfiguration;
+package org.ambientlight.device.led;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class LK35CLientDeviceConfiguration extends RemoteHostConfiguration {
+public class LK35LedPointConfiguration extends LedPointConfiguration {
 
-	private static final long serialVersionUID = 1L;
-
-	public LK35LedPointConfiguration configuredLed = new LK35LedPointConfiguration();
+	public int zone;
 }

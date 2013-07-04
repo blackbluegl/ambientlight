@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.device.drivers.DeviceDriver;
+import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
-import org.ambientlight.device.stripe.Stripe;
+import org.ambientlight.device.led.LedPoint;
+import org.ambientlight.device.led.Stripe;
 import org.ambientlight.process.entities.Process;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.room.entities.EventGenerator;
@@ -79,6 +81,18 @@ public class Room {
 				for (Stripe currentStripe : currentLedStripeDevice.getAllStripes()) {
 					result.addAll(currentStripe.getStripeParts());
 				}
+			}
+		}
+		return result;
+	}
+
+
+	public List<LedPoint> getAllLedPointsInRoom() {
+		List<LedPoint> result = new ArrayList<LedPoint>();
+		for (DeviceDriver currentDevice : devices) {
+			if (currentDevice instanceof LedPointDeviceDriver) {
+				LedPointDeviceDriver currentLedPointDevice = (LedPointDeviceDriver) currentDevice;
+				result.add(currentLedPointDevice.getLedPoint());
 			}
 		}
 		return result;

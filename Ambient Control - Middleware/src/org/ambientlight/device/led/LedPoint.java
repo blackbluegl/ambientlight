@@ -13,18 +13,33 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.drivers;
+package org.ambientlight.device.led;
 
-import org.ambientlight.device.led.LK35LedPointConfiguration;
+import java.awt.Color;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class LK35CLientDeviceConfiguration extends RemoteHostConfiguration {
+public class LedPoint {
 
-	private static final long serialVersionUID = 1L;
+	public LedPointConfiguration configuration;
 
-	public LK35LedPointConfiguration configuredLed = new LK35LedPointConfiguration();
+	Integer rgbValue;
+
+
+	public void setPixel(int rgbValue) {
+		this.rgbValue = rgbValue;
+	}
+
+
+	public Integer getOutputResult() {
+		return rgbValue;
+	}
+
+
+	public void clear() {
+		this.rgbValue = Color.BLACK.getRGB();
+	}
 }

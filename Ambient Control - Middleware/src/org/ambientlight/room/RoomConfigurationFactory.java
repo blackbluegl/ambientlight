@@ -8,8 +8,8 @@ import java.io.IOException;
 
 import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
-import org.ambientlight.device.stripe.StripeConfiguration;
-import org.ambientlight.device.stripe.StripePartConfiguration;
+import org.ambientlight.device.led.StripeConfiguration;
+import org.ambientlight.device.led.StripePartConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;

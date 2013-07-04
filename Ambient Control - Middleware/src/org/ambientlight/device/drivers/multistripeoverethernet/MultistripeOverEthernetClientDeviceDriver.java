@@ -14,7 +14,7 @@ import java.util.List;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.device.drivers.RemoteHostConfiguration;
-import org.ambientlight.device.stripe.Stripe;
+import org.ambientlight.device.led.Stripe;
 
 
 public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDeviceDriver {

@@ -3,8 +3,8 @@ package test;
 import java.awt.Color;
 
 import org.ambientlight.device.drivers.dummy.DummyDeviceDriver;
-import org.ambientlight.device.stripe.Stripe;
-import org.ambientlight.device.stripe.StripeConfiguration;
+import org.ambientlight.device.led.Stripe;
+import org.ambientlight.device.led.StripeConfiguration;
 
 public class DummyDeviceDriverTest {
 

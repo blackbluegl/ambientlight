@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.rendering.effects.RenderingEffect;
 import org.ambientlight.rendering.effects.transitions.FadeOutTransition;
 import org.ambientlight.rendering.effects.transitions.Transition;
@@ -30,6 +31,7 @@ public class Renderer {
 	ITransitionEffectFinishedListener transitionFinishedListener;
 
 	List<StripePixelMapping> stripePixelMapping = new ArrayList<StripePixelMapping>();
+	List<LedPoint> ledPoints = new ArrayList<LedPoint>();
 
 	boolean hadDirtyRegionInLastRun = false;
 
@@ -48,18 +50,19 @@ public class Renderer {
 		BufferedImage roomCanvas = room.getRoomBitMap();
 		// reset color of background to black
 		roomCanvas = ImageUtil.getPaintedImage(roomCanvas,Color.black);
+
+		this.stripePixelMapping = StripeUtil.getStripePixelMapping(room.getAllStripePartsInRoom());
+		this.ledPoints = room.getAllLedPointsInRoom();
 	}
 
 
 	public void setRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
 		this.renderLightObjectMapping.put(lightObject, programm);
-		this.stripePixelMapping = StripeUtil.getStripePixelMapping(room.getAllStripePartsInRoom());
 	}
 
 
 	public void removeRenderTaskForLightObject(LightObject lightObject) {
 		renderLightObjectMapping.remove(lightObject);
-		this.stripePixelMapping = StripeUtil.getStripePixelMapping(room.getAllStripePartsInRoom());
 	}
 
 
@@ -171,6 +174,10 @@ public class Renderer {
 		for (StripePixelMapping current : this.stripePixelMapping) {
 			int rgbValue = room.getRoomBitMap().getRGB(current.xPosition, current.yPosition);
 			current.stripePart.setPixelData(current.stripePartPosition, rgbValue);
+		}
+		for (LedPoint current : this.ledPoints) {
+			int rgbValue = room.getRoomBitMap().getRGB(current.configuration.xPosition, current.configuration.yPosition);
+			current.setPixel(rgbValue);
 		}
 	}
 }

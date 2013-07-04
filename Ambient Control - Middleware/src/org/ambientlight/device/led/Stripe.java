@@ -1,8 +1,9 @@
-package org.ambientlight.device.stripe;
+package org.ambientlight.device.led;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.room.StripePart;
 
 public class Stripe {
