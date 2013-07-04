@@ -3,7 +3,7 @@ package org.ambientlight.device.drivers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.device.stripe.StripeConfiguration;
+import org.ambientlight.device.led.StripeConfiguration;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

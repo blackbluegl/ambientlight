@@ -15,7 +15,7 @@
 
 package org.ambientlight.device.drivers;
 
-import org.ambientlight.device.stripe.StripeConfiguration;
+import org.ambientlight.device.led.StripeConfiguration;
 
 
 /**
@@ -23,6 +23,8 @@ import org.ambientlight.device.stripe.StripeConfiguration;
  * 
  */
 public class LK35CLientDeviceConfiguration extends RemoteHostConfiguration {
+
+	private static final long serialVersionUID = 1L;
 
 	public StripeConfiguration configuredStripe = new StripeConfiguration();
 }
