@@ -22,6 +22,7 @@ package org.ambientlight.device.led;
  */
 public class LedPointConfiguration {
 
+	public int port;
 	public int xPosition;
 	public int yPosition;
 }

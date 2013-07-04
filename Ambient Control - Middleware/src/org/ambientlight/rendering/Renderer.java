@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,12 +36,21 @@ public class Renderer {
 
 	boolean hadDirtyRegionInLastRun = false;
 
+	/**
+	 * determines if it is possible to add or remove lightobjects to the
+	 * renderer
+	 */
+	boolean locked = false;
+
 
 	public boolean hadDirtyRegionInLastRun() {
 		return hadDirtyRegionInLastRun;
 	}
 
-	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new ConcurrentHashMap<LightObject, RenderingProgramm>();
+	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new HashMap<LightObject, RenderingProgramm>();
+
+	private final List<LightObject> lightObjectsToRemove = new ArrayList<LightObject>();
+	private final Map<LightObject, RenderingProgramm> lightObjectsToAdd = new ConcurrentHashMap<LightObject, RenderingProgramm>();
 
 
 	public Renderer(Room room, ITransitionEffectFinishedListener transitionFinishedListener) {
@@ -49,20 +59,34 @@ public class Renderer {
 
 		BufferedImage roomCanvas = room.getRoomBitMap();
 		// reset color of background to black
-		roomCanvas = ImageUtil.getPaintedImage(roomCanvas,Color.black);
+		roomCanvas = ImageUtil.getPaintedImage(roomCanvas, Color.black);
 
 		this.stripePixelMapping = StripeUtil.getStripePixelMapping(room.getAllStripePartsInRoom());
 		this.ledPoints = room.getAllLedPointsInRoom();
 	}
 
 
-	public void setRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
-		this.renderLightObjectMapping.put(lightObject, programm);
+	public void addRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
+		while (this.locked) {
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		this.lightObjectsToAdd.put(lightObject, programm);
 	}
 
 
 	public void removeRenderTaskForLightObject(LightObject lightObject) {
-		renderLightObjectMapping.remove(lightObject);
+		while (this.locked) {
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		this.lightObjectsToRemove.add(lightObject);
 	}
 
 
@@ -72,6 +96,17 @@ public class Renderer {
 
 
 	public void render() {
+		this.locked = true;
+		// remove all lightObjects that where added during rendering process
+		for (LightObject current : this.lightObjectsToRemove) {
+			this.renderLightObjectMapping.remove(current);
+		}
+		this.lightObjectsToRemove.clear();
+
+		// add all new lightobjects since last run
+		this.renderLightObjectMapping.putAll(this.lightObjectsToAdd);
+		this.lightObjectsToAdd.clear();
+		this.locked = false;
 
 		this.hadDirtyRegionInLastRun = false;
 
@@ -85,9 +120,7 @@ public class Renderer {
 	private void mergeLightObjectsToRoomCanvas() {
 		BufferedImage roomCanvas = room.getRoomBitMap();
 		// reset color of background to black
-		roomCanvas = ImageUtil.getPaintedImage(roomCanvas,Color.black);
-
-		// boolean imageReseted = false;
+		roomCanvas = ImageUtil.getPaintedImage(roomCanvas, Color.black);
 
 		Set<LightObject> lightObjects = renderLightObjectMapping.keySet();
 

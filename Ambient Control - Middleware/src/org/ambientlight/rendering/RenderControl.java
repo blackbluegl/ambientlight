@@ -54,7 +54,7 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 
 		renderProgram.addEffect(transition);
 
-		renderer.setRenderTaskForLightObject(lightObject, renderProgram);
+		renderer.addRenderTaskForLightObject(lightObject, renderProgram);
 
 	}
 
@@ -82,7 +82,7 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 			RenderingEffect effect = effectFactory.getFadeOutEffect(lightObject);
 			RenderingProgramm renderProgram = renderer.getProgramForLightObject(lightObject);
 			renderProgram.addEffect(effect);
-			renderer.setRenderTaskForLightObject(lightObject, renderProgram);
+			renderer.addRenderTaskForLightObject(lightObject, renderProgram);
 
 			// and set to deletion queue after effect has finished rendering
 			this.queueDeleteLightObjects.add(lightObject);

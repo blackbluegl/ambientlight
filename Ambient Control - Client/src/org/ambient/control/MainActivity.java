@@ -113,7 +113,7 @@ public class MainActivity extends FragmentActivity {
 	public void createNFCProgrammingFragment(LinearLayout content) {
 		currentDialog = "NFC-Tag anlernen";
 		clearFragments();
-		roomConfigManager.removeAllListeners();
+		// roomConfigManager.removeAllListeners();
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -146,7 +146,7 @@ public class MainActivity extends FragmentActivity {
 		ft.add(content.getId(), roof, "roof");
 		ft.commit();
 
-		for (String currentServer : roomConfigManager.listeners.keySet()) {
+		for (String currentServer : this.getAllRoomServers()) {
 			ft = getSupportFragmentManager().beginTransaction();
 			Bundle argsRoom = new Bundle();
 

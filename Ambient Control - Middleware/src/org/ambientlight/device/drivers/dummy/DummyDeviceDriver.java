@@ -41,7 +41,8 @@ public class DummyDeviceDriver implements LedStripeDeviceDriver {
 
 	@Override
 	public void closeConnection() {
-		//do nothing
+		display.dispose();
+		display = null;
 	}
 
 	@Override
