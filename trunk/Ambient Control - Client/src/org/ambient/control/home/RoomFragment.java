@@ -440,7 +440,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	@Override
 	public void onResume() {
 		super.onResume();
-		this.onRoomConfigurationChange(this.serverName, this.roomConfig);
+		// this.onRoomConfigurationChange(this.serverName, this.roomConfig);
 	}
 
 }

@@ -146,7 +146,7 @@ public class MainActivity extends FragmentActivity {
 		ft.add(content.getId(), roof, "roof");
 		ft.commit();
 
-		for (String currentServer : roomConfigManager.getServerNames()) {
+		for (String currentServer : roomConfigManager.listeners.keySet()) {
 			ft = getSupportFragmentManager().beginTransaction();
 			Bundle argsRoom = new Bundle();
 
