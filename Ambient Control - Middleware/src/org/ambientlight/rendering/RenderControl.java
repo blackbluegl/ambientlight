@@ -70,8 +70,7 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 
 		if (lightObject.configuration.getPowerState() == powerState) {
 			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getName()
-					+ " already set to: "
-					+ powerState);
+					+ " already set to: " + powerState);
 			return;
 		}
 
@@ -104,11 +103,19 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 
 
 	@Override
-	public void lightObjectTransitionEffectFinished(Renderer renderer, LightObject lightObject) {
+	public void lightObjectTransitionEffectFinished(final Renderer renderer, final LightObject lightObject) {
 		if (this.queueDeleteLightObjects.contains(lightObject)) {
-			renderer.removeRenderTaskForLightObject(lightObject);
 			lightObject.setPixelMap(ImageUtil.getPaintedImage(lightObject.getPixelMap(), Color.black));
 			this.queueDeleteLightObjects.remove(lightObject);
+
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					renderer.removeRenderTaskForLightObject(lightObject);
+				}
+			}) {
+			}.start();
 		}
 	}
 

@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.rendering.effects.RenderingEffect;
@@ -36,11 +37,7 @@ public class Renderer {
 
 	boolean hadDirtyRegionInLastRun = false;
 
-	/**
-	 * determines if it is possible to add or remove lightobjects to the
-	 * renderer
-	 */
-	boolean locked = false;
+	private final ReentrantLock lightObjectMappingLock = new ReentrantLock();
 
 
 	public boolean hadDirtyRegionInLastRun() {
@@ -48,9 +45,6 @@ public class Renderer {
 	}
 
 	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new HashMap<LightObject, RenderingProgramm>();
-
-	private final List<LightObject> lightObjectsToRemove = new ArrayList<LightObject>();
-	private final Map<LightObject, RenderingProgramm> lightObjectsToAdd = new ConcurrentHashMap<LightObject, RenderingProgramm>();
 
 
 	public Renderer(Room room, ITransitionEffectFinishedListener transitionFinishedListener) {
@@ -66,53 +60,51 @@ public class Renderer {
 	}
 
 
-	public void addRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
-		while (this.locked) {
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	public synchronized void addRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
+		try {
+			lightObjectMappingLock.lock();
+			renderLightObjectMapping.put(lightObject, programm);
+		} finally {
+			lightObjectMappingLock.unlock();
 		}
-		this.lightObjectsToAdd.put(lightObject, programm);
 	}
 
 
-	public void removeRenderTaskForLightObject(LightObject lightObject) {
-		while (this.locked) {
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	public synchronized void removeRenderTaskForLightObject(LightObject lightObject) {
+		try {
+			lightObjectMappingLock.lock();
+			renderLightObjectMapping.remove(lightObject);
+		} finally {
+			lightObjectMappingLock.unlock();
 		}
-		this.lightObjectsToRemove.add(lightObject);
 	}
 
 
-	public RenderingProgramm getProgramForLightObject(LightObject lightObject) {
-		return renderLightObjectMapping.get(lightObject);
+	public synchronized RenderingProgramm getProgramForLightObject(LightObject lightObject) {
+		try {
+			lightObjectMappingLock.lock();
+			return renderLightObjectMapping.get(lightObject);
+		} finally {
+			lightObjectMappingLock.unlock();
+		}
 	}
 
 
 	public void render() {
-		this.locked = true;
-		// remove all lightObjects that where added during rendering process
-		for (LightObject current : this.lightObjectsToRemove) {
-			this.renderLightObjectMapping.remove(current);
-		}
-		this.lightObjectsToRemove.clear();
+		try {
+			lightObjectMappingLock.lock();
 
-		// add all new lightobjects since last run
-		this.renderLightObjectMapping.putAll(this.lightObjectsToAdd);
-		this.lightObjectsToAdd.clear();
-		this.locked = false;
+			this.hadDirtyRegionInLastRun = false;
 
-		this.hadDirtyRegionInLastRun = false;
-
-		this.mergeLightObjectsToRoomCanvas();
-		if (this.hadDirtyRegionInLastRun) {
-			this.fillStripesWithLight();
+			this.mergeLightObjectsToRoomCanvas();
+			if (this.hadDirtyRegionInLastRun) {
+				this.fillStripesWithLight();
+			}
+		} catch (ConcurrentModificationException e) {
+			System.out.println("fix this problem!!");
+			e.printStackTrace();
+		} finally {
+			lightObjectMappingLock.unlock();
 		}
 	}
 
