@@ -15,7 +15,6 @@ import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.rendering.effects.RenderingEffect;
 import org.ambientlight.rendering.effects.transitions.FadeOutTransition;
 import org.ambientlight.rendering.effects.transitions.Transition;
-import org.ambientlight.rendering.programms.ITransitionEffectFinishedListener;
 import org.ambientlight.rendering.programms.RenderingProgramm;
 import org.ambientlight.rendering.util.ImageUtil;
 import org.ambientlight.rendering.util.StripePixelMapping;
@@ -26,11 +25,11 @@ import org.ambientlight.room.entities.LightObject;
 
 public class Renderer {
 
+	List<LightObject> queueDeleteLightObjects = new ArrayList<LightObject>();
+
 	boolean debug = false;
 
 	Room room;
-
-	ITransitionEffectFinishedListener transitionFinishedListener;
 
 	List<StripePixelMapping> stripePixelMapping = new ArrayList<StripePixelMapping>();
 	List<LedPoint> ledPoints = new ArrayList<LedPoint>();
@@ -47,9 +46,8 @@ public class Renderer {
 	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new HashMap<LightObject, RenderingProgramm>();
 
 
-	public Renderer(Room room, ITransitionEffectFinishedListener transitionFinishedListener) {
+	public Renderer(Room room) {
 		this.room = room;
-		this.transitionFinishedListener = transitionFinishedListener;
 
 		BufferedImage roomCanvas = room.getRoomBitMap();
 		// reset color of background to black
@@ -60,7 +58,7 @@ public class Renderer {
 	}
 
 
-	public synchronized void addRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
+	public void addRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
 		try {
 			lightObjectMappingLock.lock();
 			renderLightObjectMapping.put(lightObject, programm);
@@ -80,13 +78,8 @@ public class Renderer {
 	}
 
 
-	public synchronized RenderingProgramm getProgramForLightObject(LightObject lightObject) {
-		try {
-			lightObjectMappingLock.lock();
-			return renderLightObjectMapping.get(lightObject);
-		} finally {
-			lightObjectMappingLock.unlock();
-		}
+	public RenderingProgramm getProgramForLightObject(LightObject lightObject) {
+		return renderLightObjectMapping.get(lightObject);
 	}
 
 
@@ -100,6 +93,12 @@ public class Renderer {
 			if (this.hadDirtyRegionInLastRun) {
 				this.fillStripesWithLight();
 			}
+
+			for (LightObject current : this.queueDeleteLightObjects) {
+				this.removeRenderTaskForLightObject(current);
+			}
+			this.queueDeleteLightObjects.clear();
+
 		} catch (ConcurrentModificationException e) {
 			System.out.println("fix this problem!!");
 			e.printStackTrace();
@@ -130,7 +129,6 @@ public class Renderer {
 			for (LightObject currentLightObject : lightObjects) {
 
 				if (currentLightObject.configuration.layerNumber == currentLayer) {
-					// TODO this here could be done in several threads
 
 					BufferedImage result = renderLightObjectCanvas(currentLightObject);
 
@@ -158,13 +156,15 @@ public class Renderer {
 		// handle finished transitions
 		if (effect != null && effect instanceof Transition && ((Transition) effect).isFinished() == true) {
 			this.hadDirtyRegionInLastRun = true;
-			this.transitionFinishedListener.lightObjectTransitionEffectFinished(this, lightObject);
 			currentRenderProgramm.removeEffect();
 
 			// after the last step of a fadeout the background should be
 			// rendered.
-			if (effect instanceof FadeOutTransition)
+			if (effect instanceof FadeOutTransition) {
+				lightObject.setPixelMap(ImageUtil.getPaintedImage(lightObject.getPixelMap(), Color.black));
+				this.queueDeleteLightObjects.add(lightObject);
 				return null;
+			}
 		}
 
 		// if no effect exists (anymore) render in quick mode
@@ -194,7 +194,6 @@ public class Renderer {
 	}
 
 
-	// TODO put to stripemapper
 	public void fillStripesWithLight() {
 		for (StripePixelMapping current : this.stripePixelMapping) {
 			int rgbValue = room.getRoomBitMap().getRGB(current.xPosition, current.yPosition);

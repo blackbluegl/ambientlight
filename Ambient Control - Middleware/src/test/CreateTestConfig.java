@@ -8,8 +8,6 @@ import java.util.List;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.device.drivers.DummySwitchDeviceConfiguration;
-import org.ambientlight.device.drivers.LK35CLientDeviceConfiguration;
-import org.ambientlight.device.led.LedPointConfiguration;
 import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.device.led.StripePartConfiguration;
 import org.ambientlight.process.NodeConfiguration;
@@ -63,21 +61,22 @@ public class CreateTestConfig {
 		// switchingBridge.hostName="localhost";
 		// switchingBridge.port=2003;
 
-		LK35CLientDeviceConfiguration lk35 = new LK35CLientDeviceConfiguration();
-		lk35.hostName = "ambi-lk35-2";
-		lk35.port = 8899;
-		LedPointConfiguration ledPoint = new LedPointConfiguration();
-		ledPoint.xPosition = 10;
-		ledPoint.yPosition = 10;
-		ledPoint.port = 1;
-		lk35.configuredLeds.add(ledPoint);
-		rc.deviceConfigurations.add(lk35);
-
-		LedPointConfiguration ledPoint2 = new LedPointConfiguration();
-		ledPoint2.xPosition = 40;
-		ledPoint2.yPosition = 30;
-		ledPoint2.port = 2;
-		lk35.configuredLeds.add(ledPoint2);
+		// LK35CLientDeviceConfiguration lk35 = new
+		// LK35CLientDeviceConfiguration();
+		// lk35.hostName = "ambi-lk35-2";
+		// lk35.port = 8899;
+		// LedPointConfiguration ledPoint = new LedPointConfiguration();
+		// ledPoint.xPosition = 10;
+		// ledPoint.yPosition = 10;
+		// ledPoint.port = 1;
+		// lk35.configuredLeds.add(ledPoint);
+		// rc.deviceConfigurations.add(lk35);
+		//
+		// LedPointConfiguration ledPoint2 = new LedPointConfiguration();
+		// ledPoint2.xPosition = 40;
+		// ledPoint2.yPosition = 30;
+		// ledPoint2.port = 2;
+		// lk35.configuredLeds.add(ledPoint2);
 
 		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
 		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();

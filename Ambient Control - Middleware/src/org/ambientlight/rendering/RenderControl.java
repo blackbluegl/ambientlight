@@ -1,24 +1,21 @@
 package org.ambientlight.rendering;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.rendering.effects.RenderingEffect;
 import org.ambientlight.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.rendering.effects.transitions.FadeInTransition;
-import org.ambientlight.rendering.programms.ITransitionEffectFinishedListener;
 import org.ambientlight.rendering.programms.RenderingProgramm;
 import org.ambientlight.rendering.programms.SimpleColor;
 import org.ambientlight.rendering.programms.Tron;
-import org.ambientlight.rendering.util.ImageUtil;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 
 
-public class RenderControl implements ITransitionEffectFinishedListener {
+public class RenderControl {
 
 	RenderingEffectFactory effectFactory;
 
@@ -26,8 +23,6 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 	public RenderControl(RenderingEffectFactory effectFactory) {
 		this.effectFactory = effectFactory;
 	}
-
-	List<LightObject> queueDeleteLightObjects = new ArrayList<LightObject>();
 
 
 	public void addLightObjectToRender(Renderer renderer, LightObject lightObject, FadeInTransition transition) {
@@ -83,12 +78,7 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 			renderProgram.addEffect(effect);
 			renderer.addRenderTaskForLightObject(lightObject, renderProgram);
 
-			// and set to deletion queue after effect has finished rendering
-			this.queueDeleteLightObjects.add(lightObject);
 		} else {
-			// maybe the light should be asyncrounously removed. we will keep
-			// the light and remove it from the deletion list.
-			this.queueDeleteLightObjects.remove(lightObject);
 			this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
 		}
 	}
@@ -100,23 +90,4 @@ public class RenderControl implements ITransitionEffectFinishedListener {
 		lightObject.configuration.actorConductConfiguration = newConfig;
 		this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
 	}
-
-
-	@Override
-	public void lightObjectTransitionEffectFinished(final Renderer renderer, final LightObject lightObject) {
-		if (this.queueDeleteLightObjects.contains(lightObject)) {
-			lightObject.setPixelMap(ImageUtil.getPaintedImage(lightObject.getPixelMap(), Color.black));
-			this.queueDeleteLightObjects.remove(lightObject);
-
-			new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					renderer.removeRenderTaskForLightObject(lightObject);
-				}
-			}) {
-			}.start();
-		}
-	}
-
 }

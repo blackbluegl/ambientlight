@@ -89,7 +89,7 @@ public class AmbientControlMW {
 		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
 		RenderControl renderProgrammFactory = new RenderControl(effectFactory);
 
-		renderer = new Renderer(room, renderProgrammFactory);
+		renderer = new Renderer(room);
 
 		AmbientControlMW.setRenderProgrammFactory(renderProgrammFactory);
 	}
