@@ -8,12 +8,14 @@ import org.ambientlight.room.entities.LightObject;
 public abstract class RenderingProgramm{
 
 	RenderingEffect effect;
-	
-	public synchronized void addEffect(RenderingEffect effect) {
+
+
+	public void addEffect(RenderingEffect effect) {
 		this.effect=effect;
 	}
 
-	public synchronized void removeEffect() {
+
+	public void removeEffect() {
 		this.effect = null;
 	}
 
@@ -22,6 +24,6 @@ public abstract class RenderingProgramm{
 	public RenderingEffect getEffect() {
 		return this.effect;
 	}
-	
+
 	public abstract boolean hasDirtyRegion();
 }
