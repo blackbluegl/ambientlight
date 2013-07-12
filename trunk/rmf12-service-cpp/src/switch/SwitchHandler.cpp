@@ -13,7 +13,7 @@
 using namespace std;
 
 int zeroWait=320;//was 400
-int oneWait=900;//was oneWait
+int oneWait=900;
 
 SwitchHandler::SwitchHandler() {
 }
@@ -55,6 +55,7 @@ void SwitchHandler::handleElroSwitch(int houseCode, int switchNumber, int powerS
 	rfm12.rf12SetupTx();
 	rfm12.rf12EnableTransmitter();
 
+	//do it 6 times to get shure that the switch accepts the signal
 	for (int i = 0; i < 6; i++) {
 		//send data here
 		sendHouseCode(houseCode);
