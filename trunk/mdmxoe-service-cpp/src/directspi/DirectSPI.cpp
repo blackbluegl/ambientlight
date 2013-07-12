@@ -29,7 +29,7 @@ DirectSPI::~DirectSPI() {
 int DirectSPI::setup(int port) {
 	piHiPri(99);
 
-	if (wiringPiSPISetup (port, 1000000) < 0){
+	if (wiringPiSPISetup (port, 400000) < 0){
 	  fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
 	  return -1;
 	}
