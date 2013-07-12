@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,9 +99,6 @@ public class Renderer {
 			}
 			this.queueDeleteLightObjects.clear();
 
-		} catch (ConcurrentModificationException e) {
-			System.out.println("fix this problem!!");
-			e.printStackTrace();
 		} finally {
 			lightObjectMappingLock.unlock();
 		}
@@ -126,7 +123,9 @@ public class Renderer {
 		while (currentLayer <= maxLayer) {
 			// iterate through all objects and look if the layer is the current
 			// layer to merge
-			for (LightObject currentLightObject : lightObjects) {
+			Iterator<LightObject> lightObjectIterator = lightObjects.iterator();
+			while (lightObjectIterator.hasNext()) {
+				LightObject currentLightObject = lightObjectIterator.next();
 
 				if (currentLightObject.configuration.layerNumber == currentLayer) {
 
@@ -138,6 +137,9 @@ public class Renderer {
 						g2d.drawImage(result, null, currentLightObject.configuration.xOffsetInRoom,
 								currentLightObject.configuration.yOffsetInRoom);
 						g2d.dispose();
+					}
+					else{
+						lightObjectIterator.remove();
 					}
 				}
 			}
@@ -160,11 +162,8 @@ public class Renderer {
 
 			// after the last step of a fadeout the background should be
 			// rendered.
-			if (effect instanceof FadeOutTransition) {
-				lightObject.setPixelMap(ImageUtil.getPaintedImage(lightObject.getPixelMap(), Color.black));
-				this.queueDeleteLightObjects.add(lightObject);
+			if (effect instanceof FadeOutTransition)
 				return null;
-			}
 		}
 
 		// if no effect exists (anymore) render in quick mode
