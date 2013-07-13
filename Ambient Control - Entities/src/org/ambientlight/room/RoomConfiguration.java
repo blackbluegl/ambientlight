@@ -10,6 +10,7 @@ import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
+import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
 
@@ -56,6 +57,19 @@ public class RoomConfiguration implements Serializable {
 			if (eventGeneratorConfiguration instanceof SwitchEventGeneratorConfiguration) {
 				result.put(((SwitchEventGeneratorConfiguration) eventGeneratorConfiguration).name,
 						(SwitchEventGeneratorConfiguration) eventGeneratorConfiguration);
+			}
+		}
+		return result;
+	}
+
+
+	public Map<String, SceneryEventGeneratorConfiguration> getSceneryEventGenerator() {
+		Map<String, SceneryEventGeneratorConfiguration> result = new HashMap<String, SceneryEventGeneratorConfiguration>();
+
+		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations) {
+			if (eventGeneratorConfiguration instanceof SceneryEventGeneratorConfiguration) {
+				result.put(((SceneryEventGeneratorConfiguration) eventGeneratorConfiguration).name,
+						(SceneryEventGeneratorConfiguration) eventGeneratorConfiguration);
 			}
 		}
 		return result;
