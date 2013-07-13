@@ -1,5 +1,6 @@
 package org.ambient.control.nfc;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import org.ambient.control.RoomConfigManager;
@@ -21,6 +22,7 @@ import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,16 +40,44 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		initTTS();
 		handleNFCIntent(getIntent());
+	}
+
+
+	private void initTTS() {
 		tts = new TextToSpeech(this, this);
+		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+
+			@Override
+			public void onStart(String paramString) {
+				// TODO Auto-generated method stub
+
+			}
+
+
+			@Override
+			public void onError(String paramString) {
+				// TODO Auto-generated method stub
+
+			}
+
+
+			@Override
+			public void onDone(String paramString) {
+				if ("EOM".equals(paramString)) {
+					finish();
+				}
+			}
+		});
 	}
 
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
+		initTTS();
 		handleNFCIntent(intent);
-		tts = new TextToSpeech(this, this);
 	}
 
 
@@ -136,13 +166,15 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 		} else {
 			Toast.makeText(this, "Sprachsynthese wurde nicht korrekt gestartet", Toast.LENGTH_SHORT).show();
 		}
-
 	}
 
 
 	private void speakOut() {
-		tts.speak(this.speakout, TextToSpeech.QUEUE_FLUSH, null);
-		finish();
+		HashMap<String, String> myHashAlarm = new HashMap<String, String>();
+		// myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
+		// String.valueOf(AudioManager.STREAM_ALARM));
+		myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "EOM");
+		tts.speak(this.speakout, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 	}
 
 
