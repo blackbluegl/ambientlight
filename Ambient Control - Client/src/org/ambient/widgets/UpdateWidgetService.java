@@ -1,5 +1,8 @@
 package org.ambient.widgets;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.ambient.control.R;
 import org.ambient.control.RoomConfigManager;
 import org.ambient.control.rest.RestClient;
@@ -19,6 +22,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -117,7 +121,9 @@ public class UpdateWidgetService extends Service {
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
 		}
-		else if (this.isConnectedToWifi(getApplicationContext()) == false) {
+
+		else if (this.isConnectedToWifi(getApplicationContext()) == false && Build.BRAND.startsWith("generic") == false) {
+			Log.i(LOG, Build.BRAND);
 			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
 			setWidgetToDisabledView(intent, appWidgetManager);
 			return START_STICKY;
@@ -138,61 +144,73 @@ public class UpdateWidgetService extends Service {
 	}
 
 
-	private void updateWidget(Intent intent, AppWidgetManager appWidgetManager) {
-		String[] serverNames = URLUtils.ANDROID_ADT_SERVERS;
+	private void updateWidget(final Intent intent, final AppWidgetManager appWidgetManager) {
 
-		int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+		new Thread(new Runnable() {
 
-		for (int widgetId : allWidgetIds) {
+			@Override
+			public void run() {
+				String[] serverNames = URLUtils.ANDROID_ADT_SERVERS;
+				Map<String, RoomConfiguration> config = new HashMap<String, RoomConfiguration>();
+				int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
 
-			RemoteViews remoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),
-					R.layout.widget_roomscenery_switch);
-			remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
-
-			for (String room : serverNames) {
-				try {
-					RoomConfiguration roomConfig = RestClient.getRoom(room);
-					if (roomConfig == null) {
-						continue;
-					}
-					boolean switchOn = false;
-					for (ActorConfiguration current : roomConfig.actorConfigurations.values()) {
-						if (current.getPowerState() == true) {
-							switchOn = true;
-							break;
+				for (String currentServer : serverNames) {
+					RoomConfiguration roomConfig;
+					try {
+						roomConfig = RestClient.getRoom(currentServer);
+						if (roomConfig == null) {
+							continue;
 						}
+						config.put(currentServer, roomConfig);
+					} catch (Exception e) {
+						Log.e(LOG, currentServer + " is not available");
 					}
-					RemoteViews switchIcon = new RemoteViews(this.getApplicationContext().getPackageName(),
-							R.layout.widget_icon_switch);
-
-					if (switchOn) {
-						switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_active);
-					} else {
-						switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_disabled);
-					}
-					switchIcon.setTextViewText(R.id.textViewWidgetSwitch, roomConfig.roomName);
-					remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
-
-					// Register an onClickListener
-					Intent clickIntent = new Intent(this.getApplicationContext(), RoomSwitchesWidgetProvider.class);
-
-					clickIntent.setAction("SWITCH " + room);
-					clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-					clickIntent.putExtra("switchClicked", room);
-					clickIntent.putExtra("powerState", !switchOn);
-
-					PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
-							PendingIntent.FLAG_UPDATE_CURRENT);
-					switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
-				} catch (Exception e) {
-					// Do nothing here. just try the next server and display an
-					// icon if this one is reachable
-					e.printStackTrace();
 				}
-			}
 
-			appWidgetManager.updateAppWidget(widgetId, remoteViews);
-		}
+				for (int widgetId : allWidgetIds) {
+
+					RemoteViews remoteViews = new RemoteViews(getApplicationContext().getPackageName(),
+							R.layout.widget_roomscenery_switch);
+					remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
+
+					for (String room : serverNames) {
+						RoomConfiguration roomConfig = config.get(room);
+						boolean switchOn = false;
+						for (ActorConfiguration current : roomConfig.actorConfigurations.values()) {
+							if (current.getPowerState() == true) {
+								switchOn = true;
+								break;
+							}
+						}
+						RemoteViews switchIcon = new RemoteViews(getApplicationContext().getPackageName(),
+								R.layout.widget_icon_switch);
+
+						if (switchOn) {
+							switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_active);
+						} else {
+							switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_disabled);
+						}
+						switchIcon.setTextViewText(R.id.textViewWidgetSwitch, roomConfig.roomName);
+						remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
+
+						// Register an onClickListener
+						Intent clickIntent = new Intent(getApplicationContext(), RoomSwitchesWidgetProvider.class);
+
+						clickIntent.setAction("SWITCH " + room);
+						clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+						clickIntent.putExtra("switchClicked", room);
+						clickIntent.putExtra("powerState", !switchOn);
+
+						PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
+								PendingIntent.FLAG_UPDATE_CURRENT);
+						switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
+					}
+
+					appWidgetManager.updateAppWidget(widgetId, remoteViews);
+				}
+
+			}
+		}).start();
 	}
 
 
