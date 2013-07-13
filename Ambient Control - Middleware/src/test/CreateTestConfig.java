@@ -51,15 +51,18 @@ public class CreateTestConfig {
 	public RoomConfiguration getTestRoom() {
 		RoomConfiguration rc = new RoomConfiguration();
 
+		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
+		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
+
 		// MultiStripeOverEthernetClientDeviceConfiguration dc = new
 		// MultiStripeOverEthernetClientDeviceConfiguration();
-		// dc.hostName="192.168.1.44";
-		// dc.port=2002;
+		// dc.hostName = "ambi-schlafen";
+		// dc.port = 2002;
 		//
 		// SwitchDeviceOverEthernetConfiguration switchingBridge = new
 		// SwitchDeviceOverEthernetConfiguration();
-		// switchingBridge.hostName="localhost";
-		// switchingBridge.port=2003;
+		// switchingBridge.hostName = "rfmbridge";
+		// switchingBridge.port = 2003;
 
 		// LK35CLientDeviceConfiguration lk35 = new
 		// LK35CLientDeviceConfiguration();
@@ -78,24 +81,23 @@ public class CreateTestConfig {
 		// ledPoint2.port = 2;
 		// lk35.configuredLeds.add(ledPoint2);
 
-		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
-		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
+
 
 		rc.deviceConfigurations.add(switchingBridge);
 		rc.deviceConfigurations.add(dc);
 
 		StripeConfiguration sc = new StripeConfiguration();
-		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
-		sc.pixelAmount = 128;
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
+		sc.pixelAmount = 162;
 		sc.port = 0;
 
 		StripePartConfiguration spLo1S1 = new StripePartConfiguration();
-		spLo1S1.endXPositionInRoom = 24;
-		spLo1S1.endYPositionInRoom = 5;
+		spLo1S1.endXPositionInRoom = 161;
+		spLo1S1.endYPositionInRoom = 0;
 		spLo1S1.offsetInStripe = 0;
-		spLo1S1.pixelAmount = 20;
-		spLo1S1.startXPositionInRoom = 5;
-		spLo1S1.startYPositionInRoom = 5;
+		spLo1S1.pixelAmount = 162;
+		spLo1S1.startXPositionInRoom = 0;
+		spLo1S1.startYPositionInRoom = 0;
 		sc.stripeParts.add(spLo1S1);
 
 		dc.configuredStripes.add(sc);
