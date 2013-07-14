@@ -1,5 +1,9 @@
 package org.ambientlight;
 
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
+
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -15,14 +19,19 @@ public class WebserviceTask extends Thread {
 
 		// Start Webservice
 		try {
-			final ResourceConfig rc = new PackagesResourceConfig(
-"org.ambientlight.webservice");
+			final ResourceConfig rc = new PackagesResourceConfig("org.ambientlight.webservice");
 			rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
 			rc.getFeatures().put("com.sun.jersey.config.feature.Trace", true);
 
 			// HttpServer server = HttpServerFactory.create(BASE_URI, rc);
 
-			GrizzlyServerFactory.createHttpServer(BASE_URI,rc);
+			HttpServer server = GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
+
+			ThreadPoolConfig config = ThreadPoolConfig.defaultConfig().setPoolName("mypool").setCorePoolSize(10)
+					.setMaxPoolSize(300);
+
+			NetworkListener listener = server.getListeners().iterator().next();
+			listener.getTransport().setWorkerThreadPoolConfig(config);
 
 		} catch (Exception e) {
 			e.printStackTrace();
