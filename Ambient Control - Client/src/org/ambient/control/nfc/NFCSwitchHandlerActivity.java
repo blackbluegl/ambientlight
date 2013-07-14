@@ -40,8 +40,8 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		initTTS();
 		handleNFCIntent(getIntent());
+		initTTS();
 	}
 
 
@@ -51,15 +51,11 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 
 			@Override
 			public void onStart(String paramString) {
-				// TODO Auto-generated method stub
-
 			}
 
 
 			@Override
 			public void onError(String paramString) {
-				// TODO Auto-generated method stub
-
 			}
 
 
@@ -76,8 +72,8 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		initTTS();
-		handleNFCIntent(intent);
+		// do nothing here so if a tag will be discovered a second time while
+		// the activity is running no unwished action will be performed
 	}
 
 
@@ -180,7 +176,6 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 
 	@Override
 	public void onDestroy() {
-		// Don't forget to shutdown tts!
 		if (tts != null) {
 			tts.stop();
 			tts.shutdown();

@@ -30,6 +30,110 @@ import android.widget.RemoteViews;
 
 public class UpdateWidgetService extends Service {
 
+	boolean updateThreadFinished = true;
+	UpdateRunnable updateRunnable = null;
+
+	private class UpdateRunnable implements Runnable {
+
+		public boolean updateDuringRuntimeOccured = false;
+		public Intent intent;
+		public AppWidgetManager appWidgetManager;
+
+		private final Map<String, RoomConfiguration> config = new HashMap<String, RoomConfiguration>();
+
+
+		private void waitAndGetData(String[] serverNames) {
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e1) {
+			}
+
+			if (updateDuringRuntimeOccured)
+				return;
+
+			for (String currentServer : serverNames) {
+				RoomConfiguration roomConfig;
+				try {
+					roomConfig = RestClient.getRoom(currentServer);
+					if (roomConfig == null) {
+						continue;
+					}
+					config.put(currentServer, roomConfig);
+				} catch (Exception e) {
+					Log.e(LOG, currentServer + " is not available");
+				}
+			}
+		}
+
+
+		@Override
+		public void run() {
+			updateThreadFinished = false;
+			do {
+				updateDuringRuntimeOccured = false;
+
+				String[] serverNames = URLUtils.ANDROID_ADT_SERVERS;
+
+				this.waitAndGetData(serverNames);
+
+				while (updateDuringRuntimeOccured) {
+					updateDuringRuntimeOccured = false;
+					Log.i(LOG, "Update during datafetching occured. We have to start fetching data again!");
+					this.waitAndGetData(serverNames);
+				}
+
+				int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+
+				for (int widgetId : allWidgetIds) {
+
+					RemoteViews remoteViews = new RemoteViews(getApplicationContext().getPackageName(),
+							R.layout.widget_roomscenery_switch);
+					remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
+
+					for (String room : serverNames) {
+						RoomConfiguration roomConfig = config.get(room);
+						boolean switchOn = false;
+						for (ActorConfiguration current : roomConfig.actorConfigurations.values()) {
+							if (current.getPowerState() == true) {
+								switchOn = true;
+								break;
+							}
+						}
+						RemoteViews switchIcon = new RemoteViews(getApplicationContext().getPackageName(),
+								R.layout.widget_icon_switch);
+
+						if (switchOn) {
+							switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_active);
+						} else {
+							switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_disabled);
+						}
+						switchIcon.setTextViewText(R.id.textViewWidgetSwitch, roomConfig.roomName);
+						remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
+
+						// Register an onClickListener
+						Intent clickIntent = new Intent(getApplicationContext(), RoomSwitchesWidgetProvider.class);
+
+						clickIntent.setAction("SWITCH " + room);
+						clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+						clickIntent.putExtra("switchClicked", room);
+						clickIntent.putExtra("powerState", !switchOn);
+
+						PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
+								PendingIntent.FLAG_UPDATE_CURRENT);
+						switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
+					}
+					appWidgetManager.updateAppWidget(widgetId, remoteViews);
+
+					if (updateDuringRuntimeOccured) {
+						Log.i(LOG, "Update during rendering occured. We have to start everything again!");
+						run();
+					}
+				}
+			} while (updateDuringRuntimeOccured);
+			updateThreadFinished = true;
+		}
+	};
+
 	private static final String LOG = "UpdateWidgetService";
 
 	/**
@@ -146,71 +250,15 @@ public class UpdateWidgetService extends Service {
 
 	private void updateWidget(final Intent intent, final AppWidgetManager appWidgetManager) {
 
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				String[] serverNames = URLUtils.ANDROID_ADT_SERVERS;
-				Map<String, RoomConfiguration> config = new HashMap<String, RoomConfiguration>();
-				int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-
-				for (String currentServer : serverNames) {
-					RoomConfiguration roomConfig;
-					try {
-						roomConfig = RestClient.getRoom(currentServer);
-						if (roomConfig == null) {
-							continue;
-						}
-						config.put(currentServer, roomConfig);
-					} catch (Exception e) {
-						Log.e(LOG, currentServer + " is not available");
-					}
-				}
-
-				for (int widgetId : allWidgetIds) {
-
-					RemoteViews remoteViews = new RemoteViews(getApplicationContext().getPackageName(),
-							R.layout.widget_roomscenery_switch);
-					remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
-
-					for (String room : serverNames) {
-						RoomConfiguration roomConfig = config.get(room);
-						boolean switchOn = false;
-						for (ActorConfiguration current : roomConfig.actorConfigurations.values()) {
-							if (current.getPowerState() == true) {
-								switchOn = true;
-								break;
-							}
-						}
-						RemoteViews switchIcon = new RemoteViews(getApplicationContext().getPackageName(),
-								R.layout.widget_icon_switch);
-
-						if (switchOn) {
-							switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_active);
-						} else {
-							switchIcon.setImageViewResource(R.id.iconWidgetSwitch, R.drawable.ic_power_disabled);
-						}
-						switchIcon.setTextViewText(R.id.textViewWidgetSwitch, roomConfig.roomName);
-						remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
-
-						// Register an onClickListener
-						Intent clickIntent = new Intent(getApplicationContext(), RoomSwitchesWidgetProvider.class);
-
-						clickIntent.setAction("SWITCH " + room);
-						clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-						clickIntent.putExtra("switchClicked", room);
-						clickIntent.putExtra("powerState", !switchOn);
-
-						PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
-								PendingIntent.FLAG_UPDATE_CURRENT);
-						switchIcon.setOnClickPendingIntent(R.id.iconWidgetSwitch, pendingIntent);
-					}
-
-					appWidgetManager.updateAppWidget(widgetId, remoteViews);
-				}
-
-			}
-		}).start();
+		if (this.updateThreadFinished == false) {
+			this.updateRunnable.updateDuringRuntimeOccured = true;
+		} else {
+			this.updateRunnable = new UpdateRunnable();
+			updateRunnable.appWidgetManager = appWidgetManager;
+			updateRunnable.intent = intent;
+			this.updateThreadFinished = false;
+			new Thread(this.updateRunnable).start();
+		}
 	}
 
 

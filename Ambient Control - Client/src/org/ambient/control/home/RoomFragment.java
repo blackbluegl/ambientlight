@@ -240,10 +240,11 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 					// updateing the icon
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
 
+					updateRoomBackground();
+
 					// update widgets
 					WidgetUtils.notifyWidgets(getActivity());
 
-					updateRoomBackground();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

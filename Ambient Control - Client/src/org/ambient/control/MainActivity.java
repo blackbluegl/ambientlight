@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.ambient.control.home.RoofTopFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
+import org.ambient.control.processes.ProcessCardFragment;
 import org.ambient.control.rest.RestClient;
 import org.ambient.control.rest.URLUtils;
 import org.ambientlight.room.RoomConfiguration;
@@ -32,6 +33,7 @@ public class MainActivity extends FragmentActivity {
 	private static final String LOG = "MainActivity";
 
 	NFCProgrammingFragment nfcProgramming;
+	ProcessCardFragment processCard;
 
 	RoomConfigManager roomConfigManager;
 	ArrayList<String> fragments = new ArrayList<String>();
@@ -88,7 +90,7 @@ public class MainActivity extends FragmentActivity {
 		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-		String[] values = new String[] { "Mein Ambiente", "Mein Klima", "NFC-Tag anlernen" };
+		String[] values = new String[] { "Mein Ambiente", "Mein Klima", "Meine Prozesse", "NFC-Tag anlernen" };
 		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		// Set the adapter for the list view
 		mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values));
@@ -105,15 +107,29 @@ public class MainActivity extends FragmentActivity {
 				if (item.equals("NFC-Tag anlernen")) {
 					createNFCProgrammingFragment(content);
 				}
+				if (item.equals("Meine Prozesse")) {
+					createProcessCard(content);
+				}
 			}
 		});
+	}
+
+
+	private void createProcessCard(LinearLayout content) {
+		currentDialog = "Meine Prozesse";
+		clearFragments();
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		processCard = new ProcessCardFragment();
+		ft.add(content.getId(), processCard, "processCardTag");
+		this.fragments.add("processCardTag");
+		ft.commit();
 	}
 
 
 	public void createNFCProgrammingFragment(LinearLayout content) {
 		currentDialog = "NFC-Tag anlernen";
 		clearFragments();
-		// roomConfigManager.removeAllListeners();
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
