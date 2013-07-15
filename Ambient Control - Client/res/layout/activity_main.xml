@@ -4,19 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ScrollView
-        android:id="@+id/scrollViewMain"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
         <LinearLayout
             android:id="@+id/LayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
         </LinearLayout>
-    </ScrollView>
-    
     <!-- The navigation drawer -->
     <ListView
         android:id="@+id/left_drawer"
