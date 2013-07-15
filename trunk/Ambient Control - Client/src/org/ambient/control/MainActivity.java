@@ -85,7 +85,6 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-
 	public void createNavigationDrawer(final LinearLayout content) {
 		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -117,7 +116,7 @@ public class MainActivity extends FragmentActivity {
 
 	private void createProcessCard(LinearLayout content) {
 		currentDialog = "Meine Prozesse";
-		clearFragments();
+		clearFragments(content);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 		processCard = new ProcessCardFragment();
@@ -129,7 +128,7 @@ public class MainActivity extends FragmentActivity {
 
 	public void createNFCProgrammingFragment(LinearLayout content) {
 		currentDialog = "NFC-Tag anlernen";
-		clearFragments();
+		clearFragments(content);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -148,8 +147,10 @@ public class MainActivity extends FragmentActivity {
 	public void createHomeFragment(LinearLayout content) {
 		currentDialog = "Mein Ambiente";
 
-		clearFragments();
+		clearFragments(content);
 		roomConfigManager.removeAllListeners();
+		View scrollView = getLayoutInflater().inflate(R.layout.container_home, content);
+		LinearLayout homeContainer = (LinearLayout) scrollView.findViewById(R.id.linearLayoutHomeContainer);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -159,7 +160,7 @@ public class MainActivity extends FragmentActivity {
 		roof.setArguments(argsRoof);
 		this.fragments.add("roof");
 		this.roomConfigManager.addMetaListener(roof);
-		ft.add(content.getId(), roof, "roof");
+		ft.add(homeContainer.getId(), roof, "roof");
 		ft.commit();
 
 		for (String currentServer : this.getAllRoomServers()) {
@@ -173,7 +174,7 @@ public class MainActivity extends FragmentActivity {
 			roomFragment.setArguments(argsRoom);
 			this.fragments.add("roomFragment" + currentServer);
 			this.roomConfigManager.addRoomConfigurationChangeListener(currentServer, roomFragment);
-			ft.add(content.getId(), roomFragment, "roomFragment" + currentServer);
+			ft.add(homeContainer.getId(), roomFragment, "roomFragment" + currentServer);
 			ft.commit();
 		}
 	}
@@ -182,13 +183,15 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * 
 	 */
-	public void clearFragments() {
+	public void clearFragments(LinearLayout content) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		for (String currentTag : fragments) {
 			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
 		}
 		fragments.clear();
 		ft.commit();
+
+		content.removeAllViews();
 	}
 
 
