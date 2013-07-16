@@ -45,14 +45,16 @@ import android.widget.Spinner;
 public class ProcessCardFragment extends Fragment {
 
 	private final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
-	private final String BUNDLE_SPINNER_PROCESS_POSITION = "bundleSpinnerProcessPosition";
 
+	// helper list and values to correlate between the two spinners
 	private final List<String> serverNames = new ArrayList<String>();
-	private final List<String> roomNames = new ArrayList<String>();
-
 	String selectedServer = null;
-	RoomConfiguration selectedRoomConfiguration = null;
-	String selectedProcess = null;
+	String selectedProcessPosition = null;
+
+	// adapter values of the two spinners
+	private final List<String> roomNames = new ArrayList<String>();
+	private final List<String> processNames = new ArrayList<String>();
+
 
 	View content;
 
@@ -64,60 +66,75 @@ public class ProcessCardFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		this.content = inflater.inflate(R.layout.fragment_processcard, container, false);
 		final ProcessCardDrawer drawer = (ProcessCardDrawer) content.findViewById(R.id.processCardDrawer);
-		this.initRoomArrays();
 
-		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
-				roomNames);
+		if (savedInstanceState != null) {
+			int position = savedInstanceState.getInt(BUNDLE_SPINNER_ROOM_POSITION);
+			this.initRoomArrays(position);
+		} else {
+			this.initRoomArrays(0);
+		}
+
+		final ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
+				android.R.layout.simple_spinner_item, roomNames);
+		final ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(this.getActivity(),
+				android.R.layout.simple_spinner_item, processNames);
 
 		spinnerRoom = (Spinner) content.findViewById(R.id.spinnerProcessRoom);
-
 		spinnerProcess = (Spinner) content.findViewById(R.id.spinnerProcess);
 
+		spinnerProcess.setAdapter(switchesAdapter);
 		spinnerRoom.setAdapter(roomAdapter);
 
-		spinnerRoom.setOnItemSelectedListener(new OnItemSelectedListener() {
+		// create the listener after the initialisation. we do not want to
+		// affect the second spinner while its in creation. let android this for
+		// us (onResume, Screenrotation etc.)
+		spinnerRoom.post(new Runnable() {
 
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				selectedServer = serverNames.get(pos);
-				selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
-						selectedServer);
+			public void run() {
+				spinnerRoom.setOnItemSelectedListener(new OnItemSelectedListener() {
 
-				List<String> processNames = new ArrayList<String>();
-				for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
-					processNames.add(currentProcess.id);
-				}
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
-				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),
-						android.R.layout.simple_spinner_item, processNames);
-				spinnerProcess.setAdapter(switchesAdapter);
-			}
+						selectedServer = serverNames.get(pos);
+						RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
+								.getRoomConfiguration(selectedServer);
+
+						processNames.clear();
+						for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
+							processNames.add(currentProcess.id);
+						}
+
+						switchesAdapter.notifyDataSetChanged();
+						spinnerProcess.setSelection(0);
+					}
 
 
-			@Override
-			public void onNothingSelected(AdapterView<?> paramAdapterView) {
+					@Override
+					public void onNothingSelected(AdapterView<?> paramAdapterView) {
 
+					}
+				});
 			}
 		});
+
 
 		spinnerProcess.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
-				selectedProcess = (String) parent.getItemAtPosition(pos);
-				for (ProcessConfiguration current : selectedRoomConfiguration.processes) {
-					if (current.id.equals(selectedProcess)) {
-						drawer.setProcess(current);
-						break;
-					}
-				}
+
+				RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
+						.getRoomConfiguration(selectedServer);
+
+				drawer.setProcess(selectedRoomConfiguration.processes.get(pos));
+
 			}
 
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-
 			}
 		});
 
@@ -128,28 +145,30 @@ public class ProcessCardFragment extends Fragment {
 				Log.i("nodeSelectListener", node.actionHandler.getClass().getSimpleName());
 			}
 		});
-
-		if (savedInstanceState != null) {
-			// spinnerRoom.setSelection(savedInstanceState.getInt(BUNDLE_SPINNER_ROOM_POSITION));
-			// spinnerProcess.setSelection(savedInstanceState.getInt(BUNDLE_SPINNER_PROCESS_POSITION));
-		}
-
 		return content;
 	}
 
 
-	private void initRoomArrays() {
+	private void initRoomArrays(int roomSpinnerSelection) {
 		for (String serverName : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().keySet()) {
 			serverNames.add(serverName);
 			roomNames
 			.add(((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(serverName).roomName);
+		}
+
+		this.selectedServer = serverNames.get(roomSpinnerSelection);
+
+		for (ProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
+				.get(serverNames.get(roomSpinnerSelection)).processes) {
+			processNames.add(config.id);
 		}
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putInt(BUNDLE_SPINNER_PROCESS_POSITION, spinnerProcess.getSelectedItemPosition());
 		savedInstanceState.putInt(BUNDLE_SPINNER_ROOM_POSITION, spinnerRoom.getSelectedItemPosition());
+		super.onSaveInstanceState(savedInstanceState);
+
 	}
 }
