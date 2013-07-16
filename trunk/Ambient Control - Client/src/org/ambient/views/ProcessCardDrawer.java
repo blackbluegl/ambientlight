@@ -274,6 +274,8 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 			canvas.drawBitmap(bitmap, srcRect, srcRect, null);
 			return;
 		}
+		if (this.process == null)
+			return;
 
 		int lastXPos = shiftX + lastX;
 		if (lastXPos < 0) {
@@ -498,6 +500,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		this.selectedNode = null;
 		this.process = process;
 		this.contentBitmap = null;
+		this.nodeSnippets = new HashMap<Integer, ProcessCardDrawer.NodeSnippet>();
 
 		createNodeSnippetsRecursively(0, 0, 0);
 		calculateContentDimensions();
