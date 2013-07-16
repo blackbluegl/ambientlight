@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.ambient.control.R;
 import org.ambientlight.process.NodeConfiguration;
@@ -51,8 +52,34 @@ import android.widget.Scroller;
 
 public class ProcessCardDrawer extends View implements OnTouchListener {
 
+	private NodeSelectionListener listener = null;
+
+
+	public void setOnNodeSelectionListener(NodeSelectionListener listener) {
+		this.listener = listener;
+	}
+
+	public interface NodeSelectionListener {
+
+		public void onNodeSelected(NodeConfiguration node);
+	}
+
+	private NodeConfiguration selectedNode = null;
+
+
+	public NodeConfiguration getSelectedNode() {
+		return selectedNode;
+	}
+
+
+	public void setSelectdeNode(NodeConfiguration node) {
+		this.selectedNode = node;
+		this.createProcessCardBitmap(this.nodeSnippets.get(node.id).rect);
+	}
+
 	private class NodeSnippet {
 
+		public Rect rect;
 		public Bitmap snippet;
 		public int rowNumber;
 		public int columNumber;
@@ -142,7 +169,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	/**
 	 * @return
 	 */
-	public void createProcessCardBitmap() {
+	public void createProcessCardBitmap(Rect markedNode) {
 
 		int elementWidth = this.nodeWidth + this.spaceHorizontal;
 		int elementHeight = this.nodeHeight + this.spaceVertical;
@@ -178,9 +205,18 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 			int xOff = xPos + this.nodeWidth;
 			int yOff = yPos + this.nodeHeight;
 
-			Rect pasteRect = new Rect(xPos, yPos, xOff, yOff);
-			canvas.drawBitmap(current.snippet, nodeRect, pasteRect, null);
+			current.rect = new Rect(xPos, yPos, xOff, yOff);
+			canvas.drawBitmap(current.snippet, nodeRect, current.rect, null);
 
+		}
+
+		if (markedNode != null) {
+			Resources res = this.getContext().getResources();
+			Drawable myImage = res.getDrawable(R.drawable.process_node_marked);
+			int xPos = markedNode.left;
+			int yPos = markedNode.top;
+			myImage.setBounds(xPos, yPos, xPos + nodeWidth, yPos + nodeHeight);
+			myImage.draw(canvas);
 		}
 	}
 
@@ -200,7 +236,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	private void createNodeSnippetsRecursively(int id, int rowNumber, int columnNumber) {
 		NodeConfiguration current = process.nodes.get(id);
 
-		Bitmap result = this.createNode(current.actionHandler.getClass().getSimpleName(), 0, 0);
+		Bitmap result = this.createNode(current.actionHandler.getClass().getSimpleName());
 		NodeSnippet snippet = new NodeSnippet();
 		snippet.columNumber = columnNumber;
 		snippet.rowNumber = rowNumber;
@@ -230,30 +266,31 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 	@Override
 	public void onDraw(Canvas canvas) {
+		destRect.set(0, 0, canvas.getWidth(), canvas.getHeight());
+
 		if (this.isInEditMode()) {
-			Bitmap bitmap = this.createNode("ProcessCard", 0, 0);
+			Bitmap bitmap = this.createNode("ProcessCard");
 			srcRect.set(0, 0, this.nodeWidth, this.nodeHeight);
-			destRect.set(20, 20, this.nodeWidth * 2, this.nodeHeight * 2);
-			canvas.drawBitmap(bitmap, srcRect, destRect, null);
+			canvas.drawBitmap(bitmap, srcRect, srcRect, null);
 			return;
 		}
 
-		lastX = shiftX + lastX;
-		if (lastX < 0) {
-			lastX = 0;
-		} else if (lastX > contentBitmap.getWidth() - canvas.getWidth()) {
-			lastX = contentBitmap.getWidth() - canvas.getWidth();
+		int lastXPos = shiftX + lastX;
+		if (lastXPos < 0) {
+			lastXPos = 0;
+		} else if (lastXPos > contentBitmap.getWidth() - canvas.getWidth()) {
+			lastXPos = contentBitmap.getWidth() - canvas.getWidth();
 		}
-		lastY = shiftY + lastY;
-		if (lastY < 0) {
-			lastY = 0;
-		} else if (lastY > contentBitmap.getHeight() - canvas.getHeight()) {
-			lastY = contentBitmap.getHeight() - canvas.getHeight();
+		int lastYPos = shiftY + lastY;
+		if (lastYPos < 0) {
+			lastYPos = 0;
+		} else if (lastYPos > contentBitmap.getHeight() - canvas.getHeight()) {
+			lastYPos = contentBitmap.getHeight() - canvas.getHeight();
 		}
-		// Log.i("pos", String.valueOf(lastX) + "," + String.valueOf(lastY));
+		this.lastX = lastXPos;
+		this.lastY = lastYPos;
+		srcRect.set(lastXPos, lastYPos, canvas.getWidth() + lastXPos, canvas.getHeight() + lastYPos);
 
-		srcRect.set(lastX, lastY, canvas.getWidth() + lastX, canvas.getHeight() + lastY);
-		destRect.set(0, 0, canvas.getWidth(), canvas.getHeight());
 		if (srcRect.right - srcRect.left < destRect.right - destRect.left) {
 			destRect.right = srcRect.right;
 		}
@@ -270,6 +307,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 			srcRect.right = contentBitmap.getWidth();
 		}
 		canvas.drawBitmap(contentBitmap, srcRect, destRect, null);
+
 	}
 
 
@@ -331,6 +369,21 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		public boolean onDown(MotionEvent e) {
 			Log.i("GestureListener onDown: ", "pressed");
 			mScrollAnimator.cancel();
+			int x = (int) (e.getX() + lastX);
+			int y = (int) (e.getY() + lastY);
+
+			for (Entry<Integer, NodeSnippet> current : nodeSnippets.entrySet()) {
+				if (current.getValue().rect.contains(x, y)) {
+					createProcessCardBitmap(current.getValue().rect);
+					selectedNode = process.nodes.get(current.getKey());
+					if (listener != null) {
+						listener.onNodeSelected(process.nodes.get(current.getKey()));
+					}
+					invalidate();
+					return true;
+				}
+			}
+
 			return true;
 		}
 	}
@@ -366,12 +419,12 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	}
 
 
-	private Bitmap createNode(String label, int x, int y) {
+	private Bitmap createNode(String label) {
 		Bitmap bitmap = Bitmap.createBitmap(nodeWidth, nodeHeight, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		Resources res = this.getContext().getResources();
 		Drawable myImage = res.getDrawable(R.drawable.process_node_background);
-		myImage.setBounds(x, y, x + nodeWidth, y + nodeHeight);
+		myImage.setBounds(0, 0, 0 + nodeWidth, 0 + nodeHeight);
 		myImage.draw(canvas);
 		TextPaint textPaint = new TextPaint();
 		textPaint.setTextAlign(Align.CENTER);
@@ -379,13 +432,14 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		textPaint.setTextSize(15);
 		textPaint.setAntiAlias(true);
 		textPaint.setShadowLayer(2.0f, 1.0f, 1.0f, Color.BLACK);
-
-		StaticLayout layout = new StaticLayout(label, textPaint, nodeWidth - 10, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0, false);
-		canvas.translate(nodeWidth / 2, nodeHeight / 2); // position the
-		// text
-		layout.draw(canvas);
-		// canvas.drawText(label, x + nodeWidth / 2, y + nodeHeight / 2,
-		// textPaint);
+		if (this.isInEditMode() == false) {
+			StaticLayout layout = new StaticLayout(label, textPaint, nodeWidth - 10, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0,
+					false);
+			canvas.translate(nodeWidth / 2, nodeHeight / 2);
+			layout.draw(canvas);
+		} else {
+			canvas.drawText(label, nodeWidth / 2, nodeHeight / 2, textPaint);
+		}
 		return bitmap;
 	}
 
@@ -441,12 +495,13 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 
 	public void setProcess(ProcessConfiguration process) {
+		this.selectedNode = null;
 		this.process = process;
 		this.contentBitmap = null;
 
 		createNodeSnippetsRecursively(0, 0, 0);
 		calculateContentDimensions();
-		createProcessCardBitmap();
+		createProcessCardBitmap(null);
 
 		this.invalidate();
 	}
