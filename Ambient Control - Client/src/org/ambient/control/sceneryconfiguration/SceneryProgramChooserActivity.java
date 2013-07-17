@@ -5,23 +5,19 @@ import java.util.Map;
 
 import org.ambient.control.R;
 import org.ambient.util.GuiUtils;
+import org.ambient.views.adapter.ListIconArrayAdapter;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -47,18 +43,21 @@ public class SceneryProgramChooserActivity extends FragmentActivity {
 
 		final Resources res = getResources();
 		final Map<String, String> valuesMap = new HashMap<String, String>();
+		final int[] iconsMap = new int[valuesMap.size()];
+		iconsMap[0] = R.drawable.ic_simple_color_active;
 
 		valuesMap.put(res.getString(R.string.program_simple_color), SimpleColorRenderingProgramConfiguration.class.getName());
 		valuesMap.put(res.getString(R.string.program_tron), TronRenderingProgrammConfiguration.class.getName());
 
-		ListIconArrayAdapter adapter = new ListIconArrayAdapter(this, valuesMap.keySet().toArray(new String[0]));
+
+		ListIconArrayAdapter adapter = new ListIconArrayAdapter(this, valuesMap.keySet().toArray(new String[0]), iconsMap);
 		listView.setAdapter(adapter);
 		final SceneryProgramChooserActivity myself = this;
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView result = (TextView) view.findViewById(R.id.textViewSceneryChooserEntryLabel);
+				TextView result = (TextView) view.findViewById(R.id.textViewIconArrayAdapterEntry);
 
 				values.putString("configType", valuesMap.get(result.getText()));
 				values.putString("title",result.getText().toString());
@@ -87,37 +86,6 @@ public class SceneryProgramChooserActivity extends FragmentActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_sceneries_chooser, menu);
 		return true;
-	}
-
-	public class ListIconArrayAdapter extends ArrayAdapter<String> {
-
-		private final Context context;
-		private final String[] values;
-
-
-		public ListIconArrayAdapter(Context context, String[] values) {
-			super(context, R.layout.layout_programs_chooser_entry, values);
-			this.context = context;
-			this.values = values;
-		}
-
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View rowView = inflater.inflate(R.layout.layout_programs_chooser_entry, parent, false);
-			TextView textView = (TextView) rowView.findViewById(R.id.textViewSceneryChooserEntryLabel);
-			ImageView imageView = (ImageView) rowView.findViewById(R.id.imageViewSceneryChooserEntryIcon);
-			textView.setText(values[position]);
-
-			String s = values[position];
-			Resources res = getResources();
-			if (s.startsWith(res.getString(R.string.program_simple_color))) {
-				imageView.setImageResource(R.drawable.ic_simple_color_active);
-			}
-
-			return rowView;
-		}
 	}
 
 }
