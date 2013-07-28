@@ -28,8 +28,12 @@ import org.ambientlight.room.RoomConfiguration;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -55,7 +59,6 @@ public class ProcessCardFragment extends Fragment {
 	private final List<String> roomNames = new ArrayList<String>();
 	private final List<String> processNames = new ArrayList<String>();
 
-
 	View content;
 
 	Spinner spinnerRoom;
@@ -75,9 +78,9 @@ public class ProcessCardFragment extends Fragment {
 		}
 
 		final ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_spinner_item, roomNames);
+				android.R.layout.simple_dropdown_item_1line, roomNames);
 		final ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_spinner_item, processNames);
+				android.R.layout.simple_dropdown_item_1line, processNames);
 
 		spinnerRoom = (Spinner) content.findViewById(R.id.spinnerProcessRoom);
 		spinnerProcess = (Spinner) content.findViewById(R.id.spinnerProcess);
@@ -119,7 +122,6 @@ public class ProcessCardFragment extends Fragment {
 			}
 		});
 
-
 		spinnerProcess.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -143,9 +145,44 @@ public class ProcessCardFragment extends Fragment {
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
 				Log.i("nodeSelectListener", node.actionHandler.getClass().getSimpleName());
+
+				EditConfigHandlerFragment frag = new EditConfigHandlerFragment();
+				Bundle arguments = new Bundle();
+				arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, node.actionHandler);
+				arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+				frag.setArguments(arguments);
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.replace(R.id.LayoutMain, frag);
+				ft.addToBackStack(null);
+				ft.commit();
 			}
 		});
+		setHasOptionsMenu(true);
 		return content;
+	}
+
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.fragment_processcard_menu, menu);
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menuEntryProcessAddNode:
+
+
+			ChooseActionHandlerFragment frag = new ChooseActionHandlerFragment();
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ft.replace(R.id.LayoutMain, frag);
+			ft.addToBackStack(null);
+			ft.commit();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 

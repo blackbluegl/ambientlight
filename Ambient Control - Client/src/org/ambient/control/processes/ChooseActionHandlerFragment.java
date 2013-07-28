@@ -15,19 +15,23 @@
 
 package org.ambient.control.processes;
 
-import java.lang.reflect.Modifier;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Arrays;
 
 import org.ambient.control.R;
-import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
-import org.reflections.Reflections;
+import org.ambient.views.adapter.ListIconArrayAdapter;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 
@@ -38,73 +42,47 @@ import android.widget.ListView;
 public class ChooseActionHandlerFragment extends Fragment {
 
 	ArrayList<String> contentValues = new ArrayList<String>();
-	ListView content;
-
+	LinearLayout content;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		this.initArray();
+		try {
+			this.initArray();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		this.content = (ListView) inflater.inflate(R.layout.fragment_actionhandler_chooser, container, false);
+		this.content = (LinearLayout) inflater.inflate(R.layout.fragment_actionhandler_chooser, container, false);
+		ListView listView = (ListView) content.findViewById(R.id.listViewActionHandlerChooser);
 
-		// ListIconArrayAdapter adapter = new
-		// ListIconArrayAdapter(this.getActivity(), content.toArray(new
-		// String[0]), null);
-		// listView.setAdapter(adapter);
-		// final SceneryProgramChooserActivity myself = this;
-		// listView.setOnItemClickListener(new OnItemClickListener() {
-		//
-		// @Override
-		// public void onItemClick(AdapterView<?> parent, View view, int
-		// position, long id) {
-		// TextView result = (TextView)
-		// view.findViewById(R.id.textViewSceneryChooserEntryLabel);
-		//
-		// values.putString("configType", valuesMap.get(result.getText()));
-		// values.putString("title",result.getText().toString());
-		//
-		// FragmentManager fm = getSupportFragmentManager();
-		// SceneryConfigEditDialogFragment editSceneryConfigFragment = new
-		// SceneryConfigEditDialogFragment();
-		//
-		// editSceneryConfigFragment.setArguments(values);
-		//
-		// if (isLargeLayout) {
-		// // The device is using a large layout, so show the fragment as a
-		// dialog
-		// editSceneryConfigFragment.show(fm, null);
-		// } else {
-		// // The screen is smaller, so show the fragment in a fullscreen
-		// activity
-		// Intent i = new Intent(myself, SceneryConfigEditDialogHolder.class);
-		// i.putExtras(values);
-		// startActivity(i);
-		// }
-		//
-		// }
-		// });
-		// }
+		ListIconArrayAdapter adapter = new ListIconArrayAdapter(this.getActivity(), contentValues.toArray(new String[0]), null);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				String itemClicked = contentValues.get(position);
+				EditConfigHandlerFragment editSceneryConfigFragment = new EditConfigHandlerFragment();
+				Bundle values = new Bundle();
+				values.putString(EditConfigHandlerFragment.CLASS_NAME, itemClicked);
+				values.putBoolean(EditConfigHandlerFragment.CREATE_MODE, true);
+				editSceneryConfigFragment.setArguments(values);
 
-
-
-
-
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.replace(R.id.LayoutMain, editSceneryConfigFragment);
+				ft.addToBackStack(null);
+				ft.commit();
+			}
+		});
 		return content;
-
 	}
 
 
-	private void initArray() {
-		contentValues.clear();
-		Reflections reflections = new Reflections("org.ambientlight.process.handler");
-		Set<Class<? extends AbstractActionHandlerConfiguration>> modules = reflections
-				.getSubTypesOf(AbstractActionHandlerConfiguration.class);
-		for (Class current : modules) {
-			if (Modifier.isAbstract(current.getModifiers()) == false) {
-				contentValues.add(current.getSimpleName());
-			}
-		}
+	private void initArray() throws IOException {
+		Resources res = getResources();
+		String[] handlers = res.getStringArray(R.array.actionhandler_array);
+		contentValues = new ArrayList<String>(Arrays.asList(handlers));
 	}
 
 }
