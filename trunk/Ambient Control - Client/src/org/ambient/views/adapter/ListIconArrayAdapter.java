@@ -54,8 +54,8 @@ public class ListIconArrayAdapter extends ArrayAdapter<String> {
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.imageViewArrayAdapterEntry);
 		textView.setText(values[position]);
 
-		int resourceId = drawables[position];
-		if (drawables != null && resourceId != 0) {
+		if (drawables != null) {
+			int resourceId = drawables[position];
 			imageView.setImageResource(resourceId);
 		}
 

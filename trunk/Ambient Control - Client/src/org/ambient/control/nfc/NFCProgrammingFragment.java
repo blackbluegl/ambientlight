@@ -93,7 +93,8 @@ public class NFCProgrammingFragment extends Fragment {
 
 		this.initRoomArrays();
 
-		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
+		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
+				android.R.layout.simple_dropdown_item_1line,
 				roomNames);
 
 		Spinner spinnerRoom = (Spinner) content.findViewById(R.id.spinnerRoom);
@@ -117,7 +118,7 @@ public class NFCProgrammingFragment extends Fragment {
 				}
 
 				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),
-						android.R.layout.simple_spinner_item, switchNames);
+						android.R.layout.simple_dropdown_item_1line, switchNames);
 				spinnerSwitch.setAdapter(switchesAdapter);
 			}
 

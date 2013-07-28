@@ -11,10 +11,12 @@ import org.ambient.control.rest.RestClient;
 import org.ambient.control.rest.URLUtils;
 import org.ambientlight.room.RoomConfiguration;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -38,7 +40,7 @@ public class MainActivity extends FragmentActivity {
 	RoomConfigManager roomConfigManager;
 	ArrayList<String> fragments = new ArrayList<String>();
 	String currentDialog = null;
-
+	LinearLayout content;
 
 	public RoomConfigManager getRoomConfigManager() {
 		return roomConfigManager;
@@ -61,11 +63,23 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
+	public void replaceFragment(Fragment frag, String tag, String dialogName) {
+		clearFragments(content);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		ft.replace(content.getId(), frag, tag);
+		this.fragments.add(tag);
+		this.currentDialog = dialogName;
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		final LinearLayout content = (LinearLayout) findViewById(R.id.LayoutMain);
+		content = (LinearLayout) findViewById(R.id.LayoutMain);
 
 		this.roomConfigManager = this.createRoomConfigAdapter(this.getAllRoomServers());
 		this.restClient = new RestClient(this.roomConfigManager);
@@ -81,6 +95,8 @@ public class MainActivity extends FragmentActivity {
 				createHomeFragment(content);
 			}
 		}
+
+		ActionBar actionBar = getActionBar();
 
 	}
 
