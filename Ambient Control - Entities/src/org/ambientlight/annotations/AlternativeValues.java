@@ -19,15 +19,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 
-/**
- * @author Florian Bornkessel
- * 
- */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Alternative {
+public @interface AlternativeValues {
 
-	public String name();
-
-
-	public String className();
+	public String idBinding() default "";
+	public Value[] values();
 }
