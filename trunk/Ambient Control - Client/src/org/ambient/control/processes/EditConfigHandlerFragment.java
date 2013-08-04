@@ -18,15 +18,24 @@ package org.ambient.control.processes;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.views.adapter.EditConfigMapAdapter;
+import org.ambientlight.annotations.AlternativeIds;
+import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
+import org.ambientlight.room.RoomConfiguration;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -40,7 +49,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -56,17 +64,64 @@ import de.devmil.common.ui.color.ColorSelectorView.OnColorChangedListener;
  */
 public class EditConfigHandlerFragment extends Fragment {
 
+	private static enum WhereToPutType {
+		FIELD, MAP, LIST
+	}
+
+	private class WhereToPutConfigurationData {
+
+		public String fieldName;
+		public String keyInMap;
+		public int positionInList;
+		public WhereToPutType type;
+	}
+
 	public static String CREATE_MODE = "creationMode";
 	public static String CLASS_NAME = "className";
 	public static String OBJECT_VALUE = "objectValue";
+	public static String SELECTED_SERVER = "selectedServer";
+
+	public static int REQ_RETURN_OBJECT = 0;
 
 	public Object myConfigurationData;
 
+	private String selectedServer = null;
 	private boolean createMode = false;
+	private WhereToPutConfigurationData whereToPutDataFromChild = null;
+
+
+	public void persistConfigurationFromChild(Object configuration) throws IllegalArgumentException, IllegalAccessException,
+	NoSuchFieldException {
+		Class myObjectClass = myConfigurationData.getClass();
+		Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);
+		if (whereToPutDataFromChild.type.equals(WhereToPutType.FIELD)) {
+			myField.set(myConfigurationData, configuration);
+		} else if (whereToPutDataFromChild.type.equals(WhereToPutType.LIST)) {
+			List list = (List) myField.get(myConfigurationData);
+			if (whereToPutDataFromChild.positionInList != 0) {
+				list.set(whereToPutDataFromChild.positionInList, configuration);
+			} else {
+				list.add(configuration);
+			}
+		} else if (whereToPutDataFromChild.type.equals(WhereToPutType.MAP)) {
+			Map map = (Map) myField.get(myConfigurationData);
+			map.put(whereToPutDataFromChild.keyInMap, configuration);
+		}
+	}
+
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.fragment_edit_configuration_menu, menu);
+	}
 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		setHasOptionsMenu(true);
+		// ActionBar actionBar = getActivity().getActionBar();
+		// actionBar.show();
 		if (getArguments().containsKey(CREATE_MODE)) {
 			createMode = getArguments().getBoolean(CREATE_MODE);
 		}
@@ -80,11 +135,13 @@ public class EditConfigHandlerFragment extends Fragment {
 		} else {
 			myConfigurationData = getArguments().getSerializable(OBJECT_VALUE);
 		}
+
+		selectedServer = getArguments().getString(SELECTED_SERVER);
+
 		View result = null;
 		try {
 			result = this.createViewByObject(inflater, myConfigurationData);
 		} catch (Exception e) {
-
 		}
 		return result;
 	}
@@ -121,15 +178,18 @@ public class EditConfigHandlerFragment extends Fragment {
 	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout content, final Field field, String name)
 			throws IllegalAccessException {
 		TypeDef description = field.getAnnotation(TypeDef.class);
-		TextView label = new TextView(content.getContext());
+		String fieldLabel = "";
 		if (name != null) {
-			label.setText(name);
+			fieldLabel = (name);
 		} else {
-			label.setText(field.getName());
+			fieldLabel = field.getName();
 		}
-		content.addView(label);
 
 		if (description.fieldType().equals(FieldType.COLOR)) {
+			TextView label = new TextView(content.getContext());
+			label.setText(fieldLabel);
+			content.addView(label);
+
 			ColorSelectorView colorView = new ColorSelectorView(content.getContext());
 			colorView.setColor(field.getInt(config));
 			content.addView(colorView);
@@ -147,6 +207,10 @@ public class EditConfigHandlerFragment extends Fragment {
 		}
 
 		if (description.fieldType().equals(FieldType.NUMERIC)) {
+			TextView label = new TextView(content.getContext());
+			label.setText(fieldLabel);
+			content.addView(label);
+
 			final double min = Double.parseDouble(description.min());
 			final double difference = Double.parseDouble(description.max()) - min;
 
@@ -190,50 +254,115 @@ public class EditConfigHandlerFragment extends Fragment {
 				}
 			});
 		}
+
 		if (description.fieldType().equals(FieldType.MAP)) {
 			LinearLayout mapViewHandler = (LinearLayout) inflater.inflate(R.layout.layout_map_list, content);
-			ListView list = (ListView) mapViewHandler.findViewById(R.id.listView);
+			TextView title = (TextView) mapViewHandler.findViewById(R.id.textViewTitleOfMap);
+			title.setText(fieldLabel);
+
+			RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
+					selectedServer);
+			AlternativeIds altIds = field.getAnnotation(AlternativeIds.class);
+			List<String> additionalIds = ConfigBindingHelper.getArrayList(roomConfig, altIds.idBinding());
+
+			final ListView list = (ListView) mapViewHandler.findViewById(R.id.listView);
 			ParameterizedType pt = (ParameterizedType) field.getGenericType();
-			String containingClass = pt.getActualTypeArguments()[1].toString();
+			final String containingClass = pt.getActualTypeArguments()[1].toString();
 			list.setTag(containingClass);
+
+			final AlternativeValues altValues = field.getAnnotation(AlternativeValues.class);
+			final CharSequence[] alternativeValues = new CharSequence[altValues.values().length];
+			for (int i = 0; i < alternativeValues.length; i++) {
+				alternativeValues[i] = altValues.values()[i].name();
+			}
+
 			@SuppressWarnings("rawtypes")
 			final Map map = (Map) field.get(config);
 
+			for (Object key : additionalIds) {
+				if (map.containsKey(key) == false) {
+					map.put(key, null);
+				}
+			}
+
 			final EditConfigMapAdapter adapter = new EditConfigMapAdapter(getFragmentManager(), getActivity(), map);
 			list.setAdapter(adapter);
+			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
-			list.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-				@Override
-				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-					view.setSelected(true);
-					return true;
-				}
-			});
-
+			final Fragment myself = this;
 			list.setOnItemClickListener(new OnItemClickListener() {
 
 				@Override
 				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-					FragmentTransaction ft = getFragmentManager().beginTransaction();
-					EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-					ft.replace(R.id.LayoutMain, configHandler);
-					ft.addToBackStack(null);
-					Bundle args = new Bundle();
-					configHandler.setArguments(args);
-					String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
-					args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) map.get(currentText));
-					ft.commit();
+
+					Object valueAtPosition = adapter.getItem(paramInt).getValue();
+
+					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+					whereToStore.fieldName = field.getName();
+					whereToStore.type = WhereToPutType.MAP;
+					whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
+					whereToPutDataFromChild = whereToStore;
+
+					if (valueAtPosition == null) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+						builder.setTitle("Bitte auswählen").setItems(alternativeValues, new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Bundle args = new Bundle();
+								args.putString(CLASS_NAME, altValues.values()[which].className());
+								args.putString(SELECTED_SERVER, selectedServer);
+								args.putBoolean(CREATE_MODE, true);
+								FragmentTransaction ft = getFragmentManager().beginTransaction();
+								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+								ft.replace(R.id.LayoutMain, configHandler);
+								ft.addToBackStack(null);
+								configHandler.setArguments(args);
+								configHandler.setTargetFragment(myself, REQ_RETURN_OBJECT);
+								ft.commit();
+							}
+						});
+						builder.create().show();
+					} else {
+						FragmentTransaction ft = getFragmentManager().beginTransaction();
+						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+						ft.replace(R.id.LayoutMain, configHandler);
+						ft.addToBackStack(null);
+						Bundle args = new Bundle();
+						configHandler.setArguments(args);
+						String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
+						args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) map.get(currentText));
+						args.putString(SELECTED_SERVER, selectedServer);
+						ft.commit();
+					}
 
 				}
 			});
 
-			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 			list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+
+				List<Integer> checkedItems = new ArrayList<Integer>();
+
 
 				@Override
 				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-					// TODO Auto-generated method stub
+
+					switch (item.getItemId()) {
+
+					case R.id.menuEntryRemoveConfigurationClass:
+
+						List<Entry<String, Object>> list = new ArrayList<Entry<String, Object>>();
+						for (Integer position : checkedItems) {
+							list.add(adapter.getItem(position));
+						}
+
+						for (Entry<String, Object> current : list) {
+							adapter.remove(current);
+							map.remove(current.getKey());
+						}
+						adapter.notifyDataSetChanged();
+						break;
+					}
 					return false;
 				}
 
@@ -241,7 +370,8 @@ public class EditConfigHandlerFragment extends Fragment {
 				@Override
 				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 					MenuInflater inflater = mode.getMenuInflater();
-					inflater.inflate(R.menu.fragment_processcard_menu, menu);
+					inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
+					// menu.add("test");
 					return true;
 
 				}
@@ -249,7 +379,7 @@ public class EditConfigHandlerFragment extends Fragment {
 
 				@Override
 				public void onDestroyActionMode(ActionMode mode) {
-
+					checkedItems.clear();
 				}
 
 
@@ -262,32 +392,37 @@ public class EditConfigHandlerFragment extends Fragment {
 
 				@Override
 				public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-					// TODO Auto-generated method stub
-
+					if (checked) {
+						checkedItems.add(position);
+					} else {
+						checkedItems.remove(position);
+					}
+					mode.setTitle(checkedItems.size() + " ausgewählt");
 				}
 			});
 		}
 	}
 
 
-	// @Override
-	// public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo
-	// menuInfo) {
-	// super.onCreateContextMenu(menu, v, menuInfo);
-	// if (v.getId() == R.id.listView) {
-	// String className = (String) v.getTag();
-	// Class classForAlternatives = null;
-	// try {
-	// classForAlternatives = Class.forName(className);
-	// } catch (ClassNotFoundException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// Alternatives alternatives = (Alternatives)
-	// classForAlternatives.getAnnotation(Alternatives.class);
-	// for (Alternative alternativeClassType : alternatives.alternatives()) {
-	// menu.add(Menu.NONE, v.getId(), Menu.NONE, alternativeClassType.name());
-	// }
-	// }
-	// }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menuEntryCancelEditConfiguration:
+			getFragmentManager().popBackStack();
+			return true;
+		case R.id.menuEntryFinishEditConfiguration:
+			try {
+				((EditConfigHandlerFragment) getTargetFragment()).persistConfigurationFromChild(myConfigurationData);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			getFragmentManager().popBackStack();
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 }

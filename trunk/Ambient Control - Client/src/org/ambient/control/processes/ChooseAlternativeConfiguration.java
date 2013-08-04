@@ -15,14 +15,11 @@
 
 package org.ambient.control.processes;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.ambient.control.R;
 import org.ambient.views.adapter.ListIconArrayAdapter;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -39,19 +36,20 @@ import android.widget.ListView;
  * @author Florian Bornkessel
  * 
  */
-public class ChooseActionHandlerFragment extends Fragment {
+public class ChooseAlternativeConfiguration extends Fragment {
 
 	ArrayList<String> contentValues = new ArrayList<String>();
+	ArrayList<String> correspondingClasses = new ArrayList<String>();
 	LinearLayout content;
+
+	public static final String BUNDLE_CONTENT_VALUES = "contentValues";
+	public static final String BUNDLE_CORESPONDING_CLASSNAMES = "classNames";
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		try {
-			this.initArray();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		contentValues = getArguments().getStringArrayList(BUNDLE_CONTENT_VALUES);
+		correspondingClasses = getArguments().getStringArrayList(BUNDLE_CORESPONDING_CLASSNAMES);
 
 		this.content = (LinearLayout) inflater.inflate(R.layout.fragment_actionhandler_chooser, container, false);
 		ListView listView = (ListView) content.findViewById(R.id.listViewActionHandlerChooser);
@@ -62,7 +60,7 @@ public class ChooseActionHandlerFragment extends Fragment {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				String itemClicked = contentValues.get(position);
+				String itemClicked = correspondingClasses.get(position);
 				EditConfigHandlerFragment editSceneryConfigFragment = new EditConfigHandlerFragment();
 				Bundle values = new Bundle();
 				values.putString(EditConfigHandlerFragment.CLASS_NAME, itemClicked);
@@ -77,12 +75,4 @@ public class ChooseActionHandlerFragment extends Fragment {
 		});
 		return content;
 	}
-
-
-	private void initArray() throws IOException {
-		Resources res = getResources();
-		String[] handlers = res.getStringArray(R.array.actionhandler_array);
-		contentValues = new ArrayList<String>(Arrays.asList(handlers));
-	}
-
 }

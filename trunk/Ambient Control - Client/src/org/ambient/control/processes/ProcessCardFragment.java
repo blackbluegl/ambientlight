@@ -150,6 +150,7 @@ public class ProcessCardFragment extends Fragment {
 				Bundle arguments = new Bundle();
 				arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, node.actionHandler);
 				arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+				arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
 				frag.setArguments(arguments);
 				FragmentTransaction ft = getFragmentManager().beginTransaction();
 				ft.replace(R.id.LayoutMain, frag);
@@ -174,7 +175,7 @@ public class ProcessCardFragment extends Fragment {
 		case R.id.menuEntryProcessAddNode:
 
 
-			ChooseActionHandlerFragment frag = new ChooseActionHandlerFragment();
+			ChooseAlternativeConfiguration frag = new ChooseAlternativeConfiguration();
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.replace(R.id.LayoutMain, frag);
 			ft.addToBackStack(null);
