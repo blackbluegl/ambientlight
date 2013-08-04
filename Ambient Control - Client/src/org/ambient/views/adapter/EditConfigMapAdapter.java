@@ -32,19 +32,40 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-
-public class EditConfigMapAdapter extends ArrayAdapter<String> {
+public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>> {
 
 	private final Context context;
-	private final FragmentManager fm;
-	private final Map map;
+	private final Map<String, Object> map;
 
 
-	public EditConfigMapAdapter(FragmentManager fm, Context context, Map map) {
-		super(context, R.layout.layout_map_list_entry, (String[]) map.keySet().toArray(new String[0]));
-		this.fm = fm;
+	public EditConfigMapAdapter(FragmentManager fm, Context context, Map<String, Object> map) {
+		super(context, R.layout.layout_map_list_entry);
 		this.context = context;
 		this.map = map;
+		for (Map.Entry<String, Object> currentEntry : map.entrySet()) {
+			super.add(currentEntry);
+		}
+	}
+
+
+	public void removeAt(int position) {
+		Map.Entry<String, Object> entry = super.getItem(position);
+		super.remove(entry);
+		map.remove(entry.getKey());
+	}
+
+
+	@Override
+	public void remove(Map.Entry<String, Object> value) {
+		super.remove(value);
+		map.remove(value.getKey());
+	}
+
+
+	@Override
+	public void add(Map.Entry<String, Object> value) {
+		super.add(value);
+		map.put(value.getKey(), value.getValue());
 	}
 
 
@@ -53,26 +74,13 @@ public class EditConfigMapAdapter extends ArrayAdapter<String> {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
 		TextView textView = (TextView) rowView.findViewById(R.id.textViewName);
-		final String currentText = (String) map.keySet().toArray(new String[0])[position];
+
+		final String currentText = super.getItem(position).getKey();
 		textView.setText(currentText);
-		TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-		textViewType.setText(map.get(currentText).getClass().getSimpleName());
-		// textView.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View paramView) {
-		// FragmentTransaction ft = fm.beginTransaction();
-		// EditConfigHandlerFragment configHandler = new
-		// EditConfigHandlerFragment();
-		// ft.replace(R.id.LayoutMain, configHandler);
-		// ft.addToBackStack(null);
-		// Bundle args = new Bundle();
-		// configHandler.setArguments(args);
-		// args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-		// (Serializable) map.get(currentText));
-		// ft.commit();
-		// }
-		// });
+		if (map.get(currentText) != null) {
+			TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
+			textViewType.setText(map.get(currentText).getClass().getSimpleName());
+		}
 
 		return rowView;
 	}

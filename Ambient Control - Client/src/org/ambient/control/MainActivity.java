@@ -97,7 +97,7 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		ActionBar actionBar = getActionBar();
-
+		actionBar.show();
 	}
 
 
