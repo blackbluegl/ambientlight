@@ -26,8 +26,8 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Value {
 
-	public String name();
+	public String displayName();
 
 
-	public String className();
+	public String value();
 }

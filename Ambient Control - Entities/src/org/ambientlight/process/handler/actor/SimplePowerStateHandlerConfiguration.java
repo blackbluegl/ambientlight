@@ -15,6 +15,9 @@
 
 package org.ambientlight.process.handler.actor;
 
+import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.Presentation;
+import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 
 
@@ -24,5 +27,7 @@ import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
  */
 public class SimplePowerStateHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
+	@TypeDef(fieldType = FieldType.BOOLEAN)
+	@Presentation(name = "Alle Schalten")
 	public boolean powerState;
 }

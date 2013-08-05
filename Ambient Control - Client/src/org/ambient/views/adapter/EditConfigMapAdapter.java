@@ -25,6 +25,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 
@@ -36,15 +39,17 @@ public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>
 
 	private final Context context;
 	private final Map<String, Object> map;
+	private final String valueClassType;
 
 
-	public EditConfigMapAdapter(FragmentManager fm, Context context, Map<String, Object> map) {
+	public EditConfigMapAdapter(FragmentManager fm, Context context, Map<String, Object> map, String valueClassType) {
 		super(context, R.layout.layout_map_list_entry);
 		this.context = context;
 		this.map = map;
 		for (Map.Entry<String, Object> currentEntry : map.entrySet()) {
 			super.add(currentEntry);
 		}
+		this.valueClassType = valueClassType;
 	}
 
 
@@ -71,17 +76,36 @@ public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		final String currentKeyValue = super.getItem(position).getKey();
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
-		TextView textView = (TextView) rowView.findViewById(R.id.textViewName);
+		View rowView = null;
+		if (valueClassType.equals(Boolean.class.getName())) {
+			rowView = inflater.inflate(R.layout.layout_map_list_entry_boolean, parent, false);
+			final TextView textIsSet = (TextView) rowView.findViewById(R.id.textViewType);
+			CheckBox checkbox = (CheckBox) rowView.findViewById(R.id.checkBoxMapListEntry);
+			checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-		final String currentText = super.getItem(position).getKey();
-		textView.setText(currentText);
-		if (map.get(currentText) != null) {
-			TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-			textViewType.setText(map.get(currentText).getClass().getSimpleName());
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					map.put(currentKeyValue, isChecked);
+					textIsSet.setText("wird verwendet");
+				}
+			});
+			if (map.get(currentKeyValue) != null) {
+				textIsSet.setText("wird verwendet");
+				checkbox.setChecked((Boolean) map.get(currentKeyValue));
+			} else {
+				textIsSet.setText("");
+			}
+		} else {
+			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
+			if (map.get(currentKeyValue) != null) {
+				TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
+				textViewType.setText(map.get(currentKeyValue).getClass().getSimpleName());
+			}
 		}
-
+		TextView textViewKey = (TextView) rowView.findViewById(R.id.textViewName);
+		textViewKey.setText(currentKeyValue);
 		return rowView;
 	}
 }
