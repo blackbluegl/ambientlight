@@ -19,7 +19,7 @@ public class ConfigurationChangeHandlerConfiguration extends AbstractActionHandl
 	@TypeDef(fieldType = FieldType.MAP)
 	@AlternativeIds(idBinding = "actorConfigurations.keySet()")
 	@AlternativeValues(values = {
-			@Value(name = "Farbe auswählen", className = "org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration"),
-			@Value(name = "Tron auswählen", className = "org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration") })
+			@Value(displayName = "Farbe auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration"),
+			@Value(displayName = "Tron auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration") })
 	public Map<String, ActorConductConfiguration> actorConfiguration = new HashMap<String, ActorConductConfiguration>();
 }

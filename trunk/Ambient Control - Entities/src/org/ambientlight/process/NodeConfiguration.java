@@ -18,7 +18,7 @@ public class NodeConfiguration implements Serializable {
 	 * null the process will stop at this node
 	 */
 	@AlternativeValues(values = {
-					@Value(name = "Konfiguration ändern", className = "org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration"),
-					@Value(name = "Powerstate ändern", className = "org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration") })
+					@Value(displayName = "Konfiguration ändern", value = "org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration"),
+					@Value(displayName = "Powerstate ändern", value = "org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration") })
 	public AbstractActionHandlerConfiguration actionHandler;
 }

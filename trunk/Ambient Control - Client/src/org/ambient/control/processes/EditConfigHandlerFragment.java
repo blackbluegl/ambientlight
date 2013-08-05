@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +27,7 @@ import java.util.TreeMap;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.util.GuiUtils;
 import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
 import org.ambientlight.annotations.AlternativeValues;
@@ -39,6 +41,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,10 +54,18 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Spinner;
 import android.widget.TextView;
 import de.devmil.common.ui.color.ColorSelectorView;
 import de.devmil.common.ui.color.ColorSelectorView.OnColorChangedListener;
@@ -140,18 +153,20 @@ public class EditConfigHandlerFragment extends Fragment {
 
 		View result = null;
 		try {
-			result = this.createViewByObject(inflater, myConfigurationData);
+			result = this.createViewByObject(inflater, myConfigurationData, container);
 		} catch (Exception e) {
+			Log.e("editConfigHandler", "an Exception has been raised", e);
 		}
 		return result;
 	}
 
 
-	public View createViewByObject(LayoutInflater inflater, final Object config) throws IllegalArgumentException,
-	IllegalAccessException {
+	public View createViewByObject(LayoutInflater inflater, final Object config, ViewGroup container)
+			throws IllegalArgumentException, IllegalAccessException {
 
-		LinearLayout content = new LinearLayout(this.getActivity());
-		content.setOrientation(LinearLayout.VERTICAL);
+		ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_edit_config, container, false);
+
+		LinearLayout content = (LinearLayout) scrollView.findViewById(R.id.linearLayoutEditConfigContent);
 
 		Map<Integer, Field> sortedMap = new TreeMap<Integer, Field>();
 
@@ -171,7 +186,7 @@ public class EditConfigHandlerFragment extends Fragment {
 				addFieldToView(inflater, config, content, field, field.getAnnotation(Presentation.class).name());
 			}
 		}
-		return content;
+		return scrollView;
 	}
 
 
@@ -185,14 +200,114 @@ public class EditConfigHandlerFragment extends Fragment {
 			fieldLabel = field.getName();
 		}
 
+		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer);
+
+		LinearLayout fieldView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_entry, null);
+		content.addView(fieldView);
+		TextView title = (TextView) fieldView.findViewById(R.id.textViewTitleOfMap);
+		title.setText(fieldLabel);
+		LinearLayout contentArea = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryContent);
+
+		if (description.fieldType().equals(FieldType.STRING)) {
+			if (field.getAnnotation(AlternativeValues.class) != null) {
+				// create spinner
+
+				Spinner spinner = new Spinner(content.getContext());
+				content.addView(spinner);
+				final List<String> values = ConfigBindingHelper.getAlternativeValues(
+						field.getAnnotation(AlternativeValues.class), roomConfig);
+				List<String> valuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
+						field.getAnnotation(AlternativeValues.class), roomConfig);
+
+				final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
+						android.R.layout.simple_dropdown_item_1line, valuesToDisplay);
+				spinner.setAdapter(adapter);
+
+				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+					@Override
+					public void onItemSelected(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
+						String valueToPaste = values.get(paramInt);
+						try {
+							field.set(config, valueToPaste);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+
+
+					@Override
+					public void onNothingSelected(AdapterView<?> paramAdapterView) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+
+			} else {
+				// create textfield
+				final EditText input = new EditText(content.getContext());
+				content.addView(input);
+				input.setText((String) field.get(config));
+				input.addTextChangedListener(new TextWatcher() {
+
+					@Override
+					public void onTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
+						try {
+							field.set(config, input.getText().toString());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+
+
+					@Override
+					public void beforeTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
+						// TODO Auto-generated method stub
+					}
+
+
+					@Override
+					public void afterTextChanged(Editable paramEditable) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+			}
+		}
+
+		if (description.fieldType().equals(FieldType.BOOLEAN)) {
+			final CheckBox checkbox = new CheckBox(content.getContext());
+			contentArea.addView(checkbox);
+			checkbox.setChecked(field.getBoolean(config));
+			if (checkbox.isChecked()) {
+				checkbox.setText("aktiviert");
+			} else {
+				checkbox.setText("deaktiviert");
+			}
+			checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+				@Override
+				public void onCheckedChanged(CompoundButton paramCompoundButton, boolean paramBoolean) {
+					try {
+						field.setBoolean(config, paramBoolean);
+						if (paramBoolean) {
+							checkbox.setText("aktiviert");
+						} else {
+							checkbox.setText("deaktiviert");
+						}
+
+					} catch (Exception e) {
+						// this should not happen
+					}
+				}
+			});
+		}
+
 		if (description.fieldType().equals(FieldType.COLOR)) {
-			TextView label = new TextView(content.getContext());
-			label.setText(fieldLabel);
-			content.addView(label);
 
 			ColorSelectorView colorView = new ColorSelectorView(content.getContext());
 			colorView.setColor(field.getInt(config));
-			content.addView(colorView);
+			contentArea.addView(colorView);
 			colorView.setOnColorChangedListener(new OnColorChangedListener() {
 
 				@Override
@@ -207,9 +322,9 @@ public class EditConfigHandlerFragment extends Fragment {
 		}
 
 		if (description.fieldType().equals(FieldType.NUMERIC)) {
-			TextView label = new TextView(content.getContext());
-			label.setText(fieldLabel);
-			content.addView(label);
+			// TextView label = new TextView(content.getContext());
+			// label.setText(fieldLabel);
+			// content.addView(label);
 
 			final double min = Double.parseDouble(description.min());
 			final double difference = Double.parseDouble(description.max()) - min;
@@ -218,7 +333,7 @@ public class EditConfigHandlerFragment extends Fragment {
 			seekBar.setMax(256);
 			double doubleValue = ((((Number) field.get(config)).doubleValue()) - min) / difference;
 			seekBar.setProgress((int) (doubleValue * 256.0));
-			content.addView(seekBar);
+			contentArea.addView(seekBar);
 			seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 				@Override
@@ -256,40 +371,41 @@ public class EditConfigHandlerFragment extends Fragment {
 		}
 
 		if (description.fieldType().equals(FieldType.MAP)) {
-			LinearLayout mapViewHandler = (LinearLayout) inflater.inflate(R.layout.layout_map_list, content);
-			TextView title = (TextView) mapViewHandler.findViewById(R.id.textViewTitleOfMap);
-			title.setText(fieldLabel);
 
-			RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
-					selectedServer);
-			AlternativeIds altIds = field.getAnnotation(AlternativeIds.class);
-			List<String> additionalIds = ConfigBindingHelper.getArrayList(roomConfig, altIds.idBinding());
+			List<String> additionalIds = ConfigBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class),
+					roomConfig);
 
-			final ListView list = (ListView) mapViewHandler.findViewById(R.id.listView);
+			final ListView list = new ListView(contentArea.getContext());
+			contentArea.addView(list);
 			ParameterizedType pt = (ParameterizedType) field.getGenericType();
-			final String containingClass = pt.getActualTypeArguments()[1].toString();
+			final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
 			list.setTag(containingClass);
-
-			final AlternativeValues altValues = field.getAnnotation(AlternativeValues.class);
-			final CharSequence[] alternativeValues = new CharSequence[altValues.values().length];
-			for (int i = 0; i < alternativeValues.length; i++) {
-				alternativeValues[i] = altValues.values()[i].name();
-			}
 
 			@SuppressWarnings("rawtypes")
 			final Map map = (Map) field.get(config);
+			final Map arrayMap = new LinkedHashMap();
 
 			for (Object key : additionalIds) {
 				if (map.containsKey(key) == false) {
-					map.put(key, null);
+					arrayMap.put(key, null);
+				} else {
+					arrayMap.put(key, map.get(key));
 				}
 			}
 
-			final EditConfigMapAdapter adapter = new EditConfigMapAdapter(getFragmentManager(), getActivity(), map);
+			final EditConfigMapAdapter adapter = new EditConfigMapAdapter(getFragmentManager(), getActivity(), arrayMap,
+					containingClass);
 			list.setAdapter(adapter);
 			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
+			GuiUtils.setListViewHeightBasedOnChildren(list);
 			final Fragment myself = this;
+
+			final List<String> altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class),
+					roomConfig);
+
+			final CharSequence[] alternativeValuesForDisplay = ConfigBindingHelper.toCharSequenceArray(ConfigBindingHelper
+					.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class), roomConfig));
+
 			list.setOnItemClickListener(new OnItemClickListener() {
 
 				@Override
@@ -303,14 +419,15 @@ public class EditConfigHandlerFragment extends Fragment {
 					whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
 					whereToPutDataFromChild = whereToStore;
 
-					if (valueAtPosition == null) {
+					if (valueAtPosition == null && alternativeValuesForDisplay.length > 0) {
 						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-						builder.setTitle("Bitte auswählen").setItems(alternativeValues, new DialogInterface.OnClickListener() {
+						builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay,
+								new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								Bundle args = new Bundle();
-								args.putString(CLASS_NAME, altValues.values()[which].className());
+								args.putString(CLASS_NAME, altValues.get(which));
 								args.putString(SELECTED_SERVER, selectedServer);
 								args.putBoolean(CREATE_MODE, true);
 								FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -323,7 +440,7 @@ public class EditConfigHandlerFragment extends Fragment {
 							}
 						});
 						builder.create().show();
-					} else {
+					} else if (valueAtPosition != null) {
 						FragmentTransaction ft = getFragmentManager().beginTransaction();
 						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 						ft.replace(R.id.LayoutMain, configHandler);
@@ -335,7 +452,6 @@ public class EditConfigHandlerFragment extends Fragment {
 						args.putString(SELECTED_SERVER, selectedServer);
 						ft.commit();
 					}
-
 				}
 			});
 
@@ -357,11 +473,25 @@ public class EditConfigHandlerFragment extends Fragment {
 						}
 
 						for (Entry<String, Object> current : list) {
-							adapter.remove(current);
+							current.setValue(null);
 							map.remove(current.getKey());
 						}
 						adapter.notifyDataSetChanged();
 						break;
+
+					case R.id.menuEntryEditConfigurationClass:
+						FragmentTransaction ft = getFragmentManager().beginTransaction();
+						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+						ft.replace(R.id.LayoutMain, configHandler);
+						ft.addToBackStack(null);
+						Bundle args = new Bundle();
+						configHandler.setArguments(args);
+						args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
+								(Serializable) adapter.getItem(checkedItems.get(0)).getValue());
+						args.putString(SELECTED_SERVER, selectedServer);
+						ft.commit();
+						break;
+
 					}
 					return false;
 				}
@@ -371,7 +501,6 @@ public class EditConfigHandlerFragment extends Fragment {
 				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 					MenuInflater inflater = mode.getMenuInflater();
 					inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
-					// menu.add("test");
 					return true;
 
 				}
@@ -392,12 +521,20 @@ public class EditConfigHandlerFragment extends Fragment {
 
 				@Override
 				public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
 					if (checked) {
 						checkedItems.add(position);
 					} else {
 						checkedItems.remove(position);
 					}
 					mode.setTitle(checkedItems.size() + " ausgewählt");
+
+					MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
+					if (checkedItems.size() == 1 && adapter.getItem(checkedItems.get(0)).getValue() != null) {
+						editItem.setVisible(true);
+					} else {
+						editItem.setVisible(false);
+					}
 				}
 			});
 		}

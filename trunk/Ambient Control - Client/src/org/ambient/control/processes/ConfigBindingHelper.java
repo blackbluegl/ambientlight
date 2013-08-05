@@ -23,6 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.ambientlight.annotations.AlternativeIds;
+import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.Value;
+
 
 /**
  * @author Florian Bornkessel
@@ -30,7 +34,58 @@ import java.util.Set;
  */
 public class ConfigBindingHelper {
 
-	public static List<String> getArrayList(Object sourceBean, String path) {
+	public static List<String> getAlternativeIds(AlternativeIds annotation, Object sourceBean) {
+
+		String path = annotation.idBinding();
+		return getByPathBinding(sourceBean, path);
+
+	}
+
+
+	public static List<String> getAlternativeValues(AlternativeValues annotation, Object sourceBean) {
+
+		String path = annotation.valueBinding();
+		if (path.isEmpty() == false)
+			return getByPathBinding(sourceBean, path);
+		else {
+			List<String> result = new ArrayList<String>();
+			for (Value current : annotation.values()) {
+				result.add(current.value());
+			}
+			return result;
+		}
+	}
+
+
+	public static List<String> getAlternativeValuesForDisplay(AlternativeValues annotation, Object sourceBean) {
+
+		List<String> result = new ArrayList<String>();
+		for (Value current : annotation.values()) {
+			result.add(current.displayName());
+		}
+
+		if (result.size() == 0)
+			return getAlternativeValues(annotation, sourceBean);
+
+		return result;
+	}
+
+
+	public static CharSequence[] toCharSequenceArray(List<String> input) {
+		CharSequence[] result = new CharSequence[input.size()];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = input.get(i);
+		}
+		return result;
+	}
+
+
+	/**
+	 * @param sourceBean
+	 * @param path
+	 * @return
+	 */
+	private static List<String> getByPathBinding(Object sourceBean, String path) {
 		String[] pathElements = path.split("\\.");
 		Object result = null;
 		try {
