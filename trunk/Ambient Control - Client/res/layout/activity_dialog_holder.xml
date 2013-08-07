@@ -6,7 +6,7 @@
     tools:context=".SceneryConfigEditDialogHolder" >
 
     <Button
-        android:id="@+id/buttonDialogHolderApply"
+        android:id="@+id/linearLayoutConfigEntryHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -18,7 +18,7 @@
         android:id="@+id/scrollViewDialogHolderContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/buttonDialogHolderApply"
+        android:layout_above="@+id/linearLayoutConfigEntryHeader"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" >

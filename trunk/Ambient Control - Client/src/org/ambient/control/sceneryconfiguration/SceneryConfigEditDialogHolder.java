@@ -34,7 +34,7 @@ public class SceneryConfigEditDialogHolder extends FragmentActivity {
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		Button applyButton = (Button) findViewById(R.id.buttonDialogHolderApply);
+		Button applyButton = (Button) findViewById(R.id.linearLayoutConfigEntryHeader);
 		applyButton.setOnClickListener(new OnClickListener() {
 
 			@Override

@@ -309,8 +309,9 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 
 
 	public void updateScenerySpinner() {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_dropdown_item_1line,
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
 				getSceneryArray(roomConfig.sceneries));
+		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
 		Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
 		spinner.setAdapter(adapter);

@@ -15,6 +15,9 @@
 
 package org.ambientlight.process.handler.expression;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
 
@@ -23,7 +26,6 @@ import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.entities.TokenValueType;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.room.entities.Sensor;
 
 
@@ -46,9 +48,9 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 
 		evaluator.putVariable("tokenValue", token.data.toString());
 
-		for (String dataproviderName : getConfig().expressionConfiguration.sensorNames) {
+		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
 			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
-			evaluator.putVariable(dataproviderName, dataprovider.getValue().toString());
+			evaluator.putVariable(dataproviderName, getValueFromDataProvider(dataprovider.getValue()));
 		}
 		try {
 			String resultString = evaluator.evaluate(this.getConfig().expressionConfiguration.expression);
@@ -58,6 +60,29 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 			ActionHandlerException ae = new ActionHandlerException(e);
 			throw ae;
 		}
+	}
+
+
+	protected String getValueFromDataProvider(Object value) {
+		if (value instanceof Boolean) {
+			boolean boolValue = (Boolean) value;
+			if (boolValue)
+				return "1.0";
+			else
+				return "0.0";
+		} else
+			return value.toString();
+	}
+
+
+	protected List<String> extractDataProvider(String expression) {
+		String[] tokens = expression.split("{");
+
+		List<String> result = new ArrayList<String>();
+		for (String currentToken : tokens) {
+			result.add(currentToken.substring(0, currentToken.indexOf('}') - 1));
+		}
+		return result;
 	}
 
 

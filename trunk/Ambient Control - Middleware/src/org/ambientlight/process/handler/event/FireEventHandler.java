@@ -38,7 +38,7 @@ public class FireEventHandler extends AbstractActionHandler {
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
 		EventConfiguration event = ((FireEventHandlerConfiguration) this.config).event;
-		if (event == null) {
+		if (((FireEventHandlerConfiguration) this.config).useFromToken || event == null) {
 			event = (EventConfiguration) token.data;
 		}
 
