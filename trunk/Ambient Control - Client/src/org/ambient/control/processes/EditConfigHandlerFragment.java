@@ -654,62 +654,64 @@ public class EditConfigHandlerFragment extends Fragment {
 			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 			GuiUtils.setListViewHeightBasedOnChildren(list);
 			final Fragment myself = this;
+			// we skip this if the values are simple and can be handled directly
+			// on the view, like booleans
+			if (containingClass.equals(Boolean.class.getName()) == false) {
+				final List<String> altValues = ConfigBindingHelper.getAlternativeValues(
+						field.getAnnotation(AlternativeValues.class), roomConfig);
 
-			final List<String> altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class),
-					roomConfig);
+				final CharSequence[] alternativeValuesForDisplay = ConfigBindingHelper.toCharSequenceArray(ConfigBindingHelper
+						.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class), roomConfig));
 
-			final CharSequence[] alternativeValuesForDisplay = ConfigBindingHelper.toCharSequenceArray(ConfigBindingHelper
-					.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class), roomConfig));
+				list.setOnItemClickListener(new OnItemClickListener() {
 
-			list.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
 
-				@Override
-				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
+						Object valueAtPosition = adapter.getItem(paramInt).getValue();
 
-					Object valueAtPosition = adapter.getItem(paramInt).getValue();
+						WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+						whereToStore.fieldName = field.getName();
+						whereToStore.type = WhereToPutType.MAP;
+						whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
+						whereToPutDataFromChild = whereToStore;
 
-					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
-					whereToStore.fieldName = field.getName();
-					whereToStore.type = WhereToPutType.MAP;
-					whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
-					whereToPutDataFromChild = whereToStore;
+						if (valueAtPosition == null && alternativeValuesForDisplay.length > 0) {
+							AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+							builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay,
+									new DialogInterface.OnClickListener() {
 
-					if (valueAtPosition == null && alternativeValuesForDisplay.length > 0) {
-						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-						builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay,
-								new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								Bundle args = new Bundle();
-								args.putString(CLASS_NAME, altValues.get(which));
-								args.putString(SELECTED_SERVER, selectedServer);
-								args.putBoolean(CREATE_MODE, true);
-								FragmentTransaction ft = getFragmentManager().beginTransaction();
-								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-								ft.replace(R.id.LayoutMain, configHandler);
-								ft.addToBackStack(null);
-								configHandler.setArguments(args);
-								configHandler.setTargetFragment(myself, REQ_RETURN_OBJECT);
-								ft.commit();
-							}
-						});
-						builder.create().show();
-					} else if (valueAtPosition != null) {
-						FragmentTransaction ft = getFragmentManager().beginTransaction();
-						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-						ft.replace(R.id.LayoutMain, configHandler);
-						ft.addToBackStack(null);
-						Bundle args = new Bundle();
-						configHandler.setArguments(args);
-						String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
-						args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) map.get(currentText));
-						args.putString(SELECTED_SERVER, selectedServer);
-						ft.commit();
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									Bundle args = new Bundle();
+									args.putString(CLASS_NAME, altValues.get(which));
+									args.putString(SELECTED_SERVER, selectedServer);
+									args.putBoolean(CREATE_MODE, true);
+									FragmentTransaction ft = getFragmentManager().beginTransaction();
+									EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+									ft.replace(R.id.LayoutMain, configHandler);
+									ft.addToBackStack(null);
+									configHandler.setArguments(args);
+									configHandler.setTargetFragment(myself, REQ_RETURN_OBJECT);
+									ft.commit();
+								}
+							});
+							builder.create().show();
+						} else if (valueAtPosition != null) {
+							FragmentTransaction ft = getFragmentManager().beginTransaction();
+							EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+							ft.replace(R.id.LayoutMain, configHandler);
+							ft.addToBackStack(null);
+							Bundle args = new Bundle();
+							configHandler.setArguments(args);
+							String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
+							args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) map.get(currentText));
+							args.putString(SELECTED_SERVER, selectedServer);
+							ft.commit();
+						}
 					}
-				}
-			});
-
+				});
+			}
 			list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
 				List<Integer> checkedItems = new ArrayList<Integer>();
@@ -780,7 +782,7 @@ public class EditConfigHandlerFragment extends Fragment {
 					if (checked) {
 						checkedItems.add(position);
 					} else {
-						checkedItems.remove(position);
+						checkedItems.remove(Integer.valueOf(position));
 					}
 					mode.setTitle(checkedItems.size() + " ausgewählt");
 
