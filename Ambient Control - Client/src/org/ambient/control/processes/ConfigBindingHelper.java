@@ -117,9 +117,17 @@ public class ConfigBindingHelper {
 			Field fieldForResult = currentClass.getField(path[positionInPath]);
 			result = fieldForResult.get(current);
 		}
-		if (positionInPath < path.length - 1)
-			return getObjectRecursively(result, path, positionInPath + 1);
-		else
+
+		if (positionInPath < path.length - 1) {
+			if (result instanceof Iterable) {
+				ArrayList arrayToReturn = new ArrayList();
+				for (Object currentToDescend : (Iterable) result) {
+					arrayToReturn.add(getObjectRecursively(currentToDescend, path, positionInPath + 1));
+				}
+				return arrayToReturn;
+			} else
+				return getObjectRecursively(result, path, positionInPath + 1);
+		} else
 			return result;
 	}
 }

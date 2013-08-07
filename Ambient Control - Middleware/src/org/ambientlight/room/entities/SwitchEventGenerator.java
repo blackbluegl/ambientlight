@@ -15,6 +15,7 @@
 
 package org.ambientlight.room.entities;
 
+import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
@@ -23,7 +24,7 @@ import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
  * @author Florian Bornkessel
  * 
  */
-public class SwitchEventGenerator extends EventGenerator {
+public class SwitchEventGenerator extends EventGenerator implements EventSensor {
 
 	public void switchEventOccured(SwitchEventConfiguration event) {
 		SwitchEventConfiguration correlation = new SwitchEventConfiguration();
@@ -32,5 +33,20 @@ public class SwitchEventGenerator extends EventGenerator {
 
 		((SwitchEventGeneratorConfiguration) this.config).setPowerState(event.powerState);
 
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.EventSensor#getValue()
+	 */
+	@Override
+	public EventConfiguration getValue() {
+		// TODO Auto-generated method stub
+		SwitchEventConfiguration config = new SwitchEventConfiguration();
+		config.eventGeneratorName = this.config.name;
+		config.powerState = ((SwitchEventGeneratorConfiguration) this.config).getPowerState();
+		return config;
 	}
 }

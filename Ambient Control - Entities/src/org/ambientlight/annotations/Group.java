@@ -13,23 +13,20 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler.event;
-
-import org.ambientlight.annotations.AlternativeValues;
-import org.ambientlight.annotations.FieldType;
-import org.ambientlight.annotations.Presentation;
-import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
+package org.ambientlight.annotations;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public class EventGeneratorSensorAdapterConfiguration extends AbstractActionHandlerConfiguration {
+public @interface Group {
 
-	@AlternativeValues(valueBinding = "eventGeneratorConfigurations.name")
-	@TypeDef(fieldType = FieldType.STRING)
-	@Presentation(name = "Event auslesen und weitergeben von")
-	public String eventSensorId;
+	public String description() default "";
+
+
+	public String name();
+
+
+	public int position();
 }

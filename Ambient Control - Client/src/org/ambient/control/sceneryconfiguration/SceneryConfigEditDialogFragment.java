@@ -179,7 +179,7 @@ public class SceneryConfigEditDialogFragment extends DialogFragment {
 			if (field.isAnnotationPresent(TypeDef.class)) {
 				if (field.isAnnotationPresent(Presentation.class)) {
 					Presentation presentation = field.getAnnotation(Presentation.class);
-					sortedMap.put(Integer.parseInt(presentation.position()), field);
+					sortedMap.put(presentation.position(), field);
 				} else {
 					addFieldToView(config, content, field, null);
 				}

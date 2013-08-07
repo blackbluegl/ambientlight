@@ -31,7 +31,9 @@ import org.ambient.util.GuiUtils;
 import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
 import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.ClassDescription;
 import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.Group;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.room.RoomConfiguration;
@@ -50,6 +52,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
@@ -62,6 +66,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -168,59 +173,309 @@ public class EditConfigHandlerFragment extends Fragment {
 
 		LinearLayout content = (LinearLayout) scrollView.findViewById(R.id.linearLayoutEditConfigContent);
 
-		Map<Integer, Field> sortedMap = new TreeMap<Integer, Field>();
+		// init the maps for sorted views
+		Map<Integer, Map<Integer, Field>> sortedMap = new TreeMap<Integer, Map<Integer, Field>>();
+		List<Field> unsortedList = new ArrayList<Field>();
+		ClassDescription description = config.getClass().getAnnotation(ClassDescription.class);
+		if (description != null) {
+			for (Group currentGroup : description.groups()) {
+				Map<Integer, Field> category = new TreeMap<Integer, Field>();
+				sortedMap.put(currentGroup.position(), category);
+			}
+		} else {
+			Map<Integer, Field> defaultCategory = new TreeMap<Integer, Field>();
+			sortedMap.put(0, defaultCategory);
+		}
 
 		for (final Field field : config.getClass().getFields()) {
 			if (field.isAnnotationPresent(TypeDef.class)) {
 				if (field.isAnnotationPresent(Presentation.class)) {
 					Presentation presentation = field.getAnnotation(Presentation.class);
-					sortedMap.put(Integer.parseInt(presentation.position()), field);
+					sortedMap.get(presentation.groupPosition()).put(presentation.position(), field);
 				} else {
-					addFieldToView(inflater, config, content, field, null);
+					unsortedList.add(field);
 				}
 			}
 		}
 
-		if (sortedMap.size() > 0) {
-			for (Field field : sortedMap.values()) {
-				addFieldToView(inflater, config, content, field, field.getAnnotation(Presentation.class).name());
+		boolean sortedValuesDrawn = false;
+
+		for (Integer currentCategoryId : sortedMap.keySet()) {
+			if (sortedMap.get(currentCategoryId).isEmpty() == false) {
+				LinearLayout categoryView = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
+				TextView title = (TextView) categoryView.findViewById(R.id.textViewGroupHeader);
+				TextView descriptionTextView = (TextView) categoryView.findViewById(R.id.textViewGroupDescription);
+				content.addView(categoryView);
+				if (currentCategoryId == 0) {
+					// draw allgemein for category 0
+					title.setText("ALLGEMEIN");
+					descriptionTextView.setVisibility(View.GONE);
+				} else {
+					for (Group currentGroup : description.groups()) {
+						if (currentGroup.position() == currentCategoryId) {
+							title.setText(currentGroup.name());
+							if (currentGroup.description().isEmpty() == false) {
+								descriptionTextView.setText(currentGroup.description());
+							} else {
+								descriptionTextView.setVisibility(View.GONE);
+							}
+							break;
+						}
+					}
+				}
+				Map<Integer, Field> values = sortedMap.get(currentCategoryId);
+				for (Field field : values.values()) {
+					addFieldToView(inflater, config, content, field);
+					sortedValuesDrawn = true;
+				}
 			}
 		}
+
+		// do the same for unsorted fields
+		if (sortedValuesDrawn && unsortedList.isEmpty() == false) {
+			LinearLayout categoryFurther = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
+			TextView title = (TextView) categoryFurther.findViewById(R.id.textViewGroupHeader);
+			title.setText("WEITERE");
+			TextView descriptionTextView = (TextView) categoryFurther.findViewById(R.id.textViewGroupDescription);
+			descriptionTextView.setVisibility(View.GONE);
+			content.addView(categoryFurther);
+		}
+
+		for (Field currentField : unsortedList) {
+			addFieldToView(inflater, config, content, currentField);
+		}
+
+		if (sortedValuesDrawn == false && unsortedList.isEmpty()) {
+			TextView tv = new TextView(content.getContext());
+			tv.setText("Dieses Objekt wird nicht konfiguriert");
+			content.addView(tv);
+		}
+
 		return scrollView;
 	}
 
 
-	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout content, final Field field, String name)
+	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout container, final Field field)
 			throws IllegalAccessException {
-		TypeDef description = field.getAnnotation(TypeDef.class);
-		String fieldLabel = "";
-		if (name != null) {
-			fieldLabel = (name);
+		TypeDef typedef = field.getAnnotation(TypeDef.class);
+		String fieldLabel = null;
+
+		LinearLayout fieldView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_entry, null);
+		container.addView(fieldView);
+
+		if (field.getAnnotation(Presentation.class) != null && field.getAnnotation(Presentation.class).name().isEmpty() == false) {
+			fieldLabel = (field.getAnnotation(Presentation.class).name());
+			final String description = (field.getAnnotation(Presentation.class)).description();
+			if (description.isEmpty() == false) {
+				fieldView.findViewById(R.id.imageViewEditEntryHelp).setVisibility(View.VISIBLE);
+				LinearLayout header = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryHeader);
+				header.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+						builder.setTitle("Hilfe").setMessage(description).setPositiveButton("OK", null).create().show();
+					}
+				});
+			}
+
 		} else {
 			fieldLabel = field.getName();
 		}
 
 		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer);
 
-		LinearLayout fieldView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_entry, null);
-		content.addView(fieldView);
 		TextView title = (TextView) fieldView.findViewById(R.id.textViewTitleOfMap);
 		title.setText(fieldLabel);
 		LinearLayout contentArea = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryContent);
 
-		if (description.fieldType().equals(FieldType.STRING)) {
+		if (typedef.fieldType().equals(FieldType.EXPRESSION)) {
+
+			// create textfield
+			final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(container.getContext());
+			contentArea.addView(input);
+			input.setText((String) field.get(config));
+			List<String> variablesRawValues = ConfigBindingHelper.getAlternativeValues(
+					field.getAnnotation(AlternativeValues.class), roomConfig);
+			List<String> variablesEnrichedValues = new ArrayList<String>();
+			variablesEnrichedValues.add("#{tokenValue}");
+			for (String current : variablesRawValues) {
+				variablesEnrichedValues.add("#{" + current + "}");
+			}
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
+					android.R.layout.simple_dropdown_item_1line, variablesEnrichedValues);
+			input.setAdapter(adapter);
+			input.showDropDown();
+			input.setThreshold(1);
+			input.setTokenizer(new SpaceTokenizer());
+			input.addTextChangedListener(new TextWatcher() {
+
+				@Override
+				public void onTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
+					try {
+						field.set(config, input.getText().toString());
+						input.showDropDown();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+
+				@Override
+				public void beforeTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
+					// TODO Auto-generated method stub
+				}
+
+
+				@Override
+				public void afterTextChanged(Editable paramEditable) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+		}
+
+		if (typedef.fieldType().equals(FieldType.BEAN)) {
+			final Object value = field.get(config);
+			final TextView beanView = new TextView(contentArea.getContext());
+			contentArea.addView(beanView);
+			if (value != null) {
+				beanView.setText(value.getClass().getName());
+			} else {
+				beanView.setText("kein Objekt gesetzt");
+			}
+			final List<String> altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class),
+					roomConfig);
+
+			final CharSequence[] alternativeValuesForDisplay = ConfigBindingHelper.toCharSequenceArray(ConfigBindingHelper
+					.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class), roomConfig));
+			final EditConfigHandlerFragment myself = this;
+			beanView.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+
+					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+					whereToStore.fieldName = field.getName();
+					whereToStore.type = WhereToPutType.FIELD;
+					whereToPutDataFromChild = whereToStore;
+
+					if (value == null && alternativeValuesForDisplay.length > 0) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+						builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay,
+								new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Bundle args = new Bundle();
+								args.putString(CLASS_NAME, altValues.get(which));
+								args.putString(SELECTED_SERVER, selectedServer);
+								args.putBoolean(CREATE_MODE, true);
+								FragmentTransaction ft = getFragmentManager().beginTransaction();
+								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+								ft.replace(R.id.LayoutMain, configHandler);
+								ft.addToBackStack(null);
+								configHandler.setArguments(args);
+								configHandler.setTargetFragment(myself, REQ_RETURN_OBJECT);
+								ft.commit();
+							}
+						});
+						builder.create().show();
+					} else if (value != null) {
+						FragmentTransaction ft = getFragmentManager().beginTransaction();
+						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+						ft.replace(R.id.LayoutMain, configHandler);
+						ft.addToBackStack(null);
+						Bundle args = new Bundle();
+						configHandler.setArguments(args);
+						args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) value);
+						args.putString(SELECTED_SERVER, selectedServer);
+						ft.commit();
+					}
+				}
+			});
+
+			beanView.setOnLongClickListener(new OnLongClickListener() {
+
+				@Override
+				public boolean onLongClick(View v) {
+					getActivity().startActionMode(new ActionMode.Callback() {
+
+						@Override
+						public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+							return false;
+						}
+
+
+						@Override
+						public void onDestroyActionMode(ActionMode mode) {
+
+						}
+
+
+						@Override
+						public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+							MenuInflater inflater = mode.getMenuInflater();
+							inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
+							MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
+							if (value != null) {
+								editItem.setVisible(true);
+							} else {
+								editItem.setVisible(false);
+							}
+							return true;
+						}
+
+
+						@Override
+						public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+							switch (item.getItemId()) {
+
+							case R.id.menuEntryRemoveConfigurationClass:
+
+								try {
+									field.set(config, null);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								break;
+
+							case R.id.menuEntryEditConfigurationClass:
+								FragmentTransaction ft = getFragmentManager().beginTransaction();
+								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+								ft.replace(R.id.LayoutMain, configHandler);
+								ft.addToBackStack(null);
+								Bundle args = new Bundle();
+								configHandler.setArguments(args);
+								args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) value);
+								args.putString(SELECTED_SERVER, selectedServer);
+								ft.commit();
+								break;
+
+							}
+							return false;
+						}
+					});
+					return true;
+				}
+			});
+		}
+
+		if (typedef.fieldType().equals(FieldType.STRING)) {
 			if (field.getAnnotation(AlternativeValues.class) != null) {
 				// create spinner
 
-				Spinner spinner = new Spinner(content.getContext());
-				content.addView(spinner);
+				Spinner spinner = new Spinner(container.getContext());
+				contentArea.addView(spinner);
 				final List<String> values = ConfigBindingHelper.getAlternativeValues(
 						field.getAnnotation(AlternativeValues.class), roomConfig);
 				List<String> valuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 						field.getAnnotation(AlternativeValues.class), roomConfig);
 
 				final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
-						android.R.layout.simple_dropdown_item_1line, valuesToDisplay);
+						android.R.layout.simple_spinner_item, valuesToDisplay);
+				adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 				spinner.setAdapter(adapter);
 
 				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -245,8 +500,8 @@ public class EditConfigHandlerFragment extends Fragment {
 
 			} else {
 				// create textfield
-				final EditText input = new EditText(content.getContext());
-				content.addView(input);
+				final EditText input = new EditText(container.getContext());
+				contentArea.addView(input);
 				input.setText((String) field.get(config));
 				input.addTextChangedListener(new TextWatcher() {
 
@@ -275,8 +530,8 @@ public class EditConfigHandlerFragment extends Fragment {
 			}
 		}
 
-		if (description.fieldType().equals(FieldType.BOOLEAN)) {
-			final CheckBox checkbox = new CheckBox(content.getContext());
+		if (typedef.fieldType().equals(FieldType.BOOLEAN)) {
+			final CheckBox checkbox = new CheckBox(container.getContext());
 			contentArea.addView(checkbox);
 			checkbox.setChecked(field.getBoolean(config));
 			if (checkbox.isChecked()) {
@@ -303,9 +558,9 @@ public class EditConfigHandlerFragment extends Fragment {
 			});
 		}
 
-		if (description.fieldType().equals(FieldType.COLOR)) {
+		if (typedef.fieldType().equals(FieldType.COLOR)) {
 
-			ColorSelectorView colorView = new ColorSelectorView(content.getContext());
+			ColorSelectorView colorView = new ColorSelectorView(container.getContext());
 			colorView.setColor(field.getInt(config));
 			contentArea.addView(colorView);
 			colorView.setOnColorChangedListener(new OnColorChangedListener() {
@@ -321,15 +576,15 @@ public class EditConfigHandlerFragment extends Fragment {
 			});
 		}
 
-		if (description.fieldType().equals(FieldType.NUMERIC)) {
+		if (typedef.fieldType().equals(FieldType.NUMERIC)) {
 			// TextView label = new TextView(content.getContext());
 			// label.setText(fieldLabel);
 			// content.addView(label);
 
-			final double min = Double.parseDouble(description.min());
-			final double difference = Double.parseDouble(description.max()) - min;
+			final double min = Double.parseDouble(typedef.min());
+			final double difference = Double.parseDouble(typedef.max()) - min;
 
-			SeekBar seekBar = new SeekBar(content.getContext());
+			SeekBar seekBar = new SeekBar(container.getContext());
 			seekBar.setMax(256);
 			double doubleValue = ((((Number) field.get(config)).doubleValue()) - min) / difference;
 			seekBar.setProgress((int) (doubleValue * 256.0));
@@ -370,7 +625,7 @@ public class EditConfigHandlerFragment extends Fragment {
 			});
 		}
 
-		if (description.fieldType().equals(FieldType.MAP)) {
+		if (typedef.fieldType().equals(FieldType.MAP)) {
 
 			List<String> additionalIds = ConfigBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class),
 					roomConfig);

@@ -78,9 +78,12 @@ public class ProcessCardFragment extends Fragment {
 		}
 
 		final ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_dropdown_item_1line, roomNames);
+				android.R.layout.simple_spinner_item, roomNames);
+		roomAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+
 		final ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_dropdown_item_1line, processNames);
+				android.R.layout.simple_spinner_item, processNames);
+		switchesAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
 		spinnerRoom = (Spinner) content.findViewById(R.id.spinnerProcessRoom);
 		spinnerProcess = (Spinner) content.findViewById(R.id.spinnerProcess);

@@ -21,7 +21,6 @@ import net.sourceforge.jeval.Evaluator;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.entities.TokenValueType;
-import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
 import org.ambientlight.room.entities.Sensor;
 
@@ -30,7 +29,7 @@ import org.ambientlight.room.entities.Sensor;
  * @author Florian Bornkessel
  * 
  */
-public class DecissionActionHandler extends AbstractActionHandler {
+public class DecissionActionHandler extends ExpressionActionHandler {
 
 	boolean takeDefaultTransition = true;
 
@@ -48,9 +47,9 @@ public class DecissionActionHandler extends AbstractActionHandler {
 
 		evaluator.putVariable("tokenValue", token.data.toString());
 
-		for (String dataproviderName : getConfig().expressionConfiguration.sensorNames) {
+		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
 			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
-			evaluator.putVariable(dataproviderName, dataprovider.getValue().toString());
+			evaluator.putVariable(dataproviderName, getValueFromDataProvider(dataprovider.getValue()));
 		}
 		try {
 			takeDefaultTransition = evaluator.getBooleanResult(this.getConfig().expressionConfiguration.expression);
@@ -63,6 +62,7 @@ public class DecissionActionHandler extends AbstractActionHandler {
 	}
 
 
+	@Override
 	DecisionHandlerConfiguration getConfig() {
 		return (DecisionHandlerConfiguration) this.config;
 	}
@@ -74,5 +74,4 @@ public class DecissionActionHandler extends AbstractActionHandler {
 		System.out.println("DecissionHandler: takes transition to node: " + nextNodeId);
 		return nextNodeId;
 	}
-
 }

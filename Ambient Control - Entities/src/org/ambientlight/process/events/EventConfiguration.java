@@ -2,9 +2,6 @@ package org.ambientlight.process.events;
 
 import java.io.Serializable;
 
-import org.ambientlight.annotations.AlternativeValues;
-import org.ambientlight.annotations.FieldType;
-import org.ambientlight.annotations.TypeDef;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
@@ -13,8 +10,6 @@ public abstract class EventConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueBinding = "eventGeneratorConfigurations.eventGeneratorName")
 	public String eventGeneratorName;
 
 
