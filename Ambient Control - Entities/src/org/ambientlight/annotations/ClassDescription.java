@@ -15,10 +15,15 @@
 
 package org.ambientlight.annotations;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+
 /**
  * @author Florian Bornkessel
  * 
  */
+@Retention(RetentionPolicy.RUNTIME)
 public @interface ClassDescription {
 
 	public String header() default "";
