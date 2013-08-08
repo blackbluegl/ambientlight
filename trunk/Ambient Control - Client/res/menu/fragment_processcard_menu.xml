@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item android:id="@+id/menuEntryProcessAddNode" 
-          android:title="Knoten hinzufügen"
-          android:icon="@drawable/content_new"
-          android:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menuEntryProcessSave"
+        android:icon="@drawable/content_save"
+        android:showAsAction="always|withText"
+        android:title="@string/button_save"/>
+    <item
+        android:id="@+id/menuEntryProcessEditNode"
+        android:icon="@drawable/content_edit"
+        android:showAsAction="always|withText"
+        android:title="@string/button_edit"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessAddNode"
+        android:icon="@drawable/content_new"
+        android:showAsAction="always|withText"
+        android:title="Knoten hinzufügen"/>
 
 </menu>

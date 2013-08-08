@@ -46,7 +46,9 @@ import android.widget.Spinner;
  * @author Florian Bornkessel
  * 
  */
-public class ProcessCardFragment extends Fragment {
+public class ProcessCardFragment extends Fragment implements IntegrateObjectValueHandler {
+
+	private NodeConfiguration selectedNode = null;
 
 	private final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
 
@@ -67,9 +69,11 @@ public class ProcessCardFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+		// getActivity().getActionBar().setDisplayShowHomeEnabled(false);
 		this.content = inflater.inflate(R.layout.fragment_processcard, container, false);
 		final ProcessCardDrawer drawer = (ProcessCardDrawer) content.findViewById(R.id.processCardDrawer);
-
+		this.selectedNode = drawer.getSelectedNode();
 		if (savedInstanceState != null) {
 			int position = savedInstanceState.getInt(BUNDLE_SPINNER_ROOM_POSITION);
 			this.initRoomArrays(position);
@@ -103,6 +107,9 @@ public class ProcessCardFragment extends Fragment {
 					@Override
 					public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
+						selectedNode = null;
+						getActivity().invalidateOptionsMenu();
+
 						selectedServer = serverNames.get(pos);
 						RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
 								.getRoomConfiguration(selectedServer);
@@ -129,7 +136,8 @@ public class ProcessCardFragment extends Fragment {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
-
+				selectedNode = null;
+				getActivity().invalidateOptionsMenu();
 				RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
 						.getRoomConfiguration(selectedServer);
 
@@ -148,17 +156,8 @@ public class ProcessCardFragment extends Fragment {
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
 				Log.i("nodeSelectListener", node.actionHandler.getClass().getSimpleName());
-
-				EditConfigHandlerFragment frag = new EditConfigHandlerFragment();
-				Bundle arguments = new Bundle();
-				arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, node.actionHandler);
-				arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
-				arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
-				frag.setArguments(arguments);
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.replace(R.id.LayoutMain, frag);
-				ft.addToBackStack(null);
-				ft.commit();
+				selectedNode = node;
+				getActivity().invalidateOptionsMenu();
 			}
 		});
 		setHasOptionsMenu(true);
@@ -169,6 +168,10 @@ public class ProcessCardFragment extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_processcard_menu, menu);
+		MenuItem edit = menu.findItem(R.id.menuEntryProcessEditNode);
+		if (this.selectedNode != null) {
+			edit.setVisible(true);
+		}
 	}
 
 
@@ -176,13 +179,26 @@ public class ProcessCardFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menuEntryProcessAddNode:
-
-
 			ChooseAlternativeConfiguration frag = new ChooseAlternativeConfiguration();
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.replace(R.id.LayoutMain, frag);
 			ft.addToBackStack(null);
 			ft.commit();
+			return true;
+
+		case R.id.menuEntryProcessEditNode:
+			final ProcessCardFragment myself = this;
+			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
+			fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+			Bundle arguments = new Bundle();
+			arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, selectedNode);
+			arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+			arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
+			fragEdit.setArguments(arguments);
+			FragmentTransaction ft2 = getFragmentManager().beginTransaction();
+			ft2.replace(R.id.LayoutMain, fragEdit);
+			ft2.addToBackStack(null);
+			ft2.commit();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -210,6 +226,21 @@ public class ProcessCardFragment extends Fragment {
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		savedInstanceState.putInt(BUNDLE_SPINNER_ROOM_POSITION, spinnerRoom.getSelectedItemPosition());
 		super.onSaveInstanceState(savedInstanceState);
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambient.control.processes.IntegrateObjectValueHandler#
+	 * integrateConfiguration(java.lang.Object)
+	 */
+	@Override
+	public void integrateConfiguration(Object configuration) {
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+		getActivity().getActionBar().setDisplayShowHomeEnabled(false);
+		Log.i("ProcessCardFragment", "object returned");
 
 	}
 }

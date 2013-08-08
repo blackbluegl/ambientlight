@@ -63,7 +63,7 @@ public class SceneryConfigEditDialogHolder extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		switch (item.getItemId()) {
-		case R.id.menu_finish:
+		case R.id.dialog_save:
 
 			myFragment.applyAction();
 

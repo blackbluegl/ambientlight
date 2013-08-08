@@ -74,7 +74,12 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 	public void setSelectdeNode(NodeConfiguration node) {
 		this.selectedNode = node;
-		this.createProcessCardBitmap(this.nodeSnippets.get(node.id).rect);
+		if (this.selectedNode != null) {
+			this.createProcessCardBitmap(this.nodeSnippets.get(node.id).rect);
+		} else {
+			this.createProcessCardBitmap(null);
+		}
+
 	}
 
 	private class NodeSnippet {
@@ -236,7 +241,11 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	private void createNodeSnippetsRecursively(int id, int rowNumber, int columnNumber) {
 		NodeConfiguration current = process.nodes.get(id);
 
-		Bitmap result = this.createNode(current.actionHandler.getClass().getSimpleName());
+		String nodeTitle = "leer";
+		if (current.actionHandler != null) {
+			nodeTitle = current.actionHandler.getClass().getSimpleName();
+		}
+		Bitmap result = this.createNode(nodeTitle);
 		NodeSnippet snippet = new NodeSnippet();
 		snippet.columNumber = columnNumber;
 		snippet.rowNumber = rowNumber;
