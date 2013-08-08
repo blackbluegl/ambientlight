@@ -372,6 +372,7 @@ public class EditConfigHandlerFragment extends Fragment {
 								args.putString(SELECTED_SERVER, selectedServer);
 								args.putBoolean(CREATE_MODE, true);
 								FragmentTransaction ft = getFragmentManager().beginTransaction();
+										ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 								ft.replace(R.id.LayoutMain, configHandler);
 								ft.addToBackStack(null);
@@ -383,6 +384,7 @@ public class EditConfigHandlerFragment extends Fragment {
 						builder.create().show();
 					} else if (value != null) {
 						FragmentTransaction ft = getFragmentManager().beginTransaction();
+						ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 						ft.replace(R.id.LayoutMain, configHandler);
 						ft.addToBackStack(null);
@@ -443,6 +445,7 @@ public class EditConfigHandlerFragment extends Fragment {
 
 							case R.id.menuEntryEditConfigurationClass:
 								FragmentTransaction ft = getFragmentManager().beginTransaction();
+								ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 								ft.replace(R.id.LayoutMain, configHandler);
 								ft.addToBackStack(null);
@@ -688,6 +691,7 @@ public class EditConfigHandlerFragment extends Fragment {
 									args.putString(SELECTED_SERVER, selectedServer);
 									args.putBoolean(CREATE_MODE, true);
 									FragmentTransaction ft = getFragmentManager().beginTransaction();
+											ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 									EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 									ft.replace(R.id.LayoutMain, configHandler);
 									ft.addToBackStack(null);
@@ -699,6 +703,7 @@ public class EditConfigHandlerFragment extends Fragment {
 							builder.create().show();
 						} else if (valueAtPosition != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
+							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 							EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 							ft.replace(R.id.LayoutMain, configHandler);
 							ft.addToBackStack(null);
@@ -738,6 +743,7 @@ public class EditConfigHandlerFragment extends Fragment {
 
 					case R.id.menuEntryEditConfigurationClass:
 						FragmentTransaction ft = getFragmentManager().beginTransaction();
+						ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 						ft.replace(R.id.LayoutMain, configHandler);
 						ft.addToBackStack(null);
