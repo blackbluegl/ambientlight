@@ -9,6 +9,7 @@
     <string name="title_activity_main">Ambient Control</string>
     <string name="title_activity_sceneries">Szenerien</string>
     <string name="button_new">Neu</string>
+    <string name="button_edit">Bearbeiten</string>
     <string name="button_home">zur Haussteuerung</string>
     <string name="button_save">Speichern</string>
     <string name="button_abort">Abbrechen</string>

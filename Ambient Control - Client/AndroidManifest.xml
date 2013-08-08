@@ -27,6 +27,9 @@
         <activity
             android:name="org.ambient.control.MainActivity"
             android:label="@string/title_activity_main" >
+             <meta-data android:name="android.support.UI_OPTIONS"
+                   android:value="splitActionBarWhenNarrow" />
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

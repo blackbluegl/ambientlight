@@ -80,11 +80,13 @@ import de.devmil.common.ui.color.ColorSelectorView.OnColorChangedListener;
  * @author Florian Bornkessel
  * 
  */
-public class EditConfigHandlerFragment extends Fragment {
+public class EditConfigHandlerFragment extends Fragment implements IntegrateObjectValueHandler {
 
 	private static enum WhereToPutType {
 		FIELD, MAP, LIST
 	}
+
+	private SaveObjectHandler saveObjectCallback;
 
 	private class WhereToPutConfigurationData {
 
@@ -108,38 +110,22 @@ public class EditConfigHandlerFragment extends Fragment {
 	private WhereToPutConfigurationData whereToPutDataFromChild = null;
 
 
-	public void persistConfigurationFromChild(Object configuration) throws IllegalArgumentException, IllegalAccessException,
-	NoSuchFieldException {
-		Class myObjectClass = myConfigurationData.getClass();
-		Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);
-		if (whereToPutDataFromChild.type.equals(WhereToPutType.FIELD)) {
-			myField.set(myConfigurationData, configuration);
-		} else if (whereToPutDataFromChild.type.equals(WhereToPutType.LIST)) {
-			List list = (List) myField.get(myConfigurationData);
-			if (whereToPutDataFromChild.positionInList != 0) {
-				list.set(whereToPutDataFromChild.positionInList, configuration);
-			} else {
-				list.add(configuration);
-			}
-		} else if (whereToPutDataFromChild.type.equals(WhereToPutType.MAP)) {
-			Map map = (Map) myField.get(myConfigurationData);
-			map.put(whereToPutDataFromChild.keyInMap, configuration);
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.fragment_edit_configuration_menu, menu);
+		MenuItem saveIcon = menu.findItem(R.id.menuEntrySaveEditConfiguration);
+		if (this.saveObjectCallback != null) {
+			saveIcon.setVisible(true);
 		}
 	}
 
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.fragment_edit_configuration_menu, menu);
-	}
-
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActivity().getActionBar().setDisplayShowHomeEnabled(true);
 
 		setHasOptionsMenu(true);
-		// ActionBar actionBar = getActivity().getActionBar();
-		// actionBar.show();
 		if (getArguments().containsKey(CREATE_MODE)) {
 			createMode = getArguments().getBoolean(CREATE_MODE);
 		}
@@ -336,11 +322,10 @@ public class EditConfigHandlerFragment extends Fragment {
 		}
 
 		if (typedef.fieldType().equals(FieldType.BEAN)) {
-			final Object value = field.get(config);
 			final TextView beanView = new TextView(contentArea.getContext());
 			contentArea.addView(beanView);
-			if (value != null) {
-				beanView.setText(value.getClass().getName());
+			if (field.get(config) != null) {
+				beanView.setText(field.get(config).getClass().getName());
 			} else {
 				beanView.setText("kein Objekt gesetzt");
 			}
@@ -354,45 +339,48 @@ public class EditConfigHandlerFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
+					try {
+						WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+						whereToStore.fieldName = field.getName();
+						whereToStore.type = WhereToPutType.FIELD;
+						whereToPutDataFromChild = whereToStore;
 
-					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
-					whereToStore.fieldName = field.getName();
-					whereToStore.type = WhereToPutType.FIELD;
-					whereToPutDataFromChild = whereToStore;
+						if (field.get(config) == null && alternativeValuesForDisplay.length > 0) {
+							AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+							builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay,
+									new DialogInterface.OnClickListener() {
 
-					if (value == null && alternativeValuesForDisplay.length > 0) {
-						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-						builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay,
-								new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									Bundle args = new Bundle();
+									args.putString(CLASS_NAME, altValues.get(which));
+									args.putString(SELECTED_SERVER, selectedServer);
+									args.putBoolean(CREATE_MODE, true);
+									FragmentTransaction ft = getFragmentManager().beginTransaction();
+									ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+									EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+									ft.replace(R.id.LayoutMain, configHandler);
+									ft.addToBackStack(null);
+									configHandler.setArguments(args);
+									configHandler.setTargetFragment(myself, REQ_RETURN_OBJECT);
+									ft.commit();
+								}
+							});
+							builder.create().show();
+						} else if (field.get(config) != null) {
+							FragmentTransaction ft = getFragmentManager().beginTransaction();
+							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+							EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+							ft.replace(R.id.LayoutMain, configHandler);
+							ft.addToBackStack(null);
+							Bundle args = new Bundle();
+							configHandler.setArguments(args);
+							args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) field.get(config));
+							args.putString(SELECTED_SERVER, selectedServer);
+							ft.commit();
+						}
+					} catch (Exception e) {
 
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								Bundle args = new Bundle();
-								args.putString(CLASS_NAME, altValues.get(which));
-								args.putString(SELECTED_SERVER, selectedServer);
-								args.putBoolean(CREATE_MODE, true);
-								FragmentTransaction ft = getFragmentManager().beginTransaction();
-										ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-								ft.replace(R.id.LayoutMain, configHandler);
-								ft.addToBackStack(null);
-								configHandler.setArguments(args);
-								configHandler.setTargetFragment(myself, REQ_RETURN_OBJECT);
-								ft.commit();
-							}
-						});
-						builder.create().show();
-					} else if (value != null) {
-						FragmentTransaction ft = getFragmentManager().beginTransaction();
-						ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-						EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-						ft.replace(R.id.LayoutMain, configHandler);
-						ft.addToBackStack(null);
-						Bundle args = new Bundle();
-						configHandler.setArguments(args);
-						args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) value);
-						args.putString(SELECTED_SERVER, selectedServer);
-						ft.commit();
 					}
 				}
 			});
@@ -420,10 +408,14 @@ public class EditConfigHandlerFragment extends Fragment {
 							MenuInflater inflater = mode.getMenuInflater();
 							inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
 							MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
-							if (value != null) {
-								editItem.setVisible(true);
-							} else {
-								editItem.setVisible(false);
+							try {
+								if (field.get(config) != null) {
+									editItem.setVisible(true);
+								} else {
+									editItem.setVisible(false);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
 							return true;
 						}
@@ -431,31 +423,33 @@ public class EditConfigHandlerFragment extends Fragment {
 
 						@Override
 						public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+							try {
+								switch (item.getItemId()) {
 
-							switch (item.getItemId()) {
+								case R.id.menuEntryRemoveConfigurationClass:
 
-							case R.id.menuEntryRemoveConfigurationClass:
-
-								try {
 									field.set(config, null);
-								} catch (Exception e) {
-									e.printStackTrace();
+									beanView.setText("kein Objekt gesetzt");
+
+									break;
+
+								case R.id.menuEntryEditConfigurationClass:
+									FragmentTransaction ft = getFragmentManager().beginTransaction();
+									ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+									EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+									ft.replace(R.id.LayoutMain, configHandler);
+									ft.addToBackStack(null);
+									Bundle args = new Bundle();
+									configHandler.setArguments(args);
+									args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) field.get(config));
+									args.putString(SELECTED_SERVER, selectedServer);
+									ft.commit();
+									break;
+
 								}
-								break;
 
-							case R.id.menuEntryEditConfigurationClass:
-								FragmentTransaction ft = getFragmentManager().beginTransaction();
-								ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-								EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-								ft.replace(R.id.LayoutMain, configHandler);
-								ft.addToBackStack(null);
-								Bundle args = new Bundle();
-								configHandler.setArguments(args);
-								args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) value);
-								args.putString(SELECTED_SERVER, selectedServer);
-								ft.commit();
-								break;
-
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
 							return false;
 						}
@@ -691,7 +685,7 @@ public class EditConfigHandlerFragment extends Fragment {
 									args.putString(SELECTED_SERVER, selectedServer);
 									args.putBoolean(CREATE_MODE, true);
 									FragmentTransaction ft = getFragmentManager().beginTransaction();
-											ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+									ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 									EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 									ft.replace(R.id.LayoutMain, configHandler);
 									ft.addToBackStack(null);
@@ -807,21 +801,74 @@ public class EditConfigHandlerFragment extends Fragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menuEntryCancelEditConfiguration:
-			getFragmentManager().popBackStack();
-			return true;
 		case R.id.menuEntryFinishEditConfiguration:
 			try {
-				((EditConfigHandlerFragment) getTargetFragment()).persistConfigurationFromChild(myConfigurationData);
+				if (getTargetFragment() != null) {
+					((IntegrateObjectValueHandler) getTargetFragment()).integrateConfiguration(myConfigurationData);
+				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			getFragmentManager().popBackStack();
 			return true;
+		case R.id.menuEntrySaveEditConfiguration:
+			saveObjectCallback.saveObject(this.myConfigurationData);
+			return true;
+
+		case android.R.id.home:
+			getFragmentManager().popBackStack();
+			// getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+
+	/**
+	 * @return the saveObjectCallback
+	 */
+	public SaveObjectHandler getSaveObjectCallback() {
+		return saveObjectCallback;
+	}
+
+
+	/**
+	 * @param saveObjectCallback
+	 *            the saveObjectCallback to set
+	 */
+	public void setSaveObjectCallback(SaveObjectHandler saveObjectCallback) {
+		this.saveObjectCallback = saveObjectCallback;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambient.control.processes.IntegrateObjectValueHandler#
+	 * integrateConfiguration(java.lang.Object)
+	 */
+	@Override
+	public void integrateConfiguration(Object configuration) {
+		try {
+			Class myObjectClass = myConfigurationData.getClass();
+			Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);
+			if (whereToPutDataFromChild.type.equals(WhereToPutType.FIELD)) {
+				myField.set(myConfigurationData, configuration);
+			} else if (whereToPutDataFromChild.type.equals(WhereToPutType.LIST)) {
+				List list = (List) myField.get(myConfigurationData);
+				if (whereToPutDataFromChild.positionInList != 0) {
+					list.set(whereToPutDataFromChild.positionInList, configuration);
+				} else {
+					list.add(configuration);
+				}
+			} else if (whereToPutDataFromChild.type.equals(WhereToPutType.MAP)) {
+				Map map = (Map) myField.get(myConfigurationData);
+				map.put(whereToPutDataFromChild.keyInMap, configuration);
+			}
+		} catch (Exception e) {
+			Log.e("EditConfigHandler", "error trying to integrate data from child into configuration", e);
 		}
 	}
 
