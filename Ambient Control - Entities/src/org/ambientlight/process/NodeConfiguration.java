@@ -1,6 +1,8 @@
 package org.ambientlight.process;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
@@ -30,4 +32,6 @@ public class NodeConfiguration implements Serializable {
 			@Value(displayName = "Mathematische Funktion", value = "org.ambientlight.process.handler.expression.ExpressionConfiguration"),
 			@Value(displayName = "Verzweigung", value = "org.ambientlight.process.handler.expression.DecisionHandlerConfiguration") })
 	public AbstractActionHandlerConfiguration actionHandler;
+
+	public List<Integer> nextNodeIds = new ArrayList<Integer>();
 }

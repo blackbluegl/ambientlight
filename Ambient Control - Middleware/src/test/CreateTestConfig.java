@@ -169,15 +169,15 @@ public class CreateTestConfig {
 		NodeConfiguration eventMapperNode = new NodeConfiguration();
 		eventMapperNode.id = 0;
 		EventToBooleanHandlerConfiguration eventMapper = new EventToBooleanHandlerConfiguration();
-		eventMapper.nextNodeId = 1;
+		eventMapperNode.nextNodeIds.add(1);
 		eventMapperNode.actionHandler = eventMapper;
 		roomSwitchProcess.nodes.put(0, eventMapperNode);
 
 		NodeConfiguration decissionNode = new NodeConfiguration();
 		decissionNode.id = 1;
 		DecisionHandlerConfiguration decission = new DecisionHandlerConfiguration();
-		decission.nextNodeId = 2;
-		decission.nextAlternativeNodeId = 3;
+		decissionNode.nextNodeIds.add(2);
+		decissionNode.nextNodeIds.add(3);
 		ExpressionConfiguration expression = new ExpressionConfiguration();
 		decission.expressionConfiguration = expression;
 		expression.expression = "#{tokenValue}==1.0";
@@ -188,7 +188,7 @@ public class CreateTestConfig {
 		grabCurrentSceneryNode.id = 2;
 		EventGeneratorSensorAdapterConfiguration grabSceneryHandler = new EventGeneratorSensorAdapterConfiguration();
 		grabSceneryHandler.eventSensorId = "RoomSceneryEventGenerator";
-		grabSceneryHandler.nextNodeId = 4;
+		grabCurrentSceneryNode.nextNodeIds.add(4);
 		grabCurrentSceneryNode.actionHandler = grabSceneryHandler;
 		roomSwitchProcess.nodes.put(2, grabCurrentSceneryNode);
 
@@ -196,7 +196,6 @@ public class CreateTestConfig {
 		fireEventNode.id = 4;
 		FireEventHandlerConfiguration fireEventHandler = new FireEventHandlerConfiguration();
 		fireEventHandler.event = null;
-		fireEventHandler.nextNodeId = null;
 		fireEventNode.actionHandler = fireEventHandler;
 		roomSwitchProcess.nodes.put(4, fireEventNode);
 
@@ -204,7 +203,6 @@ public class CreateTestConfig {
 		turnOffNode.id = 3;
 		SimplePowerStateHandlerConfiguration powerDownHandler = new SimplePowerStateHandlerConfiguration();
 		powerDownHandler.powerState = false;
-		powerDownHandler.nextNodeId = null;
 		turnOffNode.actionHandler = powerDownHandler;
 		roomSwitchProcess.nodes.put(3, turnOffNode);
 
@@ -236,21 +234,21 @@ public class CreateTestConfig {
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
-		cHandler.nextNodeId = 1;
 		for (LightObjectConfiguration current : lo) {
 			cHandler.actorConfiguration.put(current.getName(), createSimpleColor());
 		}
 		startNode.actionHandler = cHandler;
+		startNode.nextNodeIds.add(1);
 
 		NodeConfiguration switchNode = new NodeConfiguration();
 		switchNode.id = 1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		powerstatehandler.nextNodeId = null;
 		for (IUserRoomItem current : itemsToPutOn) {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;
+
 
 		process.nodes.put(0, startNode);
 		process.nodes.put(1, switchNode);

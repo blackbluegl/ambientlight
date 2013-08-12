@@ -16,6 +16,7 @@
         android:id="@+id/menuEntryProcessAddNode"
         android:icon="@drawable/content_new"
         android:showAsAction="always|withText"
-        android:title="Knoten hinzufügen"/>
+        android:title="Knoten hinzufügen"
+        android:visible="false"/>
 
 </menu>

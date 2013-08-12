@@ -93,7 +93,7 @@ public class ProcessFactory {
 			handler = new PowerStateHandler();
 		} else if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
 			handler = new DecissionActionHandler();
-			createNodes(process, ((DecisionHandlerConfiguration) nodeConfig.actionHandler).nextAlternativeNodeId);
+			createNodes(process, nodeConfig.nextNodeIds.get(1));
 		} else if (nodeConfig.actionHandler instanceof ExpressionHandlerConfiguration) {
 			handler = new ExpressionActionHandler();
 		} else if (nodeConfig.actionHandler instanceof EventToBooleanHandlerConfiguration) {
@@ -105,12 +105,13 @@ public class ProcessFactory {
 		}
 		System.out.println("ProcessFactory: actionhandler for node id: " + i + " is a: " + handler.getClass().getSimpleName());
 		handler.config = nodeConfig.actionHandler;
+		handler.nodeIds = nodeConfig.nextNodeIds;
 		node.handler = handler;
 
 		process.nodes.put(node.config.id, node);
 
-		if (nodeConfig.actionHandler.nextNodeId != null) {
-			createNodes(process, nodeConfig.actionHandler.nextNodeId);
+		if (nodeConfig.nextNodeIds.isEmpty() == false) {
+			createNodes(process, nodeConfig.nextNodeIds.get(0));
 		}
 	}
 }
