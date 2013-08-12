@@ -1,15 +1,17 @@
 package org.ambientlight.process.handler;
 
+import java.util.List;
+
 import org.ambientlight.process.entities.Token;
 
 
 public abstract class AbstractActionHandler {
 
 	public AbstractActionHandlerConfiguration config;
-
+	public List<Integer> nodeIds;
 
 	public Integer getNextNodeId() {
-		return config.nextNodeId;
+		return nodeIds.get(0);
 	}
 
 

@@ -55,7 +55,8 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	// helper list and values to correlate between the two spinners
 	private final List<String> serverNames = new ArrayList<String>();
 	String selectedServer = null;
-	String selectedProcessPosition = null;
+	// String selectedProcessPosition = null;
+	ProcessConfiguration selectedProcess = null;
 
 	// adapter values of the two spinners
 	private final List<String> roomNames = new ArrayList<String>();
@@ -65,6 +66,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 	Spinner spinnerRoom;
 	Spinner spinnerProcess;
+	ProcessCardDrawer drawer;
 
 
 	@Override
@@ -72,7 +74,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		// getActivity().getActionBar().setDisplayShowHomeEnabled(false);
 		this.content = inflater.inflate(R.layout.fragment_processcard, container, false);
-		final ProcessCardDrawer drawer = (ProcessCardDrawer) content.findViewById(R.id.processCardDrawer);
+		drawer = (ProcessCardDrawer) content.findViewById(R.id.processCardDrawer);
 		this.selectedNode = drawer.getSelectedNode();
 		if (savedInstanceState != null) {
 			int position = savedInstanceState.getInt(BUNDLE_SPINNER_ROOM_POSITION);
@@ -140,9 +142,8 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				getActivity().invalidateOptionsMenu();
 				RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
 						.getRoomConfiguration(selectedServer);
-
-				drawer.setProcess(selectedRoomConfiguration.processes.get(pos));
-
+				selectedProcess = selectedRoomConfiguration.processes.get(pos);
+				drawer.setProcess(selectedProcess);
 			}
 
 
@@ -155,7 +156,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
-				Log.i("nodeSelectListener", node.actionHandler.getClass().getSimpleName());
 				selectedNode = node;
 				getActivity().invalidateOptionsMenu();
 			}
@@ -169,9 +169,12 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_processcard_menu, menu);
 		MenuItem edit = menu.findItem(R.id.menuEntryProcessEditNode);
+		MenuItem add = menu.findItem(R.id.menuEntryProcessAddNode);
 		if (this.selectedNode != null) {
 			edit.setVisible(true);
+			add.setVisible(true);
 		}
+
 	}
 
 
@@ -179,11 +182,25 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menuEntryProcessAddNode:
-			ChooseAlternativeConfiguration frag = new ChooseAlternativeConfiguration();
-			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			ft.replace(R.id.LayoutMain, frag);
-			ft.addToBackStack(null);
-			ft.commit();
+			if (selectedNode.nextNodeIds.size() > 1) {
+				// create dialog
+			} else {
+				NodeConfiguration nodeConfig = new NodeConfiguration();
+				if (selectedNode.nextNodeIds.isEmpty() == false) {
+					nodeConfig.nextNodeIds.add(selectedNode.nextNodeIds.get(0));
+				}
+
+				for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
+					if (selectedProcess.nodes.containsKey(i) == false) {
+						nodeConfig.id = i;
+						selectedNode.nextNodeIds.clear();
+						selectedNode.nextNodeIds.add(nodeConfig.id);
+						selectedProcess.nodes.put(i, nodeConfig);
+						drawer.setProcess(selectedProcess);
+						break;
+					}
+				}
+			}
 			return true;
 
 		case R.id.menuEntryProcessEditNode:

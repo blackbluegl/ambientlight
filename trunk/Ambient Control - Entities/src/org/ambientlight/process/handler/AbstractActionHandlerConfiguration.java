@@ -10,5 +10,4 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public abstract class AbstractActionHandlerConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public Integer nextNodeId;
 }

@@ -70,7 +70,7 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 
 	@Override
 	public Integer getNextNodeId() {
-		Integer nextNodeId = takeDefaultTransition ? config.nextNodeId : getConfig().nextAlternativeNodeId;
+		Integer nextNodeId = takeDefaultTransition ? this.nodeIds.get(0) : this.nodeIds.get(1);
 		System.out.println("DecissionHandler: takes transition to node: " + nextNodeId);
 		return nextNodeId;
 	}

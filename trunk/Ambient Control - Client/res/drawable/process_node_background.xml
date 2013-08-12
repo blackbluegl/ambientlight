@@ -27,7 +27,7 @@
             android:shape="rectangle" >
             <stroke
                 android:width="2dp"
-                android:color="#AAFFFFFF" />
+                android:color="#FFCCCCCC" />
 
             <gradient
                 android:angle="225"
