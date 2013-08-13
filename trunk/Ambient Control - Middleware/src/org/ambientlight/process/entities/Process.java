@@ -16,6 +16,7 @@ public class Process implements IEventListener {
 	Map<Integer, Node> nodes = new HashMap<Integer, Node>();
 	Token token;
 
+
 	public void start() {
 		// wait until event happens
 		for (EventConfiguration event : config.eventTriggerConfigurations) {
@@ -28,7 +29,7 @@ public class Process implements IEventListener {
 	@Override
 	public void handleEvent(EventConfiguration event) {
 		token = new Token();
-		token.nextNodeId = 0;
+		token.nextNodeId = getFirstNode();
 
 		token.valueType = TokenValueType.EVENT;
 		token.data = event;
@@ -47,5 +48,26 @@ public class Process implements IEventListener {
 			System.out.println("Process: " + config.id + " stopped during an error in node: " + currentNode.config.id + ":");
 			e.printStackTrace();
 		}
+	}
+
+
+	private Integer getFirstNode() {
+		for (Node currentNode : nodes.values()) {
+			boolean foundPrevious = false;
+			for (Node possiblePrevious : nodes.values()) {
+				for (Integer nextNodeId : possiblePrevious.config.nextNodeIds) {
+					if (nextNodeId.equals(currentNode.config.id)) {
+						foundPrevious = true;
+						break;
+					}
+					if (foundPrevious) {
+						break;
+					}
+				}
+			}
+			if (foundPrevious == false)
+				return currentNode.config.id;
+		}
+		return null;
 	}
 }
