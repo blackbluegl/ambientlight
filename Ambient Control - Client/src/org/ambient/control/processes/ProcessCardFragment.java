@@ -48,7 +48,7 @@ import android.widget.Spinner;
  */
 public class ProcessCardFragment extends Fragment implements IntegrateObjectValueHandler {
 
-	private NodeConfiguration selectedNode = null;
+	// private NodeConfiguration selectedNode = null;
 
 	private final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
 
@@ -75,7 +75,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 		// getActivity().getActionBar().setDisplayShowHomeEnabled(false);
 		this.content = inflater.inflate(R.layout.fragment_processcard, container, false);
 		drawer = (ProcessCardDrawer) content.findViewById(R.id.processCardDrawer);
-		this.selectedNode = drawer.getSelectedNode();
 		if (savedInstanceState != null) {
 			int position = savedInstanceState.getInt(BUNDLE_SPINNER_ROOM_POSITION);
 			this.initRoomArrays(position);
@@ -109,7 +108,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 					@Override
 					public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
-						selectedNode = null;
 						getActivity().invalidateOptionsMenu();
 
 						selectedServer = serverNames.get(pos);
@@ -138,7 +136,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
-				selectedNode = null;
 				getActivity().invalidateOptionsMenu();
 				RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
 						.getRoomConfiguration(selectedServer);
@@ -156,7 +153,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
-				selectedNode = node;
 				getActivity().invalidateOptionsMenu();
 			}
 		});
@@ -170,9 +166,18 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 		inflater.inflate(R.menu.fragment_processcard_menu, menu);
 		MenuItem edit = menu.findItem(R.id.menuEntryProcessEditNode);
 		MenuItem add = menu.findItem(R.id.menuEntryProcessAddNode);
-		if (this.selectedNode != null) {
+		MenuItem addSecond = menu.findItem(R.id.menuEntryProcessAddSecondNode);
+		MenuItem remove = menu.findItem(R.id.menuEntryProcessRemoveNode);
+		if (this.drawer.getSelectedNode() != null) {
 			edit.setVisible(true);
 			add.setVisible(true);
+
+			if (drawer.getSelectedNode().nextNodeIds.size() < 2) {
+				remove.setVisible(true);
+				if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
+					addSecond.setVisible(true);
+				}
+			}
 		}
 
 	}
@@ -181,22 +186,52 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+
+		case R.id.menuEntryProcessRemoveNode:
+			if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
+				for (NodeConfiguration currentPreviousNode : selectedProcess.nodes.values()) {
+					if (currentPreviousNode.nextNodeIds != null && currentPreviousNode.nextNodeIds.size() > 0
+							&& currentPreviousNode.nextNodeIds.get(0).equals(drawer.getSelectedNode().id)) {
+						currentPreviousNode.nextNodeIds = drawer.getSelectedNode().nextNodeIds;
+						selectedProcess.nodes.remove(drawer.getSelectedNode().id);
+						drawer.setProcess(selectedProcess);
+						break;
+					}
+				}
+			}
+			return true;
+		case R.id.menuEntryProcessAddSecondNode:
+			NodeConfiguration secondNodeConfig = new NodeConfiguration();
+
+			for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
+				if (selectedProcess.nodes.containsKey(i) == false) {
+					secondNodeConfig.id = i;
+					this.drawer.getSelectedNode().nextNodeIds.add(secondNodeConfig.id);
+					selectedProcess.nodes.put(i, secondNodeConfig);
+					drawer.setProcess(selectedProcess);
+					drawer.setSelectdeNode(secondNodeConfig);
+					break;
+				}
+			}
+			return true;
+
 		case R.id.menuEntryProcessAddNode:
-			if (selectedNode.nextNodeIds.size() > 1) {
+			if (this.drawer.getSelectedNode().nextNodeIds.size() > 1) {
 				// create dialog
 			} else {
 				NodeConfiguration nodeConfig = new NodeConfiguration();
-				if (selectedNode.nextNodeIds.isEmpty() == false) {
-					nodeConfig.nextNodeIds.add(selectedNode.nextNodeIds.get(0));
+				if (this.drawer.getSelectedNode().nextNodeIds.isEmpty() == false) {
+					nodeConfig.nextNodeIds.add(this.drawer.getSelectedNode().nextNodeIds.get(0));
 				}
 
 				for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
 					if (selectedProcess.nodes.containsKey(i) == false) {
 						nodeConfig.id = i;
-						selectedNode.nextNodeIds.clear();
-						selectedNode.nextNodeIds.add(nodeConfig.id);
+						this.drawer.getSelectedNode().nextNodeIds.clear();
+						this.drawer.getSelectedNode().nextNodeIds.add(nodeConfig.id);
 						selectedProcess.nodes.put(i, nodeConfig);
 						drawer.setProcess(selectedProcess);
+						drawer.setSelectdeNode(nodeConfig);
 						break;
 					}
 				}
@@ -208,7 +243,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
 			fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 			Bundle arguments = new Bundle();
-			arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, selectedNode);
+			arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, this.drawer.getSelectedNode());
 			arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
 			arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
 			fragEdit.setArguments(arguments);

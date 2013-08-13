@@ -2,21 +2,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menuEntryProcessSave"
-        android:icon="@drawable/content_save"
-        android:showAsAction="always|withText"
-        android:title="@string/button_save"/>
-    <item
         android:id="@+id/menuEntryProcessEditNode"
         android:icon="@drawable/content_edit"
-        android:showAsAction="always|withText"
+        android:showAsAction="ifRoom|withText"
         android:title="@string/button_edit"
         android:visible="false"/>
     <item
         android:id="@+id/menuEntryProcessAddNode"
         android:icon="@drawable/content_new"
-        android:showAsAction="always|withText"
+        android:showAsAction="ifRoom|withText"
         android:title="Knoten hinzufügen"
         android:visible="false"/>
-
+    <item
+        android:id="@+id/menuEntryProcessAddSecondNode"
+        android:icon="@drawable/content_split"
+        android:showAsAction="ifRoom|withText"
+        android:title="weiteren Knoten hinzufügen"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessRemoveNode"
+        android:icon="@drawable/content_discard"
+        android:showAsAction="ifRoom|withText"
+        android:title="Knoten entfernen"
+        android:visible="false"/>
+   <item
+        android:id="@+id/menuEntryProcessSave"
+        android:icon="@drawable/content_save"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/button_save"/>
+ 
 </menu>

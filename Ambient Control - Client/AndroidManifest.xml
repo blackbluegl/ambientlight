@@ -26,10 +26,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="org.ambient.control.MainActivity"
+            android:uiOptions="splitActionBarWhenNarrow"
             android:label="@string/title_activity_main" >
-             <meta-data android:name="android.support.UI_OPTIONS"
-                   android:value="splitActionBarWhenNarrow" />
-            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,7 +60,10 @@
             android:label="@string/title_activity_dialog_holder" >
         </activity>
 
-        <receiver android:name="org.ambient.widgets.RoomSwitchesWidgetProvider" android:label="Raumschalter" android:icon="@drawable/widget_room_switches">
+        <receiver
+            android:name="org.ambient.widgets.RoomSwitchesWidgetProvider"
+            android:icon="@drawable/widget_room_switches"
+            android:label="Raumschalter" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
