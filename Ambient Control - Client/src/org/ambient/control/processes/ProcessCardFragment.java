@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -148,12 +149,128 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			public void onNothingSelected(AdapterView<?> arg0) {
 			}
 		});
-
+		final ProcessCardFragment myself = this;
 		drawer.setOnNodeSelectionListener(new NodeSelectionListener() {
 
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
-				getActivity().invalidateOptionsMenu();
+				// getActivity().invalidateOptionsMenu();
+				myself.getActivity().startActionMode(new ActionMode.Callback() {
+
+					@Override
+					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+						mode.finish();
+						switch (item.getItemId()) {
+
+						case R.id.menuEntryProcessRemoveNode:
+							if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
+								for (NodeConfiguration currentPreviousNode : selectedProcess.nodes.values()) {
+									if (currentPreviousNode.nextNodeIds != null && currentPreviousNode.nextNodeIds.size() > 0
+											&& currentPreviousNode.nextNodeIds.get(0).equals(drawer.getSelectedNode().id)) {
+										currentPreviousNode.nextNodeIds = drawer.getSelectedNode().nextNodeIds;
+										selectedProcess.nodes.remove(drawer.getSelectedNode().id);
+										drawer.setProcess(selectedProcess);
+										break;
+									}
+								}
+							}
+							return true;
+						case R.id.menuEntryProcessAddSecondNode:
+							NodeConfiguration secondNodeConfig = new NodeConfiguration();
+
+							for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
+								if (selectedProcess.nodes.containsKey(i) == false) {
+									secondNodeConfig.id = i;
+									myself.drawer.getSelectedNode().nextNodeIds.add(secondNodeConfig.id);
+									selectedProcess.nodes.put(i, secondNodeConfig);
+									drawer.setProcess(selectedProcess);
+									drawer.setSelectdeNode(secondNodeConfig);
+									break;
+								}
+							}
+							return true;
+
+						case R.id.menuEntryProcessAddNode:
+							if (myself.drawer.getSelectedNode().nextNodeIds.size() > 1) {
+								// create dialog
+							} else {
+								NodeConfiguration nodeConfig = new NodeConfiguration();
+								if (myself.drawer.getSelectedNode().nextNodeIds.isEmpty() == false) {
+									nodeConfig.nextNodeIds.add(myself.drawer.getSelectedNode().nextNodeIds.get(0));
+								}
+
+								for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
+									if (selectedProcess.nodes.containsKey(i) == false) {
+										nodeConfig.id = i;
+										myself.drawer.getSelectedNode().nextNodeIds.clear();
+										myself.drawer.getSelectedNode().nextNodeIds.add(nodeConfig.id);
+										selectedProcess.nodes.put(i, nodeConfig);
+										drawer.setProcess(selectedProcess);
+										drawer.setSelectdeNode(nodeConfig);
+										break;
+									}
+								}
+							}
+							return true;
+
+						case R.id.menuEntryProcessEditNode:
+							EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
+							fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+							Bundle arguments = new Bundle();
+							arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, myself.drawer.getSelectedNode());
+							arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+							arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
+							fragEdit.setArguments(arguments);
+							FragmentTransaction ft2 = getFragmentManager().beginTransaction();
+							ft2.replace(R.id.LayoutMain, fragEdit);
+							ft2.addToBackStack(null);
+							ft2.commit();
+							return true;
+						default:
+							return true;
+
+						}
+					}
+
+
+					@Override
+					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+						mode.getMenuInflater().inflate(R.menu.fragment_processcard_cab, menu);
+						// inflater.inflate(R.menu.fragment_processcard_menu,
+						// menu);
+						MenuItem edit = menu.findItem(R.id.menuEntryProcessEditNode);
+						MenuItem add = menu.findItem(R.id.menuEntryProcessAddNode);
+						MenuItem addSecond = menu.findItem(R.id.menuEntryProcessAddSecondNode);
+						MenuItem remove = menu.findItem(R.id.menuEntryProcessRemoveNode);
+						if (myself.drawer.getSelectedNode() != null) {
+							edit.setVisible(true);
+							add.setVisible(true);
+
+							if (drawer.getSelectedNode().nextNodeIds.size() < 2) {
+								remove.setVisible(true);
+								if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
+									addSecond.setVisible(true);
+								}
+							}
+						}
+						return true;
+					}
+
+
+					@Override
+					public void onDestroyActionMode(ActionMode mode) {
+						// TODO Auto-generated method stub
+
+					}
+
+
+					@Override
+					public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				});
+
 			}
 		});
 		setHasOptionsMenu(true);
@@ -164,22 +281,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_processcard_menu, menu);
-		MenuItem edit = menu.findItem(R.id.menuEntryProcessEditNode);
-		MenuItem add = menu.findItem(R.id.menuEntryProcessAddNode);
-		MenuItem addSecond = menu.findItem(R.id.menuEntryProcessAddSecondNode);
-		MenuItem remove = menu.findItem(R.id.menuEntryProcessRemoveNode);
-		if (this.drawer.getSelectedNode() != null) {
-			edit.setVisible(true);
-			add.setVisible(true);
-
-			if (drawer.getSelectedNode().nextNodeIds.size() < 2) {
-				remove.setVisible(true);
-				if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
-					addSecond.setVisible(true);
-				}
-			}
-		}
-
 	}
 
 
@@ -187,71 +288,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 
-		case R.id.menuEntryProcessRemoveNode:
-			if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
-				for (NodeConfiguration currentPreviousNode : selectedProcess.nodes.values()) {
-					if (currentPreviousNode.nextNodeIds != null && currentPreviousNode.nextNodeIds.size() > 0
-							&& currentPreviousNode.nextNodeIds.get(0).equals(drawer.getSelectedNode().id)) {
-						currentPreviousNode.nextNodeIds = drawer.getSelectedNode().nextNodeIds;
-						selectedProcess.nodes.remove(drawer.getSelectedNode().id);
-						drawer.setProcess(selectedProcess);
-						break;
-					}
-				}
-			}
-			return true;
-		case R.id.menuEntryProcessAddSecondNode:
-			NodeConfiguration secondNodeConfig = new NodeConfiguration();
-
-			for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
-				if (selectedProcess.nodes.containsKey(i) == false) {
-					secondNodeConfig.id = i;
-					this.drawer.getSelectedNode().nextNodeIds.add(secondNodeConfig.id);
-					selectedProcess.nodes.put(i, secondNodeConfig);
-					drawer.setProcess(selectedProcess);
-					drawer.setSelectdeNode(secondNodeConfig);
-					break;
-				}
-			}
-			return true;
-
-		case R.id.menuEntryProcessAddNode:
-			if (this.drawer.getSelectedNode().nextNodeIds.size() > 1) {
-				// create dialog
-			} else {
-				NodeConfiguration nodeConfig = new NodeConfiguration();
-				if (this.drawer.getSelectedNode().nextNodeIds.isEmpty() == false) {
-					nodeConfig.nextNodeIds.add(this.drawer.getSelectedNode().nextNodeIds.get(0));
-				}
-
-				for (Integer i = 0; i <= selectedProcess.nodes.keySet().size(); i++) {
-					if (selectedProcess.nodes.containsKey(i) == false) {
-						nodeConfig.id = i;
-						this.drawer.getSelectedNode().nextNodeIds.clear();
-						this.drawer.getSelectedNode().nextNodeIds.add(nodeConfig.id);
-						selectedProcess.nodes.put(i, nodeConfig);
-						drawer.setProcess(selectedProcess);
-						drawer.setSelectdeNode(nodeConfig);
-						break;
-					}
-				}
-			}
-			return true;
-
-		case R.id.menuEntryProcessEditNode:
-			final ProcessCardFragment myself = this;
-			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
-			fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-			Bundle arguments = new Bundle();
-			arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, this.drawer.getSelectedNode());
-			arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
-			arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
-			fragEdit.setArguments(arguments);
-			FragmentTransaction ft2 = getFragmentManager().beginTransaction();
-			ft2.replace(R.id.LayoutMain, fragEdit);
-			ft2.addToBackStack(null);
-			ft2.commit();
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

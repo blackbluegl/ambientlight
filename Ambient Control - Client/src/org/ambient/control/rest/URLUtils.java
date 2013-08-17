@@ -2,7 +2,7 @@ package org.ambient.control.rest;
 
 public class URLUtils {
 
-	public static final String[] ANDROID_ADT_SERVERS = new String[] { "192.168.1.32:9998", "192.168.1.32:9999" };
+	public static final String[] ANDROID_ADT_SERVERS = new String[] { "192.168.1.29:9998", "192.168.1.29:9999" };
 
 
 	// public static final String[] ANDROID_ADT_SERVERS = { "server:9999",
