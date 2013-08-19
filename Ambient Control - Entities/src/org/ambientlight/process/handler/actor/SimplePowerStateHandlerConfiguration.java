@@ -19,6 +19,8 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
+import org.ambientlight.process.handler.DataTypeValidation;
+import org.ambientlight.process.handler.HandlerDataTypeValidation;
 
 
 /**
@@ -27,6 +29,9 @@ import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
  */
 public class SimplePowerStateHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
+	private static final long serialVersionUID = 1L;
+
+	@HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA }, generates = DataTypeValidation.CREATES_NO_DATA)
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	@Presentation(name = "Alle Schalten")
 	public boolean powerState;

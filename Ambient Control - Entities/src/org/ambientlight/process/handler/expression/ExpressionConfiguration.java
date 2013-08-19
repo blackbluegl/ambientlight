@@ -7,8 +7,9 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 
-
 public class ExpressionConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@TypeDef(fieldType = FieldType.EXPRESSION)
 	@Presentation(name = "Mathematischer Ausdruck", description = "Durch Variablen ist der Zugriff auf Werte von "

@@ -22,13 +22,18 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
+import org.ambientlight.process.handler.DataTypeValidation;
+import org.ambientlight.process.handler.HandlerDataTypeValidation;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
+@HandlerDataTypeValidation(consumes = { DataTypeValidation.EVENT, DataTypeValidation.CONSUMES_NO_DATA }, generates = DataTypeValidation.CREATES_NO_DATA)
 public class FireEventHandlerConfiguration extends AbstractActionHandlerConfiguration {
+
+	private static final long serialVersionUID = 1L;
 
 	@Presentation(name = "Events aus Prozess verwenden")
 	@TypeDef(fieldType = FieldType.BOOLEAN)
