@@ -260,6 +260,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 					@Override
 					public void onDestroyActionMode(ActionMode mode) {
 						// TODO Auto-generated method stub
+						myself.drawer.setSelectdeNode(null);
 
 					}
 

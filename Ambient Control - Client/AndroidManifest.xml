@@ -78,7 +78,8 @@
 
         <activity
             android:name="org.ambient.control.nfc.NFCSwitchHandlerActivity"
-            android:label="@string/title_activity_nfcswitch_handler" >
+            android:label="@string/title_activity_nfcswitch_handler" 
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 

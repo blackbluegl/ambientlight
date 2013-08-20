@@ -78,7 +78,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		} else {
 			this.createProcessCardBitmap(null);
 		}
-
+		invalidate();
 	}
 
 	private class NodeSnippet {

@@ -8,7 +8,12 @@
             android:shape="rectangle" >
             <stroke
                 android:width="2dp"
-                android:color="#FF335599" />
+                android:color="#FFFF0000" />
+
+            <gradient
+                android:angle="225"
+                android:endColor="#00AA0000"
+                android:startColor="#20FF0000" />
 
             <corners
                 android:bottomLeftRadius="7dp"
