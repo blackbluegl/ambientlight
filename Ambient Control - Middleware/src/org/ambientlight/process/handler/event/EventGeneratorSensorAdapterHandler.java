@@ -17,9 +17,9 @@ package org.ambientlight.process.handler.event;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.entities.TokenValueType;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
+import org.ambientlight.process.handler.DataTypeValidation;
 import org.ambientlight.room.entities.EventSensor;
 
 
@@ -40,7 +40,7 @@ public class EventGeneratorSensorAdapterHandler extends AbstractActionHandler {
 	public void performAction(Token token) throws ActionHandlerException {
 		EventSensor sensor = AmbientControlMW.getRoom().getEventSensorById(this.getConfig().eventSensorId);
 		token.data = sensor.getValue();
-		token.valueType = TokenValueType.EVENT;
+		token.valueType = DataTypeValidation.EVENT;
 	}
 
 

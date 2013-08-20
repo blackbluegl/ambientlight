@@ -7,6 +7,7 @@ import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.process.eventmanager.IEventListener;
 import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.handler.DataTypeValidation;
 
 
 public class Process implements IEventListener {
@@ -31,7 +32,7 @@ public class Process implements IEventListener {
 		token = new Token();
 		token.nextNodeId = getFirstNode();
 
-		token.valueType = TokenValueType.EVENT;
+		token.valueType = DataTypeValidation.EVENT;
 		token.data = event;
 
 		Node currentNode = null;
