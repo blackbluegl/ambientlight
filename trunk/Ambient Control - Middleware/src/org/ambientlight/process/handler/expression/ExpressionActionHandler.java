@@ -23,9 +23,9 @@ import net.sourceforge.jeval.Evaluator;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.entities.TokenValueType;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
+import org.ambientlight.process.handler.DataTypeValidation;
 import org.ambientlight.room.entities.Sensor;
 
 
@@ -55,7 +55,7 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 		try {
 			String resultString = evaluator.evaluate(this.getConfig().expressionConfiguration.expression);
 			token.data = Double.parseDouble(resultString);
-			token.valueType = TokenValueType.NUMERIC;
+			token.valueType = DataTypeValidation.NUMERIC;
 		} catch (EvaluationException e) {
 			ActionHandlerException ae = new ActionHandlerException(e);
 			throw ae;

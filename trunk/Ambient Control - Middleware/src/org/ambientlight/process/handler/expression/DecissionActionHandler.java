@@ -20,8 +20,8 @@ import net.sourceforge.jeval.Evaluator;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.entities.TokenValueType;
 import org.ambientlight.process.handler.ActionHandlerException;
+import org.ambientlight.process.handler.DataTypeValidation;
 import org.ambientlight.room.entities.Sensor;
 
 
@@ -45,7 +45,17 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 	public void performAction(Token token) throws ActionHandlerException {
 		Evaluator evaluator = new Evaluator();
 
-		evaluator.putVariable("tokenValue", token.data.toString());
+		String tokenValue = "";
+		if (token.valueType.equals(DataTypeValidation.BOOLEAN)) {
+			if (Boolean.TRUE.equals(token.data)) {
+				tokenValue = "1.0";
+			} else {
+				tokenValue = "0.0";
+			}
+		} else {
+			tokenValue = token.data.toString();
+		}
+		evaluator.putVariable("tokenValue", tokenValue);
 
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
 			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
@@ -54,7 +64,7 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 		try {
 			takeDefaultTransition = evaluator.getBooleanResult(this.getConfig().expressionConfiguration.expression);
 			token.data = takeDefaultTransition;
-			token.valueType = TokenValueType.BOOLEAN;
+			token.valueType = DataTypeValidation.BOOLEAN;
 		} catch (EvaluationException e) {
 			ActionHandlerException ae = new ActionHandlerException(e);
 			throw ae;

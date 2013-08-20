@@ -16,11 +16,11 @@
 package org.ambientlight.process.handler.event;
 
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.entities.TokenValueType;
 import org.ambientlight.process.events.AlarmEventConfiguration;
 import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.process.handler.AbstractActionHandler;
+import org.ambientlight.process.handler.DataTypeValidation;
 
 
 /**
@@ -38,15 +38,15 @@ public class EventToBooleanHandler extends AbstractActionHandler {
 	 */
 	@Override
 	public void performAction(Token token) {
-		if (token.valueType.equals(TokenValueType.EVENT)) {
+		if (token.valueType.equals(DataTypeValidation.EVENT)) {
 			if (token.data instanceof SwitchEventConfiguration) {
 				SwitchEventConfiguration event = (SwitchEventConfiguration) token.data;
 				token.data = event.powerState ? 1.0 : 0.0;
-				token.valueType = TokenValueType.BOOLEAN;
+				token.valueType = DataTypeValidation.BOOLEAN;
 			}
 			if (token.data instanceof AlarmEventConfiguration || token.data instanceof SceneryEntryEventConfiguration) {
 				token.data = 1.0;
-				token.valueType = TokenValueType.BOOLEAN;
+				token.valueType = DataTypeValidation.BOOLEAN;
 			}
 		}
 	}
