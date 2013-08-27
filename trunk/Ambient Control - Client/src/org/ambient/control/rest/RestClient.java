@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.ambient.control.RoomConfigManager;
+import org.ambientlight.process.AbstractProcessConfiguration;
 import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
@@ -37,6 +39,22 @@ public class RestClient {
 	}
 
 
+	public ValidationResult addProcess(String hostName, AbstractProcessConfiguration process) throws InterruptedException,
+	ExecutionException {
+		AddProcessTask task = new AddProcessTask();
+		task.execute(hostName, process);
+		return task.get();
+	}
+
+
+	public ValidationResult validateProcess(String hostName, AbstractProcessConfiguration process) throws InterruptedException,
+	ExecutionException {
+		VerifyProcessTask task = new VerifyProcessTask();
+		task.execute(hostName, process);
+		return task.get();
+	}
+
+
 	public String[] getSceneriesForRoom(String hostName) throws InterruptedException, ExecutionException {
 		GetSceneriesTask task = new GetSceneriesTask();
 		task.execute(hostName);
@@ -44,8 +62,7 @@ public class RestClient {
 	}
 
 
-	public void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException,
-	ExecutionException {
+	public void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException, ExecutionException {
 		ToggleRoomPowerStateTask task = new ToggleRoomPowerStateTask();
 		task.execute(hostName, state, configAdapter);
 	}

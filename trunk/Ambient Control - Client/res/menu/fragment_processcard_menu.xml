@@ -3,19 +3,23 @@
 
     <item
         android:id="@+id/menuEntryProcessValidate"
-        android:icon="@drawable/navigation_accept"
+        android:icon="@drawable/process_validate"
         android:showAsAction="ifRoom|withText"
-        android:title="Überprüfen"/>
-   <item
+        android:title="Prozess überprüfen"/>
+    <item
         android:id="@+id/menuEntryProcessAdd"
         android:icon="@drawable/content_new"
         android:showAsAction="ifRoom|withText"
-        android:title="Hinzufügen"/>
-    
+        android:title="Prozess hinzufügen"/>
+    <item
+        android:id="@+id/menuEntryProcessRemove"
+        android:icon="@drawable/content_discard"
+        android:showAsAction="ifRoom|withText"
+        android:title="Prozess entfernen"/>
     <item
         android:id="@+id/menuEntryProcessSave"
         android:icon="@drawable/content_save"
         android:showAsAction="ifRoom|withText"
         android:title="@string/button_save"/>
- 
+
 </menu>

@@ -13,19 +13,13 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler.event;
-
-import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
-import org.ambientlight.process.handler.DataTypeValidation;
-import org.ambientlight.process.validation.HandlerDataTypeValidation;
+package org.ambientlight.process.validation;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-@HandlerDataTypeValidation(consumes = { DataTypeValidation.EVENT }, generates = DataTypeValidation.BOOLEAN)
-public class EventToBooleanHandlerConfiguration extends AbstractActionHandlerConfiguration {
+public class ForkHasNoCorrespondingHandler extends ValidationEntry {
 
-	private static final long serialVersionUID = 1L;
 }

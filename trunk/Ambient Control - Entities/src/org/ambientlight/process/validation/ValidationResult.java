@@ -28,8 +28,13 @@ import org.ambientlight.process.handler.DataTypeValidation;
 public class ValidationResult {
 
 	public List<ValidationEntry> invalidateEntries = new ArrayList<ValidationEntry>();
-	public boolean idExists = false;
 
+
+	public void addForkWithoutCorrespondingHandler(int nodeId) {
+		ForkHasNoCorrespondingHandler entry = new ForkHasNoCorrespondingHandler();
+		entry.nodeId = nodeId;
+		invalidateEntries.add(entry);
+	}
 
 	public void addEmptyActionHandlerEntry(int nodeId) {
 		EmptyActionHandlerEntry entry = new EmptyActionHandlerEntry();
@@ -50,7 +55,7 @@ public class ValidationResult {
 
 
 	public boolean resultIsValid() {
-		if (idExists || invalidateEntries.size() > 0)
+		if (invalidateEntries.size() > 0)
 			return false;
 		return true;
 	}

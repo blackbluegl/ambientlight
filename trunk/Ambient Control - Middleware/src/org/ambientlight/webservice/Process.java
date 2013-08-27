@@ -19,18 +19,20 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.process.AbstractProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.handler.DataTypeValidation;
-import org.ambientlight.process.handler.HandlerDataTypeValidation;
-import org.ambientlight.process.handler.ValidationResult;
+import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
+import org.ambientlight.process.validation.HandlerDataTypeValidation;
+import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfigurationFactory;
 
 
@@ -41,20 +43,20 @@ import org.ambientlight.room.RoomConfigurationFactory;
 @Path("/process")
 public class Process {
 
-	@PUT
+	@POST
 	@Path("/processes/validation")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ValidationResult validateProcess(ProcessConfiguration process) {
+	public ValidationResult validateProcess(AbstractProcessConfiguration process) {
 		ValidationResult result = new ValidationResult();
 
-		List<ProcessConfiguration> processes = AmbientControlMW.getRoom().config.processes;
-		for (ProcessConfiguration currentProcess : processes) {
-			if (currentProcess.id.equals(process.id)) {
-				result.idExists = true;
-				break;
-			}
-		}
+		List<EventProcessConfiguration> processes = AmbientControlMW.getRoom().config.processes;
+		// for (ProcessConfiguration currentProcess : processes) {
+		// if (currentProcess.id.equals(process.id)) {
+		// result.idExists = true;
+		// break;
+		// }
+		// }
 
 		for (NodeConfiguration currentNode : process.nodes.values()) {
 
@@ -63,11 +65,22 @@ public class Process {
 				continue;
 			}
 
+			if (currentNode.nextNodeIds.size() > 1) {
+				if (currentNode.actionHandler instanceof DecisionHandlerConfiguration == false) {
+					result.addForkWithoutCorrespondingHandler(currentNode.id);
+				}
+			}
+
 			HandlerDataTypeValidation currentNodeValidation = currentNode.actionHandler.getClass().getAnnotation(
 					HandlerDataTypeValidation.class);
 
 			for (Integer nextNodeId : currentNode.nextNodeIds) {
 				NodeConfiguration nextNode = process.nodes.get(nextNodeId);
+				if (nextNode.actionHandler == null) {
+					// do not validate this connection because it will be
+					// validatet at the beginning of the outer for loop
+					continue;
+				}
 				HandlerDataTypeValidation nextNodeValidation = nextNode.actionHandler.getClass().getAnnotation(
 						HandlerDataTypeValidation.class);
 				boolean valide = DataTypeValidation.validate(nextNodeValidation.consumes(), currentNodeValidation.generates());
@@ -80,16 +93,28 @@ public class Process {
 	}
 
 
-	@PUT
-	@Path("/processes/new")
+	@POST
+	@Path("/processes")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object createProcess(ProcessConfiguration process) {
+	public Object createOrUpdateProcess(EventProcessConfiguration process) {
 		ValidationResult result = this.validateProcess(process);
 		if (result.resultIsValid() == false)
 			return result;
+		Integer positionToReplace = null;
+		for (AbstractProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
+			if (currentProcess.id.equals(process.id)) {
+				positionToReplace = AmbientControlMW.getRoom().config.processes.indexOf(currentProcess);
+				break;
+			}
+		}
 
-		AmbientControlMW.getRoom().config.processes.add(process);
+		if (positionToReplace != null) {
+			AmbientControlMW.getRoom().config.processes.remove(positionToReplace);
+			AmbientControlMW.getRoom().config.processes.add(positionToReplace, process);
+		} else {
+			AmbientControlMW.getRoom().config.processes.add(process);
+		}
 
 		try {
 			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
@@ -99,6 +124,7 @@ public class Process {
 
 			return Response.status(500).build();
 		}
+
 
 		return result;
 	}

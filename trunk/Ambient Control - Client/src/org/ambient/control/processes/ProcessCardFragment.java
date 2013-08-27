@@ -25,8 +25,8 @@ import org.ambient.control.config.IntegrateObjectValueHandler;
 import org.ambient.control.rest.RestClient;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
+import org.ambientlight.process.AbstractProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.validation.ValidationEntry;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
@@ -63,7 +63,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	private final List<String> serverNames = new ArrayList<String>();
 	String selectedServer = null;
 	// String selectedProcessPosition = null;
-	ProcessConfiguration selectedProcess = null;
+	AbstractProcessConfiguration selectedProcess = null;
 
 	// adapter values of the two spinners
 	private final List<String> roomNames = new ArrayList<String>();
@@ -122,7 +122,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 								.getRoomConfiguration(selectedServer);
 
 						processNames.clear();
-						for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
+						for (AbstractProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
 							processNames.add(currentProcess.id);
 						}
 
@@ -319,7 +319,8 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				}
 			}
 			return true;
-
+		case R.id.menuEntryProcessAdd:
+			EditConfigHandlerFragment.createNewConfigBean(AbstractProcessConfiguration.class, this, selectedServer);
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -335,7 +336,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 		this.selectedServer = serverNames.get(roomSpinnerSelection);
 
-		for (ProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
+		for (AbstractProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
 				.get(serverNames.get(roomSpinnerSelection)).processes) {
 			processNames.add(config.id);
 		}
