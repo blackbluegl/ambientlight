@@ -20,12 +20,18 @@ import java.util.List;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.IntegrateObjectValueHandler;
+import org.ambient.control.rest.RestClient;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
 import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.validation.ValidationEntry;
+import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -49,7 +55,7 @@ import android.widget.Spinner;
  */
 public class ProcessCardFragment extends Fragment implements IntegrateObjectValueHandler {
 
-	// private NodeConfiguration selectedNode = null;
+	private ActionMode mode = null;
 
 	private final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
 
@@ -154,12 +160,15 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
-				// getActivity().invalidateOptionsMenu();
-				myself.getActivity().startActionMode(new ActionMode.Callback() {
+				if (node == null && mode != null) {
+					mode.finish();
+					return;
+				}
+
+				mode = myself.getActivity().startActionMode(new ActionMode.Callback() {
 
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-						mode.finish();
 						switch (item.getItemId()) {
 
 						case R.id.menuEntryProcessRemoveNode:
@@ -174,7 +183,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 									}
 								}
 							}
-							return true;
+							break;
 						case R.id.menuEntryProcessAddSecondNode:
 							NodeConfiguration secondNodeConfig = new NodeConfiguration();
 
@@ -188,7 +197,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 									break;
 								}
 							}
-							return true;
+							break;
 
 						case R.id.menuEntryProcessAddNode:
 							if (myself.drawer.getSelectedNode().nextNodeIds.size() > 1) {
@@ -211,7 +220,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 									}
 								}
 							}
-							return true;
+							break;
 
 						case R.id.menuEntryProcessEditNode:
 							EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
@@ -225,11 +234,13 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 							ft2.replace(R.id.LayoutMain, fragEdit);
 							ft2.addToBackStack(null);
 							ft2.commit();
-							return true;
+							break;
 						default:
-							return true;
+							break;
 
 						}
+						mode.finish();
+						return true;
 					}
 
 
@@ -288,6 +299,26 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+
+		case R.id.menuEntryProcessValidate:
+			RestClient restClient = new RestClient(null);
+			ValidationResult result = null;
+			try {
+				result = restClient.validateProcess(selectedServer, selectedProcess);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (result.resultIsValid()) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setTitle("Validierung")
+				.setMessage("Die Validierung ist abgeschlossen. Es wurden keine semantische Fehler gefunden.")
+				.setPositiveButton("OK", null).create().show();
+			} else {
+				for (ValidationEntry entry : result.invalidateEntries) {
+					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
+				}
+			}
+			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
