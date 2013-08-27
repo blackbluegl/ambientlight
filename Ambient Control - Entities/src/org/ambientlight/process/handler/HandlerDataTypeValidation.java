@@ -15,11 +15,15 @@
 
 package org.ambientlight.process.handler;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 
 /**
  * @author Florian Bornkessel
  *
  */
+@Retention(RetentionPolicy.RUNTIME)
 public @interface HandlerDataTypeValidation {
 
 	public DataTypeValidation[] consumes();
