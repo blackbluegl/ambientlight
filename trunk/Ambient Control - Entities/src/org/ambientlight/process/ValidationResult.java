@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.process.handler.DataTypeValidation;
+import org.ambientlight.process.validation.EmptyActionHandlerEntry;
+import org.ambientlight.process.validation.InvalidFormatEntry;
+import org.ambientlight.process.validation.ValidationEntry;
 
 
 /**
@@ -26,22 +29,6 @@ import org.ambientlight.process.handler.DataTypeValidation;
  * 
  */
 public class ValidationResult {
-
-	public class ValidationEntry {
-
-		public int nodeId;
-	}
-
-	public class InvalidFormatEntry extends ValidationEntry {
-
-		public int previousNodeId;
-		public DataTypeValidation previousNodeGenerates;
-		public DataTypeValidation[] nodeConsumes;
-	}
-
-	public class EmptyActionHandlerEntry extends ValidationEntry {
-
-	}
 
 	public List<ValidationEntry> invalidateEntries = new ArrayList<ValidationEntry>();
 	public boolean idExists = false;
