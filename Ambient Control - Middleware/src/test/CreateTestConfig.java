@@ -11,7 +11,7 @@ import org.ambientlight.device.drivers.DummySwitchDeviceConfiguration;
 import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.device.led.StripePartConfiguration;
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
@@ -152,7 +152,7 @@ public class CreateTestConfig {
 
 		sceneryEventGenerator.currentScenery = userScenario;
 
-		ProcessConfiguration roomSwitchProcess = new ProcessConfiguration();
+		EventProcessConfiguration roomSwitchProcess = new EventProcessConfiguration();
 		roomSwitchProcess.id = "roomSwitch";
 		rc.processes.add(roomSwitchProcess);
 		SwitchEventConfiguration triggerConfOn = new SwitchEventConfiguration();
@@ -223,7 +223,7 @@ public class CreateTestConfig {
 	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
 			List<LightObjectConfiguration> lo, List<IUserRoomItem> itemsToPutOn) {
 
-		ProcessConfiguration process = new ProcessConfiguration();
+		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.id = "process-scenario1";
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;

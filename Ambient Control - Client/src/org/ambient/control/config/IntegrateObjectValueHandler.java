@@ -13,21 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package org.ambient.control.config;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface HandlerDataTypeValidation {
+public interface IntegrateObjectValueHandler {
 
-	public DataTypeValidation[] consumes();
-
-
-	public DataTypeValidation generates();
+	public void integrateConfiguration(Object configuration);
 }

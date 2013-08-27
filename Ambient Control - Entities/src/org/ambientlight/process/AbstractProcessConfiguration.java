@@ -13,19 +13,22 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler.event;
+package org.ambientlight.process;
 
-import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
-import org.ambientlight.process.handler.DataTypeValidation;
-import org.ambientlight.process.validation.HandlerDataTypeValidation;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.Value;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-@HandlerDataTypeValidation(consumes = { DataTypeValidation.EVENT }, generates = DataTypeValidation.BOOLEAN)
-public class EventToBooleanHandlerConfiguration extends AbstractActionHandlerConfiguration {
+@AlternativeValues(values = { @Value(displayName = "Eventgesteuerter Prozess", value = "org.ambientlight.process.EventProcessConfiguration") })
+public abstract class AbstractProcessConfiguration {
 
-	private static final long serialVersionUID = 1L;
+	public String id;
+	public Map<Integer, NodeConfiguration> nodes = new HashMap<Integer, NodeConfiguration>();
 }

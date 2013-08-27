@@ -3,7 +3,7 @@ package org.ambientlight.process.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.process.eventmanager.IEventListener;
 import org.ambientlight.process.events.EventConfiguration;
@@ -12,7 +12,7 @@ import org.ambientlight.process.handler.DataTypeValidation;
 
 public class Process implements IEventListener {
 
-	ProcessConfiguration config;
+	EventProcessConfiguration config;
 	EventManager eventManager;
 	Map<Integer, Node> nodes = new HashMap<Integer, Node>();
 	Token token;

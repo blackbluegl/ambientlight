@@ -22,8 +22,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ambient.control.R;
+import org.ambientlight.process.AbstractProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.validation.ValidationEntry;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -64,6 +65,28 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	}
 
 	private NodeConfiguration selectedNode = null;
+	private final Map<NodeConfiguration, ValidationEntry> nodesWithError = new HashMap<NodeConfiguration, ValidationEntry>();
+
+
+	public void addNodeWithError(NodeConfiguration node, ValidationEntry validationResult) {
+		nodesWithError.put(node, validationResult);
+		this.createProcessCardBitmap();
+		invalidate();
+	}
+
+
+	public void removeNodeWithError(NodeConfiguration node) {
+		nodesWithError.remove(node);
+		this.createProcessCardBitmap();
+		invalidate();
+	}
+
+
+	public void clearNodesWithError() {
+		nodesWithError.clear();
+		this.createProcessCardBitmap();
+		invalidate();
+	}
 
 
 	public NodeConfiguration getSelectedNode() {
@@ -73,11 +96,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 	public void setSelectdeNode(NodeConfiguration node) {
 		this.selectedNode = node;
-		if (this.selectedNode != null) {
-			this.createProcessCardBitmap(this.nodeSnippets.get(node.id).rect);
-		} else {
-			this.createProcessCardBitmap(null);
-		}
+		this.createProcessCardBitmap();
 		invalidate();
 	}
 
@@ -90,7 +109,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		public List<Integer> drawLineToNodeIds = new ArrayList<Integer>();
 	}
 
-	private ProcessConfiguration process;
+	private AbstractProcessConfiguration process;
 
 	private int rows = 0;
 	private int columns = 0;
@@ -173,7 +192,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	/**
 	 * @return
 	 */
-	public void createProcessCardBitmap(Rect markedNode) {
+	public void createProcessCardBitmap() {
 
 		int elementWidth = this.nodeWidth + this.spaceHorizontal;
 		int elementHeight = this.nodeHeight + this.spaceVertical;
@@ -214,9 +233,20 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 		}
 
-		if (markedNode != null) {
+		if (selectedNode != null) {
+			Rect markedNode = this.nodeSnippets.get(selectedNode.id).rect;
 			Resources res = this.getContext().getResources();
 			Drawable myImage = res.getDrawable(R.drawable.process_node_marked);
+			int xPos = markedNode.left;
+			int yPos = markedNode.top;
+			myImage.setBounds(xPos, yPos, xPos + nodeWidth, yPos + nodeHeight);
+			myImage.draw(canvas);
+		}
+
+		for (NodeConfiguration nodewithError : nodesWithError.keySet()) {
+			Rect markedNode = this.nodeSnippets.get(nodewithError.id).rect;
+			Resources res = this.getContext().getResources();
+			Drawable myImage = res.getDrawable(R.drawable.process_node_invalid);
 			int xPos = markedNode.left;
 			int yPos = markedNode.top;
 			myImage.setBounds(xPos, yPos, xPos + nodeWidth, yPos + nodeHeight);
@@ -377,8 +407,8 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 			for (Entry<Integer, NodeSnippet> current : nodeSnippets.entrySet()) {
 				if (current.getValue().rect.contains(x, y)) {
-					createProcessCardBitmap(current.getValue().rect);
 					selectedNode = process.nodes.get(current.getKey());
+					createProcessCardBitmap();
 					if (listener != null) {
 						listener.onNodeSelected(process.nodes.get(current.getKey()));
 					}
@@ -386,7 +416,10 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 					return true;
 				}
 			}
-
+			selectedNode = null;
+			if (listener != null) {
+				listener.onNodeSelected(null);
+			}
 			return true;
 		}
 	}
@@ -498,20 +531,21 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	}
 
 
-	public ProcessConfiguration getProcess() {
+	public AbstractProcessConfiguration getProcess() {
 		return process;
 	}
 
 
-	public void setProcess(ProcessConfiguration process) {
+	public void setProcess(AbstractProcessConfiguration process) {
 		this.selectedNode = null;
+		this.nodesWithError.clear();
 		this.process = process;
 		this.contentBitmap = null;
 		this.nodeSnippets = new HashMap<Integer, ProcessCardDrawer.NodeSnippet>();
 
 		createNodeSnippetsRecursively(0, 0, 0);
 		calculateContentDimensions();
-		createProcessCardBitmap(null);
+		createProcessCardBitmap();
 
 		this.invalidate();
 	}

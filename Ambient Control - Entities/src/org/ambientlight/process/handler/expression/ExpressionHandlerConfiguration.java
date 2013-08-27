@@ -7,7 +7,7 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.process.handler.DataTypeValidation;
-import org.ambientlight.process.handler.HandlerDataTypeValidation;
+import org.ambientlight.process.validation.HandlerDataTypeValidation;
 
 
 @HandlerDataTypeValidation(consumes = { DataTypeValidation.NUMERIC }, generates = DataTypeValidation.NUMERIC)

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.device.drivers.DeviceConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
@@ -27,7 +27,7 @@ public class RoomConfiguration implements Serializable {
 	public int height;
 	public Map<String, ActorConfiguration> actorConfigurations = new HashMap<String, ActorConfiguration>();
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
-	public List<ProcessConfiguration> processes = new ArrayList<ProcessConfiguration>();
+	public List<EventProcessConfiguration> processes = new ArrayList<EventProcessConfiguration>();
 	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
 	public List<EventGeneratorConfiguration> eventGeneratorConfigurations = new ArrayList<EventGeneratorConfiguration>();
 

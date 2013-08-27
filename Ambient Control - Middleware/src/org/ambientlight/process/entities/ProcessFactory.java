@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
+import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandler;
@@ -48,7 +48,7 @@ public class ProcessFactory {
 
 	public List<Process> initProcesses(RoomConfiguration roomConfig, EventManager eventManager) {
 		List<Process> processes = new ArrayList<Process>();
-		for (ProcessConfiguration processConfig : roomConfig.processes) {
+		for (EventProcessConfiguration processConfig : roomConfig.processes) {
 			System.out.println("ProcessFactory: Building process: " + processConfig.id);
 			Process process = createProcess(processConfig);
 			process.eventManager = eventManager;
@@ -64,7 +64,7 @@ public class ProcessFactory {
 	 * @param processConfig
 	 * @return
 	 */
-	private Process createProcess(ProcessConfiguration processConfig) {
+	private Process createProcess(EventProcessConfiguration processConfig) {
 		Process result = new Process();
 		result.config = processConfig;
 		createNodes(result, 0);
