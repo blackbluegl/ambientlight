@@ -10,10 +10,16 @@ public class SwitchEventConfiguration extends EventConfiguration {
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean powerState;
 
-
 	@TypeDef(fieldType = FieldType.STRING)
 	@AlternativeValues(valueBinding = "getSwitchGenerators().keySet()")
 	public String eventGeneratorName;
+
+
+	@Override
+	public String toString() {
+		String value = "Schalter: " + eventGeneratorName + " im Zustand: ";
+		return powerState ? value + "ein" : value + "aus";
+	}
 
 
 	@Override

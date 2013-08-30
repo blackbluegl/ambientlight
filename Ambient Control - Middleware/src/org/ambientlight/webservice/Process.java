@@ -16,19 +16,20 @@
 package org.ambientlight.webservice;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.AbstractProcessConfiguration;
-import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.EventProcessConfiguration;
+import org.ambientlight.process.NodeConfiguration;
+import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.handler.DataTypeValidation;
 import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.validation.HandlerDataTypeValidation;
@@ -47,16 +48,8 @@ public class Process {
 	@Path("/processes/validation")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ValidationResult validateProcess(AbstractProcessConfiguration process) {
+	public ValidationResult validateProcess(ProcessConfiguration process) {
 		ValidationResult result = new ValidationResult();
-
-		List<EventProcessConfiguration> processes = AmbientControlMW.getRoom().config.processes;
-		// for (ProcessConfiguration currentProcess : processes) {
-		// if (currentProcess.id.equals(process.id)) {
-		// result.idExists = true;
-		// break;
-		// }
-		// }
 
 		for (NodeConfiguration currentNode : process.nodes.values()) {
 
@@ -102,7 +95,7 @@ public class Process {
 		if (result.resultIsValid() == false)
 			return result;
 		Integer positionToReplace = null;
-		for (AbstractProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
+		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(process.id)) {
 				positionToReplace = AmbientControlMW.getRoom().config.processes.indexOf(currentProcess);
 				break;
@@ -125,7 +118,30 @@ public class Process {
 			return Response.status(500).build();
 		}
 
-
 		return result;
+	}
+
+
+	@DELETE
+	@Path("/processes/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object createOrUpdateProcess(@PathParam(value = "id") String id) {
+		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
+			if (currentProcess.id.equals(id)) {
+				AmbientControlMW.getRoom().config.processes.remove(currentProcess);
+				break;
+			}
+		}
+
+		try {
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
+					AmbientControlMW.getRoomConfigFileName());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
+
+		return Response.status(200).build();
 	}
 }

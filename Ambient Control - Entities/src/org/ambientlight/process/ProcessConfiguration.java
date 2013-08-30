@@ -19,7 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.Presentation;
+import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
 /**
@@ -27,8 +31,12 @@ import org.ambientlight.annotations.Value;
  *
  */
 @AlternativeValues(values = { @Value(displayName = "Eventgesteuerter Prozess", value = "org.ambientlight.process.EventProcessConfiguration") })
-public abstract class AbstractProcessConfiguration {
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+public class ProcessConfiguration {
 
+	@Presentation(name = "Name des Prozesses", position = 0)
+	@TypeDef(fieldType = FieldType.STRING)
 	public String id;
+
 	public Map<Integer, NodeConfiguration> nodes = new HashMap<Integer, NodeConfiguration>();
 }

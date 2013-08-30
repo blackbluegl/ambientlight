@@ -34,6 +34,6 @@ public class EventGeneratorSensorAdapterConfiguration extends AbstractActionHand
 	private static final long serialVersionUID = 1L;
 	@AlternativeValues(valueBinding = "eventGeneratorConfigurations.name")
 	@TypeDef(fieldType = FieldType.STRING)
-	@Presentation(name = "Event auslesen und weitergeben")
+	@Presentation(name = "Event auslesen und weitergeben", position = 0)
 	public String eventSensorId;
 }

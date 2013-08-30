@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ambient.control.R;
-import org.ambientlight.process.AbstractProcessConfiguration;
+import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.validation.ValidationEntry;
 
@@ -109,7 +109,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		public List<Integer> drawLineToNodeIds = new ArrayList<Integer>();
 	}
 
-	private AbstractProcessConfiguration process;
+	private ProcessConfiguration process;
 
 	private int rows = 0;
 	private int columns = 0;
@@ -305,7 +305,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 			canvas.drawBitmap(bitmap, srcRect, srcRect, null);
 			return;
 		}
-		if (this.process == null)
+		if (this.process == null || this.process.nodes.isEmpty())
 			return;
 
 		int lastXPos = shiftX + lastX;
@@ -531,21 +531,23 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 	}
 
 
-	public AbstractProcessConfiguration getProcess() {
+	public ProcessConfiguration getProcess() {
 		return process;
 	}
 
 
-	public void setProcess(AbstractProcessConfiguration process) {
+	public void setProcess(ProcessConfiguration process) {
 		this.selectedNode = null;
 		this.nodesWithError.clear();
 		this.process = process;
 		this.contentBitmap = null;
 		this.nodeSnippets = new HashMap<Integer, ProcessCardDrawer.NodeSnippet>();
 
-		createNodeSnippetsRecursively(0, 0, 0);
-		calculateContentDimensions();
-		createProcessCardBitmap();
+		if (process.nodes.isEmpty() == false) {
+			createNodeSnippetsRecursively(0, 0, 0);
+			calculateContentDimensions();
+			createProcessCardBitmap();
+		}
 
 		this.invalidate();
 	}
