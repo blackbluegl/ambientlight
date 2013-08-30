@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.ambient.control.RoomConfigManager;
-import org.ambientlight.process.AbstractProcessConfiguration;
+import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
@@ -39,7 +39,13 @@ public class RestClient {
 	}
 
 
-	public ValidationResult addProcess(String hostName, AbstractProcessConfiguration process) throws InterruptedException,
+	public void deleteProcessFromRoom(String hostName, String processName) {
+		DeleteProcessTask task = new DeleteProcessTask();
+		task.execute(hostName, processName);
+	}
+
+
+	public ValidationResult addProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
 	ExecutionException {
 		AddProcessTask task = new AddProcessTask();
 		task.execute(hostName, process);
@@ -47,7 +53,7 @@ public class RestClient {
 	}
 
 
-	public ValidationResult validateProcess(String hostName, AbstractProcessConfiguration process) throws InterruptedException,
+	public ValidationResult validateProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
 	ExecutionException {
 		VerifyProcessTask task = new VerifyProcessTask();
 		task.execute(hostName, process);

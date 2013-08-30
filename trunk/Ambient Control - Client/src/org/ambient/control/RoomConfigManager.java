@@ -69,9 +69,9 @@ public class RoomConfigManager {
 		for (RoomConfigurationUpdateListener metaListener : metaListeners) {
 			metaListener.onRoomConfigurationChange(server, config);
 		}
-
-		this.listeners.get(server).onRoomConfigurationChange(server, config);
-
+		if (this.listeners.containsKey(server)) {
+			this.listeners.get(server).onRoomConfigurationChange(server, config);
+		}
 	}
 
 

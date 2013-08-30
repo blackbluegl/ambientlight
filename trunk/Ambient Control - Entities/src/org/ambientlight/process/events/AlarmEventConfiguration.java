@@ -1,12 +1,24 @@
 package org.ambientlight.process.events;
 
+import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.TypeDef;
+
 
 
 public class AlarmEventConfiguration extends EventConfiguration {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public int hour;
 	public int minute;
 
+	@TypeDef(fieldType = FieldType.STRING)
+	@AlternativeValues(valueBinding = "getAlarmEventGenerator().keySet()")
+	public String eventGeneratorName;
 
 	@Override
 	public int hashCode() {

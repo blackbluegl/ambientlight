@@ -20,22 +20,24 @@ import java.util.List;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.control.RoomConfigManager;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.IntegrateObjectValueHandler;
 import org.ambient.control.rest.RestClient;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
-import org.ambientlight.process.AbstractProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
+import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.validation.ValidationEntry;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -59,11 +61,13 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 	private final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
 
+	private boolean editNewProcess = false;
+
 	// helper list and values to correlate between the two spinners
 	private final List<String> serverNames = new ArrayList<String>();
 	String selectedServer = null;
 	// String selectedProcessPosition = null;
-	AbstractProcessConfiguration selectedProcess = null;
+	ProcessConfiguration selectedProcess = null;
 
 	// adapter values of the two spinners
 	private final List<String> roomNames = new ArrayList<String>();
@@ -93,18 +97,18 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				android.R.layout.simple_spinner_item, roomNames);
 		roomAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
-		final ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(this.getActivity(),
+		final ArrayAdapter<String> processAdapter = new ArrayAdapter<String>(this.getActivity(),
 				android.R.layout.simple_spinner_item, processNames);
-		switchesAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+		processAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
 		spinnerRoom = (Spinner) content.findViewById(R.id.spinnerProcessRoom);
 		spinnerProcess = (Spinner) content.findViewById(R.id.spinnerProcess);
-
-		spinnerProcess.setAdapter(switchesAdapter);
 		spinnerRoom.setAdapter(roomAdapter);
+		spinnerProcess.setAdapter(processAdapter);
 
 		// create the listener after the initialisation. we do not want to
-		// affect the second spinner while its in creation. let android this for
+		// affect the second spinner while its in creation. let android this
+		// for
 		// us (onResume, Screenrotation etc.)
 		spinnerRoom.post(new Runnable() {
 
@@ -114,7 +118,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 					@Override
 					public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-
+						editNewProcess = false;
 						getActivity().invalidateOptionsMenu();
 
 						selectedServer = serverNames.get(pos);
@@ -122,11 +126,11 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 								.getRoomConfiguration(selectedServer);
 
 						processNames.clear();
-						for (AbstractProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
+						for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
 							processNames.add(currentProcess.id);
 						}
 
-						switchesAdapter.notifyDataSetChanged();
+						processAdapter.notifyDataSetChanged();
 						spinnerProcess.setSelection(0);
 					}
 
@@ -155,6 +159,14 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			public void onNothingSelected(AdapterView<?> arg0) {
 			}
 		});
+
+		if (editNewProcess == true) {
+			spinnerRoom.setVisibility(View.GONE);
+			spinnerProcess.setVisibility(View.GONE);
+			drawer.setProcess(selectedProcess);
+			getActivity().invalidateOptionsMenu();
+		}
+
 		final ProcessCardFragment myself = this;
 		drawer.setOnNodeSelectionListener(new NodeSelectionListener() {
 
@@ -240,6 +252,10 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 						}
 						mode.finish();
+						editNewProcess = true;
+						spinnerProcess.setVisibility(View.GONE);
+						spinnerRoom.setVisibility(View.GONE);
+						getActivity().invalidateOptionsMenu();
 						return true;
 					}
 
@@ -247,8 +263,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 						mode.getMenuInflater().inflate(R.menu.fragment_processcard_cab, menu);
-						// inflater.inflate(R.menu.fragment_processcard_menu,
-						// menu);
+
 						MenuItem edit = menu.findItem(R.id.menuEntryProcessEditNode);
 						MenuItem add = menu.findItem(R.id.menuEntryProcessAddNode);
 						MenuItem addSecond = menu.findItem(R.id.menuEntryProcessAddSecondNode);
@@ -270,7 +285,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 					@Override
 					public void onDestroyActionMode(ActionMode mode) {
-						// TODO Auto-generated method stub
 						myself.drawer.setSelectdeNode(null);
 
 					}
@@ -278,7 +292,6 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 					@Override
 					public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-						// TODO Auto-generated method stub
 						return false;
 					}
 				});
@@ -293,6 +306,11 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_processcard_menu, menu);
+		if (editNewProcess) {
+			menu.findItem(R.id.menuEntryProcessRevertNew).setVisible(true);
+			menu.findItem(R.id.menuEntryProcessRemove).setVisible(false);
+			menu.findItem(R.id.menuEntryProcessSave).setVisible(true);
+		}
 	}
 
 
@@ -320,7 +338,83 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			}
 			return true;
 		case R.id.menuEntryProcessAdd:
-			EditConfigHandlerFragment.createNewConfigBean(AbstractProcessConfiguration.class, this, selectedServer);
+			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer);
+			return true;
+		case R.id.menuEntryProcessRevertNew:
+			this.editNewProcess = false;
+			spinnerProcess.setSelection(0);
+			RoomConfigManager manager = ((MainActivity) getActivity()).getRoomConfigManager();
+			try {
+				manager.addRoomConfiguration(selectedServer, RestClient.getRoom(selectedServer));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			selectedProcess = manager.getRoomConfiguration(selectedServer).processes.get(0);
+			drawer.setProcess(selectedProcess);
+			getActivity().invalidateOptionsMenu();
+			spinnerRoom.setVisibility(View.VISIBLE);
+			spinnerProcess.setVisibility(View.VISIBLE);
+			return true;
+		case R.id.menuEntryProcessSave:
+			final RestClient rest = new RestClient(null);
+			boolean saveProcess = true;
+			for (ProcessConfiguration current : ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
+					selectedServer).processes) {
+				if (current.id.equals(selectedProcess.id)) {
+					saveProcess = false;
+				}
+			}
+
+			if (saveProcess) {
+				try {
+					rest.addProcess(selectedServer, selectedProcess);
+					editNewProcess = false;
+					getActivity().invalidateOptionsMenu();
+					spinnerRoom.setVisibility(View.VISIBLE);
+					spinnerProcess.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setTitle("Prozess überschreiben").setMessage("Soll der bestehende Prozess überschrieben werden?")
+				.setPositiveButton("OK", new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						try {
+							rest.addProcess(selectedServer, selectedProcess);
+							editNewProcess = false;
+							getActivity().invalidateOptionsMenu();
+							spinnerRoom.setVisibility(View.VISIBLE);
+							spinnerProcess.setVisibility(View.VISIBLE);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}).setNegativeButton("Abbrechen", null).create().show();
+			}
+			return true;
+
+		case R.id.menuEntryProcessRemove:
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setTitle("Prozess löschen").setMessage("Soll der Prozess gelöscht werden?")
+			.setPositiveButton("OK", new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					try {
+						new RestClient(null).deleteProcessFromRoom(selectedServer, selectedProcess.id);
+								// editNewProcess = false;
+								// getActivity().invalidateOptionsMenu();
+								// spinnerRoom.setVisibility(View.VISIBLE);
+								// spinnerProcess.setVisibility(View.VISIBLE);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).setNegativeButton("Abbrechen", null).create().show();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -336,7 +430,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 		this.selectedServer = serverNames.get(roomSpinnerSelection);
 
-		for (AbstractProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
+		for (ProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
 				.get(serverNames.get(roomSpinnerSelection)).processes) {
 			processNames.add(config.id);
 		}
@@ -359,9 +453,21 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	 */
 	@Override
 	public void integrateConfiguration(Object configuration) {
-		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
-		getActivity().getActionBar().setDisplayShowHomeEnabled(false);
-		Log.i("ProcessCardFragment", "object returned");
+		// getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+		// getActivity().getActionBar().setDisplayShowHomeEnabled(false);
+		// Log.i("ProcessCardFragment", "object returned");
+		this.editNewProcess = true;
+		if (configuration instanceof ProcessConfiguration) {
+			this.selectedProcess = (ProcessConfiguration) configuration;
+			if (this.selectedProcess.nodes.isEmpty()) {
+				NodeConfiguration node = new NodeConfiguration();
+				this.selectedProcess.nodes.put(0, node);
+			}
+		}
+		if (configuration instanceof NodeConfiguration) {
+			NodeConfiguration nodeConfig = (NodeConfiguration) configuration;
+			this.selectedProcess.nodes.put(nodeConfig.id, nodeConfig);
+		}
 
 	}
 }

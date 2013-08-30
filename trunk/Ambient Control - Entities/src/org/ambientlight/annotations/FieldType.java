@@ -2,5 +2,5 @@ package org.ambientlight.annotations;
 
 
 public enum FieldType {
-	COLOR, NUMERIC, MAP, BOOLEAN, STRING, BEAN, EXPRESSION
+	COLOR, NUMERIC, MAP, BOOLEAN, STRING, BEAN, EXPRESSION, SELECTION_LIST, SIMPLE_LIST
 }

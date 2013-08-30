@@ -9,7 +9,7 @@ public @interface Presentation {
 	public int groupPosition() default 0;
 
 
-	public int position() default 0;
+	public int position();
 	public String name() default "";
 
 	public String description() default "";

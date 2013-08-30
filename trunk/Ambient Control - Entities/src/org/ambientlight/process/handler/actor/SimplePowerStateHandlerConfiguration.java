@@ -33,6 +33,6 @@ public class SimplePowerStateHandlerConfiguration extends AbstractActionHandlerC
 	private static final long serialVersionUID = 1L;
 
 	@TypeDef(fieldType = FieldType.BOOLEAN)
-	@Presentation(name = "Alle Schalten")
+	@Presentation(name = "Alle Schalten", position = 0)
 	public boolean powerState;
 }

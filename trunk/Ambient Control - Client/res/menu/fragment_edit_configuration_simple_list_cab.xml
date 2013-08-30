@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item android:id="@+id/menuEntryAddConfigurationClass" 
+          android:title="hinzufügen"
+          android:icon="@drawable/content_new"
+          android:showAsAction="ifRoom|withText" />
+    
+    <item android:id="@+id/menuEntryRemoveConfigurationClass" 
+          android:title="entfernen"
+          android:icon="@drawable/content_discard"
+          android:showAsAction="ifRoom|withText" />
+
+</menu>

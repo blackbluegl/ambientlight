@@ -35,7 +35,7 @@ public class FireEventHandlerConfiguration extends AbstractActionHandlerConfigur
 
 	private static final long serialVersionUID = 1L;
 
-	@Presentation(name = "Events aus Prozess verwenden")
+	@Presentation(name = "Events aus Prozess verwenden", position = 0)
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean useFromToken;
 

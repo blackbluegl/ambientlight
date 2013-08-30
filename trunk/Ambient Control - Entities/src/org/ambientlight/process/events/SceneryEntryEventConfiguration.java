@@ -16,6 +16,12 @@ public class SceneryEntryEventConfiguration extends EventConfiguration {
 	public String eventGeneratorName;
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + " für " + eventGeneratorName;
+	}
+
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();

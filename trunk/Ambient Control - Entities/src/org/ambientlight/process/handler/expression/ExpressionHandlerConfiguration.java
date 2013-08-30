@@ -16,7 +16,7 @@ public class ExpressionHandlerConfiguration extends AbstractActionHandlerConfigu
 	private static final long serialVersionUID = 1L;
 
 	@TypeDef(fieldType = FieldType.BEAN)
-	@Presentation(name = "Mathematische Funktion", description = "Ist der Ausdruck wahr wird der Knoten über die erste Verbindung verlassen. Ist der Ausdruck falsch wird die alternative Verbindung verwendet.")
+	@Presentation(name = "Mathematische Funktion", position = 0, description = "Ist der Ausdruck wahr wird der Knoten über die erste Verbindung verlassen. Ist der Ausdruck falsch wird die alternative Verbindung verwendet.")
 	@AlternativeValues(values = { @Value(displayName = "Neuer Ausdruck", value = "org.ambientlight.process.handler.expression.ExpressionConfiguration") })
 	public ExpressionConfiguration expressionConfiguration;
 }
