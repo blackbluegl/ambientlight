@@ -77,6 +77,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 	Spinner spinnerRoom;
 	Spinner spinnerProcess;
+	ArrayAdapter<String> processAdapter;
 	ProcessCardDrawer drawer;
 
 
@@ -97,8 +98,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				android.R.layout.simple_spinner_item, roomNames);
 		roomAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
-		final ArrayAdapter<String> processAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_spinner_item, processNames);
+		processAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, processNames);
 		processAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
 		spinnerRoom = (Spinner) content.findViewById(R.id.spinnerProcessRoom);
@@ -404,11 +404,19 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					try {
+
 						new RestClient(null).deleteProcessFromRoom(selectedServer, selectedProcess.id);
-								// editNewProcess = false;
-								// getActivity().invalidateOptionsMenu();
-								// spinnerRoom.setVisibility(View.VISIBLE);
-								// spinnerProcess.setVisibility(View.VISIBLE);
+						RoomConfigManager manager = ((MainActivity) getActivity()).getRoomConfigManager();
+						manager.addRoomConfiguration(selectedServer, RestClient.getRoom(selectedServer));
+						selectedProcess = manager.getRoomConfiguration(selectedServer).processes.get(0);
+						drawer.setProcess(selectedProcess);
+
+						processNames.clear();
+						for (ProcessConfiguration currentProcess : manager.getRoomConfiguration(selectedServer).processes) {
+							processNames.add(currentProcess.id);
+						}
+						processAdapter.notifyDataSetChanged();
+						spinnerProcess.setSelection(0);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
