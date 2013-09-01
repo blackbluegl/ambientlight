@@ -184,17 +184,34 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 						switch (item.getItemId()) {
 
 						case R.id.menuEntryProcessRemoveNode:
-							if (drawer.getSelectedNode().nextNodeIds.size() == 1) {
-								for (NodeConfiguration currentPreviousNode : selectedProcess.nodes.values()) {
-									if (currentPreviousNode.nextNodeIds != null && currentPreviousNode.nextNodeIds.size() > 0
-											&& currentPreviousNode.nextNodeIds.get(0).equals(drawer.getSelectedNode().id)) {
-										currentPreviousNode.nextNodeIds = drawer.getSelectedNode().nextNodeIds;
-										selectedProcess.nodes.remove(drawer.getSelectedNode().id);
-										drawer.setProcess(selectedProcess);
-										break;
-									}
+							// handling for nodes with a previous node in the
+							// process
+							NodeConfiguration previousNode = null;
+							for (NodeConfiguration currentPreviousNode : selectedProcess.nodes.values()) {
+								if (currentPreviousNode.nextNodeIds != null
+										&& currentPreviousNode.nextNodeIds.contains(drawer.getSelectedNode().id)) {
+									previousNode = currentPreviousNode;
+									break;
 								}
 							}
+
+							if (previousNode != null) {
+								int position = previousNode.nextNodeIds.indexOf(drawer.getSelectedNode().id);
+								previousNode.nextNodeIds.remove(position);
+								if (drawer.getSelectedNode().nextNodeIds.isEmpty() == false) {
+									previousNode.nextNodeIds.add(position, drawer.getSelectedNode().nextNodeIds.get(0));
+								}
+								selectedProcess.nodes.remove(drawer.getSelectedNode().id);
+							} else {
+								// it is the first node in the process
+								NodeConfiguration nextNode = selectedProcess.nodes.get(drawer.getSelectedNode().nextNodeIds
+										.get(0));
+								selectedProcess.nodes.remove(nextNode.id);
+								nextNode.id = 0;
+								selectedProcess.nodes.put(0, nextNode);
+							}
+							drawer.setProcess(selectedProcess);
+
 							break;
 						case R.id.menuEntryProcessAddSecondNode:
 							NodeConfiguration secondNodeConfig = new NodeConfiguration();
@@ -356,8 +373,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			spinnerProcess.setVisibility(View.VISIBLE);
 			return true;
 		case R.id.menuEntryProcessSave:
-			final RestClient rest = new RestClient(null);
-			boolean saveProcess = true;
+			Boolean saveProcess = true;
 			for (ProcessConfiguration current : ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
 					selectedServer).processes) {
 				if (current.id.equals(selectedProcess.id)) {
@@ -365,34 +381,18 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				}
 			}
 
-			if (saveProcess) {
-				try {
-					rest.addProcess(selectedServer, selectedProcess);
-					editNewProcess = false;
-					getActivity().invalidateOptionsMenu();
-					spinnerRoom.setVisibility(View.VISIBLE);
-					spinnerProcess.setVisibility(View.VISIBLE);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
+			if (saveProcess == false) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Prozess überschreiben").setMessage("Soll der bestehende Prozess überschrieben werden?")
 				.setPositiveButton("OK", new OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						try {
-							rest.addProcess(selectedServer, selectedProcess);
-							editNewProcess = false;
-							getActivity().invalidateOptionsMenu();
-							spinnerRoom.setVisibility(View.VISIBLE);
-							spinnerProcess.setVisibility(View.VISIBLE);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						saveSelectedProcess();
 					}
 				}).setNegativeButton("Abbrechen", null).create().show();
+			} else {
+				saveSelectedProcess();
 			}
 			return true;
 
@@ -429,6 +429,29 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	}
 
 
+	public void saveSelectedProcess() {
+		try {
+			RestClient rest = new RestClient(null);
+			ValidationResult result = rest.addProcess(selectedServer, selectedProcess);
+			editNewProcess = false;
+			getActivity().invalidateOptionsMenu();
+			spinnerRoom.setVisibility(View.VISIBLE);
+			spinnerProcess.setVisibility(View.VISIBLE);
+
+			if (result.resultIsValid() == false) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setTitle("Fehler").setMessage("Es wurden Fehler gefunden. Der Prozess wurde nicht gespeichert.")
+				.setPositiveButton("OK", null).create().show();
+				for (ValidationEntry entry : result.invalidateEntries) {
+					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	private void initRoomArrays(int roomSpinnerSelection) {
 		for (String serverName : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().keySet()) {
 			serverNames.add(serverName);
@@ -461,9 +484,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	 */
 	@Override
 	public void integrateConfiguration(Object configuration) {
-		// getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
-		// getActivity().getActionBar().setDisplayShowHomeEnabled(false);
-		// Log.i("ProcessCardFragment", "object returned");
+
 		this.editNewProcess = true;
 		if (configuration instanceof ProcessConfiguration) {
 			this.selectedProcess = (ProcessConfiguration) configuration;

@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ambient.control.R;
-import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
+import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.validation.ValidationEntry;
 
 import android.animation.ValueAnimator;
@@ -153,10 +153,8 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		mDetector = new GestureDetector(this.getContext(), new GestureListener());
 
 		// Turn off long press--this control doesn't use it, and if long press
-		// is enabled,
-		// you can't scroll for a bit, pause, then scroll some more (the pause
-		// is interpreted
-		// as a long press, apparently)
+		// is enabled, you can't scroll for a bit, pause, then scroll some more
+		// (the pause is interpreted as a long press, apparently)
 		mDetector.setIsLongpressEnabled(false);
 
 		// Create a Scroller to handle the fling gesture.
@@ -164,11 +162,9 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		// The scroller doesn't have any built-in animation functions--it just
 		// supplies
 		// values when we ask it to. So we have to have a way to call it every
-		// frame
-		// until the fling ends. This code (ab)uses a ValueAnimator object to
-		// generate
-		// a callback on every animation frame. We don't use the animated value
-		// at all.
+		// frame until the fling ends. This code (ab)uses a ValueAnimator object
+		// to generate a callback on every animation frame. We don't use the
+		// animated value at all.
 		mScrollAnimator = ValueAnimator.ofFloat(0, 1);
 		mScrollAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
