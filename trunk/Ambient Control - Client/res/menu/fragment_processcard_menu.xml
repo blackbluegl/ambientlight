@@ -6,6 +6,11 @@
         android:icon="@drawable/process_validate"
         android:showAsAction="ifRoom|withText"
         android:title="Prozess überprüfen"/>
+     <item
+        android:id="@+id/menuEntryProcessEdit"
+        android:icon="@drawable/content_edit"
+        android:showAsAction="ifRoom|withText"
+        android:title="Eigenschaften bearbeiten"/>
     <item
         android:id="@+id/menuEntryProcessAdd"
         android:icon="@drawable/content_new"

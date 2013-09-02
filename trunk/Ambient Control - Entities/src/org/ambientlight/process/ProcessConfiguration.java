@@ -15,6 +15,7 @@
 
 package org.ambientlight.process;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,9 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
  */
 @AlternativeValues(values = { @Value(displayName = "Eventgesteuerter Prozess", value = "org.ambientlight.process.EventProcessConfiguration") })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class ProcessConfiguration {
+public class ProcessConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Presentation(name = "Name des Prozesses", position = 0)
 	@TypeDef(fieldType = FieldType.STRING)

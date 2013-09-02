@@ -37,7 +37,6 @@ import android.graphics.Paint.Align;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -175,6 +174,7 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 					mScroller.computeScrollOffset();
 					lastX = mScroller.getCurrX();
 					lastY = mScroller.getCurrY();
+					Log.i("scroller lastXY", lastX + "," + lastY);
 					invalidate();
 				} else {
 					mScrollAnimator.cancel();
@@ -195,10 +195,6 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 		contentBitmap = Bitmap.createBitmap(this.contentWidth, this.contentHeight, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(contentBitmap);
-		// Rect rect = new Rect(0, 0, 300, 300);
-		// Paint test = new Paint();
-		// test.setColor(Color.WHITE);
-		// canvas.drawRect(rect, test);
 
 		Paint linePaint = new Paint();
 		linePaint.setColor(Color.GRAY);
@@ -301,23 +297,28 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 			canvas.drawBitmap(bitmap, srcRect, srcRect, null);
 			return;
 		}
+
 		if (this.process == null || this.process.nodes.isEmpty())
 			return;
 
 		int lastXPos = shiftX + lastX;
-		if (lastXPos < 0) {
+		if (lastXPos <= 0) {
 			lastXPos = 0;
 		} else if (lastXPos > contentBitmap.getWidth() - canvas.getWidth()) {
 			lastXPos = contentBitmap.getWidth() - canvas.getWidth();
 		}
+
 		int lastYPos = shiftY + lastY;
-		if (lastYPos < 0) {
+		if (lastYPos <= 0) {
 			lastYPos = 0;
 		} else if (lastYPos > contentBitmap.getHeight() - canvas.getHeight()) {
 			lastYPos = contentBitmap.getHeight() - canvas.getHeight();
 		}
+
 		this.lastX = lastXPos;
 		this.lastY = lastYPos;
+		shiftX = 0;
+		shiftY = 0;
 		srcRect.set(lastXPos, lastYPos, canvas.getWidth() + lastXPos, canvas.getHeight() + lastYPos);
 
 		if (srcRect.right - srcRect.left < destRect.right - destRect.left) {
@@ -369,7 +370,6 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-			// Set the pie rotation directly.
 			Log.i("GestureListener onScroll: ", distanceX + "," + distanceY);
 			shiftX = (int) distanceX;
 			shiftY = (int) distanceY;
@@ -396,57 +396,23 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 
 		@Override
 		public boolean onDown(MotionEvent e) {
-			Log.i("GestureListener onDown: ", "pressed");
 			mScrollAnimator.cancel();
 			int x = (int) (e.getX() + lastX);
 			int y = (int) (e.getY() + lastY);
+			Log.i("GestureListener onDown: ", "pressed " + e.getX() + "," + e.getY());
+			selectedNode = null;
 
 			for (Entry<Integer, NodeSnippet> current : nodeSnippets.entrySet()) {
 				if (current.getValue().rect.contains(x, y)) {
 					selectedNode = process.nodes.get(current.getKey());
-					createProcessCardBitmap();
-					if (listener != null) {
-						listener.onNodeSelected(process.nodes.get(current.getKey()));
-					}
-					invalidate();
-					return true;
+					break;
 				}
 			}
-			selectedNode = null;
-			if (listener != null) {
-				listener.onNodeSelected(null);
-			}
+
+			createProcessCardBitmap();
+			listener.onNodeSelected(selectedNode);
+			invalidate();
 			return true;
-		}
-	}
-
-
-	/**
-	 * Enable hardware acceleration (consumes memory)
-	 */
-	public void accelerate() {
-		setLayerToHW(this);
-	}
-
-
-	/**
-	 * Disable hardware acceleration (releases memory)
-	 */
-	public void decelerate() {
-		setLayerToSW(this);
-	}
-
-
-	private void setLayerToSW(View v) {
-		if (!v.isInEditMode() && Build.VERSION.SDK_INT >= 11) {
-			setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-		}
-	}
-
-
-	private void setLayerToHW(View v) {
-		if (!v.isInEditMode() && Build.VERSION.SDK_INT >= 11) {
-			setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		}
 	}
 

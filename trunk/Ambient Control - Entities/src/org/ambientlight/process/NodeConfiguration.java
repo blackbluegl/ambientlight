@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
@@ -21,6 +22,7 @@ public class NodeConfiguration implements Serializable {
 	 * Actionhandler that processes the node. If nextNodeId within is set to
 	 * null the process will stop at this node
 	 */
+	@Presentation(description = "Aktion auswählen", position = 1)
 	@TypeDef(fieldType = FieldType.BEAN)
 	@AlternativeValues(values = {
 			@Value(displayName = "RGB-LED Konfiguration ändern", value = "org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration"),
