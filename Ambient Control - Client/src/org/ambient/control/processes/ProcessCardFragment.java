@@ -172,10 +172,11 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 			@Override
 			public void onNodeSelected(NodeConfiguration node) {
-				if (node == null && mode != null) {
+				if (mode != null) {
 					mode.finish();
-					return;
 				}
+				if (node == null)
+					return;
 
 				mode = myself.getActivity().startActionMode(new ActionMode.Callback() {
 
@@ -222,7 +223,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 									myself.drawer.getSelectedNode().nextNodeIds.add(secondNodeConfig.id);
 									selectedProcess.nodes.put(i, secondNodeConfig);
 									drawer.setProcess(selectedProcess);
-									drawer.setSelectdeNode(secondNodeConfig);
+									drawer.setSelectdeNode(null);
 									break;
 								}
 							}
@@ -244,7 +245,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 										myself.drawer.getSelectedNode().nextNodeIds.add(nodeConfig.id);
 										selectedProcess.nodes.put(i, nodeConfig);
 										drawer.setProcess(selectedProcess);
-										drawer.setSelectdeNode(nodeConfig);
+										drawer.setSelectdeNode(null);
 										break;
 									}
 								}
@@ -302,7 +303,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 					@Override
 					public void onDestroyActionMode(ActionMode mode) {
-						myself.drawer.setSelectdeNode(null);
+						// myself.drawer.setSelectdeNode(null);
 
 					}
 
@@ -356,6 +357,19 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			return true;
 		case R.id.menuEntryProcessAdd:
 			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer);
+			return true;
+		case R.id.menuEntryProcessEdit:
+			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
+			fragEdit.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+			Bundle arguments = new Bundle();
+			arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, this.selectedProcess);
+			arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+			arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
+			fragEdit.setArguments(arguments);
+			FragmentTransaction ft2 = getFragmentManager().beginTransaction();
+			ft2.replace(R.id.LayoutMain, fragEdit);
+			ft2.addToBackStack(null);
+			ft2.commit();
 			return true;
 		case R.id.menuEntryProcessRevertNew:
 			this.editNewProcess = false;
