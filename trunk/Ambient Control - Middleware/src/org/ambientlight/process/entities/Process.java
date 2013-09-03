@@ -12,9 +12,9 @@ import org.ambientlight.process.handler.DataTypeValidation;
 
 public class Process implements IEventListener {
 
-	EventProcessConfiguration config;
-	EventManager eventManager;
-	Map<Integer, Node> nodes = new HashMap<Integer, Node>();
+	public EventProcessConfiguration config;
+	public EventManager eventManager;
+	public Map<Integer, Node> nodes = new HashMap<Integer, Node>();
 	Token token;
 
 
@@ -23,7 +23,14 @@ public class Process implements IEventListener {
 		for (EventConfiguration event : config.eventTriggerConfigurations) {
 			eventManager.register(this, event);
 		}
+	}
 
+
+	public void suspend() {
+		// wait until event happens
+		for (EventConfiguration event : config.eventTriggerConfigurations) {
+			eventManager.unregister(this, event);
+		}
 	}
 
 

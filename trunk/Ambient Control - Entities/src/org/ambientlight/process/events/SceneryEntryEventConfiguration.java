@@ -20,25 +20,29 @@ public class SceneryEntryEventConfiguration extends EventConfiguration {
 		return getClass().getSimpleName() + " für " + eventGeneratorName;
 	}
 
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
+		result = prime * result + ((eventGeneratorName == null) ? 0 : eventGeneratorName.hashCode());
 		result = prime * result + ((sceneryName == null) ? 0 : sceneryName.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		SceneryEntryEventConfiguration other = (SceneryEntryEventConfiguration) obj;
+		if (eventGeneratorName == null) {
+			if (other.eventGeneratorName != null)
+				return false;
+		} else if (!eventGeneratorName.equals(other.eventGeneratorName))
+			return false;
 		if (sceneryName == null) {
 			if (other.sceneryName != null)
 				return false;
@@ -46,5 +50,6 @@ public class SceneryEntryEventConfiguration extends EventConfiguration {
 			return false;
 		return true;
 	}
+
 
 }

@@ -6,11 +6,21 @@
         android:icon="@drawable/process_validate"
         android:showAsAction="ifRoom|withText"
         android:title="Prozess überprüfen"/>
-     <item
+    <item
         android:id="@+id/menuEntryProcessEdit"
         android:icon="@drawable/content_edit"
         android:showAsAction="ifRoom|withText"
         android:title="Eigenschaften bearbeiten"/>
+    <item
+        android:id="@+id/menuEntryProcessStart"
+        android:icon="@drawable/play"
+        android:showAsAction="ifRoom|withText"
+        android:title="Prozess starten"/>
+    <item
+        android:id="@+id/menuEntryProcessStop"
+        android:icon="@drawable/stop"
+        android:showAsAction="ifRoom|withText"
+        android:title="Prozess stoppen"/>
     <item
         android:id="@+id/menuEntryProcessAdd"
         android:icon="@drawable/content_new"
@@ -31,7 +41,7 @@
         android:id="@+id/menuEntryProcessSave"
         android:icon="@drawable/content_save"
         android:showAsAction="ifRoom|withText"
-        android:visible="false"
-        android:title="@string/button_save"/>
+        android:title="@string/button_save"
+        android:visible="false"/>
 
 </menu>

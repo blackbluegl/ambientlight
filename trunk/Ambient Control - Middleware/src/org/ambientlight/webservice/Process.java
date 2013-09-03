@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -45,7 +46,7 @@ import org.ambientlight.room.RoomConfigurationFactory;
 public class Process {
 
 	@POST
-	@Path("/processes/validation")
+	@Path("/validation/processes")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public ValidationResult validateProcess(ProcessConfiguration process) {
@@ -126,7 +127,7 @@ public class Process {
 	@Path("/processes/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object createOrUpdateProcess(@PathParam(value = "id") String id) {
+	public Object deleteProcess(@PathParam(value = "id") String id) {
 		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(id)) {
 				AmbientControlMW.getRoom().config.processes.remove(currentProcess);
@@ -142,6 +143,40 @@ public class Process {
 			return Response.status(500).build();
 		}
 
+		return Response.status(200).build();
+	}
+
+
+	@GET
+	@Path("/start/processes/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object startProcess(@PathParam(value = "id") String id) {
+		System.out.println("ProcessWS: starting Process " + id);
+
+		try {
+			AmbientControlMW.getProcessFactory().startProcess(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
+		return Response.status(200).build();
+	}
+
+
+	@GET
+	@Path("/stop/processes/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object stopProcess(@PathParam(value = "id") String id) {
+		System.out.println("ProcessWS: stopping Process " + id);
+
+		try {
+			AmbientControlMW.getProcessFactory().stopProcess(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
 		return Response.status(200).build();
 	}
 }

@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.process.entities.ProcessFactory;
+import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.rendering.RenderControl;
 import org.ambientlight.rendering.Renderer;
 import org.ambientlight.rendering.effects.RenderingEffectFactory;
@@ -25,13 +25,16 @@ public class AmbientControlMW {
 		return roomConfigFileName;
 	}
 
-	static RenderControl renderProgrammFactory;
+	static RenderControl renderControl;
 
 	static Renderer renderer;
 
 	static Room room;
 
 	static RoomFactory roomFactory;
+
+	static ProcessFactory processFactory;
+
 
 	static int FREQUENCY = 25;
 
@@ -81,17 +84,15 @@ public class AmbientControlMW {
 	private static void initComponents(RoomConfiguration roomConfiguration) throws InterruptedException, UnknownHostException,
 	IOException {
 		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
-		ProcessFactory processFactory = new ProcessFactory();
+
 		roomFactory = new RoomFactory(deviceFactory, processFactory);
 
 		room = roomFactory.initRoom(roomConfiguration);
-
-		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
-		RenderControl renderProgrammFactory = new RenderControl(effectFactory);
+		processFactory = new ProcessFactory(room);
+		room.processes = processFactory.initProcesses();
 
 		renderer = new Renderer(room);
-
-		AmbientControlMW.setRenderProgrammFactory(renderProgrammFactory);
+		renderControl = new RenderControl(new RenderingEffectFactory(room));
 	}
 
 
@@ -162,10 +163,15 @@ public class AmbientControlMW {
 	}
 
 	public static RenderControl getRenderProgrammFactory() {
-		return renderProgrammFactory;
+		return renderControl;
 	}
 
 	public static void setRenderProgrammFactory(RenderControl renderProgrammFactory) {
-		AmbientControlMW.renderProgrammFactory = renderProgrammFactory;
+		AmbientControlMW.renderControl = renderProgrammFactory;
+	}
+
+
+	public static ProcessFactory getProcessFactory() {
+		return processFactory;
 	}
 }
