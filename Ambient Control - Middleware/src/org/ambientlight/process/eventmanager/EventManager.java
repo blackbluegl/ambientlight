@@ -42,6 +42,19 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	}
 
 
+	/**
+	 * @param process
+	 * @param event
+	 */
+	public void unregister(IEventListener process, EventConfiguration event) {
+		this.eventMap.get(event).remove(process);
+		if (this.eventMap.get(event).isEmpty()) {
+			this.eventMap.remove(event);
+		}
+		System.out.println("EventManager: unregistered event:" + event.toString());
+	}
+
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -60,4 +73,5 @@ public class EventManager implements IEventManager, IEventManagerClient {
 			}
 		}
 	}
+
 }

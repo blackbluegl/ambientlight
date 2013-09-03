@@ -25,7 +25,8 @@ public class SwitchEventConfiguration extends EventConfiguration {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
+		result = prime * result + ((eventGeneratorName == null) ? 0 : eventGeneratorName.hashCode());
 		result = prime * result + (powerState ? 1231 : 1237);
 		return result;
 	}
@@ -35,14 +36,20 @@ public class SwitchEventConfiguration extends EventConfiguration {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		SwitchEventConfiguration other = (SwitchEventConfiguration) obj;
+		if (eventGeneratorName == null) {
+			if (other.eventGeneratorName != null)
+				return false;
+		} else if (!eventGeneratorName.equals(other.eventGeneratorName))
+			return false;
 		if (powerState != other.powerState)
 			return false;
 		return true;
 	}
+
 
 }

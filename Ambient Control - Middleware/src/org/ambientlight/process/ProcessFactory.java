@@ -13,14 +13,15 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.entities;
+package org.ambientlight.process;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.EventProcessConfiguration;
-import org.ambientlight.process.eventmanager.EventManager;
+import org.ambientlight.AmbientControlMW;
+import org.ambientlight.process.entities.Node;
+import org.ambientlight.process.entities.Process;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandler;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
@@ -37,7 +38,8 @@ import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionHandlerConfiguration;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.Room;
+import org.ambientlight.room.RoomConfigurationFactory;
 
 
 /**
@@ -46,17 +48,93 @@ import org.ambientlight.room.RoomConfiguration;
  */
 public class ProcessFactory {
 
-	public List<Process> initProcesses(RoomConfiguration roomConfig, EventManager eventManager) {
+	private final Room room;
+
+
+	public ProcessFactory(Room room) {
+		super();
+		this.room = room;
+	}
+
+
+	public List<Process> initProcesses() {
 		List<Process> processes = new ArrayList<Process>();
-		for (EventProcessConfiguration processConfig : roomConfig.processes) {
+		for (EventProcessConfiguration processConfig : room.config.processes) {
+			if (processConfig.run == false) {
+				System.out.println("ProcessFactory: Ommiting process: " + processConfig.id);
+				continue;
+			}
 			System.out.println("ProcessFactory: Building process: " + processConfig.id);
-			Process process = createProcess(processConfig);
-			process.eventManager = eventManager;
-			processes.add(process);
-			process.start();
+			createProcess(processConfig);
 			System.out.println("ProcessFactory: Built and setup process successfully: " + processConfig.id);
 		}
 		return processes;
+	}
+
+
+	public synchronized void startProcess(String processId) throws IOException {
+		ProcessConfiguration processConfig = null;
+		for (ProcessConfiguration currentProcess : room.config.processes) {
+			if (currentProcess.id.equals(processId)) {
+				processConfig = currentProcess;
+				break;
+			}
+		}
+
+		if (processConfig == null)
+			return;
+
+		// return if process is already running
+		for (Process currentProcess : room.processes) {
+			if (currentProcess.config.id.equals(processConfig.id))
+				return;
+		}
+
+		// todo this will crash in future if there are more process types
+		Process result = createProcess((EventProcessConfiguration) processConfig);
+		result.eventManager = room.eventManager;
+		room.processes.add(result);
+		result.start();
+
+		// persist model
+		processConfig.run = true;
+		RoomConfigurationFactory.saveRoomConfiguration(room.config,
+				AmbientControlMW.getRoomConfigFileName());
+		System.out.println("ProcessFactory: started process successfully: " + processConfig.id);
+	}
+
+
+	public synchronized void stopProcess(String processId) throws IOException {
+		ProcessConfiguration processConfig = null;
+		for (ProcessConfiguration currentProcess : room.config.processes) {
+			if (currentProcess.id.equals(processId)) {
+				processConfig = currentProcess;
+				break;
+			}
+		}
+
+		if (processConfig == null)
+			return;
+
+		// return if process is already stopped
+		Process runningProcess = null;
+		for (Process currentProcess : room.processes) {
+			if (currentProcess.config.id.equals(processConfig.id)) {
+				runningProcess = currentProcess;
+			}
+			break;
+		}
+		if (runningProcess == null)
+			return;
+
+		runningProcess.suspend();
+		room.processes.remove(runningProcess);
+
+		// persist model
+		processConfig.run = false;
+		RoomConfigurationFactory.saveRoomConfiguration(room.config,
+				AmbientControlMW.getRoomConfigFileName());
+		System.out.println("ProcessFactory: stopped process successfully: " + processConfig.id);
 	}
 
 
@@ -68,6 +146,10 @@ public class ProcessFactory {
 		Process result = new Process();
 		result.config = processConfig;
 		createNodes(result, 0);
+		result.eventManager = room.eventManager;
+		room.processes.add(result);
+		result.start();
+
 		return result;
 	}
 

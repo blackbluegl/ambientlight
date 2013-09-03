@@ -37,6 +37,8 @@ public class ProcessConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public boolean run = false;
+
 	@Presentation(name = "Name des Prozesses", position = 0)
 	@TypeDef(fieldType = FieldType.STRING)
 	public String id;

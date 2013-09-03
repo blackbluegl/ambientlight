@@ -328,16 +328,27 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			menu.findItem(R.id.menuEntryProcessRevertNew).setVisible(true);
 			menu.findItem(R.id.menuEntryProcessRemove).setVisible(false);
 			menu.findItem(R.id.menuEntryProcessSave).setVisible(true);
+			menu.findItem(R.id.menuEntryProcessStart).setVisible(false);
+			menu.findItem(R.id.menuEntryProcessStop).setVisible(false);
+			menu.findItem(R.id.menuEntryProcessAdd).setVisible(false);
 		}
 	}
 
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		RestClient restClient = new RestClient(null);
 		switch (item.getItemId()) {
 
+		case R.id.menuEntryProcessStart:
+			restClient.startProcess(selectedServer, selectedProcess.id);
+			return true;
+
+		case R.id.menuEntryProcessStop:
+			restClient.stopProcess(selectedServer, selectedProcess.id);
+			return true;
+
 		case R.id.menuEntryProcessValidate:
-			RestClient restClient = new RestClient(null);
 			ValidationResult result = null;
 			try {
 				result = restClient.validateProcess(selectedServer, selectedProcess);
@@ -355,9 +366,11 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				}
 			}
 			return true;
+
 		case R.id.menuEntryProcessAdd:
 			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer);
 			return true;
+
 		case R.id.menuEntryProcessEdit:
 			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
 			fragEdit.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
@@ -371,6 +384,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			ft2.addToBackStack(null);
 			ft2.commit();
 			return true;
+
 		case R.id.menuEntryProcessRevertNew:
 			this.editNewProcess = false;
 			spinnerProcess.setSelection(0);
@@ -386,6 +400,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			spinnerRoom.setVisibility(View.VISIBLE);
 			spinnerProcess.setVisibility(View.VISIBLE);
 			return true;
+
 		case R.id.menuEntryProcessSave:
 			Boolean saveProcess = true;
 			for (ProcessConfiguration current : ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
@@ -437,6 +452,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				}
 			}).setNegativeButton("Abbrechen", null).create().show();
 			return true;
+
 		default:
 			return super.onOptionsItemSelected(item);
 		}

@@ -33,6 +33,18 @@ public class RestClient {
 	}
 
 
+	public void startProcess(String hostName, String processId) {
+		StartProcessTask task = new StartProcessTask();
+		task.execute(hostName, processId);
+	}
+
+
+	public void stopProcess(String hostName, String processId) {
+		StopProcessTask task = new StopProcessTask();
+		task.execute(hostName, processId);
+	}
+
+
 	public void deleteScenarioFromRoom(String hostName, String sceneryName) {
 		DeleteSceneryTask task = new DeleteSceneryTask();
 		task.execute(hostName, sceneryName);

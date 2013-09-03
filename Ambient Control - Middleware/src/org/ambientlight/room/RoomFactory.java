@@ -10,9 +10,8 @@ import java.util.List;
 import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.process.entities.ProcessFactory;
+import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.process.eventmanager.EventManager;
-import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.entities.AlarmGenerator;
@@ -71,8 +70,6 @@ public class RoomFactory {
 		room.eventManager = new EventManager();
 
 		createEventGenerators(room, room.eventManager);
-
-		room.processes = this.processFactory.initProcesses(roomConfig, room.eventManager);
 
 		return room;
 	}
