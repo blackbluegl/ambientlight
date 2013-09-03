@@ -1,6 +1,5 @@
 package org.ambient.control.rest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -9,11 +8,8 @@ import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.actors.ActorConfiguration;
+import org.ambientlight.scenery.AbstractSceneryConfiguration;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
-import org.ambientlight.ws.container.RenderingProgrammConfigurationLightObjectNameMapper;
-
-import android.content.Context;
 
 
 public class RestClient {
@@ -111,21 +107,9 @@ public class RestClient {
 	}
 
 
-	public void createOrUpdateSceneryFromCurrentScenery(String hostName, String newSceneryName, Context ct) throws Exception {
-		RoomConfiguration existingRoomConfiguration = RestClient.getRoom(hostName);
-
-		List<RenderingProgrammConfigurationLightObjectNameMapper> newLightObjectConfigForScenery = new ArrayList<RenderingProgrammConfigurationLightObjectNameMapper>();
-
-		for (ActorConfiguration currentRoomItemConfiguration : existingRoomConfiguration.actorConfigurations.values()) {
-			RenderingProgrammConfigurationLightObjectNameMapper newConfigMapper = new RenderingProgrammConfigurationLightObjectNameMapper();
-
-			newConfigMapper.lightObjectName = currentRoomItemConfiguration.getName();
-			newConfigMapper.config = currentRoomItemConfiguration.actorConductConfiguration;
-
-			newLightObjectConfigForScenery.add(newConfigMapper);
-		}
-
-		CreateSceneryFromCurrentForRoomTask task = new CreateSceneryFromCurrentForRoomTask();
-		task.execute(hostName, newSceneryName, newLightObjectConfigForScenery);
+	public void createOrUpdateSceneries(String hostName, List<AbstractSceneryConfiguration> sceneries)
+			throws Exception {
+		CreateSceneriesTask task = new CreateSceneriesTask();
+		task.execute(hostName, sceneries);
 	}
 }

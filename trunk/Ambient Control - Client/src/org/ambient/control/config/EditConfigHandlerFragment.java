@@ -932,24 +932,6 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 						mode.finish();
 						break;
 
-						// case R.id.menuEntryEditConfigurationClass:
-						// FragmentTransaction ft =
-						// getFragmentManager().beginTransaction();
-						// ft.setCustomAnimations(R.anim.enter, R.anim.exit,
-						// R.anim.pop_enter, R.anim.pop_exit);
-						// EditConfigHandlerFragment configHandler = new
-						// EditConfigHandlerFragment();
-						// ft.replace(R.id.LayoutMain, configHandler);
-						// ft.addToBackStack(null);
-						// Bundle args = new Bundle();
-						// configHandler.setArguments(args);
-						// args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-						// (Serializable)
-						// adapter.getItem(checkedItems.get(0)).getValue());
-						// args.putString(SELECTED_SERVER, selectedServer);
-						// ft.commit();
-						// break;
-
 					}
 					return false;
 				}
