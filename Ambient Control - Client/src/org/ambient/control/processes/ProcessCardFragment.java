@@ -23,6 +23,7 @@ import org.ambient.control.R;
 import org.ambient.control.RoomConfigManager;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.IntegrateObjectValueHandler;
+import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.control.rest.RestClient;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
@@ -453,6 +454,23 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			}).setNegativeButton("Abbrechen", null).create().show();
 			return true;
 
+		case R.id.menuEntryProcessSceneries:
+			SceneriesWrapper sceneries = new SceneriesWrapper();
+			sceneries.sceneries = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer).sceneries;
+
+			EditConfigHandlerFragment fragEditSceneries = new EditConfigHandlerFragment();
+			fragEditSceneries.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+			Bundle argumentsSceneries = new Bundle();
+			argumentsSceneries.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, sceneries);
+			argumentsSceneries.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+			argumentsSceneries.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
+			fragEditSceneries.setArguments(argumentsSceneries);
+			FragmentTransaction ft3 = getFragmentManager().beginTransaction();
+			ft3.replace(R.id.LayoutMain, fragEditSceneries);
+			ft3.addToBackStack(null);
+			ft3.commit();
+
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -527,6 +545,9 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			NodeConfiguration nodeConfig = (NodeConfiguration) configuration;
 			this.selectedProcess.nodes.put(nodeConfig.id, nodeConfig);
 		}
+		if (configuration instanceof SceneriesWrapper) {
 
+			((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(selectedServer).sceneries = ((SceneriesWrapper) configuration).sceneries;
+		}
 	}
 }

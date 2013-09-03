@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 
 public class StartProcessTask extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/process/stop/processes/";
+	private final String URL = "/process/start/processes/";
 
 	@Override
 	protected Void doInBackground(Object... params) {

@@ -43,5 +43,10 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/button_save"
         android:visible="false"/>
-
+     <item
+        android:id="@+id/menuEntryProcessSceneries"
+        android:icon="@drawable/ic_sceneries"
+        android:showAsAction="ifRoom|withText"
+        android:title="Szenarien bearbeiten"
+        android:visible="true"/>
 </menu>
