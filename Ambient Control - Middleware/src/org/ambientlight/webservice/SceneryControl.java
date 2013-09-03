@@ -14,9 +14,11 @@ import javax.ws.rs.core.Response;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.room.IUserRoomItem;
 import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.actors.SwitchObjectConfiguration;
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
+import org.ambientlight.ws.container.SceneriesContainer;
 
 
 @Path("/sceneryControl")
@@ -35,6 +37,27 @@ public class SceneryControl {
 	public AbstractSceneryConfiguration[] getSceneries() {
 		return getRoomConfiguration().sceneries
 				.toArray(new AbstractSceneryConfiguration[getRoomConfiguration().sceneries.size()]);
+	}
+
+
+	@PUT
+	@Path("/config/room/sceneries")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createOrUpdateSceneryConfigurations(SceneriesContainer sceneries) {
+		System.out.println("SceneryControl: saving sceneries");
+		AmbientControlMW.getRoom().config.sceneries = sceneries.sceneries;
+
+		try {
+			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
+					AmbientControlMW.getRoomConfigFileName());
+			System.out.println("SceneryControl: saving sceneries finished");
+			return Response.status(200).build();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
 	}
 
 

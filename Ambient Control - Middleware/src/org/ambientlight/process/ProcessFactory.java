@@ -86,8 +86,10 @@ public class ProcessFactory {
 
 		// return if process is already running
 		for (Process currentProcess : room.processes) {
-			if (currentProcess.config.id.equals(processConfig.id))
-				return;
+			if (currentProcess.config.id.equals(processConfig.id)) {
+				System.out.println("ProcessFactory: process already running: " + processConfig.id);
+			}
+			return;
 		}
 
 		// todo this will crash in future if there are more process types
@@ -124,8 +126,11 @@ public class ProcessFactory {
 			}
 			break;
 		}
-		if (runningProcess == null)
+		if (runningProcess == null) {
+			System.out.println("ProcessFactory: process already stopped: " + processConfig.id);
 			return;
+		}
+
 
 		runningProcess.suspend();
 		room.processes.remove(runningProcess);

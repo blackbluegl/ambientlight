@@ -533,8 +533,9 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	@Override
 	public void integrateConfiguration(Object configuration) {
 
-		this.editNewProcess = true;
+
 		if (configuration instanceof ProcessConfiguration) {
+			this.editNewProcess = true;
 			this.selectedProcess = (ProcessConfiguration) configuration;
 			if (this.selectedProcess.nodes.isEmpty()) {
 				NodeConfiguration node = new NodeConfiguration();
@@ -542,12 +543,20 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			}
 		}
 		if (configuration instanceof NodeConfiguration) {
+			this.editNewProcess = true;
 			NodeConfiguration nodeConfig = (NodeConfiguration) configuration;
 			this.selectedProcess.nodes.put(nodeConfig.id, nodeConfig);
 		}
-		if (configuration instanceof SceneriesWrapper) {
 
+		if (configuration instanceof SceneriesWrapper) {
+			this.editNewProcess = false;
 			((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(selectedServer).sceneries = ((SceneriesWrapper) configuration).sceneries;
+			RestClient rest = new RestClient(null);
+			try {
+				rest.createOrUpdateSceneries(selectedServer, ((SceneriesWrapper) configuration).sceneries);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
