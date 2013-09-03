@@ -33,11 +33,13 @@ import org.ambientlight.scenery.AbstractSceneryConfiguration;
  * @author Florian Bornkessel
  * 
  */
-@ClassDescription(groups = { @Group(name = "ALLGEMEIN", position = 0, description = "Szenarien können zur Steuerung von Prozessen verwendet werden. Wichtig: wird ein Szenario in einem Prozess verwendet und gelöscht, so wird der Prozess nicht mehr ausgeführt.") })
+@ClassDescription(groups = { @Group(name = "ALLGEMEIN", position = 1, description = "Szenarien können zur Steuerung von Prozessen verwendet werden. Wichtig: wird ein Szenario in einem Prozess verwendet und gelöscht, so wird der Prozess nicht mehr ausgeführt.") })
 public class SceneriesWrapper implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	@TypeDef(fieldType = FieldType.SIMPLE_LIST)
-	@Presentation(name = "Szenarien", position = 0, groupPosition = 0)
+	@Presentation(name = "Auf folgende Szenarien reagieren", position = 0, groupPosition = 1)
 	@AlternativeValues(values = { @Value(displayName = "Anwenderszenario", value = "org.ambientlight.scenery.UserSceneryConfiguration") })
 	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
 }

@@ -17,7 +17,7 @@ public class SceneryEntryEventConfiguration extends EventConfiguration {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " für " + eventGeneratorName;
+		return "Szenario: " + sceneryName;
 	}
 
 	@Override
