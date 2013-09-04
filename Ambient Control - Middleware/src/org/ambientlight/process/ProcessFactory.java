@@ -57,7 +57,7 @@ public class ProcessFactory {
 	}
 
 
-	public List<Process> initProcesses() {
+	public void initProcesses() {
 		List<Process> processes = new ArrayList<Process>();
 		for (EventProcessConfiguration processConfig : room.config.processes) {
 			if (processConfig.run == false) {
@@ -65,10 +65,10 @@ public class ProcessFactory {
 				continue;
 			}
 			System.out.println("ProcessFactory: Building process: " + processConfig.id);
-			createProcess(processConfig);
+			processes.add(createProcess(processConfig));
 			System.out.println("ProcessFactory: Built and setup process successfully: " + processConfig.id);
 		}
-		return processes;
+		this.room.processes = processes;
 	}
 
 
@@ -88,14 +88,14 @@ public class ProcessFactory {
 		for (Process currentProcess : room.processes) {
 			if (currentProcess.config.id.equals(processConfig.id)) {
 				System.out.println("ProcessFactory: process already running: " + processConfig.id);
+				return;
 			}
-			return;
 		}
 
 		// todo this will crash in future if there are more process types
 		Process result = createProcess((EventProcessConfiguration) processConfig);
-		result.eventManager = room.eventManager;
 		room.processes.add(result);
+		result.eventManager = room.eventManager;
 		result.start();
 
 		// persist model
@@ -123,8 +123,8 @@ public class ProcessFactory {
 		for (Process currentProcess : room.processes) {
 			if (currentProcess.config.id.equals(processConfig.id)) {
 				runningProcess = currentProcess;
+				break;
 			}
-			break;
 		}
 		if (runningProcess == null) {
 			System.out.println("ProcessFactory: process already stopped: " + processConfig.id);
@@ -152,7 +152,6 @@ public class ProcessFactory {
 		result.config = processConfig;
 		createNodes(result, 0);
 		result.eventManager = room.eventManager;
-		room.processes.add(result);
 		result.start();
 
 		return result;

@@ -45,21 +45,15 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 	public void performAction(Token token) throws ActionHandlerException {
 		Evaluator evaluator = new Evaluator();
 
-		String tokenValue = "";
-		if (token.valueType.equals(DataTypeValidation.BOOLEAN)) {
-			if (Boolean.TRUE.equals(token.data)) {
-				tokenValue = "1.0";
-			} else {
-				tokenValue = "0.0";
-			}
-		} else {
-			tokenValue = token.data.toString();
-		}
-		evaluator.putVariable("tokenValue", tokenValue);
+		String tokenValue = token.data.toString();
 
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
-			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
-			evaluator.putVariable(dataproviderName, getValueFromDataProvider(dataprovider.getValue()));
+			if (dataproviderName.equals("tokenValue")) {
+				evaluator.putVariable("tokenValue", tokenValue);
+			} else {
+				Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
+				evaluator.putVariable(dataproviderName, getValueFromDataProvider(dataprovider.getValue()));
+			}
 		}
 		try {
 			takeDefaultTransition = evaluator.getBooleanResult(this.getConfig().expressionConfiguration.expression);

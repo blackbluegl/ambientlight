@@ -76,11 +76,13 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 
 
 	protected List<String> extractDataProvider(String expression) {
-		String[] tokens = expression.split("{");
+		String[] tokens = expression.split("#\\{");
 
 		List<String> result = new ArrayList<String>();
 		for (String currentToken : tokens) {
-			result.add(currentToken.substring(0, currentToken.indexOf('}') - 1));
+			if (currentToken.isEmpty() == false) {
+				result.add(currentToken.substring(0, currentToken.indexOf('}')));
+			}
 		}
 		return result;
 	}

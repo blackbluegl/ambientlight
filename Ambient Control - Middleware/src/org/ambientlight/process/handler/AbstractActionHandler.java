@@ -10,8 +10,12 @@ public abstract class AbstractActionHandler {
 	public AbstractActionHandlerConfiguration config;
 	public List<Integer> nodeIds;
 
+
 	public Integer getNextNodeId() {
-		return nodeIds.get(0);
+		if (nodeIds != null && nodeIds.size() > 0)
+			return nodeIds.get(0);
+		else
+			return null;
 	}
 
 
