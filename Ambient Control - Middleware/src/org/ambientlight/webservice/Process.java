@@ -104,7 +104,7 @@ public class Process {
 		}
 
 		if (positionToReplace != null) {
-			AmbientControlMW.getRoom().config.processes.remove(positionToReplace);
+			AmbientControlMW.getRoom().config.processes.remove(positionToReplace.intValue());
 			AmbientControlMW.getRoom().config.processes.add(positionToReplace, process);
 		} else {
 			AmbientControlMW.getRoom().config.processes.add(process);
@@ -130,6 +130,7 @@ public class Process {
 	public Object deleteProcess(@PathParam(value = "id") String id) {
 		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(id)) {
+				stopProcess(id);
 				AmbientControlMW.getRoom().config.processes.remove(currentProcess);
 				break;
 			}

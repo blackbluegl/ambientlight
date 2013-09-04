@@ -29,5 +29,7 @@ public @interface Value {
 	public String displayName();
 
 
+	public String forSubClass() default "";
+
 	public String value();
 }

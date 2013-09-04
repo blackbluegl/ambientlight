@@ -26,6 +26,7 @@ import java.util.Set;
 import org.ambientlight.annotations.AlternativeIds;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.ValueBindingPath;
 
 
 /**
@@ -42,22 +43,28 @@ public class ConfigBindingHelper {
 	}
 
 
-	public static List<String> getAlternativeValues(AlternativeValues annotation, Object sourceBean) {
+	public static List<String> getAlternativeValues(AlternativeValues annotation, String className, Object sourceBean) {
 
-		String path = annotation.valueBinding();
-		if (path.isEmpty() == false)
-			return getByPathBinding(sourceBean, path);
-		else {
+		ValueBindingPath[] pathes = annotation.valueBinding();
+		if (pathes.length != 0) {
+			for (ValueBindingPath current : pathes) {
+				if (current.forSubClass().isEmpty() || current.forSubClass().equals(className))
+					return getByPathBinding(sourceBean, current.valueBinding());
+			}
+		} else {
 			List<String> result = new ArrayList<String>();
 			for (Value current : annotation.values()) {
-				result.add(current.value());
+				if (current.forSubClass().isEmpty() || current.forSubClass().equals(className)) {
+					result.add(current.value());
+				}
 			}
 			return result;
 		}
+		return null;
 	}
 
 
-	public static List<String> getAlternativeValuesForDisplay(AlternativeValues annotation, Object sourceBean) {
+	public static List<String> getAlternativeValuesForDisplay(AlternativeValues annotation, String className, Object sourceBean) {
 
 		List<String> result = new ArrayList<String>();
 		for (Value current : annotation.values()) {
@@ -65,7 +72,7 @@ public class ConfigBindingHelper {
 		}
 
 		if (result.size() == 0)
-			return getAlternativeValues(annotation, sourceBean);
+			return getAlternativeValues(annotation, className, sourceBean);
 
 		return result;
 	}

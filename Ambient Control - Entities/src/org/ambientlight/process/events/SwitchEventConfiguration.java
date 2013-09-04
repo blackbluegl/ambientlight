@@ -1,6 +1,5 @@
 package org.ambientlight.process.events;
 
-import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 
@@ -10,9 +9,6 @@ public class SwitchEventConfiguration extends EventConfiguration {
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean powerState;
 
-	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueBinding = "getSwitchGenerators().keySet()")
-	public String eventGeneratorName;
 
 
 	@Override

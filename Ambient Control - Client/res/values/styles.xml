@@ -23,7 +23,7 @@
     
         <style name="groupDescription">
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">#CCCCCC</item>
         <item name="android:textSize">12.0sp</item>
     </style>
     
