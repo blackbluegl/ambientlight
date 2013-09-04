@@ -290,14 +290,15 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 		List<String> altValuesToDisplay = null;
 
 		if (field.getAnnotation(AlternativeValues.class) != null) {
-			altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class), roomConfig);
+			altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class), config.getClass()
+					.getName(), roomConfig);
 			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class),
-					roomConfig);
+					config.getClass().getName(), roomConfig);
 		} else if (field.getDeclaringClass().getAnnotation(AlternativeValues.class) != null) {
 			altValues = ConfigBindingHelper.getAlternativeValues(
-					field.getDeclaringClass().getAnnotation(AlternativeValues.class), roomConfig);
+					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig);
 			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-					field.getDeclaringClass().getAnnotation(AlternativeValues.class), roomConfig);
+					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig);
 		}
 
 		TextView title = (TextView) fieldView.findViewById(R.id.textViewTitleOfMap);
@@ -1085,9 +1086,9 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 				.getRoomConfiguration(server);
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
-				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), roomConfiguration);
+				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), roomConfiguration);
+				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server);
 	}
 

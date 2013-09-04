@@ -3,17 +3,16 @@ package org.ambientlight.process.events;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
+import org.ambientlight.annotations.ValueBindingPath;
 
 
 public class SceneryEntryEventConfiguration extends EventConfiguration {
 
 	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueBinding = "sceneries.id")
+	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "sceneries.id") })
 	public String sceneryName;
 
-	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueBinding = "getSceneryEventGenerator().keySet()")
-	public String eventGeneratorName;
+
 
 	@Override
 	public String toString() {
