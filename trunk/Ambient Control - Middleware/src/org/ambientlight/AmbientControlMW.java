@@ -89,7 +89,7 @@ public class AmbientControlMW {
 
 		room = roomFactory.initRoom(roomConfiguration);
 		processFactory = new ProcessFactory(room);
-		room.processes = processFactory.initProcesses();
+		processFactory.initProcesses();
 
 		renderer = new Renderer(room);
 		renderControl = new RenderControl(new RenderingEffectFactory(room));
