@@ -17,8 +17,7 @@ import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.actors.SwitchObjectConfiguration;
-import org.ambientlight.scenery.AbstractSceneryConfiguration;
-import org.ambientlight.ws.container.SceneriesContainer;
+import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 
 
 @Path("/sceneryControl")
@@ -31,27 +30,28 @@ public class SceneryControl {
 	}
 
 
-	@GET
-	@Path("/config/room/sceneries")
-	@Produces(MediaType.APPLICATION_JSON)
-	public AbstractSceneryConfiguration[] getSceneries() {
-		return getRoomConfiguration().sceneries
-				.toArray(new AbstractSceneryConfiguration[getRoomConfiguration().sceneries.size()]);
-	}
-
+	// @GET
+	// @Path("/config/room/sceneries")
+	// @Produces(MediaType.APPLICATION_JSON)
+	// public AbstractSceneryConfiguration[] getSceneries() {
+	// return getRoomConfiguration().sceneries
+	// .toArray(new
+	// AbstractSceneryConfiguration[getRoomConfiguration().sceneries.size()]);
+	// }
 
 	@PUT
-	@Path("/config/room/sceneries")
+	@Path("/config/room/eventGenerator/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateSceneryConfigurations(SceneriesContainer sceneries) {
-		System.out.println("SceneryControl: saving sceneries");
-		AmbientControlMW.getRoom().config.sceneries = sceneries.sceneries;
+	public Response createOrUpdateEventGeneratorConfig(@PathParam("id") String eventGeneratorName,
+			EventGeneratorConfiguration config) {
+		System.out.println("SceneryControl: saving eventGeneratorConfig");
+		AmbientControlMW.getRoom().config.eventGeneratorConfigurations.put(eventGeneratorName, config);
 
 		try {
 			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
 					AmbientControlMW.getRoomConfigFileName());
-			System.out.println("SceneryControl: saving sceneries finished");
+			System.out.println("SceneryControl: saving eventGeneratorConfig finished");
 			return Response.status(200).build();
 
 		} catch (IOException e) {

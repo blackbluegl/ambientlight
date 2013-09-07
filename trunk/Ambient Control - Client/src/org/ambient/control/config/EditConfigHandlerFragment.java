@@ -52,6 +52,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -88,7 +89,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 		FIELD, MAP, LIST
 	}
 
-	private SaveObjectHandler saveObjectCallback;
+	private EditConfigActionCallback actionCallback;
 
 	private class WhereToPutConfigurationData {
 
@@ -115,8 +116,17 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_edit_configuration_menu, menu);
-		MenuItem saveIcon = menu.findItem(R.id.menuEntrySaveEditConfiguration);
-		if (this.saveObjectCallback != null) {
+		if (this.actionCallback != null) {
+			MenuItem saveIcon = menu.add(actionCallback.getLabel());
+			saveIcon.setIcon(actionCallback.getIconResourceId());
+			saveIcon.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					actionCallback.perform(myConfigurationData);
+					return true;
+				}
+			});
 			saveIcon.setVisible(true);
 		}
 	}
@@ -981,15 +991,13 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 		case R.id.menuEntryFinishEditConfiguration:
 			try {
 				if (getTargetFragment() != null) {
-					((IntegrateObjectValueHandler) getTargetFragment()).integrateConfiguration(myConfigurationData);
+					((IntegrateObjectValueHandler) getTargetFragment()).integrateConfiguration(selectedServer,
+							myConfigurationData);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			getFragmentManager().popBackStack();
-			return true;
-		case R.id.menuEntrySaveEditConfiguration:
-			saveObjectCallback.saveObject(this.myConfigurationData);
 			return true;
 
 		case android.R.id.home:
@@ -1004,19 +1012,11 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 
 
 	/**
-	 * @return the saveObjectCallback
-	 */
-	public SaveObjectHandler getSaveObjectCallback() {
-		return saveObjectCallback;
-	}
-
-
-	/**
-	 * @param saveObjectCallback
+	 * @param actionCallback
 	 *            the saveObjectCallback to set
 	 */
-	public void setSaveObjectCallback(SaveObjectHandler saveObjectCallback) {
-		this.saveObjectCallback = saveObjectCallback;
+	public void setCallback(EditConfigActionCallback callback) {
+		this.actionCallback = callback;
 	}
 
 
@@ -1027,7 +1027,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 	 * integrateConfiguration(java.lang.Object)
 	 */
 	@Override
-	public void integrateConfiguration(Object configuration) {
+	public void integrateConfiguration(String serverName, Object configuration) {
 		try {
 			Class myObjectClass = myConfigurationData.getClass();
 			Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);

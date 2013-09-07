@@ -3,7 +3,6 @@ package org.ambient.control;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.ambient.control.home.RoofTopFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
@@ -40,7 +39,8 @@ public class MainActivity extends FragmentActivity {
 	RoomConfigManager roomConfigManager;
 	ArrayList<String> fragments = new ArrayList<String>();
 	String currentDialog = null;
-	LinearLayout content;
+	public LinearLayout content;
+
 
 	public RoomConfigManager getRoomConfigManager() {
 		return roomConfigManager;
@@ -165,34 +165,20 @@ public class MainActivity extends FragmentActivity {
 
 		clearFragments(content);
 		roomConfigManager.removeAllListeners();
-		View scrollView = getLayoutInflater().inflate(R.layout.container_home, content);
-		LinearLayout homeContainer = (LinearLayout) scrollView.findViewById(R.id.linearLayoutHomeContainer);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Bundle argsRoom = new Bundle();
+		argsRoom.putStringArrayList(RoomFragment.BUNDLE_SERVER_NAMES, this.roomConfigManager.getServerNames());
 
-		Bundle argsRoof = new Bundle();
-		argsRoof.putStringArrayList(RoofTopFragment.BUNDLE_HOST_LIST, this.roomConfigManager.getServerNames());
-		RoofTopFragment roof = new RoofTopFragment();
-		roof.setArguments(argsRoof);
-		this.fragments.add("roof");
-		this.roomConfigManager.addMetaListener(roof);
-		ft.add(homeContainer.getId(), roof, "roof");
-		ft.commit();
-
+		RoomFragment roomFragment = new RoomFragment();
+		roomFragment.setArguments(argsRoom);
+		this.fragments.add("roomFragment");
 		for (String currentServer : this.getAllRoomServers()) {
-			ft = getSupportFragmentManager().beginTransaction();
-			Bundle argsRoom = new Bundle();
-
-			argsRoom.putString(RoomFragment.BUNDLE_SERVER_NAME, currentServer);
-			argsRoom.putParcelable(RoomFragment.BUNDLE_ROOM_CONFIG, roomConfigManager.getRoomConfigAsParceable(currentServer));
-
-			RoomFragment roomFragment = new RoomFragment();
-			roomFragment.setArguments(argsRoom);
-			this.fragments.add("roomFragment" + currentServer);
 			this.roomConfigManager.addRoomConfigurationChangeListener(currentServer, roomFragment);
-			ft.add(homeContainer.getId(), roomFragment, "roomFragment" + currentServer);
-			ft.commit();
 		}
+		ft.add(content.getId(), roomFragment, "roomFragmentTag");
+		this.fragments.add("roomFragmentTag");
+		ft.commit();
 	}
 
 

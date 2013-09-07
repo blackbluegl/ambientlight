@@ -16,13 +16,17 @@
 package org.ambient.control.home;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomConfigManager.RoomConfigurationUpdateListener;
-import org.ambient.control.RoomConfigurationParceable;
+import org.ambient.control.config.EditConfigActionCallback;
+import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.IntegrateObjectValueHandler;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
@@ -35,7 +39,6 @@ import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
-import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
@@ -47,15 +50,21 @@ import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -70,79 +79,128 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends Fragment implements RoomConfigurationUpdateListener {
+public class RoomFragment extends Fragment implements RoomConfigurationUpdateListener, IntegrateObjectValueHandler {
 
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
+	protected String idInEditMode = "";
 
 	/*
 	 * the lightobjectMappers will store information about the configuration of
 	 * an lightobject like name, state and type. reinit is handled within the
 	 * fragment
 	 */
-	private final List<AbstractRoomItemViewMapper> configuredlightObjects = new ArrayList<AbstractRoomItemViewMapper>();
+	private final Map<String, List<AbstractRoomItemViewMapper>> configuredlightObjects = new HashMap<String, List<AbstractRoomItemViewMapper>>();
 
-	public static final String BUNDLE_ROOM_CONFIG = "roomConfig";
-	private RoomConfiguration roomConfig;
+	// public static final String BUNDLE_ROOM_CONFIG = "roomConfig";
+	// private Map<String,RoomConfiguration> roomConfig = new HashMap<String,
+	// RoomConfiguration>();
 
-	public static final String BUNDLE_SERVER_NAME = "serverName";
-	private String serverName;
-
-	private View roomContainerView;
+	public static final String BUNDLE_SERVER_NAMES = "serverName";
+	private List<String> serverNames;
+	LinearLayout roomsContainerView;
 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		serverName = getArguments().getString(BUNDLE_SERVER_NAME);
-		RoomConfigurationParceable roomConfigParceable = getArguments().getParcelable(BUNDLE_ROOM_CONFIG);
-		this.roomConfig = roomConfigParceable.roomConfiguration;
+		this.serverNames = getArguments().getStringArrayList(BUNDLE_SERVER_NAMES);
 
-		// create the room container
-		roomContainerView = inflater.inflate(R.layout.fragment_room, null);
-		roomContainerView.setTag("roomContainer");
+		// create the home container
+		View homeView = inflater.inflate(R.layout.fragment_rooms, null);
+		roomsContainerView = (LinearLayout) homeView.findViewById(R.id.linearLayoutRooms);
+		roomsContainerView.setTag("roomContainers");
 
-		TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
-		roomContent.setTag("roomContent");
+		LinearLayout roofTop = (LinearLayout) inflater.inflate(R.layout.fragment_home_rooftop, container, false);
+		roomsContainerView.addView(roofTop);
 
-		TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
-		roomLabel.setText(roomConfig.roomName);
-		roomLabel.setTag("roomLabel");
+		ImageView masterButton = (ImageView) roofTop.findViewById(R.id.imageViewMasterSwitch);
 
-		// init dynamically the clickable light object icons
-		int amountPerRow = getLightObjectAmountPerRow();
+		// this.onRoomConfigurationChange(null, null);
 
-		TableRow row = new TableRow(roomContent.getContext());
-		row.setGravity(Gravity.CENTER);
-		roomContent.addView(row);
+		masterButton.setOnClickListener(new OnClickListener() {
 
-		Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
-		for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
+			@Override
+			public void onClick(View v) {
+				for (String currentServerName : serverNames) {
+					try {
+						RoomConfiguration currentConfig = ((MainActivity) getActivity()).getRoomConfigManager()
+								.getRoomConfiguration(currentServerName);
 
-			// create a new row if last one is full
-			if (i % amountPerRow == 0) {
-				row = new TableRow(roomContent.getContext());
-				row.setGravity(Gravity.CENTER);
-				roomContent.addView(row);
+						for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators()
+								.values()) {
+							SwitchEventConfiguration event = new SwitchEventConfiguration();
+							event.eventGeneratorName = currentEventGenerator.getName();
+							event.powerState = false;
+							getRestClient().sendEvent(currentServerName, event);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				updateMasterSwitchState(false);
 			}
+		});
 
-			View lightObject = inflater.inflate(R.layout.layout_room_item, null);
-			initRoomItemIconView(this.getCurrentScenery(), iterator.next(), lightObject);
+		for (String currentServer : serverNames) {
+			RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
+					currentServer);
+			LinearLayout roomContainerView = (LinearLayout) inflater.inflate(R.layout.layout_room, null);
+			roomsContainerView.addView(roomContainerView);
+			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
+			roomContent.setTag("roomContent" + currentServer);
+			TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
+			roomLabel.setText(roomConfig.roomName);
+			roomLabel.setTag("roomLabel");
+			// init dynamically the clickable light object icons
+			int amountPerRow = getLightObjectAmountPerRow();
 
-			row.addView(lightObject);
-		}
+			TableRow row = new TableRow(roomContent.getContext());
+			row.setGravity(Gravity.CENTER);
+			roomContent.addView(row);
+			Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
+			for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
 
-		// init room power switch dynamically
-		LinearLayout roomBottomBarView = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
+				// create a new row if last one is full
+				if (i % amountPerRow == 0) {
+					row = new TableRow(roomContent.getContext());
+					row.setGravity(Gravity.CENTER);
+					roomContent.addView(row);
+				}
 
-		for (EventGeneratorConfiguration currentEventGenerator : roomConfig.eventGeneratorConfigurations) {
-			if (currentEventGenerator instanceof SwitchEventGeneratorConfiguration) {
-				createSwitch(serverName, roomBottomBarView, (SwitchEventGeneratorConfiguration) currentEventGenerator);
+				View lightObject = inflater.inflate(R.layout.layout_room_item, null);
+				initRoomItemIconView(currentServer, iterator.next(), lightObject);
+
+				row.addView(lightObject);
 			}
+			// init room power switch dynamically
+			LinearLayout roomBottomBarView = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
+
+			for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
+				createSwitch(currentServer, roomBottomBarView, currentEventGenerator);
+			}
+			// init scenery Spinner
+			Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
+			spinner.setTag("sceneries" + currentServer);
+			this.updateScenerySpinner(currentServer);
+
+			RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
+			roomBackground.setTag("roomBackground" + currentServer);
+
+			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
+			bar.setTag("progressBar" + currentServer);
 		}
+		return roomsContainerView;
+	}
 
-		// init scenery Spinner
-		this.updateScenerySpinner();
 
-		return roomContainerView;
+	public void updateMasterSwitchState(boolean powerState) {
+
+		ImageView masterSwitch = (ImageView) this.roomsContainerView.findViewById(R.id.imageViewMasterSwitch);
+
+		if (powerState == true) {
+			masterSwitch.setImageResource(R.drawable.ic_power_active);
+		} else {
+			masterSwitch.setImageResource(R.drawable.ic_power_disabled);
+		}
 	}
 
 
@@ -159,34 +217,34 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	private void disableEventListener() {
-		ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
+	private void disableEventListener(String serverName) {
+		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
 		bar.setVisibility(ProgressBar.VISIBLE);
-		TableLayout roomContent = (TableLayout) roomContainerView.findViewWithTag("roomContent");
+		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
 		roomContent.setVisibility(TableLayout.INVISIBLE);
 
 		// LinearLayout roomBottomBar = (LinearLayout)
 		// roomContainerView.findViewById(R.id.roomBottomBar);
 		// roomBottomBar.setVisibility(LinearLayout.INVISIBLE);
 
-		for (AbstractRoomItemViewMapper mapper : configuredlightObjects) {
+		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
 			mapper.setEventListenerDisabled(true);
 		}
 	}
 
 
-	private void enableEventListener() {
-		ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
+	private void enableEventListener(String serverName) {
+		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
 		bar.setVisibility(ProgressBar.INVISIBLE);
 
-		TableLayout roomContent = (TableLayout) roomContainerView.findViewWithTag("roomContent");
+		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
 		roomContent.setVisibility(TableLayout.VISIBLE);
 
 		// LinearLayout roomBottomBar = (LinearLayout)
 		// roomContainerView.findViewById(R.id.roomBottomBar);
 		// roomBottomBar.setVisibility(LinearLayout.VISIBLE);
 
-		for (AbstractRoomItemViewMapper mapper : configuredlightObjects) {
+		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
 			mapper.setEventListenerDisabled(false);
 		}
 	}
@@ -212,18 +270,125 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	private void initRoomItemIconView(AbstractSceneryConfiguration sceneryName, final ActorConfiguration currentConfig,
-			View lightObjectView) {
+	private void initRoomItemIconView(final String serverName, final ActorConfiguration currentConfig, View lightObjectView) {
 
-		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon(sceneryName, currentConfig,
-				lightObjectView);
+		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon(currentConfig, lightObjectView);
 
-		this.configuredlightObjects.add(roomItemMapper);
+		List<AbstractRoomItemViewMapper> configuredlightObjects = this.configuredlightObjects.get(serverName);
+		if (configuredlightObjects == null) {
+			configuredlightObjects = new ArrayList<AbstractRoomItemViewMapper>();
+			this.configuredlightObjects.put(serverName, configuredlightObjects);
+		}
+
+		configuredlightObjects.add(roomItemMapper);
 
 		ImageViewWithContextMenuInfo icon = (ImageViewWithContextMenuInfo) lightObjectView
 				.findViewById(R.id.imageViewLightObject);
 		icon.setTag(roomItemMapper);
 		registerForContextMenu(icon);
+		final RoomFragment myself = this;
+		icon.setOnLongClickListener(new OnLongClickListener() {
+
+			@Override
+			public boolean onLongClick(View v) {
+				getActivity().startActionMode(new ActionMode.Callback() {
+
+					EditConfigActionCallback editCallback = new EditConfigActionCallback() {
+
+						@Override
+						public void perform(Object config) {
+							ActorConductConfiguration value = (ActorConductConfiguration) config;
+							RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
+							rest.setActorConductConfiguration(serverName, idInEditMode, value);
+						}
+
+
+						@Override
+						public String getLabel() {
+							return "Vorschau";
+						}
+
+
+						@Override
+						public int getIconResourceId() {
+							return R.drawable.navigation_accept;
+						}
+					};
+
+
+					@Override
+					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+						idInEditMode = currentConfig.getName();
+
+						switch (item.getItemId()) {
+
+						case R.id.menuEntryEditRoomItem:
+							EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
+							fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+							fragEdit.setCallback(editCallback);
+							Bundle arguments = new Bundle();
+							arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
+									currentConfig.actorConductConfiguration);
+							arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
+							arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, serverName);
+							fragEdit.setArguments(arguments);
+
+							FragmentTransaction ft2 = getFragmentManager().beginTransaction();
+							ft2.replace(((MainActivity) getActivity()).content.findViewWithTag("homeScrollView").getId(),
+									fragEdit);
+							// ft2.
+							// ft2.addToBackStack(null);
+							// ft2.commit();
+							break;
+
+						case R.id.menuEntryCreateRoomItem:
+							EditConfigHandlerFragment fragEdit2 = new EditConfigHandlerFragment();
+							fragEdit2.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+							fragEdit2.setCallback(editCallback);
+							Bundle arguments2 = new Bundle();
+							arguments2.putSerializable(EditConfigHandlerFragment.CLASS_NAME,
+									ActorConductConfiguration.class.getName());
+							arguments2.putBoolean(EditConfigHandlerFragment.CREATE_MODE, true);
+							arguments2.putString(EditConfigHandlerFragment.SELECTED_SERVER, serverName);
+							fragEdit2.setArguments(arguments2);
+							FragmentTransaction ft = getFragmentManager().beginTransaction();
+							ft.replace(R.id.LayoutMain, fragEdit2);
+							ft.addToBackStack(null);
+							ft.commit();
+							break;
+
+						default:
+							break;
+
+						}
+						mode.finish();
+						return true;
+					}
+
+
+					@Override
+					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+						mode.getMenuInflater().inflate(R.menu.fragment_room_cab, menu);
+						return true;
+					}
+
+
+					@Override
+					public void onDestroyActionMode(ActionMode mode) {
+						// TODO Auto-generated method stub
+
+					}
+
+
+					@Override
+					public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				});
+				return true;
+			}
+		});
 
 		// a click on an icon toggles the powerstate on the server
 		icon.setOnClickListener(new OnClickListener() {
@@ -240,7 +405,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 					// updateing the icon
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
 
-					updateRoomBackground();
+					updateRoomBackground(serverName);
 
 					// update widgets
 					WidgetUtils.notifyWidgets(getActivity());
@@ -263,7 +428,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 			final SwitchEventGeneratorConfiguration currentEventGenerator) {
 
 		final Switch powerStateSwitch = new Switch(this.getActivity());
-		powerStateSwitch.setTag("powerStateSwitch" + currentEventGenerator.getName());
+		powerStateSwitch.setTag("powerStateSwitch" + serverName + currentEventGenerator.getName());
 		roomBottomBarView.addView(powerStateSwitch, 0);
 		powerStateSwitch.setChecked(currentEventGenerator.getPowerState());
 		powerStateSwitch.setOnClickListener(new OnClickListener() {
@@ -271,7 +436,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 			@Override
 			public void onClick(View v) {
 				try {
-					disableEventListener();
+					disableEventListener(serverName);
 					SwitchEventConfiguration event = new SwitchEventConfiguration();
 					event.eventGeneratorName = currentEventGenerator.getName();
 					event.powerState = powerStateSwitch.isChecked();
@@ -284,8 +449,8 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(AbstractSceneryConfiguration sceneryName,
-			final ActorConfiguration currentConfig, View lightObjectView) {
+	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final ActorConfiguration currentConfig,
+			View lightObjectView) {
 		AbstractRoomItemViewMapper result = null;
 
 		ActorConductConfiguration sceneryConfig = currentConfig.actorConductConfiguration;
@@ -308,29 +473,31 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	public void updateScenerySpinner() {
+	public void updateScenerySpinner(final String serverName) {
+		List<AbstractSceneryConfiguration> sceneries = ((MainActivity) getActivity()).getRoomConfigManager()
+				.getRoomConfiguration(serverName).getSceneries();
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
-				getSceneryArray(roomConfig.sceneries));
+				getSceneryArray(sceneries));
 		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
-		Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
+		Spinner spinner = (Spinner) roomsContainerView.findViewWithTag("sceneries" + serverName);
 		spinner.setAdapter(adapter);
-		adapter.getPosition(getCurrentScenery().id);
-		spinner.setSelection(adapter.getPosition(getCurrentScenery().id));
+		adapter.getPosition(getCurrentScenery(serverName).id);
+		spinner.setSelection(adapter.getPosition(getCurrentScenery(serverName).id));
 
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				String selectedScenery = (String) parent.getItemAtPosition(pos);
-				String currentScenery = getCurrentScenery().id;
+				String currentScenery = getCurrentScenery(serverName).id;
 
 				if (!selectedScenery.equals(currentScenery)) {
 					SceneryEntryEventConfiguration event = new SceneryEntryEventConfiguration();
 					event.eventGeneratorName = "RoomSceneryEventGenerator";
 					event.sceneryName = selectedScenery;
 					getRestClient().sendEvent(serverName, event);
-					disableEventListener();
+					disableEventListener(serverName);
 				}
 			}
 
@@ -343,25 +510,26 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	private void updateRoomBackground() {
+	private void updateRoomBackground(String serverName) {
 		boolean powerSwitchIsChecked = false;
-		RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
+		RelativeLayout roomBackground = (RelativeLayout) roomsContainerView.findViewWithTag("roomBackground" + serverName);
+		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(serverName);
 
-		for (SwitchEventGeneratorConfiguration currentSwitch : this.roomConfig.getSwitchGenerators().values()) {
+		for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
 			if (currentSwitch.getPowerState() == true) {
 				powerSwitchIsChecked = true;
 				break;
 			}
 		}
 
-		for (AbstractRoomItemViewMapper current : this.configuredlightObjects) {
+		for (AbstractRoomItemViewMapper current : this.configuredlightObjects.get(serverName)) {
 			if (current.getPowerState() != powerSwitchIsChecked) {
 				roomBackground.setBackgroundResource(R.drawable.bg_room_half_active);
 				return;
 			}
 		}
 
-		if (this.getPowerStateForAllLightObjectsInRoom()) {
+		if (this.getPowerStateForAllLightObjectsInRoom(serverName)) {
 			roomBackground.setBackgroundResource(R.drawable.bg_room_active);
 		} else {
 			roomBackground.setBackgroundResource(R.drawable.bg_room_disabled);
@@ -369,8 +537,8 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	private boolean getPowerStateForAllLightObjectsInRoom() {
-		for (AbstractRoomItemViewMapper current : this.configuredlightObjects) {
+	private boolean getPowerStateForAllLightObjectsInRoom(String serverName) {
+		for (AbstractRoomItemViewMapper current : this.configuredlightObjects.get(serverName)) {
 			if (current.getPowerState() == true)
 				return true;
 		}
@@ -378,12 +546,11 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	}
 
 
-	private AbstractSceneryConfiguration getCurrentScenery() {
-		for (EventGeneratorConfiguration eventGen : this.roomConfig.eventGeneratorConfigurations) {
-			if (eventGen instanceof SceneryEventGeneratorConfiguration)
-				// we assume that there is only one per room
-				return ((SceneryEventGeneratorConfiguration) eventGen).currentScenery;
-		}
+	private AbstractSceneryConfiguration getCurrentScenery(String serverName) {
+		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(serverName);
+		for (SceneryEventGeneratorConfiguration eventGen : roomConfig.getSceneryEventGenerator().values())
+			// we assume that there is only one per room
+			return eventGen.currentScenery;
 		return null;
 	}
 
@@ -399,42 +566,50 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	@Override
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
 
-		if (this.serverName != serverName)
-			return;
+		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(
+				this.configuredlightObjects.get(serverName));
 
-		this.roomConfig = config;
-
-		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(this.configuredlightObjects);
-
-		this.configuredlightObjects.clear();
+		this.configuredlightObjects.get(serverName).clear();
 
 		for (AbstractRoomItemViewMapper currentToRefresh : mappersToRefresh) {
-			ActorConfiguration currentConfig = roomConfig.actorConfigurations.get(currentToRefresh.getItemName());
-			this.initRoomItemIconView(this.getCurrentScenery(), currentConfig, currentToRefresh.getLightObjectView());
+			ActorConfiguration currentConfig = config.actorConfigurations.get(currentToRefresh.getItemName());
+			this.initRoomItemIconView(serverName, currentConfig, currentToRefresh.getLightObjectView());
 		}
 
 		// update switches
-		for (EventGeneratorConfiguration currentEventGenerator : roomConfig.eventGeneratorConfigurations) {
-			if (currentEventGenerator instanceof SwitchEventGeneratorConfiguration) {
-
-				Switch currentSwitch = (Switch) this.roomContainerView.findViewWithTag("powerStateSwitch"
-						+ currentEventGenerator.name);
-				currentSwitch.setChecked(((SwitchEventGeneratorConfiguration) currentEventGenerator).getPowerState());
-
-			}
+		for (SwitchEventGeneratorConfiguration currentEventGenerator : config.getSwitchGenerators().values()) {
+			Switch currentSwitch = (Switch) this.roomsContainerView.findViewWithTag("powerStateSwitch" + serverName
+					+ currentEventGenerator.name);
+			currentSwitch.setChecked(currentEventGenerator.getPowerState());
 		}
 
-		updateRoomBackground();
+		updateRoomBackground(serverName);
 
-		this.enableEventListener();
+		this.enableEventListener(serverName);
 
 		// update widgets
 		WidgetUtils.notifyWidgets(this.getActivity());
 
+		// update rooftop
+		boolean anyActive = false;
+
+		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
+				.values()) {
+
+			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {
+				if (currentEventGenerator.getPowerState()) {
+					anyActive = true;
+					break;
+				}
+			}
+		}
+
+		this.updateMasterSwitchState(anyActive);
+
 	}
 
 
-	private RestClient getRestClient(){
+	private RestClient getRestClient() {
 		return ((MainActivity) this.getActivity()).getRestClient();
 	}
 
@@ -442,7 +617,24 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	@Override
 	public void onResume() {
 		super.onResume();
-		// this.onRoomConfigurationChange(this.serverName, this.roomConfig);
+	}
+
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.config.IntegrateObjectValueHandler#integrateConfiguration
+	 * (java.lang.Object)
+	 */
+	@Override
+	public void integrateConfiguration(String serverName, Object configuration) {
+		if (configuration instanceof ActorConductConfiguration) {
+			RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
+			rest.setActorConductConfiguration(serverName, this.idInEditMode, (ActorConductConfiguration) configuration);
+			this.idInEditMode = "";
+		}
 	}
 
 }

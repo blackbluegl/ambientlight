@@ -107,6 +107,11 @@ public class ConfigBindingHelper {
 			return new ArrayList((Set) result);
 		else if (result instanceof String[])
 			return Arrays.asList((String[]) result);
+		else if (result instanceof String) {
+			ArrayList<String> resultArray = new ArrayList<String>();
+			resultArray.add((String) result);
+			return resultArray;
+		}
 		else
 			return null;
 	}

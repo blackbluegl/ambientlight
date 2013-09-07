@@ -32,6 +32,7 @@ import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.validation.ValidationEntry;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -327,7 +328,8 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 		case R.id.menuEntryProcessSceneries:
 			SceneriesWrapper sceneries = new SceneriesWrapper();
-			sceneries.sceneries = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer).sceneries;
+			sceneries.sceneries = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer)
+					.getSceneries();
 
 			EditConfigHandlerFragment fragEditSceneries = new EditConfigHandlerFragment();
 			fragEditSceneries.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
@@ -574,7 +576,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	 * integrateConfiguration(java.lang.Object)
 	 */
 	@Override
-	public void integrateConfiguration(Object configuration) {
+	public void integrateConfiguration(String serverName, Object configuration) {
 
 		if (configuration instanceof ProcessConfiguration) {
 			this.editMode = true;
@@ -592,10 +594,14 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 
 		if (configuration instanceof SceneriesWrapper) {
 			this.editMode = false;
-			((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(selectedServer).sceneries = ((SceneriesWrapper) configuration).sceneries;
+
+			SceneryEventGeneratorConfiguration sceneryEventGenerator = ((MainActivity) getActivity()).getRoomConfigManager()
+					.getAllRoomConfigurations().get(selectedServer).getSceneryEventGenerator().values().iterator().next();
+
+			sceneryEventGenerator.sceneries = ((SceneriesWrapper) configuration).sceneries;
 			RestClient rest = new RestClient(null);
 			try {
-				rest.createOrUpdateSceneries(selectedServer, ((SceneriesWrapper) configuration).sceneries);
+				rest.createOrUpdateEventGeneratorConfiguration(selectedServer, sceneryEventGenerator);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

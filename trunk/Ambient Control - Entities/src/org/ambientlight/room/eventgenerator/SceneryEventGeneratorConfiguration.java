@@ -15,6 +15,9 @@
 
 package org.ambientlight.room.eventgenerator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
 
 
@@ -25,4 +28,6 @@ import org.ambientlight.scenery.AbstractSceneryConfiguration;
 public class SceneryEventGeneratorConfiguration extends EventGeneratorConfiguration {
 
 	public AbstractSceneryConfiguration currentScenery;
+	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
+
 }

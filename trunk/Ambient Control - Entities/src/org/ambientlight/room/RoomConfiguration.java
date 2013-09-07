@@ -28,8 +28,7 @@ public class RoomConfiguration implements Serializable {
 	public Map<String, ActorConfiguration> actorConfigurations = new HashMap<String, ActorConfiguration>();
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
 	public List<EventProcessConfiguration> processes = new ArrayList<EventProcessConfiguration>();
-	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
-	public List<EventGeneratorConfiguration> eventGeneratorConfigurations = new ArrayList<EventGeneratorConfiguration>();
+	public Map<String, EventGeneratorConfiguration> eventGeneratorConfigurations = new HashMap<String, EventGeneratorConfiguration>();
 
 
 	public Map<String, IUserRoomItem> getUserRoomItems() {
@@ -40,7 +39,7 @@ public class RoomConfiguration implements Serializable {
 			}
 		}
 
-		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations) {
+		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations.values()) {
 			if (eventGeneratorConfiguration instanceof IUserRoomItem) {
 				result.put(((IUserRoomItem) eventGeneratorConfiguration).getName(), (IUserRoomItem) eventGeneratorConfiguration);
 			}
@@ -53,7 +52,7 @@ public class RoomConfiguration implements Serializable {
 	public Map<String, SwitchEventGeneratorConfiguration> getSwitchGenerators() {
 		Map<String, SwitchEventGeneratorConfiguration> result = new HashMap<String, SwitchEventGeneratorConfiguration>();
 
-		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations) {
+		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations.values()) {
 			if (eventGeneratorConfiguration instanceof SwitchEventGeneratorConfiguration) {
 				result.put(((SwitchEventGeneratorConfiguration) eventGeneratorConfiguration).name,
 						(SwitchEventGeneratorConfiguration) eventGeneratorConfiguration);
@@ -66,11 +65,20 @@ public class RoomConfiguration implements Serializable {
 	public Map<String, SceneryEventGeneratorConfiguration> getSceneryEventGenerator() {
 		Map<String, SceneryEventGeneratorConfiguration> result = new HashMap<String, SceneryEventGeneratorConfiguration>();
 
-		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations) {
+		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations.values()) {
 			if (eventGeneratorConfiguration instanceof SceneryEventGeneratorConfiguration) {
 				result.put(((SceneryEventGeneratorConfiguration) eventGeneratorConfiguration).name,
 						(SceneryEventGeneratorConfiguration) eventGeneratorConfiguration);
 			}
+		}
+		return result;
+	}
+
+
+	public List<AbstractSceneryConfiguration> getSceneries() {
+		ArrayList<AbstractSceneryConfiguration> result = new ArrayList<AbstractSceneryConfiguration>();
+		for (SceneryEventGeneratorConfiguration current : getSceneryEventGenerator().values()) {
+			result.addAll(current.sceneries);
 		}
 		return result;
 	}
