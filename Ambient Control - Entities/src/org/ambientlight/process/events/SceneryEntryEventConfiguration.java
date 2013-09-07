@@ -9,7 +9,7 @@ import org.ambientlight.annotations.ValueBindingPath;
 public class SceneryEntryEventConfiguration extends EventConfiguration {
 
 	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "sceneries.id") })
+	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "getSceneries().id") })
 	public String sceneryName;
 
 

@@ -22,5 +22,5 @@ package org.ambient.control.config;
  */
 public interface IntegrateObjectValueHandler {
 
-	public void integrateConfiguration(Object configuration);
+	public void integrateConfiguration(String serverName, Object configuration);
 }

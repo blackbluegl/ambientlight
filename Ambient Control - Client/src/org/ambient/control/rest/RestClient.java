@@ -1,6 +1,5 @@
 package org.ambient.control.rest;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.ambient.control.RoomConfigManager;
@@ -8,7 +7,7 @@ import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.scenery.AbstractSceneryConfiguration;
+import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
 
 
@@ -69,13 +68,6 @@ public class RestClient {
 	}
 
 
-	public String[] getSceneriesForRoom(String hostName) throws InterruptedException, ExecutionException {
-		GetSceneriesTask task = new GetSceneriesTask();
-		task.execute(hostName);
-		return task.get();
-	}
-
-
 	public void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException, ExecutionException {
 		ToggleRoomPowerStateTask task = new ToggleRoomPowerStateTask();
 		task.execute(hostName, state, configAdapter);
@@ -95,9 +87,9 @@ public class RestClient {
 	}
 
 
-	public void setProgramForLightObject(String hostName, String sceneryName, String itemName, ActorConductConfiguration config) {
+	public void setActorConductConfiguration(String hostName, String itemName, ActorConductConfiguration config) {
 		SetLightObjectConfigurationTask task = new SetLightObjectConfigurationTask();
-		task.execute(hostName, sceneryName, itemName, config);
+		task.execute(hostName, itemName, config);
 	}
 
 
@@ -107,9 +99,9 @@ public class RestClient {
 	}
 
 
-	public void createOrUpdateSceneries(String hostName, List<AbstractSceneryConfiguration> sceneries)
+	public void createOrUpdateEventGeneratorConfiguration(String hostName, EventGeneratorConfiguration config)
 			throws Exception {
-		CreateSceneriesTask task = new CreateSceneriesTask();
-		task.execute(hostName, sceneries);
+		CreateEventGeneratorTask task = new CreateEventGeneratorTask();
+		task.execute(hostName, config.name, config);
 	}
 }

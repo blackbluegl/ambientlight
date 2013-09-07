@@ -13,20 +13,21 @@
    limitations under the License.
  */
 
-package org.ambientlight.ws.container;
+package org.ambient.control.config;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.ambientlight.scenery.AbstractSceneryConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public class SceneriesContainer implements Serializable {
+public interface EditConfigActionCallback {
 
-	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
+	public String getLabel();
+
+
+	public void perform(Object config);
+
+
+	public int getIconResourceId();
 }

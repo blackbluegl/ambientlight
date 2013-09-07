@@ -83,7 +83,7 @@ public class RoomFactory {
 		// initialize eventGenerators
 		room.eventGenerators = new HashMap<String, EventGenerator>();
 
-		for (EventGeneratorConfiguration currentConfig : room.config.eventGeneratorConfigurations) {
+		for (EventGeneratorConfiguration currentConfig : room.config.eventGeneratorConfigurations.values()) {
 			EventGenerator generator = null;
 			if (currentConfig instanceof AlarmEventGeneratorConfiguration) {
 				generator = new AlarmGenerator();

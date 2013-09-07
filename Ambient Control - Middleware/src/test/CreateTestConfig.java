@@ -10,8 +10,8 @@ import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.device.drivers.DummySwitchDeviceConfiguration;
 import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.device.led.StripePartConfiguration;
-import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.EventProcessConfiguration;
+import org.ambientlight.process.NodeConfiguration;
 import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
@@ -115,8 +115,8 @@ public class CreateTestConfig {
 		lo.height = 20;
 		lo.layerNumber = 2;
 		lo.width = 20;
-		lo.xOffsetInRoom = 5;
-		lo.yOffsetInRoom = 5;
+		lo.xOffsetInRoom = 0;
+		lo.yOffsetInRoom = 0;
 		lo.actorConductConfiguration = this.createSimpleColor();
 		rc.actorConfigurations.put(lo.getName(), lo);
 
@@ -125,18 +125,18 @@ public class CreateTestConfig {
 		background.height = 200;
 		background.layerNumber = 1;
 		background.width = 200;
-		background.xOffsetInRoom = 2;
-		background.yOffsetInRoom = 2;
+		background.xOffsetInRoom = 0;
+		background.yOffsetInRoom = 0;
 		background.actorConductConfiguration = this.createSimpleColor();
 		rc.actorConfigurations.put(background.getName(), background);
 
 		SwitchEventGeneratorConfiguration triggerMainSwitch = new SwitchEventGeneratorConfiguration();
 		triggerMainSwitch.name = "RoomSwitch";
-		rc.eventGeneratorConfigurations.add(triggerMainSwitch);
+		rc.eventGeneratorConfigurations.put("RoomSwitch", triggerMainSwitch);
 
 		SceneryEventGeneratorConfiguration sceneryEventGenerator = new SceneryEventGeneratorConfiguration();
 		sceneryEventGenerator.name = "RoomSceneryEventGenerator";
-		rc.eventGeneratorConfigurations.add(sceneryEventGenerator);
+		rc.eventGeneratorConfigurations.put("RoomSceneryEventGenerator", sceneryEventGenerator);
 
 		rc.height = 400;
 		rc.width = 400;
@@ -144,15 +144,16 @@ public class CreateTestConfig {
 
 		UserSceneryConfiguration userScenario = new UserSceneryConfiguration();
 		userScenario.id = "scenario1";
-		rc.sceneries.add(userScenario);
+		sceneryEventGenerator.sceneries.add(userScenario);
 
 		UserSceneryConfiguration userScenario2 = new UserSceneryConfiguration();
 		userScenario2.id = "scenario2";
-		rc.sceneries.add(userScenario2);
+		sceneryEventGenerator.sceneries.add(userScenario2);
 
 		sceneryEventGenerator.currentScenery = userScenario;
 
 		EventProcessConfiguration roomSwitchProcess = new EventProcessConfiguration();
+		roomSwitchProcess.run = true;
 		roomSwitchProcess.id = "roomSwitch";
 		rc.processes.add(roomSwitchProcess);
 		SwitchEventConfiguration triggerConfOn = new SwitchEventConfiguration();
@@ -224,6 +225,7 @@ public class CreateTestConfig {
 			List<LightObjectConfiguration> lo, List<IUserRoomItem> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
+		process.run = true;
 		process.id = "process-scenario1";
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
