@@ -172,7 +172,6 @@ public class MainActivity extends FragmentActivity {
 
 		RoomFragment roomFragment = new RoomFragment();
 		roomFragment.setArguments(argsRoom);
-		this.fragments.add("roomFragment");
 		for (String currentServer : this.getAllRoomServers()) {
 			this.roomConfigManager.addRoomConfigurationChangeListener(currentServer, roomFragment);
 		}
