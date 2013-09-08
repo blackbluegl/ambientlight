@@ -188,6 +188,9 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
 			bar.setTag("progressBar" + currentServer);
 		}
+
+		updateRoofTop();
+
 		return myHomeScrollView;
 	}
 
@@ -334,11 +337,9 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 							fragEdit.setArguments(arguments);
 
 							FragmentTransaction ft2 = getFragmentManager().beginTransaction();
-							ft2.replace(((MainActivity) getActivity()).content.findViewWithTag("homeScrollView").getId(),
-									fragEdit);
-							// ft2.
-							// ft2.addToBackStack(null);
-							// ft2.commit();
+							ft2.replace(R.id.LayoutMain, fragEdit);
+							ft2.addToBackStack(null);
+							ft2.commit();
 							break;
 
 						case R.id.menuEntryCreateRoomItem:
@@ -590,6 +591,15 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		// update widgets
 		WidgetUtils.notifyWidgets(this.getActivity());
 
+		updateRoofTop();
+
+	}
+
+
+	/**
+	 * 
+	 */
+	public void updateRoofTop() {
 		// update rooftop
 		boolean anyActive = false;
 
@@ -605,7 +615,6 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		}
 
 		this.updateMasterSwitchState(anyActive);
-
 	}
 
 
@@ -618,7 +627,6 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	public void onResume() {
 		super.onResume();
 	}
-
 
 
 	/*
