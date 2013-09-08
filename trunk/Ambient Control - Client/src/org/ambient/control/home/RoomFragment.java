@@ -105,11 +105,11 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		this.serverNames = getArguments().getStringArrayList(BUNDLE_SERVER_NAMES);
 
 		// create the home container
-		View homeView = inflater.inflate(R.layout.fragment_rooms, null);
-		roomsContainerView = (LinearLayout) homeView.findViewById(R.id.linearLayoutRooms);
+		View myHomeScrollView = inflater.inflate(R.layout.fragment_rooms, null);
+		roomsContainerView = (LinearLayout) myHomeScrollView.findViewById(R.id.linearLayoutRooms);
 		roomsContainerView.setTag("roomContainers");
 
-		LinearLayout roofTop = (LinearLayout) inflater.inflate(R.layout.fragment_home_rooftop, container, false);
+		LinearLayout roofTop = (LinearLayout) inflater.inflate(R.layout.fragment_home_rooftop, roomsContainerView, false);
 		roomsContainerView.addView(roofTop);
 
 		ImageView masterButton = (ImageView) roofTop.findViewById(R.id.imageViewMasterSwitch);
@@ -188,7 +188,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
 			bar.setTag("progressBar" + currentServer);
 		}
-		return roomsContainerView;
+		return myHomeScrollView;
 	}
 
 
