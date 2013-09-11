@@ -88,7 +88,7 @@ public class RestClient {
 
 
 	public void setActorConductConfiguration(String hostName, String itemName, ActorConductConfiguration config) {
-		SetLightObjectConfigurationTask task = new SetLightObjectConfigurationTask();
+		SetActorConductConfigurationTask task = new SetActorConductConfigurationTask();
 		task.execute(hostName, itemName, config);
 	}
 
@@ -99,8 +99,7 @@ public class RestClient {
 	}
 
 
-	public void createOrUpdateEventGeneratorConfiguration(String hostName, EventGeneratorConfiguration config)
-			throws Exception {
+	public void createOrUpdateEventGeneratorConfiguration(String hostName, EventGeneratorConfiguration config) throws Exception {
 		CreateEventGeneratorTask task = new CreateEventGeneratorTask();
 		task.execute(hostName, config.name, config);
 	}

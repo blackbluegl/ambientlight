@@ -42,6 +42,8 @@ import org.ambientlight.room.RoomConfigurationFactory;
  * @author Florian Bornkessel
  * 
  */
+// TODO think about where to handle the file saving operations. in ws or deeper
+// within the actions? where is the api facade?
 @Path("/process")
 public class Process {
 
@@ -109,7 +111,8 @@ public class Process {
 		} else {
 			AmbientControlMW.getRoom().config.processes.add(process);
 		}
-
+		// TODO this saves the complete state. do it like in
+		// updateconductconfiguration to just save the given part
 		try {
 			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
 					AmbientControlMW.getRoomConfigFileName());
@@ -135,7 +138,8 @@ public class Process {
 				break;
 			}
 		}
-
+		// TODO this saves the complete state. do it like in
+		// updateconductconfiguration to just save the given part
 		try {
 			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
 					AmbientControlMW.getRoomConfigFileName());

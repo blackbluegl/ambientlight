@@ -20,7 +20,8 @@ package org.ambient.control.config;
  * @author Florian Bornkessel
  *
  */
-public interface IntegrateObjectValueHandler {
+public interface EditConfigExitListener {
 
-	public void integrateConfiguration(String serverName, Object configuration);
+	public void onIntegrateConfiguration(String serverName, Object configuration);
+	public void onRevertConfiguration(String serverName, Object configuration);
 }

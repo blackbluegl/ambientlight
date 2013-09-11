@@ -278,6 +278,8 @@ public class Tron extends RenderingProgramm {
 
 	@Override
 	public BufferedImage renderLightObject(LightObject lightObject) {
+		if (this.lanes.size() == 0)
+			return lightObject.getPixelMap();
 		for (int i = 0; i < this.speed; i++) {
 			handleTokens();
 			renderLanes(lightObject.getPixelMap());

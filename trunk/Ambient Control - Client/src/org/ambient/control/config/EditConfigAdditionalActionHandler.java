@@ -15,13 +15,11 @@
 
 package org.ambient.control.config;
 
-
-
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface EditConfigActionCallback {
+public interface EditConfigAdditionalActionHandler {
 
 	public String getLabel();
 
