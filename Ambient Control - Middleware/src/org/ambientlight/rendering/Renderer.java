@@ -129,7 +129,14 @@ public class Renderer {
 
 				if (currentLightObject.configuration.layerNumber == currentLayer) {
 
-					BufferedImage result = renderLightObjectCanvas(currentLightObject);
+					BufferedImage result = null;
+					try {
+						result = renderLightObjectCanvas(currentLightObject);
+					} catch (Exception e) {
+						// ignore the lightobject
+						System.out.println("Error while rendering lightobject: ");
+						e.printStackTrace();
+					}
 
 					// merge to room
 					if (result != null) {

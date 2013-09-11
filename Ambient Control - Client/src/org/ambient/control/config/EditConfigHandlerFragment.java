@@ -83,13 +83,15 @@ import de.devmil.common.ui.color.ColorSelectorView.OnColorChangedListener;
  * @author Florian Bornkessel
  * 
  */
-public class EditConfigHandlerFragment extends Fragment implements IntegrateObjectValueHandler {
+public class EditConfigHandlerFragment extends Fragment implements EditConfigExitListener {
 
 	private static enum WhereToPutType {
 		FIELD, MAP, LIST
 	}
 
-	private EditConfigActionCallback actionCallback;
+	private EditConfigExitListener editConfigCallBack;
+
+	private EditConfigAdditionalActionHandler actionCallback;
 
 	private class WhereToPutConfigurationData {
 
@@ -118,6 +120,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 		inflater.inflate(R.menu.fragment_edit_configuration_menu, menu);
 		if (this.actionCallback != null) {
 			MenuItem saveIcon = menu.add(actionCallback.getLabel());
+			saveIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			saveIcon.setIcon(actionCallback.getIconResourceId());
 			saveIcon.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -381,7 +384,8 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 						whereToPutDataFromChild = whereToStore;
 
 						if (field.get(config) == null && alternativeValuesForDisplay.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, myself, selectedServer);
+							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, myself, selectedServer,
+									myself, null);
 						} else if (field.get(config) != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -661,7 +665,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 			list.setAdapter(adapter);
 			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 			GuiUtils.setListViewHeightBasedOnChildren(list);
-			final Fragment myself = this;
+			final EditConfigHandlerFragment myself = this;
 			// we skip this if the values are simple and can be handled directly
 			// on the view, like booleans
 			if (containingClass.equals(Boolean.class.getName()) == false) {
@@ -682,7 +686,8 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 						whereToPutDataFromChild = whereToStore;
 
 						if (valueAtPosition == null && alternativeDisplayValuesForListener.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself, selectedServer);
+							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself,
+									selectedServer, myself, null);
 						} else if (valueAtPosition != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -844,7 +849,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 
 			final ListView listView = new ListView(contentArea.getContext());
 			contentArea.addView(listView);
-			final Fragment myself = this;
+			final EditConfigHandlerFragment myself = this;
 			@SuppressWarnings("rawtypes")
 			final List listContent = (List) field.get(config);
 			final List<String> altValuesFinal = altValues;
@@ -864,7 +869,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 					whereToPutDataFromChild = whereToStore;
 
 					EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer);
+							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, myself, null);
 				}
 			});
 			if (listContent.size() > 0) {
@@ -939,10 +944,9 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 						whereToPutDataFromChild = whereToStore;
 
 						EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer);
+								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, myself, null);
 						mode.finish();
 						break;
-
 					}
 					return false;
 				}
@@ -990,9 +994,8 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 		switch (item.getItemId()) {
 		case R.id.menuEntryFinishEditConfiguration:
 			try {
-				if (getTargetFragment() != null) {
-					((IntegrateObjectValueHandler) getTargetFragment()).integrateConfiguration(selectedServer,
-							myConfigurationData);
+				if (this.editConfigCallBack != null) {
+					editConfigCallBack.onIntegrateConfiguration(selectedServer, myConfigurationData);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1002,7 +1005,9 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 
 		case android.R.id.home:
 			getFragmentManager().popBackStack();
-			// getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+			if (editConfigCallBack != null) {
+				editConfigCallBack.onRevertConfiguration(selectedServer, myConfigurationData);
+			}
 			return true;
 
 		default:
@@ -1015,8 +1020,13 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 	 * @param actionCallback
 	 *            the saveObjectCallback to set
 	 */
-	public void setCallback(EditConfigActionCallback callback) {
+	public void setAdditionalActionListener(EditConfigAdditionalActionHandler callback) {
 		this.actionCallback = callback;
+	}
+
+
+	public void setEditConfigExitCallBack(EditConfigExitListener editConfigCallBack) {
+		this.editConfigCallBack = editConfigCallBack;
 	}
 
 
@@ -1027,7 +1037,7 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 	 * integrateConfiguration(java.lang.Object)
 	 */
 	@Override
-	public void integrateConfiguration(String serverName, Object configuration) {
+	public void onIntegrateConfiguration(String serverName, Object configuration) {
 		try {
 			Class myObjectClass = myConfigurationData.getClass();
 			Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);
@@ -1056,7 +1066,8 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 	 * @param myself
 	 */
 	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server) {
+			final Fragment fragment, final String server, final EditConfigExitListener editConfigExitListener,
+			final EditConfigAdditionalActionHandler additionalActionHandler) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -1070,6 +1081,8 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 				EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+				configHandler.editConfigCallBack = editConfigExitListener;
+				configHandler.setAdditionalActionListener(additionalActionHandler);
 				ft.replace(R.id.LayoutMain, configHandler);
 				ft.addToBackStack(null);
 				configHandler.setArguments(args);
@@ -1081,7 +1094,8 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 	}
 
 
-	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server) {
+	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server,
+			EditConfigExitListener editConfigExitListener, EditConfigAdditionalActionHandler additionalActionHandler) {
 		RoomConfiguration roomConfiguration = ((MainActivity) fragment.getActivity()).getRoomConfigManager()
 				.getRoomConfiguration(server);
 
@@ -1089,7 +1103,22 @@ public class EditConfigHandlerFragment extends Fragment implements IntegrateObje
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server);
+		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server,
+				editConfigExitListener, additionalActionHandler);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
+	 * (java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void onRevertConfiguration(String serverName, Object configuration) {
+		// do not merge the result
+
 	}
 
 }

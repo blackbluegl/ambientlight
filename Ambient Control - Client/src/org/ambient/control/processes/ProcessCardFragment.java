@@ -21,8 +21,8 @@ import java.util.List;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomConfigManager;
+import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.config.IntegrateObjectValueHandler;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.control.rest.RestClient;
 import org.ambient.views.ProcessCardDrawer;
@@ -57,7 +57,7 @@ import android.widget.Spinner;
  * @author Florian Bornkessel
  * 
  */
-public class ProcessCardFragment extends Fragment implements IntegrateObjectValueHandler {
+public class ProcessCardFragment extends Fragment implements EditConfigExitListener {
 
 	private static final String BUNDLE_SELECTED_PROCESS = "bundleSelectedProcess";
 	private static final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
@@ -237,7 +237,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 			return true;
 
 		case R.id.menuEntryProcessAdd:
-			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer);
+			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer, this, null);
 			return true;
 
 		case R.id.menuEntryProcessEdit:
@@ -576,7 +576,7 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 	 * integrateConfiguration(java.lang.Object)
 	 */
 	@Override
-	public void integrateConfiguration(String serverName, Object configuration) {
+	public void onIntegrateConfiguration(String serverName, Object configuration) {
 
 		if (configuration instanceof ProcessConfiguration) {
 			this.editMode = true;
@@ -606,5 +606,19 @@ public class ProcessCardFragment extends Fragment implements IntegrateObjectValu
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
+	 * (java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void onRevertConfiguration(String serverName, Object configuration) {
+		// TODO Auto-generated method stub
+
 	}
 }

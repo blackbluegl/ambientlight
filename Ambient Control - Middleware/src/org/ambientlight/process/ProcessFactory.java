@@ -97,7 +97,8 @@ public class ProcessFactory {
 		room.processes.add(result);
 		result.eventManager = room.eventManager;
 		result.start();
-
+		// TODO this saves the complete state. do it like in
+		// updateconductconfiguration to just save the given part
 		// persist model
 		processConfig.run = true;
 		RoomConfigurationFactory.saveRoomConfiguration(room.config,
@@ -134,7 +135,8 @@ public class ProcessFactory {
 
 		runningProcess.suspend();
 		room.processes.remove(runningProcess);
-
+		// TODO this saves the complete state. do it like in
+		// updateconductconfiguration to just save the given part
 		// persist model
 		processConfig.run = false;
 		RoomConfigurationFactory.saveRoomConfiguration(room.config,
