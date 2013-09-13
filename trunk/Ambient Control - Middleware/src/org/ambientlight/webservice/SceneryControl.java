@@ -24,6 +24,7 @@ import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfigura
 import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 
 
+//TODO should be better named: entitiy Control
 @Path("/sceneryControl")
 public class SceneryControl {
 
@@ -38,7 +39,7 @@ public class SceneryControl {
 	@Path("/config/room/items/{itemName}/program")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateActorConductConfigurationForItem(@PathParam("itemName") String itemName,
+	public synchronized Response createOrUpdateActorConductConfigurationForItem(@PathParam("itemName") String itemName,
 			ActorConductConfiguration itemConfiguration) {
 
 		System.out.println("SceneryControlWS:  setting config for " + itemName + " to " + itemConfiguration.getClass().getName());
@@ -81,7 +82,7 @@ public class SceneryControl {
 	@Path("/config/room/eventGenerator/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createOrUpdateEventGeneratorConfig(@PathParam("id") String eventGeneratorName,
+	public synchronized Response createOrUpdateEventGeneratorConfig(@PathParam("id") String eventGeneratorName,
 			EventGeneratorConfiguration config) {
 		System.out.println("SceneryControl: saving eventGeneratorConfig");
 		AmbientControlMW.getRoom().config.eventGeneratorConfigurations.put(eventGeneratorName, config);

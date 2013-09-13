@@ -26,7 +26,7 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 */
 	@Override
 	public void register(final IEventListener eventListener, final EventConfiguration triggerConfig) {
-		System.out.println("EventManager: registering event:" + triggerConfig.toString());
+		System.out.println("EventManager: registering event: " + triggerConfig.toString());
 		if (triggerConfig instanceof AlarmEventConfiguration) {
 			AlarmEventConfiguration alarmConfig = (AlarmEventConfiguration) triggerConfig;
 			((AlarmGenerator) AmbientControlMW.getRoom().eventGenerators.get(alarmConfig.eventGeneratorName))
