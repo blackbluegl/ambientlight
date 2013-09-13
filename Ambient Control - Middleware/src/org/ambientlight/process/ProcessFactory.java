@@ -65,7 +65,10 @@ public class ProcessFactory {
 				continue;
 			}
 			System.out.println("ProcessFactory: Building process: " + processConfig.id);
-			processes.add(createProcess(processConfig));
+			Process result = createProcess(processConfig);
+			result.start();
+			processes.add(result);
+
 			System.out.println("ProcessFactory: Built and setup process successfully: " + processConfig.id);
 		}
 		this.room.processes = processes;
@@ -95,7 +98,6 @@ public class ProcessFactory {
 		// todo this will crash in future if there are more process types
 		Process result = createProcess((EventProcessConfiguration) processConfig);
 		room.processes.add(result);
-		result.eventManager = room.eventManager;
 		result.start();
 		// TODO this saves the complete state. do it like in
 		// updateconductconfiguration to just save the given part
@@ -154,7 +156,6 @@ public class ProcessFactory {
 		result.config = processConfig;
 		createNodes(result, 0);
 		result.eventManager = room.eventManager;
-		result.start();
 
 		return result;
 	}
