@@ -237,7 +237,7 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 			return true;
 
 		case R.id.menuEntryProcessAdd:
-			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer, this, null);
+			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer);
 			return true;
 
 		case R.id.menuEntryProcessEdit:

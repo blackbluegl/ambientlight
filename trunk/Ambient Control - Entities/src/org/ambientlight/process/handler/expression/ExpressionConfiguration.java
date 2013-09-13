@@ -17,6 +17,6 @@ public class ExpressionConfiguration implements Serializable {
 			+ "Sensoren möglich. Variablen beginnen mit \'#{\'. Um auf Prozessdaten des Vorgängerkontens zuzugreifen kann"
 			+ " #{tokenValue} verwendet werden.\n\nBolsche Ausdrücke werden in JEVAL mit "
 			+ "1.0 als wahr und mit 0.0 als falsch bezeichnet.")
-	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.name") })
+	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.keySet()") })
 	public String expression = "";
 }

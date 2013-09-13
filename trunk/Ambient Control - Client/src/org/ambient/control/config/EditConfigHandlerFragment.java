@@ -52,7 +52,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -89,11 +88,9 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		FIELD, MAP, LIST
 	}
 
-	private EditConfigExitListener editConfigCallBack;
+	private class WhereToPutConfigurationData implements Serializable {
 
-	private EditConfigAdditionalActionHandler actionCallback;
-
-	private class WhereToPutConfigurationData {
+		private static final long serialVersionUID = 1L;
 
 		public String fieldName;
 		public String keyInMap;
@@ -105,12 +102,15 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	public static final String CLASS_NAME = "className";
 	public static final String OBJECT_VALUE = "objectValue";
 	public static final String SELECTED_SERVER = "selectedServer";
+	public static final String WHERE_TO_INTEGRATE = "whereToIntegrate";
 
 	public static int REQ_RETURN_OBJECT = 0;
 
 	public Object myConfigurationData;
 
-	private String selectedServer = null;
+	public Object valueToIntegrate = null;
+
+	protected String selectedServer = null;
 	private boolean createMode = false;
 	private WhereToPutConfigurationData whereToPutDataFromChild = null;
 
@@ -118,26 +118,13 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_edit_configuration_menu, menu);
-		if (this.actionCallback != null) {
-			MenuItem saveIcon = menu.add(actionCallback.getLabel());
-			saveIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-			saveIcon.setIcon(actionCallback.getIconResourceId());
-			saveIcon.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					actionCallback.perform(myConfigurationData);
-					return true;
-				}
-			});
-			saveIcon.setVisible(true);
-		}
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
 		bundle.putSerializable(OBJECT_VALUE, (Serializable) myConfigurationData);
+		bundle.putSerializable(WHERE_TO_INTEGRATE, whereToPutDataFromChild);
 		super.onSaveInstanceState(bundle);
 	}
 
@@ -148,12 +135,14 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		getActivity().getActionBar().setDisplayShowHomeEnabled(true);
 
 		setHasOptionsMenu(true);
-		if (getArguments().containsKey(CREATE_MODE)) {
+		if (getArguments().isEmpty() == false) {
 			createMode = getArguments().getBoolean(CREATE_MODE);
+			selectedServer = getArguments().getString(SELECTED_SERVER);
 		}
 
-		if (savedInstanceState != null && savedInstanceState.containsKey(OBJECT_VALUE)) {
-			myConfigurationData = getArguments().getSerializable(OBJECT_VALUE);
+		if (savedInstanceState != null) {
+			myConfigurationData = savedInstanceState.getSerializable(OBJECT_VALUE);
+			whereToPutDataFromChild = (WhereToPutConfigurationData) savedInstanceState.getSerializable(WHERE_TO_INTEGRATE);
 		} else {
 			if (createMode) {
 				try {
@@ -168,7 +157,10 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 			}
 		}
 
-		selectedServer = getArguments().getString(SELECTED_SERVER);
+		// integrate object into existing configuration
+		if (this.valueToIntegrate != null) {
+			this.integrateConfiguration(this.valueToIntegrate);
+		}
 
 		View result = null;
 		try {
@@ -384,8 +376,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						whereToPutDataFromChild = whereToStore;
 
 						if (field.get(config) == null && alternativeValuesForDisplay.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, myself, selectedServer,
-									myself, null);
+							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, myself, selectedServer);
 						} else if (field.get(config) != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -686,8 +677,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						whereToPutDataFromChild = whereToStore;
 
 						if (valueAtPosition == null && alternativeDisplayValuesForListener.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself,
-									selectedServer, myself, null);
+							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself, selectedServer);
 						} else if (valueAtPosition != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -869,7 +859,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 					whereToPutDataFromChild = whereToStore;
 
 					EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, myself, null);
+							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer);
 				}
 			});
 			if (listContent.size() > 0) {
@@ -944,7 +934,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						whereToPutDataFromChild = whereToStore;
 
 						EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, myself, null);
+								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer);
 						mode.finish();
 						break;
 					}
@@ -994,8 +984,9 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		switch (item.getItemId()) {
 		case R.id.menuEntryFinishEditConfiguration:
 			try {
-				if (this.editConfigCallBack != null) {
-					editConfigCallBack.onIntegrateConfiguration(selectedServer, myConfigurationData);
+				if (this.getTargetFragment() != null) {
+					((EditConfigExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedServer,
+							myConfigurationData);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1005,8 +996,8 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 		case android.R.id.home:
 			getFragmentManager().popBackStack();
-			if (editConfigCallBack != null) {
-				editConfigCallBack.onRevertConfiguration(selectedServer, myConfigurationData);
+			if (this.getTargetFragment() != null) {
+				((EditConfigExitListener) this.getTargetFragment()).onRevertConfiguration(selectedServer, myConfigurationData);
 			}
 			return true;
 
@@ -1016,28 +1007,21 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	}
 
 
-	/**
-	 * @param actionCallback
-	 *            the saveObjectCallback to set
-	 */
-	public void setAdditionalActionListener(EditConfigAdditionalActionHandler callback) {
-		this.actionCallback = callback;
-	}
-
-
-	public void setEditConfigExitCallBack(EditConfigExitListener editConfigCallBack) {
-		this.editConfigCallBack = editConfigCallBack;
-	}
-
-
 	/*
-	 * (non-Javadoc)
+	 * callback on targetfragment. we store the value in a global variable and
+	 * later in lifecycle onCreate will be called. there we call
+	 * integrateConfiguration
 	 * 
 	 * @see org.ambient.control.processes.IntegrateObjectValueHandler#
 	 * integrateConfiguration(java.lang.Object)
 	 */
 	@Override
 	public void onIntegrateConfiguration(String serverName, Object configuration) {
+		this.valueToIntegrate = configuration;
+	}
+
+
+	public void integrateConfiguration(Object configuration) {
 		try {
 			Class myObjectClass = myConfigurationData.getClass();
 			Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);
@@ -1057,6 +1041,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		} catch (Exception e) {
 			Log.e("EditConfigHandler", "error trying to integrate data from child into configuration", e);
 		}
+		this.valueToIntegrate = null;
 	}
 
 
@@ -1066,8 +1051,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	 * @param myself
 	 */
 	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server, final EditConfigExitListener editConfigExitListener,
-			final EditConfigAdditionalActionHandler additionalActionHandler) {
+			final Fragment fragment, final String server) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -1081,8 +1065,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 				EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
-				configHandler.editConfigCallBack = editConfigExitListener;
-				configHandler.setAdditionalActionListener(additionalActionHandler);
+				configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
 				ft.replace(R.id.LayoutMain, configHandler);
 				ft.addToBackStack(null);
 				configHandler.setArguments(args);
@@ -1094,8 +1077,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	}
 
 
-	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server,
-			EditConfigExitListener editConfigExitListener, EditConfigAdditionalActionHandler additionalActionHandler) {
+	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server) {
 		RoomConfiguration roomConfiguration = ((MainActivity) fragment.getActivity()).getRoomConfigManager()
 				.getRoomConfiguration(server);
 
@@ -1103,8 +1085,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server,
-				editConfigExitListener, additionalActionHandler);
+		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server);
 	}
 
 

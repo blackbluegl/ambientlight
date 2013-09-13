@@ -33,7 +33,7 @@ import org.ambientlight.process.validation.HandlerDataTypeValidation;
 public class EventGeneratorSensorAdapterConfiguration extends AbstractActionHandlerConfiguration {
 
 	private static final long serialVersionUID = 1L;
-	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.name") })
+	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.keySet()") })
 	@TypeDef(fieldType = FieldType.STRING)
 	@Presentation(name = "Event auslesen und weitergeben", position = 0)
 	public String eventSensorId;
