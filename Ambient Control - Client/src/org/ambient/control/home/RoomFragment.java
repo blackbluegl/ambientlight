@@ -24,7 +24,6 @@ import java.util.Map;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomConfigManager.RoomConfigurationUpdateListener;
-import org.ambient.control.config.EditConfigAdditionalActionHandler;
 import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
@@ -79,7 +78,13 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends Fragment implements RoomConfigurationUpdateListener {
+public class RoomFragment extends Fragment implements RoomConfigurationUpdateListener, EditConfigExitListener {
+
+	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
+	protected ActorConductConfiguration actorConductConfigurationAfterEditItem;
+	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME = "actorConductConfigurationAfterEditItemName";
+	protected String actorConductConfigurationAfterEditItemName;
+	protected String actorConductConfigurationAfterEditItemServerName;
 
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
 
@@ -90,9 +95,6 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	 */
 	private final Map<String, List<AbstractRoomItemViewMapper>> configuredlightObjects = new HashMap<String, List<AbstractRoomItemViewMapper>>();
 
-	// public static final String BUNDLE_ROOM_CONFIG = "roomConfig";
-	// private Map<String,RoomConfiguration> roomConfig = new HashMap<String,
-	// RoomConfiguration>();
 
 	public static final String BUNDLE_SERVER_NAMES = "serverName";
 	private List<String> serverNames;
@@ -101,6 +103,27 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		if (savedInstanceState != null) {
+			actorConductConfigurationAfterEditItemName = savedInstanceState.getString(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME);
+			// onIntegrate was not called before and the fragment will be
+			// restored
+			if (actorConductConfigurationAfterEditItem == null) {
+				actorConductConfigurationAfterEditItem = (ActorConductConfiguration) savedInstanceState
+						.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM);
+			}
+		}
+
+		// write an edited item to server. wether it was modified to persist new
+		// state or not to revert to the old state due inconsistent values on
+		// server because of preview actions
+		if (actorConductConfigurationAfterEditItem != null) {
+			RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
+			rest.setActorConductConfiguration(this.actorConductConfigurationAfterEditItemServerName,
+					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
+			actorConductConfigurationAfterEditItem = null;
+		}
+
 		this.serverNames = getArguments().getStringArrayList(BUNDLE_SERVER_NAMES);
 
 		// create the home container
@@ -112,8 +135,6 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		roomsContainerView.addView(roofTop);
 
 		ImageView masterButton = (ImageView) roofTop.findViewById(R.id.imageViewMasterSwitch);
-
-		// this.onRoomConfigurationChange(null, null);
 
 		masterButton.setOnClickListener(new OnClickListener() {
 
@@ -293,52 +314,37 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 
 			@Override
 			public boolean onLongClick(View v) {
+				myself.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) GuiUtils
+						.deepCloneSerializeable(currentConfig.actorConductConfiguration);
+				myself.actorConductConfigurationAfterEditItemName = currentConfig.getName();
+
 				getActivity().startActionMode(new ActionMode.Callback() {
 
-					final ActorConductConfiguration oldActorConductConfiguration = (ActorConductConfiguration) GuiUtils
-							.deepCloneSerializeable(currentConfig.actorConductConfiguration);
-
-					EditConfigAdditionalActionHandler actionCallback = new EditConfigAdditionalActionHandler() {
-
-						@Override
-						public void perform(Object config) {
-							ActorConductConfiguration value = (ActorConductConfiguration) config;
-							RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
-							rest.setActorConductConfiguration(serverName, currentConfig.getName(), value);
-						}
-
-
-						@Override
-						public String getLabel() {
-							return "Vorschau";
-						}
-
-
-						@Override
-						public int getIconResourceId() {
-							return R.drawable.navigation_accept;
-						}
-					};
-
-					EditConfigExitListener exitCallback = new EditConfigExitListener() {
-
-						@Override
-						public void onIntegrateConfiguration(String serverName, Object configuration) {
-
-							RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
-							rest.setActorConductConfiguration(serverName, currentConfig.getName(),
-									(ActorConductConfiguration) configuration);
-
-						}
-
-
-						@Override
-						public void onRevertConfiguration(String serverName, Object configuration) {
-							RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
-							rest.setActorConductConfiguration(serverName, currentConfig.getName(), oldActorConductConfiguration);
-						}
-					};
-
+					// EditConfigExitListener exitCallback = new
+					// EditConfigExitListener() {
+					//
+					// @Override
+					// public void onIntegrateConfiguration(String serverName,
+					// Object configuration) {
+					//
+					// RestClient rest = new RestClient(((MainActivity)
+					// getActivity()).getRoomConfigManager());
+					// rest.setActorConductConfiguration(serverName,
+					// currentConfig.getName(),
+					// (ActorConductConfiguration) configuration);
+					//
+					// }
+					//
+					//
+					// @Override
+					// public void onRevertConfiguration(String serverName,
+					// Object configuration) {
+					// RestClient rest = new RestClient(((MainActivity)
+					// getActivity()).getRoomConfigManager());
+					// rest.setActorConductConfiguration(serverName,
+					// currentConfig.getName(), oldActorConductConfiguration);
+					// }
+					// };
 
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -346,16 +352,16 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 						switch (item.getItemId()) {
 
 						case R.id.menuEntryEditActorConduct:
-							EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
-							// fragEdit.setTargetFragment(myself,
-							// EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-							fragEdit.setAdditionalActionListener(actionCallback);
-							fragEdit.setEditConfigExitCallBack(exitCallback);
+							ActorConductEditFragment fragEdit = new ActorConductEditFragment();
+							fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 							Bundle arguments = new Bundle();
 							arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-									currentConfig.actorConductConfiguration);
+									(ActorConductConfiguration) GuiUtils
+									.deepCloneSerializeable(currentConfig.actorConductConfiguration));
 							arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
 							arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, serverName);
+							arguments.putString(ActorConductEditFragment.ITEM_NAME, currentConfig.getName());
+
 							fragEdit.setArguments(arguments);
 
 							FragmentTransaction ft2 = getFragmentManager().beginTransaction();
@@ -365,8 +371,8 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 							break;
 
 						case R.id.menuEntryAddActorConduct:
-							EditConfigHandlerFragment.createNewConfigBean(ActorConductConfiguration.class, myself, serverName,
-									exitCallback, actionCallback);
+							ActorConductEditFragment.createNewConfigBean(ActorConductConfiguration.class, myself, serverName,
+									currentConfig.getName());
 							break;
 
 						default:
@@ -639,4 +645,41 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		super.onResume();
 	}
 
+
+	/*
+	 * get shure that the oldConfig will be overwritten. onCreateView will now
+	 * save the new configuration
+	 * 
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onIntegrateConfiguration
+	 * (java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void onIntegrateConfiguration(String serverName, Object configuration) {
+		this.actorConductConfigurationAfterEditItemServerName = serverName;
+		this.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) configuration;
+	}
+
+
+	/*
+	 * get shure that the oldConfig will not be overwritten. onCreateView will
+	 * now save the old configuration
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
+	 * (java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void onRevertConfiguration(String serverName, Object configuration) {
+		this.actorConductConfigurationAfterEditItemServerName = serverName;
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle bundle) {
+		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
+		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME, this.actorConductConfigurationAfterEditItemName);
+		super.onSaveInstanceState(bundle);
+	}
 }

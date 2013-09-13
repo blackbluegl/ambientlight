@@ -91,9 +91,6 @@ public class MainActivity extends FragmentActivity {
 		} else {
 			this.currentDialog = savedInstanceState.getString("currentDialog");
 			this.fragments = savedInstanceState.getStringArrayList("fragments");
-			if (this.currentDialog.equals("Mein Ambiente")) {
-				createHomeFragment(content);
-			}
 		}
 
 		ActionBar actionBar = getActionBar();
