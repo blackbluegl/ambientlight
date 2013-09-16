@@ -74,8 +74,8 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
-import de.devmil.common.ui.color.ColorSelectorView;
-import de.devmil.common.ui.color.ColorSelectorView.OnColorChangedListener;
+import de.devmil.common.ui.color.HsvSelectorView;
+import de.devmil.common.ui.color.HsvSelectorView.OnColorChangedListener;
 
 
 /**
@@ -496,8 +496,6 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 					@Override
 					public void onNothingSelected(AdapterView<?> paramAdapterView) {
-						// TODO Auto-generated method stub
-
 					}
 				});
 
@@ -563,7 +561,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 		if (typedef.fieldType().equals(FieldType.COLOR)) {
 
-			ColorSelectorView colorView = new ColorSelectorView(container.getContext());
+			HsvSelectorView colorView = new HsvSelectorView(container.getContext());
 			colorView.setColor(field.getInt(config));
 			contentArea.addView(colorView);
 			colorView.setOnColorChangedListener(new OnColorChangedListener() {
@@ -580,9 +578,6 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		}
 
 		if (typedef.fieldType().equals(FieldType.NUMERIC)) {
-			// TextView label = new TextView(content.getContext());
-			// label.setText(fieldLabel);
-			// content.addView(label);
 
 			final double min = Double.parseDouble(typedef.min());
 			final double difference = Double.parseDouble(typedef.max()) - min;
@@ -754,7 +749,6 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 				@Override
 				public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-					// TODO Auto-generated method stub
 					return false;
 				}
 
