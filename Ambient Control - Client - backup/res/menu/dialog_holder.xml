@@ -1,7 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_finish" 
-        android:title="@string/button_finish" 
-        android:showAsAction="ifRoom|withText" 
-        android:icon="@drawable/ic_menu_save"
-/>
-</menu>
