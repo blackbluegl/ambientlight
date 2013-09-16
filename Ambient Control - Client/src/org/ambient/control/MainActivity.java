@@ -3,6 +3,7 @@ package org.ambient.control;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.ambient.climate.ClimateFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
@@ -35,6 +36,7 @@ public class MainActivity extends FragmentActivity {
 
 	NFCProgrammingFragment nfcProgramming;
 	ProcessCardFragment processCard;
+	ClimateFragment climateFragment;
 
 	RoomConfigManager roomConfigManager;
 	ArrayList<String> fragments = new ArrayList<String>();
@@ -120,14 +122,17 @@ public class MainActivity extends FragmentActivity {
 					createNFCProgrammingFragment(content);
 				}
 				if (item.equals("Meine Prozesse")) {
-					createProcessCard(content);
+					createProcessCardFragment(content);
+				}
+				if (item.equals("Mein Klima")) {
+					createClimateFragment(content);
 				}
 			}
 		});
 	}
 
 
-	private void createProcessCard(LinearLayout content) {
+	private void createProcessCardFragment(LinearLayout content) {
 		currentDialog = "Meine Prozesse";
 		clearFragments(content);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -149,6 +154,20 @@ public class MainActivity extends FragmentActivity {
 
 		ft.add(content.getId(), nfcProgramming, "nfcProgrammingTag");
 		this.fragments.add("nfcProgrammingTag");
+		ft.commit();
+	}
+
+
+	public void createClimateFragment(LinearLayout content) {
+		currentDialog = "Mein Klima";
+		clearFragments(content);
+
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		climateFragment = new ClimateFragment();
+
+		ft.add(content.getId(), climateFragment, "climateFragmentTag");
+		this.fragments.add("climateFragmentTag");
 		ft.commit();
 	}
 

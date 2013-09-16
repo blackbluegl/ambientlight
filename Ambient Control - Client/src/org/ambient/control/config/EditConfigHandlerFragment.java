@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.util.GuiUtils;
+import org.ambient.views.ColorPickerView;
 import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
 import org.ambientlight.annotations.AlternativeValues;
@@ -74,8 +75,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
-import de.devmil.common.ui.color.HsvSelectorView;
-import de.devmil.common.ui.color.HsvSelectorView.OnColorChangedListener;
+
 
 
 /**
@@ -561,10 +561,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 		if (typedef.fieldType().equals(FieldType.COLOR)) {
 
-			HsvSelectorView colorView = new HsvSelectorView(container.getContext());
-			colorView.setColor(field.getInt(config));
-			contentArea.addView(colorView);
-			colorView.setOnColorChangedListener(new OnColorChangedListener() {
+			ColorPickerView.OnColorChangedListener listener = new ColorPickerView.OnColorChangedListener() {
 
 				@Override
 				public void colorChanged(int color) {
@@ -574,7 +571,10 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						// this should not happen
 					}
 				}
-			});
+			};
+
+			ColorPickerView colorPickerView = new ColorPickerView(container.getContext(), listener, field.getInt(config));
+			contentArea.addView(colorPickerView);
 		}
 
 		if (typedef.fieldType().equals(FieldType.NUMERIC)) {
