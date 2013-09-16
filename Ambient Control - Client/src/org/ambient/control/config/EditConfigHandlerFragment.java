@@ -646,7 +646,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 				}
 			}
 
-			final EditConfigMapAdapter adapter = new EditConfigMapAdapter(getFragmentManager(), getActivity(), arrayMap,
+			final EditConfigMapAdapter adapter = new EditConfigMapAdapter(getFragmentManager(), getActivity(), arrayMap, map,
 					containingClass);
 			list.setAdapter(adapter);
 			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

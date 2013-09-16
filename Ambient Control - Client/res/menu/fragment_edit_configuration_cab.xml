@@ -8,7 +8,7 @@
     
     <item android:id="@+id/menuEntryRemoveConfigurationClass" 
           android:title="Neu"
-          android:icon="@drawable/content_new"
+          android:icon="@drawable/content_discard"
           android:showAsAction="ifRoom|withText" />
 
 </menu>

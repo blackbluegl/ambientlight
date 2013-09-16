@@ -38,15 +38,18 @@ import android.widget.TextView;
 public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>> {
 
 	private final Context context;
-	private final Map<String, Object> map;
+	private final Map<String, Object> arrayMap;
+	private final Map values;
 	private final String valueClassType;
 
 
-	public EditConfigMapAdapter(FragmentManager fm, Context context, Map<String, Object> map, String valueClassType) {
+	public EditConfigMapAdapter(FragmentManager fm, Context context, Map<String, Object> arrayMap, Map values,
+			String valueClassType) {
 		super(context, R.layout.layout_map_list_entry);
 		this.context = context;
-		this.map = map;
-		for (Map.Entry<String, Object> currentEntry : map.entrySet()) {
+		this.values = values;
+		this.arrayMap = arrayMap;
+		for (Map.Entry<String, Object> currentEntry : arrayMap.entrySet()) {
 			super.add(currentEntry);
 		}
 		this.valueClassType = valueClassType;
@@ -56,21 +59,21 @@ public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>
 	public void removeAt(int position) {
 		Map.Entry<String, Object> entry = super.getItem(position);
 		super.remove(entry);
-		map.remove(entry.getKey());
+		arrayMap.remove(entry.getKey());
 	}
 
 
 	@Override
 	public void remove(Map.Entry<String, Object> value) {
 		super.remove(value);
-		map.remove(value.getKey());
+		arrayMap.remove(value.getKey());
 	}
 
 
 	@Override
 	public void add(Map.Entry<String, Object> value) {
 		super.add(value);
-		map.put(value.getKey(), value.getValue());
+		arrayMap.put(value.getKey(), value.getValue());
 	}
 
 
@@ -87,21 +90,22 @@ public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>
 
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					map.put(currentKeyValue, isChecked);
+					arrayMap.put(currentKeyValue, isChecked);
+					values.put(currentKeyValue, isChecked);
 					textIsSet.setText("wird verwendet");
 				}
 			});
-			if (map.get(currentKeyValue) != null) {
+			if (arrayMap.get(currentKeyValue) != null) {
 				textIsSet.setText("wird verwendet");
-				checkbox.setChecked((Boolean) map.get(currentKeyValue));
+				checkbox.setChecked((Boolean) arrayMap.get(currentKeyValue));
 			} else {
 				textIsSet.setText("");
 			}
 		} else {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
-			if (map.get(currentKeyValue) != null) {
+			if (arrayMap.get(currentKeyValue) != null) {
 				TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-				textViewType.setText(map.get(currentKeyValue).getClass().getSimpleName());
+				textViewType.setText(arrayMap.get(currentKeyValue).getClass().getSimpleName());
 			}
 		}
 		TextView textViewKey = (TextView) rowView.findViewById(R.id.textViewName);
