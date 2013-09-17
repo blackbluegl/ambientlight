@@ -38,12 +38,12 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 	/**
 	 * sleep between two commands in a series
 	 */
-	final int SLEEP = 10;
+	final int SLEEP = 8;
 
 	/**
 	 * sleep at the end of a command series
 	 */
-	final int SLEEP_AT_END = 10;
+	final int SLEEP_AT_END = 7;
 
 	private final byte CATEGORY_RGB = (byte) 0x8;
 	private final byte CATEGORY_GLOBAL = (byte) 0x02;
@@ -70,7 +70,6 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 	 */
 	@Override
 	public void setRGB(List<Integer> zones, int r, int g, int b) throws IOException, InterruptedException {
-
 		byte[] sendToLK;
 
 		sendToLK = getMessage(zones, CATEGORY_RGB, RED, getLK35ColorValueFor8BitInput(r));
@@ -109,19 +108,29 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 	@Override
 	public void setRGBWithWhiteChannel(List<Integer> zones, int r, int g, int b, boolean maxBrightness) throws IOException,
 	InterruptedException {
+		int commonValue = r;
+		commonValue = g < commonValue ? g : commonValue;
+		commonValue = b < commonValue ? b : commonValue;
+		if (maxBrightness) {
+			double correctionFactor = Math.pow((double) commonValue / 255, 3);
+			commonValue = (int) (commonValue * correctionFactor);
+			this.setRGB(zones, r, g, b);
+		} else {
+			double correctionFactor = Math.pow((double) commonValue / 255, 2);
+			commonValue = (int) (commonValue * correctionFactor);
+			// lowest value will be used for white channel. the difference will
+			// be send to the rgb channels
+			r = r - commonValue;
+			g = g - commonValue;
+			b = b - commonValue;
+			this.setRGB(zones, r, g, b);
 
-		// lowest value will be used for white channel. the difference will be
-		// send to the rgb channels
-		int lowestValue = r;
-		lowestValue = g < lowestValue ? g : lowestValue;
-		lowestValue = b < lowestValue ? b : lowestValue;
+			// correct by this factor to preserve saturation
+			commonValue = (int) (commonValue * 0.6);
+		}
 
-		r = r - lowestValue;
-		g = g - lowestValue;
-		b = b - lowestValue;
-		this.setRGB(zones, r, g, b);
-
-		this.setW(zones, lowestValue);
+		// the common white will be set to the white channel
+		this.setW(zones, commonValue);
 	}
 
 
@@ -226,12 +235,11 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 	 */
 	@Override
 	public void togglePower(List<Integer> zones, boolean powerState) throws IOException {
-		for(int zone : zones){
+		for (int zone : zones) {
 			byte zoneKey = (byte) (0x09 + zone);
-			if(powerState){
+			if (powerState) {
 				os.write(this.getMessage(zone, CATEGORY_GLOBAL, zoneKey, 0x1c));
-			}
-			else{
+			} else {
 				os.write(this.getMessage(zone, CATEGORY_GLOBAL, zoneKey, 0x19));
 			}
 		}
