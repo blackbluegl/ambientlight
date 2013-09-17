@@ -127,7 +127,7 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 			}
 			Color color = new Color(current.getOutputResult());
 			try {
-				this.colorHandler.setRGBWithWhiteChannel(zones, color.getRed(), color.getGreen(), color.getBlue(), false);
+				this.colorHandler.setRGBWithWhiteChannel(zones, color.getRed(), color.getGreen(), color.getBlue(), true);
 			} catch (InterruptedException e) {
 				// do nothing here
 				e.printStackTrace();
