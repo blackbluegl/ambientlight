@@ -73,7 +73,7 @@ public class SceneryControl {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
-
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 		return Response.status(200).build();
 	}
 
@@ -92,8 +92,8 @@ public class SceneryControl {
 			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
 					AmbientControlMW.getRoomConfigFileName());
 			System.out.println("SceneryControl: saving eventGeneratorConfig finished");
-			return Response.status(200).build();
 
+			return Response.status(200).build();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -136,6 +136,7 @@ public class SceneryControl {
 
 			// update model
 			config.setPowerState(powerState);
+			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 		} catch (IOException e) {
 			e.printStackTrace();
 			Response.status(500).build();

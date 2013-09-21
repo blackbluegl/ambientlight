@@ -124,7 +124,7 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main);
 		content = (LinearLayout) findViewById(R.id.LayoutMain);
 
-		this.restClient = new RestClient(null);
+		this.restClient = new RestClient();
 
 		createNavigationDrawer(content);
 

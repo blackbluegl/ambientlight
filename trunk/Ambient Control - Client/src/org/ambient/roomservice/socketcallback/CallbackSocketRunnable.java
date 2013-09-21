@@ -22,6 +22,8 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 import org.ambient.roomservice.RoomConfigService;
+import org.ambientlight.callback.requests.UpdateRoomMessage;
+import org.ambientlight.callback.responses.StatusMessage;
 
 
 /**
@@ -30,11 +32,8 @@ import org.ambient.roomservice.RoomConfigService;
  */
 public class CallbackSocketRunnable implements Runnable {
 
-	public final static String delimiter = "|";
-	public final static String REQ_COMMAND_UPDATE_ROOM_CONFIG = "UPDATE_ROOM_CONFIG";
 
-	public final static String RES_OK = "OK";
-	public final static String RES_UNKNOWN_COMMAND = "UNKNOWN_COMMAND";
+
 
 	private Socket server = null;
 	private RoomConfigService service;
@@ -54,13 +53,12 @@ public class CallbackSocketRunnable implements Runnable {
 			BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
 			PrintStream out = new PrintStream(server.getOutputStream());
 			String request = in.readLine();
-			if (request.contains(REQ_COMMAND_UPDATE_ROOM_CONFIG)) {
+			if (UpdateRoomMessage.getFromMessage(request) != null) {
 				// extract servername, commit to service
-				String serverNameAndPort = request.split(delimiter)[1];
-				service.updateRoomConfigFor(serverNameAndPort);
-				out.println(RES_OK);
+				service.updateRoomConfigFor(UpdateRoomMessage.getFromMessage(request));
+				out.println(StatusMessage.createMessage(true));
 			} else {
-				out.println(RES_UNKNOWN_COMMAND);
+				out.println(StatusMessage.createMessage(false));
 			}
 			server.close();
 		} catch (IOException ioe) {

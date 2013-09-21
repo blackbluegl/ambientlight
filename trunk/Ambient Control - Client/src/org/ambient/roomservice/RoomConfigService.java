@@ -62,8 +62,8 @@ public class RoomConfigService extends Service {
 	}
 
 	/**
-	 * the receiver is used to start and stop the socketServer based on the
-	 * state of the screen.
+	 * the receiver is used to start and stop the socketServer and register a
+	 * callback on the server based on the state of the screen.
 	 */
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -87,17 +87,17 @@ public class RoomConfigService extends Service {
 
 
 	// update request from server
-	public synchronized void updateRoomConfigFor(String serverAndPort) {
+	public synchronized void updateRoomConfigFor(String roomName) {
 		try {
-			RoomConfiguration roomConfig = RestClient.getRoom(serverAndPort);
+			RoomConfiguration roomConfig = RestClient.getRoom(roomName);
 			// update Model
-			roomConfiguration.put(serverAndPort, roomConfig);
+			roomConfiguration.put(roomName, roomConfig);
 
 			// send BroadcastMessage to my clients
 			Intent intent = new Intent();
 			intent.setAction(BROADCAST_INTENT_UPDATE_ROOMCONFIG);
 			intent.putExtra(EXTRA_ROOMCONFIG, roomConfig);
-			intent.putExtra(EXTRA_SERVERNAME, serverAndPort);
+			intent.putExtra(EXTRA_SERVERNAME, roomName);
 			sendBroadcast(intent);
 
 		} catch (Exception e) {
@@ -140,11 +140,8 @@ public class RoomConfigService extends Service {
 		startCallBackServer();
 		// register filter for sytem actions that will call us later
 		IntentFilter filter = new IntentFilter();
-		// filter.addAction(Intent.ACTION_USER_PRESENT);
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
-		// filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-		// filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(receiver, filter);
 
 		// initially load all RoomConfigurations
@@ -183,6 +180,8 @@ public class RoomConfigService extends Service {
 		if (callbackSocketServer == null) {
 			callbackSocketServer = new CallbackSocketServerRunnable(this);
 			new Thread(callbackSocketServer).start();
+			String hostname = callbackSocketServer.server.getInetAddress().getHostName();
+			hostname = hostname + ":" + 4321;
 		}
 	}
 
@@ -210,4 +209,13 @@ public class RoomConfigService extends Service {
 	public Collection<RoomConfiguration> getAllRoomConfigurations() {
 		return roomConfiguration.values();
 	}
+
+	// private String getIpAdress(){
+	//
+	// WifiManager wifiMgr = (WifiManager) getSystemService(WIFI_SERVICE);
+	// WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+	// int ip = wifiInfo.getIpAddress();
+	// String ipAddress = Formatter.formatIpAddress(ip);
+	// return ipAddress;
+	// }
 }
