@@ -2,20 +2,26 @@ package org.ambient.control;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import org.ambient.climate.ClimateFragment;
+import org.ambient.control.climate.ClimateFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
 import org.ambient.control.rest.RestClient;
 import org.ambient.control.rest.URLUtils;
+import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.room.RoomConfiguration;
 
 import android.app.ActionBar;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -32,20 +38,45 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
 
+	private List<IOnServiceConnectedListener> serviceListeners = new ArrayList<IOnServiceConnectedListener>();
+
+
+	public void addServiceListener(IOnServiceConnectedListener listener) {
+		serviceListeners.add(listener);
+	}
+
+	private RoomConfigService roomService;
+
+	private ServiceConnection mConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder binder) {
+			roomService = ((RoomConfigService.MyBinder) binder).getService();
+			for (IOnServiceConnectedListener listener : serviceListeners) {
+				listener.onRoomServiceConnected(roomService);
+			}
+		}
+
+
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			roomService = null;
+		}
+	};
+
 	private static final String LOG = "MainActivity";
 
 	NFCProgrammingFragment nfcProgramming;
 	ProcessCardFragment processCard;
 	ClimateFragment climateFragment;
 
-	RoomConfigManager roomConfigManager;
 	ArrayList<String> fragments = new ArrayList<String>();
 	String currentDialog = null;
 	public LinearLayout content;
 
 
-	public RoomConfigManager getRoomConfigManager() {
-		return roomConfigManager;
+	public RoomConfigService getRoomConfigManager() {
+		return roomService;
 	}
 
 	RestClient restClient;
@@ -56,6 +87,12 @@ public class MainActivity extends FragmentActivity {
 
 	}
 
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unbindService(mConnection);
+	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -73,6 +110,7 @@ public class MainActivity extends FragmentActivity {
 		this.fragments.add(tag);
 		this.currentDialog = dialogName;
 		ft.addToBackStack(null);
+
 		ft.commit();
 	}
 
@@ -80,11 +118,13 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		bindService(new Intent(this, RoomConfigService.class), mConnection, Context.BIND_AUTO_CREATE);
+
 		setContentView(R.layout.activity_main);
 		content = (LinearLayout) findViewById(R.id.LayoutMain);
 
-		this.roomConfigManager = this.createRoomConfigAdapter(this.getAllRoomServers());
-		this.restClient = new RestClient(this.roomConfigManager);
+		this.restClient = new RestClient(null);
 
 		createNavigationDrawer(content);
 
@@ -180,20 +220,24 @@ public class MainActivity extends FragmentActivity {
 		currentDialog = "Mein Ambiente";
 
 		clearFragments(content);
-		roomConfigManager.removeAllListeners();
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		Bundle argsRoom = new Bundle();
-		argsRoom.putStringArrayList(RoomFragment.BUNDLE_SERVER_NAMES, this.roomConfigManager.getServerNames());
+		argsRoom.putStringArrayList(RoomFragment.BUNDLE_SERVER_NAMES, getAllServers());
 
 		RoomFragment roomFragment = new RoomFragment();
 		roomFragment.setArguments(argsRoom);
-		for (String currentServer : this.getAllRoomServers()) {
-			this.roomConfigManager.addRoomConfigurationChangeListener(currentServer, roomFragment);
-		}
 		ft.add(content.getId(), roomFragment, "roomFragmentTag");
 		this.fragments.add("roomFragmentTag");
 		ft.commit();
+	}
+
+
+	/**
+	 * @return
+	 */
+	private ArrayList<String> getAllServers() {
+		return new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
 	}
 
 

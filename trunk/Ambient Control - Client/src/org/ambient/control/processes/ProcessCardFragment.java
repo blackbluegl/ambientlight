@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
-import org.ambient.control.RoomConfigManager;
 import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.processes.helper.SceneriesWrapper;
@@ -32,7 +31,6 @@ import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.validation.ValidationEntry;
 import org.ambientlight.process.validation.ValidationResult;
 import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -255,19 +253,22 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 			return true;
 
 		case R.id.menuEntryProcessRevertNew:
-			this.editMode = false;
-			spinnerProcess.setSelection(0);
-			RoomConfigManager manager = ((MainActivity) getActivity()).getRoomConfigManager();
-			try {
-				manager.addRoomConfiguration(selectedServer, RestClient.getRoom(selectedServer));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			selectedProcess = manager.getRoomConfiguration(selectedServer).processes.get(0);
-			drawer.setProcess(selectedProcess);
-			getActivity().invalidateOptionsMenu();
-			spinnerRoom.setVisibility(View.VISIBLE);
-			spinnerProcess.setVisibility(View.VISIBLE);
+			// this.editMode = false;
+			// spinnerProcess.setSelection(0);
+			// RoomConfigService manager = ((MainActivity)
+			// getActivity()).getRoomConfigManager();
+			// try {
+			// manager.addRoomConfiguration(selectedServer,
+			// RestClient.getRoom(selectedServer));
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// }
+			// selectedProcess =
+			// manager.getRoomConfiguration(selectedServer).processes.get(0);
+			// drawer.setProcess(selectedProcess);
+			// getActivity().invalidateOptionsMenu();
+			// spinnerRoom.setVisibility(View.VISIBLE);
+			// spinnerProcess.setVisibility(View.VISIBLE);
 			return true;
 
 		case R.id.menuEntryProcessSave:
@@ -306,19 +307,26 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					try {
-
-						new RestClient(null).deleteProcessFromRoom(selectedServer, selectedProcess.id);
-						RoomConfigManager manager = ((MainActivity) getActivity()).getRoomConfigManager();
-						manager.addRoomConfiguration(selectedServer, RestClient.getRoom(selectedServer));
-						selectedProcess = manager.getRoomConfiguration(selectedServer).processes.get(0);
-						drawer.setProcess(selectedProcess);
-
-						processNames.clear();
-						for (ProcessConfiguration currentProcess : manager.getRoomConfiguration(selectedServer).processes) {
-							processNames.add(currentProcess.id);
-						}
-						processAdapter.notifyDataSetChanged();
-						spinnerProcess.setSelection(0);
+								//
+								// new
+								// RestClient(null).deleteProcessFromRoom(selectedServer,
+								// selectedProcess.id);
+								// RoomConfigManager manager = ((MainActivity)
+								// getActivity()).getRoomConfigManager();
+								// manager.addRoomConfiguration(selectedServer,
+								// RestClient.getRoom(selectedServer));
+								// selectedProcess =
+								// manager.getRoomConfiguration(selectedServer).processes.get(0);
+								// drawer.setProcess(selectedProcess);
+								//
+								// processNames.clear();
+								// for (ProcessConfiguration currentProcess :
+								// manager.getRoomConfiguration(selectedServer).processes)
+								// {
+								// processNames.add(currentProcess.id);
+								// }
+								// processAdapter.notifyDataSetChanged();
+								// spinnerProcess.setSelection(0);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -512,18 +520,22 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 				spinnerRoom.setVisibility(View.VISIBLE);
 				spinnerProcess.setVisibility(View.VISIBLE);
 
-				try {
-					RoomConfigManager manager = ((MainActivity) getActivity()).getRoomConfigManager();
-					manager.addRoomConfiguration(selectedServer, RestClient.getRoom(selectedServer));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				// try {
+				// RoomConfigManager manager = ((MainActivity)
+				// getActivity()).getRoomConfigManager();
+				// manager.addRoomConfiguration(selectedServer,
+				// RestClient.getRoom(selectedServer));
+				// } catch (Exception e) {
+				// e.printStackTrace();
+				// }
 
 				processNames.clear();
-				for (ProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager()
-						.getAllRoomConfigurations().get(serverNames.get(spinnerRoom.getSelectedItemPosition())).processes) {
-					processNames.add(config.id);
-				}
+				// for (ProcessConfiguration config : ((MainActivity)
+				// getActivity()).getRoomConfigManager()
+				// .getAllRoomConfigurations().get(serverNames.get(spinnerRoom.getSelectedItemPosition())).processes)
+				// {
+				// processNames.add(config.id);
+				// }
 				processAdapter.notifyDataSetChanged();
 				spinnerProcess.setSelection(processNames.indexOf(selectedProcess.id));
 				// selectedProcess =
@@ -543,19 +555,23 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 	private void initRoomArrays(int roomSpinnerSelection) {
 		roomNames.clear();
 		serverNames.clear();
-		for (String serverName : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().keySet()) {
-			serverNames.add(serverName);
-			roomNames
-			.add(((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(serverName).roomName);
-		}
+		// for (String serverName : ((MainActivity)
+		// getActivity()).getRoomConfigManager().getAllRoomConfigurations().keySet())
+		// {
+		// serverNames.add(serverName);
+		// roomNames
+		// .add(((MainActivity)
+		// getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(serverName).roomName);
+		// }
 
 		this.selectedServer = serverNames.get(roomSpinnerSelection);
 
 		processNames.clear();
-		for (ProcessConfiguration config : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
-				.get(serverNames.get(roomSpinnerSelection)).processes) {
-			processNames.add(config.id);
-		}
+		// for (ProcessConfiguration config : ((MainActivity)
+		// getActivity()).getRoomConfigManager().getAllRoomConfigurations()
+		// .get(serverNames.get(roomSpinnerSelection)).processes) {
+		// processNames.add(config.id);
+		// }
 	}
 
 
@@ -595,16 +611,19 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 		if (configuration instanceof SceneriesWrapper) {
 			this.editMode = false;
 
-			SceneryEventGeneratorConfiguration sceneryEventGenerator = ((MainActivity) getActivity()).getRoomConfigManager()
-					.getAllRoomConfigurations().get(selectedServer).getSceneryEventGenerator().values().iterator().next();
+			// SceneryEventGeneratorConfiguration sceneryEventGenerator =
+			// ((MainActivity) getActivity()).getRoomConfigManager()
+			// .getAllRoomConfigurations().get(selectedServer).getSceneryEventGenerator().values().iterator().next();
 
-			sceneryEventGenerator.sceneries = ((SceneriesWrapper) configuration).sceneries;
+			// sceneryEventGenerator.sceneries = ((SceneriesWrapper)
+			// configuration).sceneries;
 			RestClient rest = new RestClient(null);
-			try {
-				rest.createOrUpdateEventGeneratorConfiguration(selectedServer, sceneryEventGenerator);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			// try {
+			// rest.createOrUpdateEventGeneratorConfiguration(selectedServer,
+			// sceneryEventGenerator);
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// }
 		}
 	}
 

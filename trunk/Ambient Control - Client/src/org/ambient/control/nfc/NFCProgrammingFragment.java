@@ -180,10 +180,10 @@ public class NFCProgrammingFragment extends Fragment {
 
 
 	private void initRoomArrays() {
-		for (String serverName : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().keySet()) {
+		for (String serverName : ((MainActivity) getActivity()).getAllRoomServers()) {
 			serverNames.add(serverName);
 			roomNames
-			.add(((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations().get(serverName).roomName);
+.add(((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(serverName).roomName);
 		}
 	}
 
