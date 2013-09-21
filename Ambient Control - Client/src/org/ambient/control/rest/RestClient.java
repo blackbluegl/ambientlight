@@ -2,7 +2,6 @@ package org.ambient.control.rest;
 
 import java.util.concurrent.ExecutionException;
 
-import org.ambient.control.RoomConfigManager;
 import org.ambientlight.process.ProcessConfiguration;
 import org.ambientlight.process.events.EventConfiguration;
 import org.ambientlight.process.validation.ValidationResult;
@@ -12,14 +11,6 @@ import org.ambientlight.scenery.actor.ActorConductConfiguration;
 
 
 public class RestClient {
-
-	public RoomConfigManager configAdapter;
-
-
-	public RestClient(RoomConfigManager configAdapter) {
-		this.configAdapter = configAdapter;
-	}
-
 
 	public static RoomConfiguration getRoom(String hostName) throws Exception {
 		GetRoomTask task = new GetRoomTask();

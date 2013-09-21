@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
@@ -19,12 +20,15 @@ import org.ambientlight.room.entities.EventSensor;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.Sensor;
 
+
 /**
  * 
  * @author florian
  * 
  */
 public class Room {
+
+	public CallBackManager callBackMananger;
 
 	public EventManager eventManager;
 

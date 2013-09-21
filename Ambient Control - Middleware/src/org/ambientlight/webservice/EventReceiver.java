@@ -51,6 +51,7 @@ public class EventReceiver {
 		if (event instanceof SwitchEventConfiguration) {
 			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEventConfiguration) event);
 		}
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 		return Response.status(200).build();
 	}
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.device.drivers.DeviceConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
@@ -42,6 +43,10 @@ public class RoomFactory {
 		Room room = new Room();
 
 		room.config = roomConfig;
+
+		// init CallbackManager
+		CallBackManager callbackManager = new CallBackManager();
+		room.callBackMananger = callbackManager;
 
 		// initialize Pixelmap
 		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);

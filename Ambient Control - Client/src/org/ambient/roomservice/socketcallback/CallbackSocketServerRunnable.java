@@ -28,7 +28,7 @@ import org.ambient.roomservice.RoomConfigService;
  */
 public class CallbackSocketServerRunnable implements Runnable {
 
-	private ServerSocket server = null;
+	public ServerSocket server = null;
 	private RoomConfigService service;
 	private boolean run = true;
 
@@ -36,6 +36,11 @@ public class CallbackSocketServerRunnable implements Runnable {
 	public CallbackSocketServerRunnable(RoomConfigService service) {
 		super();
 		this.service = service;
+		try {
+			server = new ServerSocket(4321);
+		} catch (IOException e) {
+			System.out.println("Could not listen on port 4321");
+		}
 	}
 
 
@@ -46,13 +51,6 @@ public class CallbackSocketServerRunnable implements Runnable {
 	 */
 	@Override
 	public void run() {
-
-
-		try {
-			server = new ServerSocket(4321);
-		} catch (IOException e) {
-			System.out.println("Could not listen on port 4321");
-		}
 
 		try {
 			while (run = true) {
