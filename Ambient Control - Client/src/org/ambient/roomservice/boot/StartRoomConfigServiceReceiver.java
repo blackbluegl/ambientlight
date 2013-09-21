@@ -13,30 +13,33 @@
    limitations under the License.
  */
 
-package org.ambient.climate;
+package org.ambient.roomservice.boot;
 
-import org.ambient.control.R;
+import org.ambient.roomservice.RoomConfigService;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public class ClimateFragment extends Fragment {
+public class StartRoomConfigServiceReceiver extends  BroadcastReceiver {
 
+	public static final String INTENT_START = "org.ambientcontrol.callback.startService";
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context,
+	 * android.content.Intent)
+	 */
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-		// create the home container
-		View myClimateView = inflater.inflate(R.layout.fragment_climate, null);
-
-		return myClimateView;
+	public void onReceive(Context context, Intent intent) {
+		Intent myIntent = new Intent(context, RoomConfigService.class);
+		context.startService(myIntent);
 	}
 
 }

@@ -21,9 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.ambient.control.IOnServiceConnectedListener;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
-import org.ambient.control.RoomConfigManager.RoomConfigurationUpdateListener;
 import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
@@ -31,6 +31,7 @@ import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
 import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.control.rest.RestClient;
+import org.ambient.roomservice.RoomConfigService;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambient.widgets.WidgetUtils;
@@ -46,6 +47,7 @@ import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgr
 import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -78,7 +80,7 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends Fragment implements RoomConfigurationUpdateListener, EditConfigExitListener {
+public class RoomFragment extends Fragment implements IOnServiceConnectedListener, EditConfigExitListener {
 
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
 	protected ActorConductConfiguration actorConductConfigurationAfterEditItem;
@@ -95,14 +97,25 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	 */
 	private final Map<String, List<AbstractRoomItemViewMapper>> configuredlightObjects = new HashMap<String, List<AbstractRoomItemViewMapper>>();
 
-
 	public static final String BUNDLE_SERVER_NAMES = "serverName";
 	private List<String> serverNames;
 	LinearLayout roomsContainerView;
 
 
+	// @Override
+	// public void onPause() {
+	// super.onPause();
+	// if (roomService != null) {
+	// getActivity().unbindService(mConnection);
+	// }
+	// }
+
+
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		((MainActivity) getActivity()).addServiceListener(this);
 
 		if (savedInstanceState != null) {
 			actorConductConfigurationAfterEditItemName = savedInstanceState.getString(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME);
@@ -118,13 +131,18 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		// state or not to revert to the old state due inconsistent values on
 		// server because of preview actions
 		if (actorConductConfigurationAfterEditItem != null) {
-			RestClient rest = new RestClient(((MainActivity) getActivity()).getRoomConfigManager());
+			RestClient rest = new RestClient(null);
 			rest.setActorConductConfiguration(this.actorConductConfigurationAfterEditItemServerName,
 					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
 			actorConductConfigurationAfterEditItem = null;
 		}
 
 		this.serverNames = getArguments().getStringArrayList(BUNDLE_SERVER_NAMES);
+	}
+
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		// create the home container
 		View myHomeScrollView = inflater.inflate(R.layout.fragment_rooms, null);
@@ -160,11 +178,39 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 			}
 		});
 
+
 		for (String currentServer : serverNames) {
-			RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
-					currentServer);
+
 			LinearLayout roomContainerView = (LinearLayout) inflater.inflate(R.layout.layout_room, null);
+			roomContainerView.setTag("roomContainer" + currentServer);
 			roomsContainerView.addView(roomContainerView);
+			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
+			roomContent.setTag("roomContent" + currentServer);
+
+			// init scenery Spinner
+			Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
+			spinner.setTag("sceneries" + currentServer);
+
+			RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
+			roomBackground.setTag("roomBackground" + currentServer);
+
+			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
+			bar.setTag("progressBar" + currentServer);
+		}
+
+		return myHomeScrollView;
+	}
+
+
+	private void initRoomValues(RoomConfigService service) {
+		for (String currentServer : serverNames) {
+			// RoomConfiguration roomConfig = ((MainActivity)
+			// getActivity()).getRoomConfigManager().getRoomConfiguration(
+			// currentServer);
+
+			RoomConfiguration roomConfig = service.getRoomConfiguration(
+					currentServer);
+			LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
 			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
 			roomContent.setTag("roomContent" + currentServer);
 			TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
@@ -185,7 +231,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 					row.setGravity(Gravity.CENTER);
 					roomContent.addView(row);
 				}
-
+				LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				View lightObject = inflater.inflate(R.layout.layout_room_item, null);
 				initRoomItemIconView(currentServer, iterator.next(), lightObject);
 
@@ -198,8 +244,6 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 				createSwitch(currentServer, roomBottomBarView, currentEventGenerator);
 			}
 			// init scenery Spinner
-			Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
-			spinner.setTag("sceneries" + currentServer);
 			this.updateScenerySpinner(currentServer);
 
 			RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
@@ -210,10 +254,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		}
 
 		updateRoofTop();
-
-		return myHomeScrollView;
 	}
-
 
 	public void updateMasterSwitchState(boolean powerState) {
 
@@ -581,7 +622,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 	 * #onRoomConfigurationChange(java.lang.String,
 	 * org.ambientlight.room.RoomConfiguration)
 	 */
-	@Override
+
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
 
 		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(
@@ -620,8 +661,7 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		// update rooftop
 		boolean anyActive = false;
 
-		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()
-				.values()) {
+		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()) {
 
 			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {
 				if (currentEventGenerator.getPowerState()) {
@@ -681,5 +721,19 @@ public class RoomFragment extends Fragment implements RoomConfigurationUpdateLis
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME, this.actorConductConfigurationAfterEditItemName);
 		super.onSaveInstanceState(bundle);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IOnServiceConnectedListener#onRoomServiceConnected
+	 * (org.ambient.modelservice.RoomConfigService)
+	 */
+	@Override
+	public void onRoomServiceConnected(RoomConfigService service) {
+		initRoomValues(service);
+
 	}
 }

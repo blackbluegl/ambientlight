@@ -13,6 +13,7 @@
     </uses-permission>
     <uses-permission android:name="android.permission.NFC" >
     </uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -26,8 +27,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="org.ambient.control.MainActivity"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+            android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,6 +60,18 @@
             android:name="org.ambient.control.sceneryconfiguration.SceneryConfigEditDialogHolder"
             android:label="@string/title_activity_dialog_holder" >
         </activity>
+        <activity
+            android:name="org.ambient.control.nfc.NFCSwitchHandlerActivity"
+            android:label="@string/title_activity_nfcswitch_handler"
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/org.ambientcontrol" />
+            </intent-filter>
+        </activity>
 
         <receiver
             android:name="org.ambient.widgets.RoomSwitchesWidgetProvider"
@@ -75,19 +88,33 @@
 
         <service android:name="org.ambient.widgets.UpdateWidgetService" >
         </service>
+        
+         <service android:name="org.ambient.roomservice.RoomConfigService" >
+        </service>
 
-        <activity
-            android:name="org.ambient.control.nfc.NFCSwitchHandlerActivity"
-            android:label="@string/title_activity_nfcswitch_handler" 
-            android:launchMode="singleTop">
+        <!-- start callbackService forRoomConfiguraion -->
+<!--         <receiver -->
+<!--             android:name="org.ambient.modelservice.boot.RoomConfigScheduleReceiver" -->
+<!--             android:enabled="true" -->
+<!--             android:exported="false" > -->
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
+<!--                 <action android:name="android.intent.action.USER_PRESENT" /> -->
+<!--                 <action android:name="android.intent.action.SCREEN_ON" /> -->
+<!--             </intent-filter> -->
+<!--         </receiver> -->
+        <receiver
+            android:name="org.ambient.roomservice.boot.StartRoomConfigServiceReceiver"
+            android:enabled="true"
+            android:exported="false" >
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="application/org.ambientcontrol" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.SCREEN_ON" />
             </intent-filter>
-        </activity>
+        </receiver>
+    </application>
+    <application>
     </application>
 
 </manifest>
