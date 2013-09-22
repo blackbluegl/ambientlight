@@ -63,6 +63,7 @@ public class CallBackManager {
 				socket.close();
 
 			} catch (Exception e) {
+				clients.remove(currentClient);
 				System.err.println("CallbackManager: Error notifying client: " + currentClient
 						+ ". Continuing without callback message.");
 				e.printStackTrace();

@@ -57,7 +57,6 @@ public class UpdateWidgetService extends Service {
 		}
 	};
 
-
 	/**
 	 * used to receive external events from wifi and user
 	 */
@@ -109,7 +108,14 @@ public class UpdateWidgetService extends Service {
 
 
 	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
+
+
+	@Override
 	public void onCreate() {
+		super.onCreate();
 		Log.i(LOG, "onCreated Called");
 		bindService(new Intent(this, RoomConfigService.class), roomServiceConnection, Context.BIND_AUTO_CREATE);
 		IntentFilter filter = new IntentFilter();
@@ -123,10 +129,10 @@ public class UpdateWidgetService extends Service {
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		Log.i(LOG, "onDestroy Called");
 		unregisterReceiver(receiver);
 		unbindService(roomServiceConnection);
-		super.onDestroy();
 	}
 
 
@@ -140,12 +146,6 @@ public class UpdateWidgetService extends Service {
 			return START_STICKY;
 		}
 
-		// //disable widget
-		// if (intent.getAction().equals("disableWidget")) {
-		// setWidgetToDisabledView();
-		// return START_STICKY;
-		// }
-
 		// if there is no connection set widget to disabled view
 		if (this.isConnectedToWifi(getApplicationContext()) == false && Build.BRAND.startsWith("generic") == false) {
 			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
@@ -153,13 +153,13 @@ public class UpdateWidgetService extends Service {
 			return START_STICKY;
 		}
 
-		// event handling
+		// handle click event from widget
 		if (intent.getAction().contains(INTENT_SWITCH_CLICKED)) {
 			switchRoom(intent, appWidgetManager);
 			return START_STICKY;
 		}
 
-		// update from widgetProvider
+		// handle update from widgetProvider
 		if (intent.getAction().equals(RoomSwitchesWidgetProvider.INTENT_UPDATE_VIEW)) {
 			updateWidget();
 			return START_STICKY;
@@ -296,12 +296,6 @@ public class UpdateWidgetService extends Service {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = cm.getActiveNetworkInfo();
 		return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
-	}
-
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
 	}
 
 }
