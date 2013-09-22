@@ -114,7 +114,4 @@
             </intent-filter>
         </receiver>
     </application>
-    <application>
-    </application>
-
 </manifest>

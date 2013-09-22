@@ -3,9 +3,7 @@ package org.ambient.control.nfc;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.ambient.control.RoomConfigManager;
 import org.ambient.control.rest.RestClient;
-import org.ambient.widgets.WidgetUtils;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.IUserRoomItem;
 import org.ambientlight.room.RoomConfiguration;
@@ -110,8 +108,7 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 		boolean powerState = true;
 
 		try {
-			RoomConfigManager adapter = new RoomConfigManager();
-			RestClient rest = new RestClient(adapter);
+			RestClient rest = new RestClient();
 			RoomConfiguration config = RestClient.getRoom(server);
 
 			if (type.equals(TYPE_ROOM_ITEM)) {
@@ -137,9 +134,6 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 				speakout = sceneryEvent.currentScenery.id + ", aus";
 				Toast.makeText(this, "Schalte " + itemName + " aus", Toast.LENGTH_LONG).show();
 			}
-
-			// update widgets
-			WidgetUtils.notifyWidgets(this);
 
 		} catch (Exception e) {
 			e.printStackTrace();

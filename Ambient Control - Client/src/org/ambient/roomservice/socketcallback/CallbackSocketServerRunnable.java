@@ -28,7 +28,7 @@ import org.ambient.roomservice.RoomConfigService;
  */
 public class CallbackSocketServerRunnable implements Runnable {
 
-	public ServerSocket server = null;
+	private ServerSocket server = null;
 	private RoomConfigService service;
 	private boolean run = true;
 
@@ -55,6 +55,7 @@ public class CallbackSocketServerRunnable implements Runnable {
 		try {
 			while (run = true) {
 				Socket client = server.accept();
+				System.out.println("CallBackSocketServer: accepted new client");
 				CallbackSocketRunnable serverRunnable = new CallbackSocketRunnable(client, service);
 				new Thread(serverRunnable).run();
 			}

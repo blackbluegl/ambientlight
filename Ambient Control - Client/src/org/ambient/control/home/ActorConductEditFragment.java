@@ -67,7 +67,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				RestClient rest = new RestClient(null);
+				RestClient rest = new RestClient();
 				rest.setActorConductConfiguration(selectedServer, itemName, (ActorConductConfiguration) myConfigurationData);
 				return true;
 			}
