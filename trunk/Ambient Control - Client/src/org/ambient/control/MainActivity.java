@@ -14,9 +14,11 @@ import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.room.RoomConfiguration;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -38,10 +40,10 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
 
-	private List<IOnServiceConnectedListener> serviceListeners = new ArrayList<IOnServiceConnectedListener>();
+	private List<IRoomServiceCallbackListener> serviceListeners = new ArrayList<IRoomServiceCallbackListener>();
 
 
-	public void addServiceListener(IOnServiceConnectedListener listener) {
+	public void addServiceListener(IRoomServiceCallbackListener listener) {
 		serviceListeners.add(listener);
 	}
 
@@ -52,7 +54,7 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			roomService = ((RoomConfigService.MyBinder) binder).getService();
-			for (IOnServiceConnectedListener listener : serviceListeners) {
+			for (IRoomServiceCallbackListener listener : serviceListeners) {
 				listener.onRoomServiceConnected(roomService);
 			}
 		}
@@ -79,6 +81,25 @@ public class MainActivity extends FragmentActivity {
 		return roomService;
 	}
 
+	private final BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+
+			if (action.equals(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG)) {
+				String serverName = intent.getExtras().getString(RoomConfigService.EXTRA_SERVERNAME);
+				RoomConfiguration config = (RoomConfiguration) intent.getExtras().getSerializable(
+						RoomConfigService.EXTRA_ROOMCONFIG);
+				Log.i(LOG, "got update for Room");
+				for (IRoomServiceCallbackListener listener : serviceListeners) {
+					listener.onRoomConfigurationChange(serverName, config);
+				}
+			}
+		}
+	};
+
 	RestClient restClient;
 
 
@@ -92,7 +113,9 @@ public class MainActivity extends FragmentActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		unbindService(mConnection);
+		unregisterReceiver(receiver);
 	}
+
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -119,6 +142,7 @@ public class MainActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		registerReceiver(receiver, new IntentFilter(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG));
 		bindService(new Intent(this, RoomConfigService.class), mConnection, Context.BIND_AUTO_CREATE);
 
 		setContentView(R.layout.activity_main);
@@ -260,20 +284,6 @@ public class MainActivity extends FragmentActivity {
 	public ArrayList<String> getAllRoomServers() {
 		ArrayList<String> result = new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
 		return result;
-	}
-
-
-	public RoomConfigManager createRoomConfigAdapter(ArrayList<String> servers) {
-		RoomConfigManager adapter = new RoomConfigManager();
-		for (String currentServer : servers) {
-			try {
-				RoomConfiguration config = RestClient.getRoom(currentServer);
-				adapter.addRoomConfiguration(currentServer, config);
-			} catch (Exception e) {
-				Log.e(LOG, "initRoomConfigurationAdapter: ommiting " + currentServer + " because of:", e);
-			}
-		}
-		return adapter;
 	}
 
 

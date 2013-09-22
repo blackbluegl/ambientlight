@@ -16,13 +16,17 @@
 package org.ambient.control;
 
 import org.ambient.roomservice.RoomConfigService;
+import org.ambientlight.room.RoomConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface IOnServiceConnectedListener {
+public interface IRoomServiceCallbackListener {
 
 	public void onRoomServiceConnected(RoomConfigService service);
+
+
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration);
 }

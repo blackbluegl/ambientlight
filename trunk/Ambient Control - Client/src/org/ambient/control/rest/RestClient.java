@@ -19,6 +19,18 @@ public class RestClient {
 	}
 
 
+	public void registerCallback(String hostName, String ipAndPort) {
+		RegisterCallbackTask task = new RegisterCallbackTask();
+		task.execute(hostName, ipAndPort);
+	}
+
+
+	public void unregisterCallback(String hostName, String ipAndPort) {
+		UnregisterCallbackTask task = new UnregisterCallbackTask();
+		task.execute(hostName, ipAndPort);
+	}
+
+
 	public void startProcess(String hostName, String processId) {
 		StartProcessTask task = new StartProcessTask();
 		task.execute(hostName, processId);
@@ -61,7 +73,7 @@ public class RestClient {
 
 	public void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException, ExecutionException {
 		ToggleRoomPowerStateTask task = new ToggleRoomPowerStateTask();
-		task.execute(hostName, state, configAdapter);
+		task.execute(hostName, state);
 	}
 
 
@@ -74,7 +86,7 @@ public class RestClient {
 
 	public void setSceneryActive(String hostName, String sceneryName) {
 		SetSceneryActiveForRoomTask task = new SetSceneryActiveForRoomTask();
-		task.execute(hostName, sceneryName, this.configAdapter);
+		task.execute(hostName, sceneryName);
 	}
 
 
@@ -86,7 +98,7 @@ public class RestClient {
 
 	public void sendEvent(String hostName, EventConfiguration event) {
 		SendEventTask task = new SendEventTask();
-		task.execute(hostName, event, this.configAdapter);
+		task.execute(hostName, event);
 	}
 
 

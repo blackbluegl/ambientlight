@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.ambient.control.IOnServiceConnectedListener;
+import org.ambient.control.IRoomServiceCallbackListener;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.config.EditConfigExitListener;
@@ -34,7 +34,6 @@ import org.ambient.control.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
-import org.ambient.widgets.WidgetUtils;
 import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.RoomConfiguration;
@@ -80,7 +79,7 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends Fragment implements IOnServiceConnectedListener, EditConfigExitListener {
+public class RoomFragment extends Fragment implements IRoomServiceCallbackListener, EditConfigExitListener {
 
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
 	protected ActorConductConfiguration actorConductConfigurationAfterEditItem;
@@ -131,7 +130,7 @@ public class RoomFragment extends Fragment implements IOnServiceConnectedListene
 		// state or not to revert to the old state due inconsistent values on
 		// server because of preview actions
 		if (actorConductConfigurationAfterEditItem != null) {
-			RestClient rest = new RestClient(null);
+			RestClient rest = new RestClient();
 			rest.setActorConductConfiguration(this.actorConductConfigurationAfterEditItemServerName,
 					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
 			actorConductConfigurationAfterEditItem = null;
@@ -466,8 +465,6 @@ public class RoomFragment extends Fragment implements IOnServiceConnectedListene
 
 					updateRoomBackground(serverName);
 
-					// update widgets
-					WidgetUtils.notifyWidgets(getActivity());
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -623,6 +620,7 @@ public class RoomFragment extends Fragment implements IOnServiceConnectedListene
 	 * org.ambientlight.room.RoomConfiguration)
 	 */
 
+	@Override
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
 
 		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(
@@ -647,7 +645,7 @@ public class RoomFragment extends Fragment implements IOnServiceConnectedListene
 		this.enableEventListener(serverName);
 
 		// update widgets
-		WidgetUtils.notifyWidgets(this.getActivity());
+		// WidgetUtils.notifyWidgets(this.getActivity());
 
 		updateRoofTop();
 
@@ -734,6 +732,5 @@ public class RoomFragment extends Fragment implements IOnServiceConnectedListene
 	@Override
 	public void onRoomServiceConnected(RoomConfigService service) {
 		initRoomValues(service);
-
 	}
 }

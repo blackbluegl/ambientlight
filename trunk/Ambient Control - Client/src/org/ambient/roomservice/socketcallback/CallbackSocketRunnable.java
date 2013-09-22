@@ -32,9 +32,6 @@ import org.ambientlight.callback.responses.StatusMessage;
  */
 public class CallbackSocketRunnable implements Runnable {
 
-
-
-
 	private Socket server = null;
 	private RoomConfigService service;
 
@@ -52,10 +49,19 @@ public class CallbackSocketRunnable implements Runnable {
 			// Get input from the client
 			BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
 			PrintStream out = new PrintStream(server.getOutputStream());
-			String request = in.readLine();
+			final String request = in.readLine();
 			if (UpdateRoomMessage.getFromMessage(request) != null) {
 				// extract servername, commit to service
-				service.updateRoomConfigFor(UpdateRoomMessage.getFromMessage(request));
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						System.out.println("CallBackSocketRunnable: updating RoomConfig for server: "
+								+ UpdateRoomMessage.getFromMessage(request));
+						service.updateRoomConfigFor(UpdateRoomMessage.getFromMessage(request));
+					}
+				}).start();
+
 				out.println(StatusMessage.createMessage(true));
 			} else {
 				out.println(StatusMessage.createMessage(false));

@@ -16,13 +16,16 @@
 package org.ambient.roomservice;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteOrder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.ambient.control.rest.RestClient;
 import org.ambient.control.rest.URLUtils;
-import org.ambient.roomservice.boot.StartRoomConfigServiceReceiver;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
 import org.ambientlight.room.RoomConfiguration;
 
@@ -31,6 +34,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -51,6 +55,8 @@ public class RoomConfigService extends Service {
 	private static final String LOG = "org.ambientcontrol.roomConfigService";
 
 	private Map<String, RoomConfiguration> roomConfiguration = new HashMap<String, RoomConfiguration>();
+	private Map<String, String> roomNameServerMapping = new HashMap<String, String>();
+
 	private CallbackSocketServerRunnable callbackSocketServer = null;
 	private final IBinder binder = new MyBinder();
 
@@ -89,15 +95,17 @@ public class RoomConfigService extends Service {
 	// update request from server
 	public synchronized void updateRoomConfigFor(String roomName) {
 		try {
-			RoomConfiguration roomConfig = RestClient.getRoom(roomName);
+			// todo extract servername
+			String serverName = roomNameServerMapping.get(roomName);
+			RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 			// update Model
-			roomConfiguration.put(roomName, roomConfig);
+			roomConfiguration.put(serverName, roomConfig);
 
-			// send BroadcastMessage to my clients
+			// send BroadcastMessage to listeners who might be interested
 			Intent intent = new Intent();
 			intent.setAction(BROADCAST_INTENT_UPDATE_ROOMCONFIG);
 			intent.putExtra(EXTRA_ROOMCONFIG, roomConfig);
-			intent.putExtra(EXTRA_SERVERNAME, roomName);
+			intent.putExtra(EXTRA_SERVERNAME, serverName);
 			sendBroadcast(intent);
 
 		} catch (Exception e) {
@@ -119,17 +127,6 @@ public class RoomConfigService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
-		// start socketserver command
-		// stop socketServer command
-
-		// simply start this service command
-		if (intent != null) {
-
-			if (StartRoomConfigServiceReceiver.INTENT_START.equals(intent.getAction())) {
-				// do nothing because onCreate is started
-			}
-		}
 		return Service.START_STICKY;
 	}
 
@@ -155,7 +152,9 @@ public class RoomConfigService extends Service {
 	private void initAllRoomConfigurations() {
 		for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
 			try {
-				roomConfiguration.put(currentServer, RestClient.getRoom(currentServer));
+				RoomConfiguration config = RestClient.getRoom(currentServer);
+				roomConfiguration.put(currentServer, config);
+				roomNameServerMapping.put(config.roomName, currentServer);
 			} catch (Exception e) {
 				Log.e(LOG, "error initializing room", e);
 			}
@@ -180,8 +179,11 @@ public class RoomConfigService extends Service {
 		if (callbackSocketServer == null) {
 			callbackSocketServer = new CallbackSocketServerRunnable(this);
 			new Thread(callbackSocketServer).start();
-			String hostname = callbackSocketServer.server.getInetAddress().getHostName();
-			hostname = hostname + ":" + 4321;
+			String hostname = getIpAdress() + ":4321";
+			RestClient rest = new RestClient();
+			for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
+				rest.registerCallback(currentServer, hostname);
+			}
 		}
 	}
 
@@ -192,6 +194,11 @@ public class RoomConfigService extends Service {
 	private synchronized void stopCallBackServer() {
 		if (callbackSocketServer != null) {
 			try {
+				String hostname = getIpAdress() + ":4321";
+				RestClient rest = new RestClient();
+				for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
+					rest.unregisterCallback(currentServer, hostname);
+				}
 				callbackSocketServer.stop();
 			} catch (IOException e) {
 				Log.e(LOG, "error closing callbackSocketService");
@@ -210,12 +217,32 @@ public class RoomConfigService extends Service {
 		return roomConfiguration.values();
 	}
 
-	// private String getIpAdress(){
-	//
-	// WifiManager wifiMgr = (WifiManager) getSystemService(WIFI_SERVICE);
-	// WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-	// int ip = wifiInfo.getIpAddress();
-	// String ipAddress = Formatter.formatIpAddress(ip);
-	// return ipAddress;
-	// }
+
+	private String getIpAdress() {
+		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+		int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+
+		// Convert little-endian to big-endianif needed
+		if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
+			ipAddress = Integer.reverseBytes(ipAddress);
+		}
+
+		byte[] ipByteArray = BigInteger.valueOf(ipAddress).toByteArray();
+
+		String ipAddressString;
+		try {
+			ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
+		} catch (UnknownHostException ex) {
+			Log.e("WIFIIP", "Unable to get host address.");
+			ipAddressString = null;
+		}
+
+		if (ipAddressString == null) {
+			Log.d(LOG, "IP Adress is 0. Asuming we are in emulated envirenment. using 127.0.0.1");
+			ipAddressString = "127.0.0.1";
+		}
+		Log.d(LOG, "IP Adress for callback is: " + ipAddressString);
+
+		return ipAddressString;
+	}
 }

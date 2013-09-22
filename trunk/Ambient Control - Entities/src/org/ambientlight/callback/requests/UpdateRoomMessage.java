@@ -33,7 +33,7 @@ public class UpdateRoomMessage {
 	public static String getFromMessage(String message) {
 		if (message.startsWith(REQ_COMMAND_UPDATE_ROOM_CONFIG) == false)
 			return null;
-		String[] result = message.split(DELIMITER);
+		String[] result = message.split("\\" + DELIMITER);
 		if (result.length != 2)
 			return null;
 		if (result[1].isEmpty())
