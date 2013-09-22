@@ -8,7 +8,6 @@ import org.ambient.control.climate.ClimateFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
-import org.ambient.control.rest.RestClient;
 import org.ambient.control.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.room.RoomConfiguration;
@@ -40,21 +39,26 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
 
-	private List<IRoomServiceCallbackListener> serviceListeners = new ArrayList<IRoomServiceCallbackListener>();
+	private static final String LOG = "MainActivity";
 
+	NFCProgrammingFragment nfcProgramming;
+	ProcessCardFragment processCard;
+	ClimateFragment climateFragment;
 
-	public void addServiceListener(IRoomServiceCallbackListener listener) {
-		serviceListeners.add(listener);
-	}
+	ArrayList<String> fragments = new ArrayList<String>();
+	String currentDialog = null;
+	public LinearLayout content;
+
+	private List<IRoomServiceCallbackListener> roomServiceListeners = new ArrayList<IRoomServiceCallbackListener>();
 
 	private RoomConfigService roomService;
 
-	private ServiceConnection mConnection = new ServiceConnection() {
+	private ServiceConnection roomServiceConnection = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			roomService = ((RoomConfigService.MyBinder) binder).getService();
-			for (IRoomServiceCallbackListener listener : serviceListeners) {
+			for (IRoomServiceCallbackListener listener : roomServiceListeners) {
 				listener.onRoomServiceConnected(roomService);
 			}
 		}
@@ -66,22 +70,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	};
 
-	private static final String LOG = "MainActivity";
-
-	NFCProgrammingFragment nfcProgramming;
-	ProcessCardFragment processCard;
-	ClimateFragment climateFragment;
-
-	ArrayList<String> fragments = new ArrayList<String>();
-	String currentDialog = null;
-	public LinearLayout content;
-
-
-	public RoomConfigService getRoomConfigManager() {
-		return roomService;
-	}
-
-	private final BroadcastReceiver receiver = new BroadcastReceiver() {
+	private final BroadcastReceiver roomServiceUpdateReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -93,28 +82,12 @@ public class MainActivity extends FragmentActivity {
 				RoomConfiguration config = (RoomConfiguration) intent.getExtras().getSerializable(
 						RoomConfigService.EXTRA_ROOMCONFIG);
 				Log.i(LOG, "got update for Room");
-				for (IRoomServiceCallbackListener listener : serviceListeners) {
+				for (IRoomServiceCallbackListener listener : roomServiceListeners) {
 					listener.onRoomConfigurationChange(serverName, config);
 				}
 			}
 		}
 	};
-
-	RestClient restClient;
-
-
-	public RestClient getRestClient() {
-		return restClient;
-
-	}
-
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		unbindService(mConnection);
-		unregisterReceiver(receiver);
-	}
 
 
 	@Override
@@ -125,16 +98,11 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	public void replaceFragment(Fragment frag, String tag, String dialogName) {
-		clearFragments(content);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
-		ft.replace(content.getId(), frag, tag);
-		this.fragments.add(tag);
-		this.currentDialog = dialogName;
-		ft.addToBackStack(null);
-
-		ft.commit();
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unbindService(roomServiceConnection);
+		unregisterReceiver(roomServiceUpdateReceiver);
 	}
 
 
@@ -142,13 +110,11 @@ public class MainActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		registerReceiver(receiver, new IntentFilter(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG));
-		bindService(new Intent(this, RoomConfigService.class), mConnection, Context.BIND_AUTO_CREATE);
+		registerReceiver(roomServiceUpdateReceiver, new IntentFilter(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG));
+		bindService(new Intent(this, RoomConfigService.class), roomServiceConnection, Context.BIND_AUTO_CREATE);
 
 		setContentView(R.layout.activity_main);
 		content = (LinearLayout) findViewById(R.id.LayoutMain);
-
-		this.restClient = new RestClient();
 
 		createNavigationDrawer(content);
 
@@ -313,6 +279,24 @@ public class MainActivity extends FragmentActivity {
 		if (nfcProgramming != null) {
 			nfcProgramming.mytag = mytag;
 		}
+	}
+
+
+	public void replaceFragment(Fragment frag, String tag, String dialogName) {
+		clearFragments(content);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		ft.replace(content.getId(), frag, tag);
+		this.fragments.add(tag);
+		this.currentDialog = dialogName;
+		ft.addToBackStack(null);
+
+		ft.commit();
+	}
+
+
+	public void addServiceListener(IRoomServiceCallbackListener listener) {
+		roomServiceListeners.add(listener);
 	}
 
 }
