@@ -48,6 +48,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -80,6 +81,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME = "actorConductConfigurationAfterEditItemName";
 	public static final String BUNDLE_SERVER_NAMES = "serverName";
+	public static final String LOG = "RoomFragment";
 
 	// size of the action icons in room
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
@@ -89,7 +91,6 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	private ActorConductConfiguration actorConductConfigurationAfterEditItem;
 	private String actorConductConfigurationAfterEditItemName;
 	private String actorConductConfigurationAfterEditItemServerName;
-
 	private List<String> serverNames;
 
 	/*
@@ -155,111 +156,75 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 */
 	@Override
 	protected void onResumeWithServiceConnected() {
-
-
 		for (String currentServer : serverNames) {
-
 			updateRoomContent(currentServer);
-
 		}
 
 		this.updateRoofTop();
 	}
 
 
-	/**
-	 * @param currentServer
-	 */
-	private void updateRoomContent(String currentServer) {
-		if (this.configuredlightObjects != null && this.configuredlightObjects.get(currentServer) != null) {
-			this.configuredlightObjects.get(currentServer).clear();
-		}
-
-		RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
-
-		LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
-
-		// init roomLabel
-		TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
-		roomLabel.setText(roomConfig.roomName);
-
-		// init room power switch dynamically
-		LinearLayout switchesView = (LinearLayout) roomContainerView.findViewById(R.id.linearLayoutRoomSwitches);
-		switchesView.removeAllViews();
-		for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
-			createSwitch(currentServer, switchesView, currentEventGenerator);
-		}
-
-		// init scenery Spinner
-		this.updateScenerySpinner(currentServer);
-
-		// init dynamically the clickable light object icons
-		TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
-		roomContent.removeAllViews();
-		createRoomItems(currentServer, roomConfig, roomContent);
-
-		// init roomBackground
-		this.updateRoomBackground(currentServer);
+	@Override
+	public void onSaveInstanceState(Bundle bundle) {
+		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
+		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME, this.actorConductConfigurationAfterEditItemName);
+		super.onSaveInstanceState(bundle);
 	}
 
 
-	/**
-	 * @param currentServer
-	 * @param roomConfig
-	 * @param roomContent
-	 * @param amountPerRow
+	/*
+	 * get shure that the oldConfig will be overwritten. onCreateView will now
+	 * save the new configuration
+	 * 
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onIntegrateConfiguration
+	 * (java.lang.String, java.lang.Object)
 	 */
-	private void createRoomItems(String currentServer, RoomConfiguration roomConfig, TableLayout roomContent) {
-		int amountPerRow = getLightObjectAmountPerRow();
-		TableRow row = new TableRow(roomContent.getContext());
-		row.setGravity(Gravity.CENTER);
-		roomContent.addView(row);
-		Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
-		for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
-
-			// create a new row if last one is full
-			if (i % amountPerRow == 0) {
-				row = new TableRow(roomContent.getContext());
-				row.setGravity(Gravity.CENTER);
-				roomContent.addView(row);
-			}
-			LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View lightObject = inflater.inflate(R.layout.layout_room_item, null);
-			initRoomItem(currentServer, iterator.next(), lightObject);
-
-			row.addView(lightObject);
-		}
+	@Override
+	public void onIntegrateConfiguration(String serverName, Object configuration) {
+		this.actorConductConfigurationAfterEditItemServerName = serverName;
+		this.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) configuration;
 	}
 
 
-	/**
-	 * @param roofTop
+	/*
+	 * get sure that the oldConfig will not be overwritten. onCreateView will
+	 * now save the old configuration
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
+	 * (java.lang.String, java.lang.Object)
 	 */
-	private void createMasterButton(LinearLayout roofTop) {
-		ImageView masterButton = (ImageView) roofTop.findViewById(R.id.imageViewMasterSwitch);
+	@Override
+	public void onRevertConfiguration(String serverName, Object configuration) {
+		this.actorConductConfigurationAfterEditItemServerName = serverName;
+	}
 
-		masterButton.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				for (String currentServerName : serverNames) {
-					try {
-						RoomConfiguration currentConfig = roomService.getRoomConfiguration(currentServerName);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener
+	 * #onRoomConfigurationChange(java.lang.String,
+	 * org.ambientlight.room.RoomConfiguration)
+	 */
 
-						for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators()
-								.values()) {
-							SwitchEventConfiguration event = new SwitchEventConfiguration();
-							event.eventGeneratorName = currentEventGenerator.getName();
-							event.powerState = false;
-							RestClient.sendEvent(currentServerName, event);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				setMasterSwitchState(false);
-			}
-		});
+	@Override
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
+
+		// we get update callbacks but if the ui is not prepared and present we
+		// would run into trouble
+		if (isVisible() == false)
+			return;
+
+		updateRoomContent(serverName);
+
+		this.enableEventListener(serverName);
+
+		updateRoofTop();
+
 	}
 
 
@@ -287,77 +252,166 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private void setMasterSwitchState(boolean powerState) {
+	/**
+	 * @param currentServer
+	 */
+	private void updateRoomContent(String currentServer) {
 
-		ImageView masterSwitch = (ImageView) this.roomsContainerView.findViewById(R.id.imageViewMasterSwitch);
+		RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
+		if (roomConfig == null)
+			return;
 
-		if (powerState == true) {
-			masterSwitch.setImageResource(R.drawable.ic_power_active);
+		if (this.configuredlightObjects != null && this.configuredlightObjects.get(currentServer) != null) {
+			this.configuredlightObjects.get(currentServer).clear();
+		}
+
+		LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
+
+		// init roomLabel
+		TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
+		roomLabel.setText(roomConfig.roomName);
+
+		// init room power switch dynamically
+		LinearLayout switchesView = (LinearLayout) roomContainerView.findViewById(R.id.linearLayoutRoomSwitches);
+		switchesView.removeAllViews();
+		for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
+			createSwitch(currentServer, switchesView, currentEventGenerator);
+		}
+
+		// init scenery Spinner
+		this.updateScenerySpinner(currentServer);
+
+		// init dynamically the clickable light object icons
+		TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
+		roomContent.removeAllViews();
+		createRoomItems(currentServer, roomConfig, roomContent);
+
+		// init roomBackground
+		this.updateRoomBackground(currentServer);
+	}
+
+
+	private void updateRoofTop() {
+		// update rooftop
+		boolean anyActive = false;
+
+		for (RoomConfiguration currentConfig : roomService.getAllRoomConfigurations()) {
+			if (currentConfig == null) {
+				continue;
+			}
+
+			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {
+				if (currentEventGenerator.getPowerState()) {
+					anyActive = true;
+					break;
+				}
+			}
+		}
+
+		this.setMasterSwitchState(anyActive);
+	}
+
+
+	private void updateScenerySpinner(final String serverName) {
+		final RoomConfiguration roomConfiguration = roomService.getRoomConfiguration(serverName);
+
+		List<AbstractSceneryConfiguration> sceneries = roomService.getRoomConfiguration(serverName).getSceneries();
+		String[] sceneryNames = new String[sceneries.size()];
+		for (int i = 0; i < sceneries.size(); i++) {
+			sceneryNames[i] = sceneries.get(i).id;
+		}
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
+				sceneryNames);
+		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+
+		Spinner spinner = (Spinner) roomsContainerView.findViewWithTag("sceneries" + serverName);
+		spinner.setAdapter(adapter);
+		adapter.getPosition(roomConfiguration.getCurrentScenery().id);
+		spinner.setSelection(adapter.getPosition(roomConfiguration.getCurrentScenery().id));
+
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+				String selectedScenery = (String) parent.getItemAtPosition(pos);
+				String currentScenery = roomConfiguration.getCurrentScenery().id;
+
+				if (!selectedScenery.equals(currentScenery)) {
+					SceneryEntryEventConfiguration event = new SceneryEntryEventConfiguration();
+					event.eventGeneratorName = "RoomSceneryEventGenerator";
+					event.sceneryName = selectedScenery;
+					RestClient.sendEvent(serverName, event);
+					disableEventListener(serverName);
+				}
+			}
+
+
+			@Override
+			public void onNothingSelected(AdapterView<?> paramAdapterView) {
+
+			}
+		});
+	}
+
+
+	private void updateRoomBackground(String serverName) {
+		boolean powerSwitchIsChecked = false;
+		RelativeLayout roomBackground = (RelativeLayout) roomsContainerView.findViewWithTag("roomBackground" + serverName);
+		RoomConfiguration roomConfig = roomService.getRoomConfiguration(serverName);
+
+		for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
+			if (currentSwitch.getPowerState() == true) {
+				powerSwitchIsChecked = true;
+				break;
+			}
+		}
+
+		for (AbstractRoomItemViewMapper current : this.configuredlightObjects.get(serverName)) {
+			if (current.getPowerState() != powerSwitchIsChecked) {
+				roomBackground.setBackgroundResource(R.drawable.bg_room_half_active);
+				return;
+			}
+		}
+
+		if (this.getPowerStateForAllLightObjectsInRoom(serverName)) {
+			roomBackground.setBackgroundResource(R.drawable.bg_room_active);
 		} else {
-			masterSwitch.setImageResource(R.drawable.ic_power_disabled);
+			roomBackground.setBackgroundResource(R.drawable.bg_room_disabled);
 		}
 	}
 
 
 	/**
-	 * @param sceneries
-	 * @return
+	 * @param currentServer
+	 * @param roomConfig
+	 * @param roomContent
+	 * @param amountPerRow
 	 */
-	private String[] getSceneryArray(List<AbstractSceneryConfiguration> sceneries) {
-		String[] result = new String[sceneries.size()];
-		for (int i = 0; i < sceneries.size(); i++) {
-			result[i] = sceneries.get(i).id;
-		}
-		return result;
-	}
+	private void createRoomItems(String currentServer, RoomConfiguration roomConfig, TableLayout roomContent) {
+		int amountPerRow = getLightObjectAmountPerRow();
+		TableRow row = new TableRow(roomContent.getContext());
+		row.setGravity(Gravity.CENTER);
+		roomContent.addView(row);
+		Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
+		for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
 
+			// create a new row if last one is full
+			if (i % amountPerRow == 0) {
+				row = new TableRow(roomContent.getContext());
+				row.setGravity(Gravity.CENTER);
+				roomContent.addView(row);
+			}
+			LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View lightObject = inflater.inflate(R.layout.layout_room_item, null);
+			createRoomItem(currentServer, iterator.next(), lightObject);
 
-	private void disableEventListener(String serverName) {
-		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
-		bar.setVisibility(ProgressBar.VISIBLE);
-		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
-		roomContent.setVisibility(TableLayout.INVISIBLE);
-
-		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
-			mapper.setEventListenerDisabled(true);
-		}
-	}
-
-
-	private void enableEventListener(String serverName) {
-		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
-		bar.setVisibility(ProgressBar.INVISIBLE);
-
-		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
-		roomContent.setVisibility(TableLayout.VISIBLE);
-
-		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
-			mapper.setEventListenerDisabled(false);
+			row.addView(lightObject);
 		}
 	}
 
 
-	private int getLightObjectAmountPerRow() {
-		DisplayMetrics metrics = new DisplayMetrics();
-		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-		float dp = getResources().getDisplayMetrics().widthPixels;
-
-		final float scale = getResources().getDisplayMetrics().density;
-		int containerSize = 0;
-		if (GuiUtils.isLargeLayout(getActivity()) == false
-				|| getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			containerSize = ((int) (dp / scale + 0.5f));
-		} else {
-			containerSize = (int) ((int) (dp / scale + 0.5f) * 0.66f);
-		}
-
-		int amountPerRow = containerSize / this.LIGHT_OBJECT_SIZE_DP;
-		return amountPerRow;
-	}
-
-
-	private void initRoomItem(final String serverName, final ActorConfiguration currentConfig, View lightObjectView) {
+	private void createRoomItem(final String serverName, final ActorConfiguration currentConfig, View lightObjectView) {
 
 		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon(currentConfig, lightObjectView);
 
@@ -430,14 +484,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 					@Override
 					public void onDestroyActionMode(ActionMode mode) {
-						// TODO Auto-generated method stub
-
 					}
 
 
 					@Override
 					public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-						// TODO Auto-generated method stub
 						return false;
 					}
 				});
@@ -455,12 +506,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 					return;
 
 				try {
+
 					RestClient.setPowerStateForRoomItem(serverName, roomItemMapper.getItemName(), !roomItemMapper.getPowerState());
-					// updateing the icon
+					// update the icon - we prevent that the user experiences a
+					// gap (request to server, response to callback)
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
-
-					updateRoomBackground(serverName);
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -500,6 +550,94 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
+	/**
+	 * @param roofTop
+	 */
+	private void createMasterButton(LinearLayout roofTop) {
+		ImageView masterButton = (ImageView) roofTop.findViewById(R.id.imageViewMasterSwitch);
+
+		masterButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				for (String currentServerName : serverNames) {
+					try {
+						RoomConfiguration currentConfig = roomService.getRoomConfiguration(currentServerName);
+
+						for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators()
+								.values()) {
+							SwitchEventConfiguration event = new SwitchEventConfiguration();
+							event.eventGeneratorName = currentEventGenerator.getName();
+							event.powerState = false;
+							RestClient.sendEvent(currentServerName, event);
+						}
+					} catch (Exception e) {
+						Log.e(LOG, "error switching masterswitch", e);
+					}
+				}
+				setMasterSwitchState(false);
+			}
+		});
+	}
+
+
+	private void setMasterSwitchState(boolean powerState) {
+
+		ImageView masterSwitch = (ImageView) this.roomsContainerView.findViewById(R.id.imageViewMasterSwitch);
+
+		if (powerState == true) {
+			masterSwitch.setImageResource(R.drawable.ic_power_active);
+		} else {
+			masterSwitch.setImageResource(R.drawable.ic_power_disabled);
+		}
+	}
+
+
+	private void disableEventListener(String serverName) {
+		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
+		bar.setVisibility(ProgressBar.VISIBLE);
+		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
+		roomContent.setVisibility(TableLayout.INVISIBLE);
+
+		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
+			mapper.setEventListenerDisabled(true);
+		}
+	}
+
+
+	private void enableEventListener(String serverName) {
+		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
+		bar.setVisibility(ProgressBar.INVISIBLE);
+
+		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
+		roomContent.setVisibility(TableLayout.VISIBLE);
+
+		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
+			mapper.setEventListenerDisabled(false);
+		}
+	}
+
+
+	private int getLightObjectAmountPerRow() {
+		DisplayMetrics metrics = new DisplayMetrics();
+		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+		float dp = getResources().getDisplayMetrics().widthPixels;
+
+		final float scale = getResources().getDisplayMetrics().density;
+		int containerSize = 0;
+		if (GuiUtils.isLargeLayout(getActivity()) == false
+				|| getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			containerSize = ((int) (dp / scale + 0.5f));
+		} else {
+			containerSize = (int) ((int) (dp / scale + 0.5f) * 0.66f);
+		}
+
+		int amountPerRow = containerSize / this.LIGHT_OBJECT_SIZE_DP;
+		return amountPerRow;
+	}
+
+
 	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final ActorConfiguration currentConfig,
 			View lightObjectView) {
 		AbstractRoomItemViewMapper result = null;
@@ -524,185 +662,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private void updateScenerySpinner(final String serverName) {
-		final RoomConfiguration roomConfiguration = roomService.getRoomConfiguration(serverName);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
-				getSceneryArray(roomConfiguration.getSceneries()));
-		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
-		Spinner spinner = (Spinner) roomsContainerView.findViewWithTag("sceneries" + serverName);
-		spinner.setAdapter(adapter);
-		adapter.getPosition(roomConfiguration.getCurrentScenery().id);
-		spinner.setSelection(adapter.getPosition(roomConfiguration.getCurrentScenery().id));
-
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				String selectedScenery = (String) parent.getItemAtPosition(pos);
-				String currentScenery = roomConfiguration.getCurrentScenery().id;
-
-				if (!selectedScenery.equals(currentScenery)) {
-					SceneryEntryEventConfiguration event = new SceneryEntryEventConfiguration();
-					event.eventGeneratorName = "RoomSceneryEventGenerator";
-					event.sceneryName = selectedScenery;
-					RestClient.sendEvent(serverName, event);
-					disableEventListener(serverName);
-				}
-			}
-
-
-			@Override
-			public void onNothingSelected(AdapterView<?> paramAdapterView) {
-
-			}
-		});
-	}
-
-
-	private void updateRoomBackground(String serverName) {
-		boolean powerSwitchIsChecked = false;
-		RelativeLayout roomBackground = (RelativeLayout) roomsContainerView.findViewWithTag("roomBackground" + serverName);
-		RoomConfiguration roomConfig = roomService.getRoomConfiguration(serverName);
-
-		for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
-			if (currentSwitch.getPowerState() == true) {
-				powerSwitchIsChecked = true;
-				break;
-			}
-		}
-
-		for (AbstractRoomItemViewMapper current : this.configuredlightObjects.get(serverName)) {
-			if (current.getPowerState() != powerSwitchIsChecked) {
-				roomBackground.setBackgroundResource(R.drawable.bg_room_half_active);
-				return;
-			}
-		}
-
-		if (this.getPowerStateForAllLightObjectsInRoom(serverName)) {
-			roomBackground.setBackgroundResource(R.drawable.bg_room_active);
-		} else {
-			roomBackground.setBackgroundResource(R.drawable.bg_room_disabled);
-		}
-	}
-
-
 	private boolean getPowerStateForAllLightObjectsInRoom(String serverName) {
 		for (AbstractRoomItemViewMapper current : this.configuredlightObjects.get(serverName)) {
 			if (current.getPowerState() == true)
 				return true;
 		}
 		return false;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener
-	 * #onRoomConfigurationChange(java.lang.String,
-	 * org.ambientlight.room.RoomConfiguration)
-	 */
-
-	@Override
-	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
-
-		// we get update callbacks but if the ui is not prepared and present we
-		// would run into trouble
-		if (isVisible() == false)
-			return;
-
-		// List<AbstractRoomItemViewMapper> mappersToRefresh = new
-		// ArrayList<AbstractRoomItemViewMapper>(
-		// this.configuredlightObjects.get(serverName));
-		//
-		// this.configuredlightObjects.get(serverName).clear();
-		//
-		// for (AbstractRoomItemViewMapper currentToRefresh : mappersToRefresh)
-		// {
-		// ActorConfiguration currentConfig =
-		// config.actorConfigurations.get(currentToRefresh.getItemName());
-		// this.initRoomItem(serverName, currentConfig,
-		// currentToRefresh.getLightObjectView());
-		// }
-		//
-		// // update switches
-		// for (SwitchEventGeneratorConfiguration currentEventGenerator :
-		// config.getSwitchGenerators().values()) {
-		// Switch currentSwitch = (Switch)
-		// this.roomsContainerView.findViewWithTag("powerStateSwitch" +
-		// serverName
-		// + currentEventGenerator.name);
-		// currentSwitch.setChecked(currentEventGenerator.getPowerState());
-		// }
-		//
-		// updateRoomBackground(serverName);
-
-		// updateScenerySpinner(serverName);
-
-		updateRoomContent(serverName);
-
-		this.enableEventListener(serverName);
-
-		updateRoofTop();
-
-
-	}
-
-
-	private void updateRoofTop() {
-		// update rooftop
-		boolean anyActive = false;
-
-		for (RoomConfiguration currentConfig : roomService.getAllRoomConfigurations()) {
-
-			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {
-				if (currentEventGenerator.getPowerState()) {
-					anyActive = true;
-					break;
-				}
-			}
-		}
-
-		this.setMasterSwitchState(anyActive);
-	}
-
-
-	/*
-	 * get shure that the oldConfig will be overwritten. onCreateView will now
-	 * save the new configuration
-	 * 
-	 * 
-	 * @see
-	 * org.ambient.control.config.EditConfigExitListener#onIntegrateConfiguration
-	 * (java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void onIntegrateConfiguration(String serverName, Object configuration) {
-		this.actorConductConfigurationAfterEditItemServerName = serverName;
-		this.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) configuration;
-	}
-
-
-	/*
-	 * get sure that the oldConfig will not be overwritten. onCreateView will
-	 * now save the old configuration
-	 * 
-	 * @see
-	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
-	 * (java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void onRevertConfiguration(String serverName, Object configuration) {
-		this.actorConductConfigurationAfterEditItemServerName = serverName;
-	}
-
-
-	@Override
-	public void onSaveInstanceState(Bundle bundle) {
-		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
-		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME, this.actorConductConfigurationAfterEditItemName);
-		super.onSaveInstanceState(bundle);
 	}
 }
