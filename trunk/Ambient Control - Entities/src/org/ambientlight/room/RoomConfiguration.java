@@ -13,6 +13,7 @@ import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -82,4 +83,15 @@ public class RoomConfiguration implements Serializable {
 		}
 		return result;
 	}
+
+
+	@JsonIgnore
+	public AbstractSceneryConfiguration getCurrentScenery() {
+
+		for (SceneryEventGeneratorConfiguration eventGen : getSceneryEventGenerator().values())
+			// we assume that there is only one per room
+			return eventGen.currentScenery;
+		return null;
+	}
+
 }
