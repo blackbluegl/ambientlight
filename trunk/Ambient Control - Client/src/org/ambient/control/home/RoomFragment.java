@@ -21,9 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.ambient.control.IRoomServiceCallbackListener;
-import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.control.RoomServiceAwareFragment;
 import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
@@ -31,7 +30,6 @@ import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
 import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.control.rest.RestClient;
-import org.ambient.roomservice.RoomConfigService;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
 import org.ambientlight.process.events.SceneryEntryEventConfiguration;
@@ -49,7 +47,6 @@ import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.ActionMode;
@@ -79,15 +76,22 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends Fragment implements IRoomServiceCallbackListener, EditConfigExitListener {
+public class RoomFragment extends RoomServiceAwareFragment implements EditConfigExitListener {
 
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
-	protected ActorConductConfiguration actorConductConfigurationAfterEditItem;
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME = "actorConductConfigurationAfterEditItemName";
-	protected String actorConductConfigurationAfterEditItemName;
-	protected String actorConductConfigurationAfterEditItemServerName;
+	public static final String BUNDLE_SERVER_NAMES = "serverName";
 
+	// size of the action icons in room
 	private final int LIGHT_OBJECT_SIZE_DP = 85;
+
+	// for EditConfigExitListener - handles the preview save action for the led
+	// configuration dialog
+	private ActorConductConfiguration actorConductConfigurationAfterEditItem;
+	private String actorConductConfigurationAfterEditItemName;
+	private String actorConductConfigurationAfterEditItemServerName;
+
+	private List<String> serverNames;
 
 	/*
 	 * the lightobjectMappers will store information about the configuration of
@@ -96,52 +100,19 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 	 */
 	private final Map<String, List<AbstractRoomItemViewMapper>> configuredlightObjects = new HashMap<String, List<AbstractRoomItemViewMapper>>();
 
-	public static final String BUNDLE_SERVER_NAMES = "serverName";
-	private List<String> serverNames;
-	LinearLayout roomsContainerView;
-
-
-	// @Override
-	// public void onPause() {
-	// super.onPause();
-	// if (roomService != null) {
-	// getActivity().unbindService(mConnection);
-	// }
-	// }
+	private LinearLayout roomsContainerView;
 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		((MainActivity) getActivity()).addServiceListener(this);
-
-		if (savedInstanceState != null) {
-			actorConductConfigurationAfterEditItemName = savedInstanceState.getString(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME);
-			// onIntegrate was not called before and the fragment will be
-			// restored
-			if (actorConductConfigurationAfterEditItem == null) {
-				actorConductConfigurationAfterEditItem = (ActorConductConfiguration) savedInstanceState
-						.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM);
-			}
-		}
-
-		// write an edited item to server. wether it was modified to persist new
-		// state or not to revert to the old state due inconsistent values on
-		// server because of preview actions
-		if (actorConductConfigurationAfterEditItem != null) {
-			RestClient rest = new RestClient();
-			rest.setActorConductConfiguration(this.actorConductConfigurationAfterEditItemServerName,
-					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
-			actorConductConfigurationAfterEditItem = null;
-		}
-
 		this.serverNames = getArguments().getStringArrayList(BUNDLE_SERVER_NAMES);
 	}
 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		handleExitEditConductResult(savedInstanceState);
 
 		// create the home container
 		View myHomeScrollView = inflater.inflate(R.layout.fragment_rooms, null);
@@ -159,15 +130,14 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 			public void onClick(View v) {
 				for (String currentServerName : serverNames) {
 					try {
-						RoomConfiguration currentConfig = ((MainActivity) getActivity()).getRoomConfigManager()
-								.getRoomConfiguration(currentServerName);
+						RoomConfiguration currentConfig = roomService.getRoomConfiguration(currentServerName);
 
 						for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators()
 								.values()) {
 							SwitchEventConfiguration event = new SwitchEventConfiguration();
 							event.eventGeneratorName = currentEventGenerator.getName();
 							event.powerState = false;
-							getRestClient().sendEvent(currentServerName, event);
+							RestClient.sendEvent(currentServerName, event);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -176,7 +146,6 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 				updateMasterSwitchState(false);
 			}
 		});
-
 
 		for (String currentServer : serverNames) {
 
@@ -201,14 +170,42 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 	}
 
 
-	private void initRoomValues(RoomConfigService service) {
-		for (String currentServer : serverNames) {
-			// RoomConfiguration roomConfig = ((MainActivity)
-			// getActivity()).getRoomConfigManager().getRoomConfiguration(
-			// currentServer);
+	/**
+	 * @param savedInstanceState
+	 */
+	private void handleExitEditConductResult(Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			actorConductConfigurationAfterEditItemName = savedInstanceState.getString(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME);
+			// onIntegrate was not called before and the fragment will be
+			// restored
+			actorConductConfigurationAfterEditItem = (ActorConductConfiguration) savedInstanceState
+					.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM);
+		}
 
-			RoomConfiguration roomConfig = service.getRoomConfiguration(
-					currentServer);
+		// write an edited item to server. weather it was modified to persist
+		// new
+		// state or not to revert to the old state due inconsistent values on
+		// server because of preview actions
+		if (actorConductConfigurationAfterEditItem != null) {
+			RestClient.setActorConductConfiguration(this.actorConductConfigurationAfterEditItemServerName,
+					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
+			actorConductConfigurationAfterEditItem = null;
+		}
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambient.control.RoomServiceAwareFragment#
+	 * initViewValuesAfterServiceConnection()
+	 */
+	@Override
+	protected void onResumeWithServiceConnected() {
+
+		for (String currentServer : serverNames) {
+
+			RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
 			LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
 			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
 			roomContent.setTag("roomContent" + currentServer);
@@ -254,6 +251,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 
 		updateRoofTop();
 	}
+
 
 	public void updateMasterSwitchState(boolean powerState) {
 
@@ -349,42 +347,15 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 				.findViewById(R.id.imageViewLightObject);
 		icon.setTag(roomItemMapper);
 		registerForContextMenu(icon);
-		final RoomFragment myself = this;
 		icon.setOnLongClickListener(new OnLongClickListener() {
 
 			@Override
 			public boolean onLongClick(View v) {
-				myself.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) GuiUtils
+				RoomFragment.this.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) GuiUtils
 						.deepCloneSerializeable(currentConfig.actorConductConfiguration);
-				myself.actorConductConfigurationAfterEditItemName = currentConfig.getName();
+				RoomFragment.this.actorConductConfigurationAfterEditItemName = currentConfig.getName();
 
 				getActivity().startActionMode(new ActionMode.Callback() {
-
-					// EditConfigExitListener exitCallback = new
-					// EditConfigExitListener() {
-					//
-					// @Override
-					// public void onIntegrateConfiguration(String serverName,
-					// Object configuration) {
-					//
-					// RestClient rest = new RestClient(((MainActivity)
-					// getActivity()).getRoomConfigManager());
-					// rest.setActorConductConfiguration(serverName,
-					// currentConfig.getName(),
-					// (ActorConductConfiguration) configuration);
-					//
-					// }
-					//
-					//
-					// @Override
-					// public void onRevertConfiguration(String serverName,
-					// Object configuration) {
-					// RestClient rest = new RestClient(((MainActivity)
-					// getActivity()).getRoomConfigManager());
-					// rest.setActorConductConfiguration(serverName,
-					// currentConfig.getName(), oldActorConductConfiguration);
-					// }
-					// };
 
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -393,7 +364,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 
 						case R.id.menuEntryEditActorConduct:
 							ActorConductEditFragment fragEdit = new ActorConductEditFragment();
-							fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+							fragEdit.setTargetFragment(RoomFragment.this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 							Bundle arguments = new Bundle();
 							arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
 									(ActorConductConfiguration) GuiUtils
@@ -411,8 +382,9 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 							break;
 
 						case R.id.menuEntryAddActorConduct:
-							ActorConductEditFragment.createNewConfigBean(ActorConductConfiguration.class, myself, serverName,
-									currentConfig.getName());
+							ActorConductEditFragment.createNewConfigBean(ActorConductConfiguration.class, RoomFragment.this,
+									serverName,
+									roomService.getRoomConfiguration(serverName), currentConfig.getName());
 							break;
 
 						default:
@@ -458,13 +430,11 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 					return;
 
 				try {
-					getRestClient().setPowerStateForRoomItem(serverName, roomItemMapper.getItemName(),
-							!roomItemMapper.getPowerState());
+					RestClient.setPowerStateForRoomItem(serverName, roomItemMapper.getItemName(), !roomItemMapper.getPowerState());
 					// updateing the icon
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
 
 					updateRoomBackground(serverName);
-
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -496,7 +466,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 					SwitchEventConfiguration event = new SwitchEventConfiguration();
 					event.eventGeneratorName = currentEventGenerator.getName();
 					event.powerState = powerStateSwitch.isChecked();
-					getRestClient().sendEvent(serverName, event);
+					RestClient.sendEvent(serverName, event);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -530,8 +500,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 
 
 	public void updateScenerySpinner(final String serverName) {
-		List<AbstractSceneryConfiguration> sceneries = ((MainActivity) getActivity()).getRoomConfigManager()
-				.getRoomConfiguration(serverName).getSceneries();
+		List<AbstractSceneryConfiguration> sceneries = roomService.getRoomConfiguration(serverName).getSceneries();
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
 				getSceneryArray(sceneries));
 		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -552,7 +521,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 					SceneryEntryEventConfiguration event = new SceneryEntryEventConfiguration();
 					event.eventGeneratorName = "RoomSceneryEventGenerator";
 					event.sceneryName = selectedScenery;
-					getRestClient().sendEvent(serverName, event);
+					RestClient.sendEvent(serverName, event);
 					disableEventListener(serverName);
 				}
 			}
@@ -569,7 +538,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 	private void updateRoomBackground(String serverName) {
 		boolean powerSwitchIsChecked = false;
 		RelativeLayout roomBackground = (RelativeLayout) roomsContainerView.findViewWithTag("roomBackground" + serverName);
-		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(serverName);
+		RoomConfiguration roomConfig = roomService.getRoomConfiguration(serverName);
 
 		for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
 			if (currentSwitch.getPowerState() == true) {
@@ -603,7 +572,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 
 
 	private AbstractSceneryConfiguration getCurrentScenery(String serverName) {
-		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(serverName);
+		RoomConfiguration roomConfig = roomService.getRoomConfiguration(serverName);
 		for (SceneryEventGeneratorConfiguration eventGen : roomConfig.getSceneryEventGenerator().values())
 			// we assume that there is only one per room
 			return eventGen.currentScenery;
@@ -659,7 +628,7 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 		// update rooftop
 		boolean anyActive = false;
 
-		for (RoomConfiguration currentConfig : ((MainActivity) getActivity()).getRoomConfigManager().getAllRoomConfigurations()) {
+		for (RoomConfiguration currentConfig : roomService.getAllRoomConfigurations()) {
 
 			for (SwitchEventGeneratorConfiguration currentEventGenerator : currentConfig.getSwitchGenerators().values()) {
 				if (currentEventGenerator.getPowerState()) {
@@ -670,17 +639,6 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 		}
 
 		this.updateMasterSwitchState(anyActive);
-	}
-
-
-	private RestClient getRestClient() {
-		return ((MainActivity) this.getActivity()).getRestClient();
-	}
-
-
-	@Override
-	public void onResume() {
-		super.onResume();
 	}
 
 
@@ -719,18 +677,5 @@ public class RoomFragment extends Fragment implements IRoomServiceCallbackListen
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME, this.actorConductConfigurationAfterEditItemName);
 		super.onSaveInstanceState(bundle);
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambient.control.IOnServiceConnectedListener#onRoomServiceConnected
-	 * (org.ambient.modelservice.RoomConfigService)
-	 */
-	@Override
-	public void onRoomServiceConnected(RoomConfigService service) {
-		initRoomValues(service);
 	}
 }

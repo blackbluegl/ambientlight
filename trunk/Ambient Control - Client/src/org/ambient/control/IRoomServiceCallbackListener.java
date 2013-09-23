@@ -29,4 +29,7 @@ public interface IRoomServiceCallbackListener {
 
 
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration);
+
+
+	public void setRoomService(RoomConfigService roomService);
 }

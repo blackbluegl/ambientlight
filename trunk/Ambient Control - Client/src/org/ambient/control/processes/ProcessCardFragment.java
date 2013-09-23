@@ -18,12 +18,13 @@ package org.ambient.control.processes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.MainActivity;
+import org.ambient.control.IRoomServiceCallbackListener;
 import org.ambient.control.R;
 import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.control.rest.RestClient;
+import org.ambient.roomservice.RoomConfigService;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
 import org.ambientlight.process.NodeConfiguration;
@@ -55,7 +56,9 @@ import android.widget.Spinner;
  * @author Florian Bornkessel
  * 
  */
-public class ProcessCardFragment extends Fragment implements EditConfigExitListener {
+public class ProcessCardFragment extends Fragment implements EditConfigExitListener, IRoomServiceCallbackListener {
+
+	private RoomConfigService roomService = null;
 
 	private static final String BUNDLE_SELECTED_PROCESS = "bundleSelectedProcess";
 	private static final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
@@ -131,7 +134,7 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 
 						selectedServer = serverNames.get(pos);
 						positionServer = pos;
-						RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
+						RoomConfiguration selectedRoomConfiguration = roomService
 								.getRoomConfiguration(selectedServer);
 
 						processNames.clear();
@@ -157,7 +160,7 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
 				getActivity().invalidateOptionsMenu();
-				RoomConfiguration selectedRoomConfiguration = ((MainActivity) getActivity()).getRoomConfigManager()
+				RoomConfiguration selectedRoomConfiguration = roomService
 						.getRoomConfiguration(selectedServer);
 				selectedProcess = selectedRoomConfiguration.processes.get(pos);
 				drawer.setProcess(selectedProcess);
@@ -235,7 +238,8 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 			return true;
 
 		case R.id.menuEntryProcessAdd:
-			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer);
+			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer,
+					roomService.getRoomConfiguration(selectedServer));
 			return true;
 
 		case R.id.menuEntryProcessEdit:
@@ -336,7 +340,7 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 
 		case R.id.menuEntryProcessSceneries:
 			SceneriesWrapper sceneries = new SceneriesWrapper();
-			sceneries.sceneries = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer)
+			sceneries.sceneries = roomService.getRoomConfiguration(selectedServer)
 					.getSceneries();
 
 			EditConfigHandlerFragment fragEditSceneries = new EditConfigHandlerFragment();
@@ -638,6 +642,48 @@ public class ProcessCardFragment extends Fragment implements EditConfigExitListe
 	@Override
 	public void onRevertConfiguration(String serverName, Object configuration) {
 		// TODO Auto-generated method stub
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IRoomServiceCallbackListener#onRoomServiceConnected
+	 * (org.ambient.roomservice.RoomConfigService)
+	 */
+	@Override
+	public void onRoomServiceConnected(RoomConfigService service) {
+		roomService = service;
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IRoomServiceCallbackListener#onRoomConfigurationChange
+	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
+	 */
+	@Override
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IRoomServiceCallbackListener#setRoomService(org.ambient
+	 * .roomservice.RoomConfigService)
+	 */
+	@Override
+	public void setRoomService(RoomConfigService roomService) {
+		this.roomService = roomService;
 
 	}
 }

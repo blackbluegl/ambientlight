@@ -71,13 +71,13 @@ public class RestClient {
 	}
 
 
-	public void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException, ExecutionException {
+	public static void setPowerStateForRoom(String hostName, Boolean state) throws InterruptedException, ExecutionException {
 		ToggleRoomPowerStateTask task = new ToggleRoomPowerStateTask();
 		task.execute(hostName, state);
 	}
 
 
-	public void setPowerStateForRoomItem(String hostName, String itemName, Boolean state) throws InterruptedException,
+	public static void setPowerStateForRoomItem(String hostName, String itemName, Boolean state) throws InterruptedException,
 	ExecutionException {
 		ToggleRoomItemPowerStateTask task = new ToggleRoomItemPowerStateTask();
 		task.execute(hostName, itemName, state);
@@ -90,13 +90,13 @@ public class RestClient {
 	}
 
 
-	public void setActorConductConfiguration(String hostName, String itemName, ActorConductConfiguration config) {
+	public static void setActorConductConfiguration(String hostName, String itemName, ActorConductConfiguration config) {
 		SetActorConductConfigurationTask task = new SetActorConductConfigurationTask();
 		task.execute(hostName, itemName, config);
 	}
 
 
-	public void sendEvent(String hostName, EventConfiguration event) {
+	public static void sendEvent(String hostName, EventConfiguration event) {
 		SendEventTask task = new SendEventTask();
 		task.execute(hostName, event);
 	}
