@@ -14,26 +14,34 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_room_disabled" >
 
-        <TableLayout
-            android:id="@+id/roomContent"
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:id="@+id/room"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="50dp" >
-
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
+            android:orientation="vertical" >
 
             <TextView
                 android:id="@+id/textViewRoomName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
+                android:text="error loading Room"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:typeface="normal" />
-        </TableLayout>
+
+            <TableLayout
+                android:id="@+id/roomContent"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp" >
+
+                <TableRow
+                    android:id="@+id/tableRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -47,7 +55,7 @@
             android:minWidth="76dp"
             android:visibility="invisible" />
     </RelativeLayout>
-    
+
     <LinearLayout
         android:id="@+id/roomBottomBar"
         android:layout_width="match_parent"
@@ -55,12 +63,18 @@
         android:layout_gravity="top"
         android:background="@drawable/bg_room_titlebar" >
 
+        <LinearLayout
+            android:id="@+id/linearLayoutRoomSwitches"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+        </LinearLayout>
+
         <Spinner
             android:id="@+id/spinnerSceneries"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="-3dp" />
-
     </LinearLayout>
 
 </LinearLayout>
