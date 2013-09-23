@@ -31,13 +31,13 @@ public class RestClient {
 	}
 
 
-	public void startProcess(String hostName, String processId) {
+	public static void startProcess(String hostName, String processId) {
 		StartProcessTask task = new StartProcessTask();
 		task.execute(hostName, processId);
 	}
 
 
-	public void stopProcess(String hostName, String processId) {
+	public static void stopProcess(String hostName, String processId) {
 		StopProcessTask task = new StopProcessTask();
 		task.execute(hostName, processId);
 	}
@@ -49,13 +49,13 @@ public class RestClient {
 	}
 
 
-	public void deleteProcessFromRoom(String hostName, String processName) {
+	public static void deleteProcessFromRoom(String hostName, String processName) {
 		DeleteProcessTask task = new DeleteProcessTask();
 		task.execute(hostName, processName);
 	}
 
 
-	public ValidationResult addProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
+	public static ValidationResult addProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
 	ExecutionException {
 		AddProcessTask task = new AddProcessTask();
 		task.execute(hostName, process);
@@ -63,7 +63,7 @@ public class RestClient {
 	}
 
 
-	public ValidationResult validateProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
+	public static ValidationResult validateProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
 	ExecutionException {
 		VerifyProcessTask task = new VerifyProcessTask();
 		task.execute(hostName, process);
@@ -102,7 +102,8 @@ public class RestClient {
 	}
 
 
-	public void createOrUpdateEventGeneratorConfiguration(String hostName, EventGeneratorConfiguration config) throws Exception {
+	public static void createOrUpdateEventGeneratorConfiguration(String hostName, EventGeneratorConfiguration config)
+			throws Exception {
 		CreateEventGeneratorTask task = new CreateEventGeneratorTask();
 		task.execute(hostName, config.name, config);
 	}

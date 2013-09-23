@@ -58,7 +58,7 @@ public class CallbackSocketRunnable implements Runnable {
 					public void run() {
 						System.out.println("CallBackSocketRunnable: updating RoomConfig for server: "
 								+ UpdateRoomMessage.getFromMessage(request));
-						service.updateRoomConfigFor(UpdateRoomMessage.getFromMessage(request));
+						service.updateRoomConfigForRoomName(UpdateRoomMessage.getFromMessage(request));
 					}
 				}).start();
 

@@ -93,10 +93,23 @@ public class RoomConfigService extends Service {
 
 
 	// update request from server
-	public synchronized void updateRoomConfigFor(String roomName) {
+	public synchronized void updateRoomConfigForRoomName(String roomName) {
 		try {
 			// todo extract servername
 			String serverName = roomNameServerMapping.get(roomName);
+			updateRoomConfigForServer(serverName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	/**
+	 * @param serverName
+	 * @throws Exception
+	 */
+	public void updateRoomConfigForServer(String serverName) {
+		try {
 			RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 			// update Model
 			roomConfiguration.put(serverName, roomConfig);
@@ -107,7 +120,6 @@ public class RoomConfigService extends Service {
 			intent.putExtra(EXTRA_ROOMCONFIG, roomConfig);
 			intent.putExtra(EXTRA_SERVERNAME, serverName);
 			sendBroadcast(intent);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -215,6 +227,11 @@ public class RoomConfigService extends Service {
 
 	public Collection<RoomConfiguration> getAllRoomConfigurations() {
 		return roomConfiguration.values();
+	}
+
+
+	public Map<String, RoomConfiguration> getAllRoomConfigurationsMap() {
+		return roomConfiguration;
 	}
 
 
