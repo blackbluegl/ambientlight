@@ -159,39 +159,47 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 		for (String currentServer : serverNames) {
 
-			if (this.configuredlightObjects != null && this.configuredlightObjects.get(currentServer) != null) {
-				this.configuredlightObjects.get(currentServer).clear();
-			}
-
-			RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
-
-			LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
-
-			// init roomLabel
-			TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
-			roomLabel.setText(roomConfig.roomName);
-
-			// init room power switch dynamically
-			LinearLayout switchesView = (LinearLayout) roomContainerView.findViewById(R.id.linearLayoutRoomSwitches);
-			switchesView.removeAllViews();
-			for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
-				createSwitch(currentServer, switchesView, currentEventGenerator);
-			}
-
-			// init scenery Spinner
-			this.updateScenerySpinner(currentServer);
-
-			// init dynamically the clickable light object icons
-			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
-			roomContent.removeAllViews();
-			createRoomItems(currentServer, roomConfig, roomContent);
-
-			// init roomBackground
-			this.updateRoomBackground(currentServer);
+			updateRoomContent(currentServer);
 
 		}
 
 		this.updateRoofTop();
+	}
+
+
+	/**
+	 * @param currentServer
+	 */
+	private void updateRoomContent(String currentServer) {
+		if (this.configuredlightObjects != null && this.configuredlightObjects.get(currentServer) != null) {
+			this.configuredlightObjects.get(currentServer).clear();
+		}
+
+		RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
+
+		LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
+
+		// init roomLabel
+		TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
+		roomLabel.setText(roomConfig.roomName);
+
+		// init room power switch dynamically
+		LinearLayout switchesView = (LinearLayout) roomContainerView.findViewById(R.id.linearLayoutRoomSwitches);
+		switchesView.removeAllViews();
+		for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
+			createSwitch(currentServer, switchesView, currentEventGenerator);
+		}
+
+		// init scenery Spinner
+		this.updateScenerySpinner(currentServer);
+
+		// init dynamically the clickable light object icons
+		TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
+		roomContent.removeAllViews();
+		createRoomItems(currentServer, roomConfig, roomContent);
+
+		// init roomBackground
+		this.updateRoomBackground(currentServer);
 	}
 
 
@@ -605,30 +613,40 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		if (isVisible() == false)
 			return;
 
-		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(
-				this.configuredlightObjects.get(serverName));
+		// List<AbstractRoomItemViewMapper> mappersToRefresh = new
+		// ArrayList<AbstractRoomItemViewMapper>(
+		// this.configuredlightObjects.get(serverName));
+		//
+		// this.configuredlightObjects.get(serverName).clear();
+		//
+		// for (AbstractRoomItemViewMapper currentToRefresh : mappersToRefresh)
+		// {
+		// ActorConfiguration currentConfig =
+		// config.actorConfigurations.get(currentToRefresh.getItemName());
+		// this.initRoomItem(serverName, currentConfig,
+		// currentToRefresh.getLightObjectView());
+		// }
+		//
+		// // update switches
+		// for (SwitchEventGeneratorConfiguration currentEventGenerator :
+		// config.getSwitchGenerators().values()) {
+		// Switch currentSwitch = (Switch)
+		// this.roomsContainerView.findViewWithTag("powerStateSwitch" +
+		// serverName
+		// + currentEventGenerator.name);
+		// currentSwitch.setChecked(currentEventGenerator.getPowerState());
+		// }
+		//
+		// updateRoomBackground(serverName);
 
-		this.configuredlightObjects.get(serverName).clear();
+		// updateScenerySpinner(serverName);
 
-		for (AbstractRoomItemViewMapper currentToRefresh : mappersToRefresh) {
-			ActorConfiguration currentConfig = config.actorConfigurations.get(currentToRefresh.getItemName());
-			this.initRoomItem(serverName, currentConfig, currentToRefresh.getLightObjectView());
-		}
-
-		// update switches
-		for (SwitchEventGeneratorConfiguration currentEventGenerator : config.getSwitchGenerators().values()) {
-			Switch currentSwitch = (Switch) this.roomsContainerView.findViewWithTag("powerStateSwitch" + serverName
-					+ currentEventGenerator.name);
-			currentSwitch.setChecked(currentEventGenerator.getPowerState());
-		}
-
-		updateRoomBackground(serverName);
+		updateRoomContent(serverName);
 
 		this.enableEventListener(serverName);
 
 		updateRoofTop();
 
-		updateScenerySpinner(serverName);
 
 	}
 
