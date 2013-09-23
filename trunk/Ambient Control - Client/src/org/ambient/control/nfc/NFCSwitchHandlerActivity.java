@@ -12,6 +12,7 @@ import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -68,10 +69,11 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 
 
 	@Override
+	// do nothing here so if a tag will be discovered a second time while
+	// the activity is running no unwished action will be performed
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		// do nothing here so if a tag will be discovered a second time while
-		// the activity is running no unwished action will be performed
+
 	}
 
 
@@ -160,11 +162,10 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 
 
 	private void speakOut() {
-		HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-		// myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
-		// String.valueOf(AudioManager.STREAM_ALARM));
-		myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "EOM");
-		tts.speak(this.speakout, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
+		params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "EOM");
+		tts.speak(this.speakout, TextToSpeech.QUEUE_FLUSH, params);
 	}
 
 
