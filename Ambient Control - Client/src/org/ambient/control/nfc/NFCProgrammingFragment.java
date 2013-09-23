@@ -20,10 +20,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.IRoomServiceCallbackListener;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
-import org.ambient.roomservice.RoomConfigService;
+import org.ambient.control.RoomServiceAwareFragment;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
@@ -39,7 +38,6 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -56,27 +54,24 @@ import android.widget.Toast;
  * @author Florian Bornkessel
  * 
  */
-public class NFCProgrammingFragment extends Fragment implements IRoomServiceCallbackListener {
+public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 
-	private RoomConfigService roomService = null;
+	public Tag mytag = null;
 
-	private View content;
 	private final List<String> serverNames = new ArrayList<String>();
 	private final List<String> roomNames = new ArrayList<String>();
+	private String selectedServer = null;
+	private String selectedItem = null;
 
-	NfcAdapter adapter;
-	PendingIntent pendingIntent;
-	IntentFilter writeTagFilters[];
-	public Tag mytag = null;
-	boolean writeMode;
-	String selectedServer = null;
-	String selectedItem = null;
+	private NfcAdapter adapter;
+	private PendingIntent pendingIntent;
+	private IntentFilter writeTagFilters[];
+
+	private View content;
 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		content = inflater.inflate(R.layout.fragment_nfc_programming, null);
-
 		adapter = NfcAdapter.getDefaultAdapter(this.getActivity());
 
 		pendingIntent = PendingIntent.getActivity(this.getActivity(), 0, new Intent(this.getActivity(), this.getActivity()
@@ -87,6 +82,7 @@ public class NFCProgrammingFragment extends Fragment implements IRoomServiceCall
 
 		IntentFilter tagNDEFDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
 		tagNDEFDetected.addCategory(Intent.CATEGORY_DEFAULT);
+
 		try {
 			tagNDEFDetected.addDataType("application/org.ambientcontrol");
 		} catch (MalformedMimeTypeException e) {
@@ -95,58 +91,7 @@ public class NFCProgrammingFragment extends Fragment implements IRoomServiceCall
 
 		writeTagFilters = new IntentFilter[] { tagDetected, tagNDEFDetected };
 
-		this.initRoomArrays();
-
-		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_dropdown_item_1line, roomNames);
-
-		Spinner spinnerRoom = (Spinner) content.findViewById(R.id.spinnerRoom);
-
-		final Spinner spinnerSwitch = (Spinner) content.findViewById(R.id.spinnerSwitch);
-
-		spinnerRoom.setAdapter(roomAdapter);
-
-		spinnerRoom.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				// String selectedRoom = (String) parent.getItemAtPosition(pos);
-				selectedServer = serverNames.get(pos);
-				RoomConfiguration roomConfig = roomService.getRoomConfiguration(
-						selectedServer);
-
-				List<String> switchNames = new ArrayList<String>();
-				for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
-					switchNames.add(currentSwitch.name);
-				}
-
-				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),
-						android.R.layout.simple_dropdown_item_1line, switchNames);
-				spinnerSwitch.setAdapter(switchesAdapter);
-			}
-
-
-			@Override
-			public void onNothingSelected(AdapterView<?> paramAdapterView) {
-
-			}
-		});
-
-		spinnerSwitch.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
-				selectedItem = (String) parent.getItemAtPosition(pos);
-			}
-
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
+		content = inflater.inflate(R.layout.fragment_nfc_programming, null);
 		Button button = (Button) content.findViewById(R.id.buttonProgramNFC);
 		button.setOnClickListener(new OnClickListener() {
 
@@ -182,11 +127,65 @@ public class NFCProgrammingFragment extends Fragment implements IRoomServiceCall
 	}
 
 
-	private void initRoomArrays() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected
+	 * ()
+	 */
+	@Override
+	protected void onResumeWithServiceConnected() {
+		
 		for (String serverName : ((MainActivity) getActivity()).getAllRoomServers()) {
 			serverNames.add(serverName);
 			roomNames.add(roomService.getRoomConfiguration(serverName).roomName);
 		}
+
+		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
+				android.R.layout.simple_dropdown_item_1line, roomNames);
+
+		Spinner spinnerRoom = (Spinner) content.findViewById(R.id.spinnerRoom);
+
+		spinnerRoom.setAdapter(roomAdapter);
+		
+		final Spinner spinnerSwitch = (Spinner) content.findViewById(R.id.spinnerSwitch);
+		
+		spinnerRoom.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+				selectedServer = serverNames.get(pos);
+				RoomConfiguration roomConfig = roomService.getRoomConfiguration(selectedServer);
+
+				List<String> switchNames = new ArrayList<String>();
+				for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
+					switchNames.add(currentSwitch.name);
+				}
+
+				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),
+						android.R.layout.simple_dropdown_item_1line, switchNames);
+				spinnerSwitch.setAdapter(switchesAdapter);
+			}
+
+
+			@Override
+			public void onNothingSelected(AdapterView<?> paramAdapterView) {
+			}
+		});
+
+		spinnerSwitch.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
+				selectedItem = (String) parent.getItemAtPosition(pos);
+			}
+
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}
+		});
 	}
 
 
@@ -205,7 +204,6 @@ public class NFCProgrammingFragment extends Fragment implements IRoomServiceCall
 
 
 	private void WriteModeOn() {
-		writeMode = true;
 		if (adapter != null) {
 			adapter.enableForegroundDispatch(this.getActivity(), pendingIntent, writeTagFilters, null);
 		}
@@ -213,7 +211,6 @@ public class NFCProgrammingFragment extends Fragment implements IRoomServiceCall
 
 
 	private void WriteModeOff() {
-		writeMode = false;
 		if (adapter != null) {
 			adapter.disableForegroundDispatch(this.getActivity());
 		}
@@ -240,41 +237,11 @@ public class NFCProgrammingFragment extends Fragment implements IRoomServiceCall
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.ambient.control.IRoomServiceCallbackListener#onRoomServiceConnected
-	 * (org.ambient.roomservice.RoomConfigService)
-	 */
-	@Override
-	public void onRoomServiceConnected(RoomConfigService service) {
-		// TODO Auto-generated method stub
-		roomService = service;
-
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * org.ambient.control.IRoomServiceCallbackListener#onRoomConfigurationChange
 	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
 	 */
 	@Override
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
-		// TODO Auto-generated method stub
-
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambient.control.IRoomServiceCallbackListener#setRoomService(org.ambient
-	 * .roomservice.RoomConfigService)
-	 */
-	@Override
-	public void setRoomService(RoomConfigService roomService) {
-		this.roomService = roomService;
 	}
 
 }
