@@ -112,6 +112,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		// maybe restore the configuration for the last edited lightObject
 		handleExitEditConductResult(savedInstanceState);
 
 		// create the home container
@@ -122,6 +123,105 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		LinearLayout roofTop = (LinearLayout) inflater.inflate(R.layout.fragment_home_rooftop, roomsContainerView, false);
 		roomsContainerView.addView(roofTop);
 
+		createMasterButton(roofTop);
+
+		for (String currentServer : serverNames) {
+
+			LinearLayout roomContainerView = (LinearLayout) inflater.inflate(R.layout.layout_room, null);
+			roomContainerView.setTag("roomContainer" + currentServer);
+			roomsContainerView.addView(roomContainerView);
+			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
+			roomContent.setTag("roomContent" + currentServer);
+
+			Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
+			spinner.setTag("sceneries" + currentServer);
+
+			RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
+			roomBackground.setTag("roomBackground" + currentServer);
+
+			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
+			bar.setTag("progressBar" + currentServer);
+		}
+
+		return myHomeScrollView;
+	}
+
+
+	/*
+	 * fill values into the rooms after they have been created and the service
+	 * is available.
+	 * 
+	 * @see org.ambient.control.RoomServiceAwareFragment#
+	 * initViewValuesAfterServiceConnection()
+	 */
+	@Override
+	protected void onResumeWithServiceConnected() {
+
+		for (String currentServer : serverNames) {
+
+			RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
+
+			LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
+
+			// init roomLabel
+			TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
+			roomLabel.setText(roomConfig.roomName);
+
+			// init room power switch dynamically
+			LinearLayout roomBottomBarView = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
+			for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
+				createSwitch(currentServer, roomBottomBarView, currentEventGenerator);
+			}
+
+			// init scenery Spinner
+			this.updateScenerySpinner(currentServer);
+
+			// init dynamically the clickable light object icons
+			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
+			createRoomItems(currentServer, roomConfig, roomContent);
+
+			// init roomBackground
+			this.updateRoomBackground(currentServer);
+
+		}
+
+		this.updateRoofTop();
+	}
+
+
+	/**
+	 * @param currentServer
+	 * @param roomConfig
+	 * @param roomContent
+	 * @param amountPerRow
+	 */
+	private void createRoomItems(String currentServer, RoomConfiguration roomConfig, TableLayout roomContent) {
+		int amountPerRow = getLightObjectAmountPerRow();
+		TableRow row = new TableRow(roomContent.getContext());
+		row.setGravity(Gravity.CENTER);
+		roomContent.addView(row);
+		Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
+		for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
+
+			// create a new row if last one is full
+			if (i % amountPerRow == 0) {
+				row = new TableRow(roomContent.getContext());
+				row.setGravity(Gravity.CENTER);
+				roomContent.addView(row);
+			}
+			LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View lightObject = inflater.inflate(R.layout.layout_room_item, null);
+			initRoomItemIconView(currentServer, iterator.next(), lightObject);
+
+			row.addView(lightObject);
+		}
+	}
+
+
+	/**
+	 * @param roofTop
+	 */
+	private void createMasterButton(LinearLayout roofTop) {
 		ImageView masterButton = (ImageView) roofTop.findViewById(R.id.imageViewMasterSwitch);
 
 		masterButton.setOnClickListener(new OnClickListener() {
@@ -146,27 +246,6 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 				updateMasterSwitchState(false);
 			}
 		});
-
-		for (String currentServer : serverNames) {
-
-			LinearLayout roomContainerView = (LinearLayout) inflater.inflate(R.layout.layout_room, null);
-			roomContainerView.setTag("roomContainer" + currentServer);
-			roomsContainerView.addView(roomContainerView);
-			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
-			roomContent.setTag("roomContent" + currentServer);
-
-			// init scenery Spinner
-			Spinner spinner = (Spinner) roomContainerView.findViewById(R.id.spinnerSceneries);
-			spinner.setTag("sceneries" + currentServer);
-
-			RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
-			roomBackground.setTag("roomBackground" + currentServer);
-
-			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
-			bar.setTag("progressBar" + currentServer);
-		}
-
-		return myHomeScrollView;
 	}
 
 
@@ -191,65 +270,6 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
 			actorConductConfigurationAfterEditItem = null;
 		}
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambient.control.RoomServiceAwareFragment#
-	 * initViewValuesAfterServiceConnection()
-	 */
-	@Override
-	protected void onResumeWithServiceConnected() {
-
-		for (String currentServer : serverNames) {
-
-			RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
-			LinearLayout roomContainerView = (LinearLayout) roomsContainerView.findViewWithTag("roomContainer" + currentServer);
-			TableLayout roomContent = (TableLayout) roomContainerView.findViewById(R.id.roomContent);
-			roomContent.setTag("roomContent" + currentServer);
-			TextView roomLabel = (TextView) roomContainerView.findViewById(R.id.textViewRoomName);
-			roomLabel.setText(roomConfig.roomName);
-			roomLabel.setTag("roomLabel");
-			// init dynamically the clickable light object icons
-			int amountPerRow = getLightObjectAmountPerRow();
-
-			TableRow row = new TableRow(roomContent.getContext());
-			row.setGravity(Gravity.CENTER);
-			roomContent.addView(row);
-			Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
-			for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
-
-				// create a new row if last one is full
-				if (i % amountPerRow == 0) {
-					row = new TableRow(roomContent.getContext());
-					row.setGravity(Gravity.CENTER);
-					roomContent.addView(row);
-				}
-				LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View lightObject = inflater.inflate(R.layout.layout_room_item, null);
-				initRoomItemIconView(currentServer, iterator.next(), lightObject);
-
-				row.addView(lightObject);
-			}
-			// init room power switch dynamically
-			LinearLayout roomBottomBarView = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
-
-			for (SwitchEventGeneratorConfiguration currentEventGenerator : roomConfig.getSwitchGenerators().values()) {
-				createSwitch(currentServer, roomBottomBarView, currentEventGenerator);
-			}
-			// init scenery Spinner
-			this.updateScenerySpinner(currentServer);
-
-			RelativeLayout roomBackground = (RelativeLayout) roomContainerView.findViewById(R.id.roomBackground);
-			roomBackground.setTag("roomBackground" + currentServer);
-
-			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
-			bar.setTag("progressBar" + currentServer);
-		}
-
-		updateRoofTop();
 	}
 
 
@@ -383,8 +403,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 						case R.id.menuEntryAddActorConduct:
 							ActorConductEditFragment.createNewConfigBean(ActorConductConfiguration.class, RoomFragment.this,
-									serverName,
-									roomService.getRoomConfiguration(serverName), currentConfig.getName());
+									serverName, roomService.getRoomConfiguration(serverName), currentConfig.getName());
 							break;
 
 						default:
@@ -592,6 +611,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	@Override
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
 
+		// we get update callbacks but if the ui is not prepared and present we
+		// would run into trouble
+		if (isVisible() == false)
+			return;
+
 		List<AbstractRoomItemViewMapper> mappersToRefresh = new ArrayList<AbstractRoomItemViewMapper>(
 				this.configuredlightObjects.get(serverName));
 
@@ -613,10 +637,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 		this.enableEventListener(serverName);
 
-		// update widgets
-		// WidgetUtils.notifyWidgets(this.getActivity());
-
 		updateRoofTop();
+
+		updateScenerySpinner(serverName);
 
 	}
 
@@ -659,7 +682,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 
 	/*
-	 * get shure that the oldConfig will not be overwritten. onCreateView will
+	 * get sure that the oldConfig will not be overwritten. onCreateView will
 	 * now save the old configuration
 	 * 
 	 * @see
