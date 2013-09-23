@@ -17,7 +17,6 @@ package org.ambient.control.home;
 
 import java.util.List;
 
-import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
@@ -81,7 +80,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 	 * @param myself
 	 */
 	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server, final String itemName) {
+			final Fragment fragment, final String server, final RoomConfiguration roomConfig, final String itemName) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -93,6 +92,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 				args.putString(SELECTED_SERVER, server);
 				args.putBoolean(CREATE_MODE, true);
 				args.putString(ITEM_NAME, itemName);
+				args.putSerializable(ROOM_CONFIG, roomConfig);
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 				ActorConductEditFragment configHandler = new ActorConductEditFragment();
@@ -108,16 +108,15 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 	}
 
 
-	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server, final String itemName) {
-		RoomConfiguration roomConfiguration = ((MainActivity) fragment.getActivity()).getRoomConfigManager()
-				.getRoomConfiguration(server);
+	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server,
+			final RoomConfiguration roomConfiguration, final String itemName) {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server, itemName);
+		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server,
+				roomConfiguration, itemName);
 	}
-
 
 }

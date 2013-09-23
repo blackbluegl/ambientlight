@@ -20,8 +20,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambient.control.IRoomServiceCallbackListener;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
+import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
@@ -54,7 +56,9 @@ import android.widget.Toast;
  * @author Florian Bornkessel
  * 
  */
-public class NFCProgrammingFragment extends Fragment {
+public class NFCProgrammingFragment extends Fragment implements IRoomServiceCallbackListener {
+
+	private RoomConfigService roomService = null;
 
 	private View content;
 	private final List<String> serverNames = new ArrayList<String>();
@@ -94,8 +98,7 @@ public class NFCProgrammingFragment extends Fragment {
 		this.initRoomArrays();
 
 		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_dropdown_item_1line,
-				roomNames);
+				android.R.layout.simple_dropdown_item_1line, roomNames);
 
 		Spinner spinnerRoom = (Spinner) content.findViewById(R.id.spinnerRoom);
 
@@ -109,7 +112,7 @@ public class NFCProgrammingFragment extends Fragment {
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				// String selectedRoom = (String) parent.getItemAtPosition(pos);
 				selectedServer = serverNames.get(pos);
-				RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(
+				RoomConfiguration roomConfig = roomService.getRoomConfiguration(
 						selectedServer);
 
 				List<String> switchNames = new ArrayList<String>();
@@ -182,8 +185,7 @@ public class NFCProgrammingFragment extends Fragment {
 	private void initRoomArrays() {
 		for (String serverName : ((MainActivity) getActivity()).getAllRoomServers()) {
 			serverNames.add(serverName);
-			roomNames
-.add(((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(serverName).roomName);
+			roomNames.add(roomService.getRoomConfiguration(serverName).roomName);
 		}
 	}
 
@@ -231,6 +233,48 @@ public class NFCProgrammingFragment extends Fragment {
 		ndef.writeNdefMessage(message);
 		// Close the connection
 		ndef.close();
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IRoomServiceCallbackListener#onRoomServiceConnected
+	 * (org.ambient.roomservice.RoomConfigService)
+	 */
+	@Override
+	public void onRoomServiceConnected(RoomConfigService service) {
+		// TODO Auto-generated method stub
+		roomService = service;
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IRoomServiceCallbackListener#onRoomConfigurationChange
+	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
+	 */
+	@Override
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.IRoomServiceCallbackListener#setRoomService(org.ambient
+	 * .roomservice.RoomConfigService)
+	 */
+	@Override
+	public void setRoomService(RoomConfigService roomService) {
+		this.roomService = roomService;
 	}
 
 }

@@ -41,11 +41,8 @@ public class MainActivity extends FragmentActivity {
 
 	private static final String LOG = "MainActivity";
 
-	NFCProgrammingFragment nfcProgramming;
-	ProcessCardFragment processCard;
-	ClimateFragment climateFragment;
+	Fragment currentFragment = null;
 
-	ArrayList<String> fragments = new ArrayList<String>();
 	String currentDialog = null;
 	public LinearLayout content;
 
@@ -94,7 +91,6 @@ public class MainActivity extends FragmentActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("currentDialog", this.currentDialog);
-		outState.putStringArrayList("fragments", this.fragments);
 	}
 
 
@@ -122,7 +118,6 @@ public class MainActivity extends FragmentActivity {
 			createHomeFragment(content);
 		} else {
 			this.currentDialog = savedInstanceState.getString("currentDialog");
-			this.fragments = savedInstanceState.getStringArrayList("fragments");
 		}
 
 		ActionBar actionBar = getActionBar();
@@ -146,59 +141,60 @@ public class MainActivity extends FragmentActivity {
 				final String item = (String) parent.getItemAtPosition(position);
 
 				if (item.equals("Mein Ambiente")) {
-					createHomeFragment(content);
+					currentFragment = createHomeFragment(content);
 				}
 				if (item.equals("NFC-Tag anlernen")) {
-					createNFCProgrammingFragment(content);
+					currentFragment = createNFCProgrammingFragment(content);
 				}
 				if (item.equals("Meine Prozesse")) {
-					createProcessCardFragment(content);
+					currentFragment = createProcessCardFragment(content);
 				}
 				if (item.equals("Mein Klima")) {
-					createClimateFragment(content);
+					currentFragment = createClimateFragment(content);
+				}
+
+				if (currentFragment instanceof IRoomServiceCallbackListener) {
+					if (roomService != null) {
+						((IRoomServiceCallbackListener) currentFragment).setRoomService(roomService);
+					}
 				}
 			}
 		});
 	}
 
 
-	private void createProcessCardFragment(LinearLayout content) {
+	private Fragment createProcessCardFragment(LinearLayout content) {
 		currentDialog = "Meine Prozesse";
-		clearFragments(content);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-		processCard = new ProcessCardFragment();
-		ft.add(content.getId(), processCard, "processCardTag");
-		this.fragments.add("processCardTag");
+		ProcessCardFragment processCard = new ProcessCardFragment();
+		ft.replace(content.getId(), processCard, "processCardTag");
 		ft.commit();
+		return processCard;
 	}
 
 
-	public void createNFCProgrammingFragment(LinearLayout content) {
+	public Fragment createNFCProgrammingFragment(LinearLayout content) {
 		currentDialog = "NFC-Tag anlernen";
-		clearFragments(content);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-		nfcProgramming = new NFCProgrammingFragment();
-
-		ft.add(content.getId(), nfcProgramming, "nfcProgrammingTag");
-		this.fragments.add("nfcProgrammingTag");
+		NFCProgrammingFragment nfcProgramming = new NFCProgrammingFragment();
+		ft.replace(content.getId(), nfcProgramming, "nfcProgrammingTag");
 		ft.commit();
+		return nfcProgramming;
 	}
 
 
-	public void createClimateFragment(LinearLayout content) {
+	public Fragment createClimateFragment(LinearLayout content) {
 		currentDialog = "Mein Klima";
-		clearFragments(content);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-		climateFragment = new ClimateFragment();
-
-		ft.add(content.getId(), climateFragment, "climateFragmentTag");
-		this.fragments.add("climateFragmentTag");
+		ClimateFragment climateFragment = new ClimateFragment();
+		ft.replace(content.getId(), climateFragment, "climateFragmentTag");
 		ft.commit();
+		return climateFragment;
 	}
 
 
@@ -206,10 +202,8 @@ public class MainActivity extends FragmentActivity {
 	 * @param content
 	 * @param ft
 	 */
-	public void createHomeFragment(LinearLayout content) {
+	public Fragment createHomeFragment(LinearLayout content) {
 		currentDialog = "Mein Ambiente";
-
-		clearFragments(content);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		Bundle argsRoom = new Bundle();
@@ -217,9 +211,9 @@ public class MainActivity extends FragmentActivity {
 
 		RoomFragment roomFragment = new RoomFragment();
 		roomFragment.setArguments(argsRoom);
-		ft.add(content.getId(), roomFragment, "roomFragmentTag");
-		this.fragments.add("roomFragmentTag");
+		ft.replace(content.getId(), roomFragment, "roomFragmentTag");
 		ft.commit();
+		return roomFragment;
 	}
 
 
@@ -228,21 +222,6 @@ public class MainActivity extends FragmentActivity {
 	 */
 	private ArrayList<String> getAllServers() {
 		return new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
-	}
-
-
-	/**
-	 * 
-	 */
-	public void clearFragments(LinearLayout content) {
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		for (String currentTag : fragments) {
-			ft.remove(getSupportFragmentManager().findFragmentByTag(currentTag));
-		}
-		fragments.clear();
-		ft.commit();
-
-		content.removeAllViews();
 	}
 
 
@@ -276,18 +255,17 @@ public class MainActivity extends FragmentActivity {
 			mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 			Toast.makeText(this, "Tag erkannt", Toast.LENGTH_SHORT).show();
 		}
-		if (nfcProgramming != null) {
-			nfcProgramming.mytag = mytag;
+
+		if (currentFragment != null && currentFragment instanceof NFCProgrammingFragment) {
+			((NFCProgrammingFragment) currentFragment).mytag = mytag;
 		}
 	}
 
 
 	public void replaceFragment(Fragment frag, String tag, String dialogName) {
-		clearFragments(content);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 		ft.replace(content.getId(), frag, tag);
-		this.fragments.add(tag);
 		this.currentDialog = dialogName;
 		ft.addToBackStack(null);
 
@@ -298,5 +276,4 @@ public class MainActivity extends FragmentActivity {
 	public void addServiceListener(IRoomServiceCallbackListener listener) {
 		roomServiceListeners.add(listener);
 	}
-
 }

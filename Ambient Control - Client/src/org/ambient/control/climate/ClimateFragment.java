@@ -16,9 +16,10 @@
 package org.ambient.control.climate;
 
 import org.ambient.control.R;
+import org.ambient.control.RoomServiceAwareFragment;
+import org.ambientlight.room.RoomConfiguration;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ import android.view.ViewGroup;
  * @author Florian Bornkessel
  *
  */
-public class ClimateFragment extends Fragment {
+public class ClimateFragment extends RoomServiceAwareFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,6 +38,34 @@ public class ClimateFragment extends Fragment {
 		View myClimateView = inflater.inflate(R.layout.fragment_climate, null);
 
 		return myClimateView;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected
+	 * ()
+	 */
+	@Override
+	protected void onResumeWithServiceConnected() {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambient.control.RoomServiceAwareFragment#onRoomConfigurationChange
+	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
+	 */
+	@Override
+	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

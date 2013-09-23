@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ColorPickerView;
@@ -103,6 +102,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	public static final String OBJECT_VALUE = "objectValue";
 	public static final String SELECTED_SERVER = "selectedServer";
 	public static final String WHERE_TO_INTEGRATE = "whereToIntegrate";
+	public static final String ROOM_CONFIG = "roomConfiguration";
 
 	public static int REQ_RETURN_OBJECT = 0;
 
@@ -110,10 +110,11 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 	public Object valueToIntegrate = null;
 
+	protected RoomConfiguration roomConfig = null;
+
 	protected String selectedServer = null;
 	private boolean createMode = false;
 	private WhereToPutConfigurationData whereToPutDataFromChild = null;
-
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -138,6 +139,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		if (getArguments().isEmpty() == false) {
 			createMode = getArguments().getBoolean(CREATE_MODE);
 			selectedServer = getArguments().getString(SELECTED_SERVER);
+			this.roomConfig = (RoomConfiguration) getArguments().getSerializable(ROOM_CONFIG);
 		}
 
 		if (savedInstanceState != null) {
@@ -289,7 +291,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 			fieldLabel = field.getName();
 		}
 
-		RoomConfiguration roomConfig = ((MainActivity) getActivity()).getRoomConfigManager().getRoomConfiguration(selectedServer);
+
 
 		List<String> altValues = null;
 		List<String> altValuesToDisplay = null;
@@ -376,7 +378,8 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						whereToPutDataFromChild = whereToStore;
 
 						if (field.get(config) == null && alternativeValuesForDisplay.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, myself, selectedServer);
+							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, myself, selectedServer,
+									roomConfig);
 						} else if (field.get(config) != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -672,7 +675,8 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						whereToPutDataFromChild = whereToStore;
 
 						if (valueAtPosition == null && alternativeDisplayValuesForListener.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself, selectedServer);
+							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself,
+									selectedServer, roomConfig);
 						} else if (valueAtPosition != null) {
 							FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -853,7 +857,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 					whereToPutDataFromChild = whereToStore;
 
 					EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer);
+							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, roomConfig);
 				}
 			});
 			if (listContent.size() > 0) {
@@ -928,7 +932,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 						whereToPutDataFromChild = whereToStore;
 
 						EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer);
+								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, roomConfig);
 						mode.finish();
 						break;
 					}
@@ -1045,7 +1049,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	 * @param myself
 	 */
 	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server) {
+			final Fragment fragment, final String server, final RoomConfiguration roomConfig) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -1056,6 +1060,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 				args.putString(CLASS_NAME, altValues.get(which));
 				args.putString(SELECTED_SERVER, server);
 				args.putBoolean(CREATE_MODE, true);
+				args.putSerializable(ROOM_CONFIG, roomConfig);
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 				EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
@@ -1071,15 +1076,15 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	}
 
 
-	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server) {
-		RoomConfiguration roomConfiguration = ((MainActivity) fragment.getActivity()).getRoomConfigManager()
-				.getRoomConfiguration(server);
+	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server,
+			final RoomConfiguration roomConfiguration) {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server);
+		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server,
+				roomConfiguration);
 	}
 
 
