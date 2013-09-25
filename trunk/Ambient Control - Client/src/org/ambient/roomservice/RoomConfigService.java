@@ -97,7 +97,7 @@ public class RoomConfigService extends Service {
 		try {
 			// todo extract servername
 			String serverName = roomNameServerMapping.get(roomName);
-			updateRoomConfigForServer(serverName);
+			invalidateRoomConfigForServer(serverName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -108,7 +108,7 @@ public class RoomConfigService extends Service {
 	 * @param serverName
 	 * @throws Exception
 	 */
-	public void updateRoomConfigForServer(String serverName) {
+	public void invalidateRoomConfigForServer(String serverName) {
 		try {
 			RoomConfiguration roomConfig = RestClient.getRoom(serverName);
 			// update Model

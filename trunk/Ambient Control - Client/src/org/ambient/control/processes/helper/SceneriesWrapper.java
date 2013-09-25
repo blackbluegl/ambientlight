@@ -39,7 +39,7 @@ public class SceneriesWrapper implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@TypeDef(fieldType = FieldType.SIMPLE_LIST)
-	@Presentation(name = "Auf folgende Szenarien reagieren", position = 0, groupPosition = 1)
+	@Presentation(name = "Szenarien verwalten", position = 0, groupPosition = 1)
 	@AlternativeValues(values = { @Value(displayName = "Anwenderszenario", value = "org.ambientlight.scenery.UserSceneryConfiguration") })
 	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
 }

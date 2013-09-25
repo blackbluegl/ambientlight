@@ -106,6 +106,10 @@ public class MainActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// create a handle to the service that we never close. so the service
+		// will stay alive even on recreate of this activity
+		startService(new Intent(this, RoomConfigService.class));
+
 		registerReceiver(roomServiceUpdateReceiver, new IntentFilter(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG));
 		bindService(new Intent(this, RoomConfigService.class), roomServiceConnection, Context.BIND_AUTO_CREATE);
 

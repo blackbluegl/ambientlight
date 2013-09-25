@@ -37,6 +37,8 @@ public class CallBackManager {
 
 
 	public void roomConfigurationChanged() {
+		List<String> removeListeners = new ArrayList<String>();
+
 		for (String currentClient : clients) {
 
 			String hostname = currentClient.split(":")[0];
@@ -63,12 +65,14 @@ public class CallBackManager {
 				socket.close();
 
 			} catch (Exception e) {
-				clients.remove(currentClient);
+				removeListeners.add(currentClient);
 				System.err.println("CallbackManager: Error notifying client: " + currentClient
 						+ ". Continuing without callback message.");
 				e.printStackTrace();
 			}
 		}
+		// remove listeners that could not be contacted
+		clients.removeAll(removeListeners);
 	}
 
 

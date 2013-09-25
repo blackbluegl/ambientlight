@@ -44,11 +44,13 @@
         android:id="@+id/menuEntryProcessStart"
         android:icon="@drawable/play"
         android:showAsAction="ifRoom|withText"
+         android:visible="false"
         android:title="Prozess starten"/>
     <item
         android:id="@+id/menuEntryProcessStop"
         android:icon="@drawable/stop"
         android:showAsAction="ifRoom|withText"
+         android:visible="false"
         android:title="Prozess stoppen"/>
     <item
         android:id="@+id/menuEntryProcessSceneries"

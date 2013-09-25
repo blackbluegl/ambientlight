@@ -24,6 +24,7 @@ import org.ambient.control.config.EditConfigExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.control.rest.RestClient;
+import org.ambient.util.GuiUtils;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
 import org.ambientlight.process.NodeConfiguration;
@@ -38,6 +39,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,13 +60,13 @@ import android.widget.Spinner;
 public class ProcessCardFragment extends RoomServiceAwareFragment implements EditConfigExitListener {
 
 	private static final String BUNDLE_SELECTED_PROCESS = "bundleSelectedProcess";
-	private static final String BUNDLE_SPINNER_ROOM_POSITION = "bundleSpinnerRoomPosition";
+	private static final String BUNDLE_SELECTED_SERVER = "bundleSelectedServer";
 	private static final String BUNDLE_EDIT_MODE = "bundleEditMode";
+	private static final String LOG = "ProcessCardFragment";
 
 	private ActionMode mode = null;
 
-
-	int positionServer = 0;
+	// int positionServer = 0;
 	String selectedServer = null;
 	ProcessConfiguration selectedProcess = null;
 	private boolean editMode = false;
@@ -76,6 +78,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	Spinner spinnerRoom;
 	Spinner spinnerProcess;
 	ArrayAdapter<String> processAdapter;
+	ArrayAdapter<String> roomAdapter;
 	ProcessCardDrawer drawer;
 
 
@@ -91,7 +94,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		spinnerProcess = (Spinner) content.findViewById(R.id.spinnerProcess);
 
 		if (savedInstanceState != null) {
-			positionServer = savedInstanceState.getInt(BUNDLE_SPINNER_ROOM_POSITION);
+			selectedServer = savedInstanceState.getString(BUNDLE_SELECTED_SERVER);
 			selectedProcess = (ProcessConfiguration) savedInstanceState.getSerializable(BUNDLE_SELECTED_PROCESS);
 			editMode = savedInstanceState.getBoolean(BUNDLE_EDIT_MODE);
 		}
@@ -109,16 +112,15 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 */
 	@Override
 	protected void onResumeWithServiceConnected() {
+		spinnerRoom.setOnItemSelectedListener(null);
+		selectedServer = initRoomArrays(selectedServer);
+		drawer.setProcess(selectedProcess);
 
-		initRoomArrays(positionServer);
-
-		final ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),
-				android.R.layout.simple_spinner_item, roomNames);
+		roomAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, roomNames);
 		roomAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
 		processAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, processNames);
 		processAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
 
 		spinnerRoom.setAdapter(roomAdapter);
 		spinnerProcess.setAdapter(processAdapter);
@@ -126,9 +128,10 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		if (editMode == true) {
 			spinnerRoom.setVisibility(View.GONE);
 			spinnerProcess.setVisibility(View.GONE);
-			drawer.setProcess(selectedProcess);
 			getActivity().invalidateOptionsMenu();
 		}
+
+		spinnerRoom.setSelection(serverNames.indexOf(selectedServer));
 
 		// create the listener after the initialisation. we do not want to
 		// affect the second spinner while its in creation. let android this
@@ -136,6 +139,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		spinnerRoom.post(new Runnable() {
 
 			@Override
+			// TODO Auto-generated method stub
 			public void run() {
 				spinnerRoom.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -145,7 +149,6 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 						getActivity().invalidateOptionsMenu();
 
 						selectedServer = serverNames.get(pos);
-						positionServer = pos;
 						RoomConfiguration selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
 
 						processNames.clear();
@@ -154,7 +157,6 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 						}
 
 						processAdapter.notifyDataSetChanged();
-						spinnerProcess.setSelection(0);
 					}
 
 
@@ -166,19 +168,24 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			}
 		});
 
+		spinnerProcess.setSelection(getPositionOfSelectedProcess());
+
 		spinnerProcess.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
 				getActivity().invalidateOptionsMenu();
 				RoomConfiguration selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
-				selectedProcess = selectedRoomConfiguration.processes.get(pos);
+				selectedProcess = (ProcessConfiguration) GuiUtils.deepCloneSerializeable(selectedRoomConfiguration.processes
+						.get(pos));
 				drawer.setProcess(selectedProcess);
+				getActivity().invalidateOptionsMenu();
 			}
 
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
+				getActivity().invalidateOptionsMenu();
 			}
 		});
 
@@ -196,6 +203,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 			}
 		});
+
 	}
 
 
@@ -206,10 +214,20 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			menu.findItem(R.id.menuEntryProcessRevertNew).setVisible(true);
 			menu.findItem(R.id.menuEntryProcessRemove).setVisible(false);
 			menu.findItem(R.id.menuEntryProcessSave).setVisible(true);
-			menu.findItem(R.id.menuEntryProcessStart).setVisible(false);
-			menu.findItem(R.id.menuEntryProcessStop).setVisible(false);
+
 			menu.findItem(R.id.menuEntryProcessAdd).setVisible(false);
+		} else {
+			if (selectedProcess != null) {
+				if (selectedProcess.run) {
+					menu.findItem(R.id.menuEntryProcessStart).setVisible(false);
+					menu.findItem(R.id.menuEntryProcessStop).setVisible(true);
+				} else {
+					menu.findItem(R.id.menuEntryProcessStart).setVisible(true);
+					menu.findItem(R.id.menuEntryProcessStop).setVisible(false);
+				}
+			}
 		}
+
 	}
 
 
@@ -219,6 +237,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 		case R.id.menuEntryProcessStart:
 			RestClient.startProcess(selectedServer, selectedProcess.id);
+
 			return true;
 
 		case R.id.menuEntryProcessStop:
@@ -230,7 +249,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			try {
 				result = RestClient.validateProcess(selectedServer, selectedProcess);
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.e(LOG, "could not validate process", e);
 			}
 			if (result.resultIsValid()) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -264,23 +283,21 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			return true;
 
 		case R.id.menuEntryProcessRevertNew:
-			this.editMode = false;
-			spinnerProcess.setSelection(0);
-			roomService.updateRoomConfigForServer(selectedServer);
-			selectedProcess = roomService.getRoomConfiguration(selectedServer).processes.get(0);
-			drawer.setProcess(selectedProcess);
+			// restore old process if possible. if not just load 1fst one in
+			// room.
+			selectedProcess = roomService.getRoomConfiguration(selectedServer).processes.get(getPositionOfSelectedProcess());
+			// maybe this could be done in onRoomConfigurationChange (at the
+			// moment the method does exactly this. but maybe this changes in
+			// future - so this commend is a reminder for me
 			getActivity().invalidateOptionsMenu();
-			spinnerRoom.setVisibility(View.VISIBLE);
-			spinnerProcess.setVisibility(View.VISIBLE);
+			stopEditMode();
 			return true;
 
 		case R.id.menuEntryProcessSave:
 			Boolean saveProcess = true;
 
-			for (ProcessConfiguration current : roomService.getRoomConfiguration(selectedServer).processes) {
-				if (current.id.equals(selectedProcess.id)) {
-					saveProcess = false;
-				}
+			if (processNames.contains(selectedProcess.id)) {
+				saveProcess = false;
 			}
 
 			if (saveProcess == false) {
@@ -296,6 +313,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			} else {
 				saveSelectedProcess();
 			}
+
 			return true;
 
 		case R.id.menuEntryProcessRemove:
@@ -306,19 +324,10 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					try {
-
 						RestClient.deleteProcessFromRoom(selectedServer, selectedProcess.id);
-						selectedProcess = roomService.getRoomConfiguration(selectedServer).processes.get(0);
-						drawer.setProcess(selectedProcess);
-
-						processNames.clear();
-						for (ProcessConfiguration currentProcess : roomService.getRoomConfiguration(selectedServer).processes) {
-							processNames.add(currentProcess.id);
-						}
-						processAdapter.notifyDataSetChanged();
-						spinnerProcess.setSelection(0);
+						selectedProcess = null;
 					} catch (Exception e) {
-						e.printStackTrace();
+						Log.e(LOG, "error deleting process", e);
 					}
 				}
 			}).setNegativeButton("Abbrechen", null).create().show();
@@ -348,6 +357,21 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 
 	/**
+	 * @return
+	 */
+	private int getPositionOfSelectedProcess() {
+		int positionOfProcess = 0;
+		if (selectedProcess != null) {
+			positionOfProcess = this.processNames.indexOf(selectedProcess.id);
+			if (positionOfProcess < 0) {
+				positionOfProcess = 0;
+			}
+		}
+		return positionOfProcess;
+	}
+
+
+	/**
 	 * 
 	 * @return
 	 */
@@ -360,8 +384,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 				switch (item.getItemId()) {
 
 				case R.id.menuEntryProcessRemoveNode:
-					// handling for nodes with a previous node in the
-					// process
+					// handling for nodes with a previous node in the process
 					NodeConfiguration previousNode = null;
 					for (NodeConfiguration currentPreviousNode : selectedProcess.nodes.values()) {
 						if (currentPreviousNode.nextNodeIds != null
@@ -447,9 +470,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 				}
 
 				mode.finish();
-				editMode = true;
-				spinnerProcess.setVisibility(View.GONE);
-				spinnerRoom.setVisibility(View.GONE);
+				startEditMode();
 				getActivity().invalidateOptionsMenu();
 				return true;
 			}
@@ -504,31 +525,15 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
 				}
 			} else {
-				editMode = false;
-				getActivity().invalidateOptionsMenu();
-				spinnerRoom.setVisibility(View.VISIBLE);
-				spinnerProcess.setVisibility(View.VISIBLE);
-				processNames.clear();
-				for (ProcessConfiguration config : roomService.getAllRoomConfigurationsMap().get(
-						serverNames.get(spinnerRoom.getSelectedItemPosition())).processes) {
-					processNames.add(config.id);
-				}
-				processAdapter.notifyDataSetChanged();
-				spinnerProcess.setSelection(processNames.indexOf(selectedProcess.id));
-				selectedProcess = roomService.getRoomConfiguration(selectedServer).processes.get(0);
-				drawer.setProcess(selectedProcess);
-				getActivity().invalidateOptionsMenu();
-				spinnerRoom.setVisibility(View.VISIBLE);
-				spinnerProcess.setVisibility(View.VISIBLE);
-
+				stopEditMode();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(LOG, "could not save process", e);
 		}
 	}
 
 
-	private void initRoomArrays(int roomSpinnerSelection) {
+	private String initRoomArrays(String selectedServer) {
 		roomNames.clear();
 		serverNames.clear();
 		for (String serverName : roomService.getAllRoomConfigurationsMap().keySet()) {
@@ -536,18 +541,27 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			roomNames.add(roomService.getAllRoomConfigurationsMap().get(serverName).roomName);
 		}
 
-		this.selectedServer = serverNames.get(roomSpinnerSelection);
+		if (selectedServer == null) {
+			selectedServer = serverNames.get(0);
+		}
 
 		processNames.clear();
-		for (ProcessConfiguration config : roomService.getAllRoomConfigurationsMap().get(serverNames.get(roomSpinnerSelection)).processes) {
+		for (ProcessConfiguration config : roomService.getRoomConfiguration(selectedServer).processes) {
 			processNames.add(config.id);
 		}
+		if (roomAdapter != null) {
+			roomAdapter.notifyDataSetChanged();
+		}
+		if (processAdapter != null) {
+			processAdapter.notifyDataSetChanged();
+		}
+		return selectedServer;
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putInt(BUNDLE_SPINNER_ROOM_POSITION, positionServer);
+		savedInstanceState.putString(BUNDLE_SELECTED_SERVER, selectedServer);
 		savedInstanceState.putSerializable(BUNDLE_SELECTED_PROCESS, selectedProcess);
 		savedInstanceState.putBoolean(BUNDLE_EDIT_MODE, editMode);
 		super.onSaveInstanceState(savedInstanceState);
@@ -565,7 +579,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	public void onIntegrateConfiguration(String serverName, Object configuration) {
 
 		if (configuration instanceof ProcessConfiguration) {
-			this.editMode = true;
+			startEditMode();
 			this.selectedProcess = (ProcessConfiguration) configuration;
 			if (this.selectedProcess.nodes.isEmpty()) {
 				NodeConfiguration node = new NodeConfiguration();
@@ -573,14 +587,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			}
 		}
 		if (configuration instanceof NodeConfiguration) {
-			this.editMode = true;
+			startEditMode();
 			NodeConfiguration nodeConfig = (NodeConfiguration) configuration;
 			this.selectedProcess.nodes.put(nodeConfig.id, nodeConfig);
 		}
 
 		if (configuration instanceof SceneriesWrapper) {
-			this.editMode = false;
-
+			stopEditMode();
 			SceneryEventGeneratorConfiguration sceneryEventGenerator = roomService.getRoomConfiguration(selectedServer)
 					.getSceneryEventGenerator().values().iterator().next();
 
@@ -591,6 +604,25 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	/*
+	 * do not forget. if a different fragments thread calls this method the
+	 * spinners will not be updated. therefore the boolean flag will signal
+	 * onResumeWith...() to hide the spinners for itself in the right thread
+	 */
+	private void startEditMode() {
+		spinnerRoom.setVisibility(View.GONE);
+		spinnerProcess.setVisibility(View.GONE);
+		this.editMode = true;
+	}
+
+
+	private void stopEditMode() {
+		this.editMode = false;
+		spinnerRoom.setVisibility(View.VISIBLE);
+		spinnerProcess.setVisibility(View.VISIBLE);
 	}
 
 
@@ -616,6 +648,21 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 */
 	@Override
 	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
-	}
+		if (serverName.equals(selectedServer)) {
+			initRoomArrays(selectedServer);
+			if (editMode == false) {
 
+				spinnerProcess.setSelection(getPositionOfSelectedProcess());
+				// for the case that the spinner has not changed its position we
+				// will restore the process here
+				selectedProcess = roomConfiguration.processes.get(getPositionOfSelectedProcess());
+				getActivity().invalidateOptionsMenu();
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setTitle("Änderung auf dem Server")
+				.setMessage("Möglicherweise wurde der ursprüngliche Prozess im Hintergrund verändert.")
+				.setPositiveButton("OK", null).create().show();
+			}
+		}
+	}
 }
