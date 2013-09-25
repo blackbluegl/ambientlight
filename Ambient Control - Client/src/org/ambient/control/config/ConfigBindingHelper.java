@@ -92,10 +92,12 @@ public class ConfigBindingHelper {
 	 * @param path
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private static List<String> getByPathBinding(Object sourceBean, String path) {
 		String[] pathElements = path.split("\\.");
 		Object result = null;
 		try {
+			System.out.println("binding path: " + path + " for bean: " + sourceBean.getClass().getName());
 			result = getObjectRecursively(sourceBean, pathElements, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
