@@ -122,6 +122,8 @@ public class Process {
 			return Response.status(500).build();
 		}
 
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 		return result;
 	}
 
@@ -148,6 +150,8 @@ public class Process {
 			return Response.status(500).build();
 		}
 
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 		return Response.status(200).build();
 	}
 
@@ -165,6 +169,9 @@ public class Process {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 		return Response.status(200).build();
 	}
 
@@ -182,6 +189,9 @@ public class Process {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 		return Response.status(200).build();
 	}
 }

@@ -505,6 +505,11 @@ public class ProcessCardDrawer extends View implements OnTouchListener {
 		this.contentBitmap = null;
 		this.nodeSnippets = new HashMap<Integer, ProcessCardDrawer.NodeSnippet>();
 
+		if (process == null) {
+			this.invalidate();
+			return;
+		}
+
 		if (process.nodes.isEmpty() == false) {
 			createNodeSnippetsRecursively(0, 0, 0);
 			calculateContentDimensions();
