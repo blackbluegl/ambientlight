@@ -92,11 +92,11 @@ public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					arrayMap.put(currentKeyValue, isChecked);
 					values.put(currentKeyValue, isChecked);
-					textIsSet.setText("wird verwendet");
+					textIsSet.setText("anwenden");
 				}
 			});
 			if (arrayMap.get(currentKeyValue) != null) {
-				textIsSet.setText("wird verwendet");
+				textIsSet.setText("anwenden");
 				checkbox.setChecked((Boolean) arrayMap.get(currentKeyValue));
 			} else {
 				textIsSet.setText("");
