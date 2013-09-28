@@ -17,20 +17,23 @@ package org.ambient.control.config;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.ambient.control.R;
-import org.ambient.util.GuiUtils;
-import org.ambient.views.ColorPickerView;
-import org.ambient.views.adapter.EditConfigMapAdapter;
-import org.ambientlight.annotations.AlternativeIds;
+import org.ambient.control.config.classhandlers.BeanField;
+import org.ambient.control.config.classhandlers.BooleanField;
+import org.ambient.control.config.classhandlers.ColorField;
+import org.ambient.control.config.classhandlers.ExpressionField;
+import org.ambient.control.config.classhandlers.MapField;
+import org.ambient.control.config.classhandlers.NumericField;
+import org.ambient.control.config.classhandlers.SelectionListField;
+import org.ambient.control.config.classhandlers.SimpleListField;
+import org.ambient.control.config.classhandlers.StringField;
+import org.ambient.control.config.classhandlers.WhereToPutConfigurationData;
+import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.ClassDescription;
 import org.ambientlight.annotations.FieldType;
@@ -44,35 +47,16 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.ScrollView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -81,20 +65,6 @@ import android.widget.TextView;
  * 
  */
 public class EditConfigHandlerFragment extends Fragment implements EditConfigExitListener {
-
-	private static enum WhereToPutType {
-		FIELD, MAP, LIST
-	}
-
-	private class WhereToPutConfigurationData implements Serializable {
-
-		private static final long serialVersionUID = 1L;
-
-		public String fieldName;
-		public String keyInMap;
-		public int positionInList;
-		public WhereToPutType type;
-	}
 
 	public static final String CREATE_MODE = "creationMode";
 	public static final String CLASS_NAME = "className";
@@ -114,7 +84,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 	protected String selectedServer = null;
 	private boolean createMode = false;
-	private WhereToPutConfigurationData whereToPutDataFromChild = null;
+	public WhereToPutConfigurationData whereToPutDataFromChild = null;
 
 
 	@Override
@@ -312,674 +282,40 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		LinearLayout contentArea = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryContent);
 
 		if (typedef.fieldType().equals(FieldType.EXPRESSION)) {
-
-			// create textfield
-			final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(container.getContext());
-			contentArea.addView(input);
-			input.setText((String) field.get(config));
-			List<String> variablesEnrichedValues = new ArrayList<String>();
-			variablesEnrichedValues.add("#{tokenValue}");
-			for (String current : altValues) {
-				variablesEnrichedValues.add("#{" + current + "}");
-			}
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
-					android.R.layout.simple_dropdown_item_1line, variablesEnrichedValues);
-			input.setAdapter(adapter);
-			input.showDropDown();
-			input.setThreshold(1);
-			input.setTokenizer(new SpaceTokenizer());
-			input.addTextChangedListener(new TextWatcher() {
-
-				@Override
-				public void onTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
-					try {
-						field.set(config, input.getText().toString());
-						input.showDropDown();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-
-
-				@Override
-				public void beforeTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
-				}
-
-
-				@Override
-				public void afterTextChanged(Editable paramEditable) {
-				}
-			});
+			ExpressionField.createView(this, config, container, field, altValues, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.BEAN)) {
-			final TextView beanView = new TextView(contentArea.getContext());
-			contentArea.addView(beanView);
-			if (field.get(config) != null) {
-				beanView.setText(field.get(config).getClass().getName());
-			} else {
-				beanView.setText("kein Objekt gesetzt");
-			}
-			final List<String> altValuesForListener = altValues;
-			final CharSequence[] alternativeValuesForDisplay = ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay);
-
-			WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
-			whereToStore.fieldName = field.getName();
-			whereToStore.type = WhereToPutType.FIELD;
-			whereToPutDataFromChild = whereToStore;
-
-			beanView.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-
-						if (field.get(config) == null && alternativeValuesForDisplay.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeValuesForDisplay,
-									EditConfigHandlerFragment.this, selectedServer, roomConfig);
-						} else if (field.get(config) != null) {
-							editConfigBean(EditConfigHandlerFragment.this, config, field, selectedServer);
-						}
-					} catch (IllegalAccessException e) {
-
-					}
-				}
-			});
-
-			beanView.setOnLongClickListener(new OnLongClickListener() {
-
-				@Override
-				public boolean onLongClick(View v) {
-					getActivity().startActionMode(new ActionMode.Callback() {
-
-						@Override
-						public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-							return false;
-						}
-
-
-						@Override
-						public void onDestroyActionMode(ActionMode mode) {
-
-						}
-
-
-						@Override
-						public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-							MenuInflater inflater = mode.getMenuInflater();
-							inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
-							MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
-							try {
-								if (field.get(config) != null) {
-									editItem.setVisible(true);
-								} else {
-									editItem.setVisible(false);
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							return true;
-						}
-
-
-						@Override
-						public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-							try {
-								switch (item.getItemId()) {
-
-								case R.id.menuEntryRemoveConfigurationClass:
-
-									field.set(config, null);
-									beanView.setText("kein Objekt gesetzt");
-
-									break;
-
-								case R.id.menuEntryEditConfigurationClass:
-
-									EditConfigHandlerFragment.editConfigBean(EditConfigHandlerFragment.this, config, field,
-											selectedServer);
-
-									break;
-
-								}
-
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							return false;
-						}
-					});
-					return true;
-				}
-			});
+			BeanField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedServer, roomConfig);
 		}
 
 		if (typedef.fieldType().equals(FieldType.STRING)) {
-			if (field.getAnnotation(AlternativeValues.class) != null) {
-				// create spinner
-
-				Spinner spinner = new Spinner(container.getContext());
-				contentArea.addView(spinner);
-				final List<String> altValuesForListener = altValues;
-				final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
-						android.R.layout.simple_spinner_item, altValuesToDisplay);
-				adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-				spinner.setAdapter(adapter);
-
-				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-					@Override
-					public void onItemSelected(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-						String valueToPaste = altValuesForListener.get(paramInt);
-						try {
-							field.set(config, valueToPaste);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-
-
-					@Override
-					public void onNothingSelected(AdapterView<?> paramAdapterView) {
-					}
-				});
-
-			} else {
-				// create textfield
-				final EditText input = new EditText(container.getContext());
-				contentArea.addView(input);
-				input.setText((String) field.get(config));
-				input.addTextChangedListener(new TextWatcher() {
-
-					@Override
-					public void onTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
-						try {
-							field.set(config, input.getText().toString());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-
-
-					@Override
-					public void beforeTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
-					}
-
-
-					@Override
-					public void afterTextChanged(Editable paramEditable) {
-					}
-				});
-			}
+			StringField.createView(this, config, container, field, altValues, altValuesToDisplay, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.BOOLEAN)) {
-			final CheckBox checkbox = new CheckBox(container.getContext());
-			contentArea.addView(checkbox);
-			checkbox.setChecked(field.getBoolean(config));
-			if (checkbox.isChecked()) {
-				checkbox.setText("aktiviert");
-			} else {
-				checkbox.setText("deaktiviert");
-			}
-			checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-				@Override
-				public void onCheckedChanged(CompoundButton paramCompoundButton, boolean paramBoolean) {
-					try {
-						field.setBoolean(config, paramBoolean);
-						if (paramBoolean) {
-							checkbox.setText("aktiviert");
-						} else {
-							checkbox.setText("deaktiviert");
-						}
-
-					} catch (Exception e) {
-						// this should not happen
-					}
-				}
-			});
+			BooleanField.createView(config, container, field, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.COLOR)) {
-
-			ColorPickerView.OnColorChangedListener listener = new ColorPickerView.OnColorChangedListener() {
-
-				@Override
-				public void colorChanged(int color) {
-					try {
-						field.setInt(config, color);
-					} catch (Exception e) {
-						// this should not happen
-					}
-				}
-			};
-
-			ColorPickerView colorPickerView = new ColorPickerView(container.getContext(), listener, field.getInt(config));
-			contentArea.addView(colorPickerView);
+			ColorField.createView(config, container, field, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.NUMERIC)) {
-
-			final double min = Double.parseDouble(typedef.min());
-			final double difference = Double.parseDouble(typedef.max()) - min;
-
-			SeekBar seekBar = new SeekBar(container.getContext());
-			seekBar.setMax(256);
-			double doubleValue = ((((Number) field.get(config)).doubleValue()) - min) / difference;
-			seekBar.setProgress((int) (doubleValue * 256.0));
-			contentArea.addView(seekBar);
-			seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-
-				@Override
-				public void onStopTrackingTouch(SeekBar seekBar) {
-				}
-
-
-				@Override
-				public void onStartTrackingTouch(SeekBar seekBar) {
-				}
-
-
-				@Override
-				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-					double result = (progress / 256.0) * difference + min;
-
-					if (field.getType().equals(Double.TYPE)) {
-						try {
-							field.setDouble(config, result);
-						} catch (Exception e) {
-							// this should not happen
-						}
-					}
-
-					if (field.getType().equals(Integer.TYPE)) {
-						try {
-							field.setInt(config, (int) result);
-						} catch (Exception e) {
-							// this should not happen
-						}
-					}
-				}
-			});
+			NumericField.createView(config, container, field, typedef, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.MAP)) {
-
-			List<String> additionalIds = ConfigBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class),
-					roomConfig);
-
-			final ListView list = new ListView(contentArea.getContext());
-			contentArea.addView(list);
-			ParameterizedType pt = (ParameterizedType) field.getGenericType();
-			final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
-			list.setTag(containingClass);
-
-			@SuppressWarnings("unchecked")
-			final Map<Object, Object> map = (Map<Object, Object>) field.get(config);
-			final Map<String, Object> arrayMap = new LinkedHashMap<String, Object>();
-
-			for (String key : additionalIds) {
-				if (map.containsKey(key) == false) {
-					arrayMap.put(key, null);
-				} else {
-					arrayMap.put(key, map.get(key));
-				}
-			}
-
-			final EditConfigMapAdapter adapter = new EditConfigMapAdapter(getFragmentManager(), getActivity(), arrayMap, map,
-					containingClass);
-			list.setAdapter(adapter);
-			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-			GuiUtils.setListViewHeightBasedOnChildren(list);
-			final EditConfigHandlerFragment myself = this;
-			// we skip this if the values are simple and can be handled directly
-			// on the view, like booleans
-			if (containingClass.equals(Boolean.class.getName()) == false) {
-				final List<String> altValuesForListener = altValues;
-				final CharSequence[] alternativeDisplayValuesForListener = ConfigBindingHelper
-						.toCharSequenceArray(altValuesToDisplay);
-				list.setOnItemClickListener(new OnItemClickListener() {
-
-					@Override
-					public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-
-						Object valueAtPosition = adapter.getItem(paramInt).getValue();
-
-						WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
-						whereToStore.fieldName = field.getName();
-						whereToStore.type = WhereToPutType.MAP;
-						whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
-						whereToPutDataFromChild = whereToStore;
-
-						if (valueAtPosition == null && alternativeDisplayValuesForListener.length > 0) {
-							createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener, myself,
-									selectedServer, roomConfig);
-						} else if (valueAtPosition != null) {
-							// FragmentTransaction ft =
-							// getFragmentManager().beginTransaction();
-							// ft.setCustomAnimations(R.anim.enter, R.anim.exit,
-							// R.anim.pop_enter, R.anim.pop_exit);
-							// EditConfigHandlerFragment configHandler = new
-							// EditConfigHandlerFragment();
-							// ft.replace(R.id.LayoutMain, configHandler);
-							// ft.addToBackStack(null);
-							// Bundle args = new Bundle();
-							// configHandler.setArguments(args);
-							String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
-							// args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-							// (Serializable) map.get(currentText));
-							// args.putString(SELECTED_SERVER, selectedServer);
-							// ft.commit();
-
-							EditConfigHandlerFragment.editConfigBean(EditConfigHandlerFragment.this, map.get(currentText), field,
-									selectedServer);
-
-						}
-					}
-				});
-			}
-			list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-
-				List<Integer> checkedItems = new ArrayList<Integer>();
-
-
-				@Override
-				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-					switch (item.getItemId()) {
-
-					case R.id.menuEntryRemoveConfigurationClass:
-
-						List<Entry<String, Object>> list = new ArrayList<Entry<String, Object>>();
-						for (Integer position : checkedItems) {
-							list.add(adapter.getItem(position));
-						}
-
-						for (Entry<String, Object> current : list) {
-							current.setValue(null);
-							map.remove(current.getKey());
-						}
-						adapter.notifyDataSetChanged();
-						break;
-
-					case R.id.menuEntryEditConfigurationClass:
-						// FragmentTransaction ft =
-						// getFragmentManager().beginTransaction();
-						// ft.setCustomAnimations(R.anim.enter, R.anim.exit,
-						// R.anim.pop_enter, R.anim.pop_exit);
-						// EditConfigHandlerFragment configHandler = new
-						// EditConfigHandlerFragment();
-						// ft.replace(R.id.LayoutMain, configHandler);
-						// ft.addToBackStack(null);
-						// Bundle args = new Bundle();
-						// configHandler.setArguments(args);
-						// args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-						// (Serializable)
-						// adapter.getItem(checkedItems.get(0)).getValue());
-						// args.putString(SELECTED_SERVER, selectedServer);
-						// ft.commit();
-						EditConfigHandlerFragment.editConfigBean(EditConfigHandlerFragment.this,
-								adapter.getItem(checkedItems.get(0)).getValue(), field, selectedServer);
-
-						break;
-
-					}
-					return false;
-				}
-
-
-				@Override
-				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-					MenuInflater inflater = mode.getMenuInflater();
-					inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
-					return true;
-
-				}
-
-
-				@Override
-				public void onDestroyActionMode(ActionMode mode) {
-					checkedItems.clear();
-				}
-
-
-				@Override
-				public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-					return false;
-				}
-
-
-				@Override
-				public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
-					if (checked) {
-						checkedItems.add(position);
-					} else {
-						checkedItems.remove(Integer.valueOf(position));
-					}
-					mode.setTitle(checkedItems.size() + " ausgewählt");
-
-					MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
-					if (checkedItems.size() == 1 && adapter.getItem(checkedItems.get(0)).getValue() != null) {
-						editItem.setVisible(true);
-					} else {
-						editItem.setVisible(false);
-					}
-				}
-			});
+			MapField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedServer, roomConfig);
 		}
 
 		if (typedef.fieldType().equals(FieldType.SELECTION_LIST)) {
 
-			final ListView list = new ListView(contentArea.getContext());
-			contentArea.addView(list);
-			ParameterizedType pt = (ParameterizedType) field.getGenericType();
-			final String containingClass = pt.getActualTypeArguments()[0].toString().substring(6);
-			list.setTag(containingClass);
-			@SuppressWarnings("unchecked")
-			// set by FieldType.SELECTION_LIST
-			final List<Object> listContent = (List<Object>) field.get(config);
-			HashMap<Object, Boolean> tempValues = new HashMap<Object, Boolean>();
-			for (Object currentObject : listContent) {
-				tempValues.put(currentObject, true);
-			}
-
-			for (Object key : altValues) {
-				if (tempValues.containsKey(key) == false) {
-					tempValues.put(key, false);
-				}
-			}
-
-			List<Object> contentForArrayAdapter = new ArrayList<Object>(tempValues.keySet());
-
-			final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(getActivity(), R.layout.layout_checkable_list_item,
-					contentForArrayAdapter);
-
-			for (Object currentKey : contentForArrayAdapter) {
-				if (tempValues.get(currentKey) == true) {
-					LinearLayout rowView = (LinearLayout) adapter.getView(adapter.getPosition(currentKey), null, list);
-					CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkBox1);
-					checkBox.setChecked(true);
-				}
-			}
-
-			list.setAdapter(adapter);
-			list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-			GuiUtils.setListViewHeightBasedOnChildren(list);
-			// we skip this if the values are simple and can be handled directly
-			// on the view, like booleans
-
-			list.setOnItemClickListener(new OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-					CheckBox checkbox = (CheckBox) paramView.findViewById(R.id.checkBox1);
-					checkbox.setChecked(!checkbox.isChecked());
-					Object valueAtPosition = adapter.getItem(paramInt);
-					if (checkbox.isChecked()) {
-						listContent.add(valueAtPosition);
-					} else {
-						listContent.remove(valueAtPosition);
-					}
-				}
-			});
+			SelectionListField.createView(this, config, field, altValues, contentArea);
 		}
 		if (typedef.fieldType().equals(FieldType.SIMPLE_LIST)) {
 
-			final ListView listView = new ListView(contentArea.getContext());
-			contentArea.addView(listView);
-			final EditConfigHandlerFragment myself = this;
-			@SuppressWarnings({ "unchecked" })
-			// set by FieldType.SIMPLE_LIST
-			final List<Object> listContent = (List<Object>) field.get(config);
-			final List<String> altValuesFinal = altValues;
-
-			final ImageView createNew = new ImageView(this.getActivity());
-			contentArea.addView(createNew);
-			createNew.setImageResource(R.drawable.content_new);
-			createNew.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
-					whereToStore.fieldName = field.getName();
-					whereToStore.type = WhereToPutType.LIST;
-					whereToStore.positionInList = 0;
-					whereToPutDataFromChild = whereToStore;
-
-					EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, roomConfig);
-				}
-			});
-			if (listContent.size() > 0) {
-				createNew.setVisibility(View.GONE);
-			}
-			final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(getActivity(), android.R.layout.simple_list_item_1,
-					listContent);
-
-			listView.setAdapter(adapter);
-			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-			GuiUtils.setListViewHeightBasedOnChildren(listView);
-
-			listView.setOnItemClickListener(new OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-
-					Object valueAtPosition = adapter.getItem(paramInt);
-
-					// WhereToPutConfigurationData whereToStore = new
-					// WhereToPutConfigurationData();
-					// whereToStore.fieldName = field.getName();
-					// whereToStore.type = WhereToPutType.LIST;
-					// whereToStore.positionInList = paramInt;
-					// whereToPutDataFromChild = whereToStore;
-					//
-					// FragmentTransaction ft =
-					// getFragmentManager().beginTransaction();
-					// ft.setCustomAnimations(R.anim.enter, R.anim.exit,
-					// R.anim.pop_enter, R.anim.pop_exit);
-					// EditConfigHandlerFragment configHandler = new
-					// EditConfigHandlerFragment();
-					// ft.replace(R.id.LayoutMain, configHandler);
-					// ft.addToBackStack(null);
-					// Bundle args = new Bundle();
-					// configHandler.setArguments(args);
-					// args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-					// (Serializable) valueAtPosition);
-					// args.putString(SELECTED_SERVER, selectedServer);
-					//
-					//
-					// ft.commit();
-
-					// try {
-					EditConfigHandlerFragment.editConfigBean(EditConfigHandlerFragment.this, valueAtPosition, field,
-							selectedServer);
-					// } catch (IllegalAccessException e) {
-					// e.printStackTrace();
-					// }
-
-				}
-			});
-
-			listView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-
-				List<Integer> checkedItems = new ArrayList<Integer>();
-
-
-				@Override
-				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-					switch (item.getItemId()) {
-
-					case R.id.menuEntryRemoveConfigurationClass:
-
-						List<Object> list = new ArrayList<Object>();
-						for (Integer position : checkedItems) {
-							list.add(adapter.getItem(position));
-						}
-
-						for (Object current : list) {
-							listContent.remove(current);
-						}
-						adapter.notifyDataSetChanged();
-						if (adapter.isEmpty()) {
-							createNew.setVisibility(View.VISIBLE);
-						}
-						mode.finish();
-						GuiUtils.setListViewHeightBasedOnChildren(listView);
-						break;
-					case R.id.menuEntryAddConfigurationClass:
-						WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
-						whereToStore.fieldName = field.getName();
-						whereToStore.type = WhereToPutType.LIST;
-						whereToStore.positionInList = 0;
-						whereToPutDataFromChild = whereToStore;
-
-						EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-								ConfigBindingHelper.toCharSequenceArray(altValuesFinal), myself, selectedServer, roomConfig);
-						mode.finish();
-						break;
-					}
-					return false;
-				}
-
-
-				@Override
-				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-					MenuInflater inflater = mode.getMenuInflater();
-					inflater.inflate(R.menu.fragment_edit_configuration_simple_list_cab, menu);
-					return true;
-
-				}
-
-
-				@Override
-				public void onDestroyActionMode(ActionMode mode) {
-					checkedItems.clear();
-				}
-
-
-				@Override
-				public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-					return false;
-				}
-
-
-				@Override
-				public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
-					if (checked) {
-						checkedItems.add(position);
-					} else {
-						checkedItems.remove(Integer.valueOf(position));
-					}
-					mode.setTitle(checkedItems.size() + " ausgewählt");
-
-				}
-			});
+			SimpleListField.createView(this, config, field, altValues, contentArea, selectedServer, roomConfig);
 		}
 	}
 
@@ -1059,7 +395,8 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	 * @param field
 	 * @throws IllegalAccessException
 	 */
-	public static void editConfigBean(Fragment fragment, final Object config, final Field field, final String selectedServer) {
+	public static void editConfigBean(Fragment fragment, final Object configValueToEdit, final String selectedServer,
+			final RoomConfiguration roomConfig) {
 		FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 		EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
@@ -1068,11 +405,10 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		ft.addToBackStack(null);
 		Bundle args = new Bundle();
 		configHandler.setArguments(args);
-		try {
-			args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) field.get(config));
-		} catch (Exception e) {
-			Log.e(LOG, "could not edit ConfigBean", e);
-		}
+		args.putString(SELECTED_SERVER, selectedServer);
+		args.putBoolean(CREATE_MODE, false);
+		args.putSerializable(ROOM_CONFIG, roomConfig);
+		args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) configValueToEdit);
 		args.putString(SELECTED_SERVER, selectedServer);
 		ft.commit();
 	}
@@ -1083,7 +419,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	 * @param alternativeValuesForDisplay
 	 * @param myself
 	 */
-	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
+	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
 			final Fragment fragment, final String server, final RoomConfiguration roomConfig) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());

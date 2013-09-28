@@ -376,7 +376,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 * @return
 	 */
 	public ActionMode createActionMode() {
-		final ProcessCardFragment myself = this;
+
 		return getActivity().startActionMode(new ActionMode.Callback() {
 
 			@Override
@@ -451,17 +451,25 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					break;
 
 				case R.id.menuEntryProcessEditNode:
-					EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
-					fragEdit.setTargetFragment(myself, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-					Bundle arguments = new Bundle();
-					arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, drawer.getSelectedNode());
-					arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
-					arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
-					fragEdit.setArguments(arguments);
-					FragmentTransaction ft2 = getFragmentManager().beginTransaction();
-					ft2.replace(R.id.LayoutMain, fragEdit);
-					ft2.addToBackStack(null);
-					ft2.commit();
+					EditConfigHandlerFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedServer,
+							roomService.getRoomConfiguration(selectedServer));
+					// EditConfigHandlerFragment fragEdit = new
+					// EditConfigHandlerFragment();
+					// fragEdit.setTargetFragment(myself,
+					// EditConfigHandlerFragment.REQ_RETURN_OBJECT);
+					// Bundle arguments = new Bundle();
+					// arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
+					// drawer.getSelectedNode());
+					// arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE,
+					// false);
+					// arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER,
+					// selectedServer);
+					// fragEdit.setArguments(arguments);
+					// FragmentTransaction ft2 =
+					// getFragmentManager().beginTransaction();
+					// ft2.replace(R.id.LayoutMain, fragEdit);
+					// ft2.addToBackStack(null);
+					// ft2.commit();
 					break;
 
 				default:
