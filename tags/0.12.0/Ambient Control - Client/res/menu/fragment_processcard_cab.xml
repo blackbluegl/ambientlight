@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menuEntryProcessEditNode"
+        android:icon="@drawable/content_edit"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/button_edit"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessAddNode"
+        android:icon="@drawable/content_new"
+        android:showAsAction="ifRoom|withText"
+        android:title="Knoten hinzufügen"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessAddSecondNode"
+        android:icon="@drawable/content_split"
+        android:showAsAction="ifRoom|withText"
+        android:title="verzweigten Knoten hinzufügen"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessRemoveNode"
+        android:icon="@drawable/content_discard"
+        android:showAsAction="ifRoom|withText"
+        android:title="Knoten entfernen"
+        android:visible="false"/>
+</menu>
