@@ -3,7 +3,7 @@ package org.ambient.control.nfc;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.ambient.control.rest.RestClient;
+import org.ambient.rest.RestClient;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.IUserRoomItem;
 import org.ambientlight.room.RoomConfiguration;

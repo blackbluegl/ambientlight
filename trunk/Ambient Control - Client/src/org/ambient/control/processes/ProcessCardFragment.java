@@ -23,7 +23,7 @@ import org.ambient.control.RoomServiceAwareFragment;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.processes.helper.SceneriesWrapper;
-import org.ambient.control.rest.RestClient;
+import org.ambient.rest.RestClient;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
