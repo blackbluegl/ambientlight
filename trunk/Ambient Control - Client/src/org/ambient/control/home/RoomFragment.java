@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigExitListener;
+import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
@@ -76,7 +76,7 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends RoomServiceAwareFragment implements EditConfigExitListener {
+public class RoomFragment extends RoomServiceAwareFragment implements EditConfigOnExitListener {
 
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME = "actorConductConfigurationAfterEditItemName";
@@ -446,11 +446,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 							ActorConductEditFragment fragEdit = new ActorConductEditFragment();
 							fragEdit.setTargetFragment(RoomFragment.this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 							Bundle arguments = new Bundle();
-							arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
+							arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE,
 									(ActorConductConfiguration) GuiUtils
 									.deepCloneSerializeable(currentConfig.actorConductConfiguration));
-							arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
-							arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, serverName);
+							arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
+							arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_SERVER, serverName);
 							arguments.putString(ActorConductEditFragment.ITEM_NAME, currentConfig.getName());
 
 							fragEdit.setArguments(arguments);

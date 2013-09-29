@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigExitListener;
+import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.control.rest.RestClient;
@@ -57,7 +57,7 @@ import android.widget.Spinner;
  * @author Florian Bornkessel
  * 
  */
-public class ProcessCardFragment extends RoomServiceAwareFragment implements EditConfigExitListener {
+public class ProcessCardFragment extends RoomServiceAwareFragment implements EditConfigOnExitListener {
 
 	private static final String BUNDLE_SELECTED_PROCESS = "bundleSelectedProcess";
 	private static final String BUNDLE_SELECTED_SERVER = "bundleSelectedServer";
@@ -272,9 +272,9 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
 			fragEdit.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 			Bundle arguments = new Bundle();
-			arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, this.selectedProcess);
-			arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
-			arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
+			arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, this.selectedProcess);
+			arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
+			arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_SERVER, selectedServer);
 			fragEdit.setArguments(arguments);
 			FragmentTransaction ft2 = getFragmentManager().beginTransaction();
 			ft2.replace(R.id.LayoutMain, fragEdit);
@@ -340,9 +340,9 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			EditConfigHandlerFragment fragEditSceneries = new EditConfigHandlerFragment();
 			fragEditSceneries.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 			Bundle argumentsSceneries = new Bundle();
-			argumentsSceneries.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, sceneries);
-			argumentsSceneries.putBoolean(EditConfigHandlerFragment.CREATE_MODE, false);
-			argumentsSceneries.putString(EditConfigHandlerFragment.SELECTED_SERVER, selectedServer);
+			argumentsSceneries.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, sceneries);
+			argumentsSceneries.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
+			argumentsSceneries.putString(EditConfigHandlerFragment.ARG_SELECTED_SERVER, selectedServer);
 			fragEditSceneries.setArguments(argumentsSceneries);
 			FragmentTransaction ft3 = getFragmentManager().beginTransaction();
 			ft3.replace(R.id.LayoutMain, fragEditSceneries);

@@ -64,26 +64,29 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class EditConfigHandlerFragment extends Fragment implements EditConfigExitListener {
+public class EditConfigHandlerFragment extends Fragment implements EditConfigOnExitListener {
 
-	public static final String CREATE_MODE = "creationMode";
-	public static final String CLASS_NAME = "className";
-	public static final String OBJECT_VALUE = "objectValue";
-	public static final String SELECTED_SERVER = "selectedServer";
-	public static final String WHERE_TO_INTEGRATE = "whereToIntegrate";
-	public static final String ROOM_CONFIG = "roomConfiguration";
-	private static final String LOG = "org.ambientlight.EditConfigHandler";
+	public static final String ARG_CREATE_MODE = "creationMode";
+	public static final String ARG_CLASS_NAME = "className";
+	public static final String BUNDLE_OBJECT_VALUE = "objectValue";
+	public static final String ARG_SELECTED_SERVER = "selectedServer";
+	public static final String BUNDLE_WHERE_TO_INTEGRATE = "whereToIntegrate";
+	public static final String ARG_ROOM_CONFIG = "roomConfiguration";
+
+	protected static final String LOG = "org.ambientlight.EditConfigHandler";
 
 	public static int REQ_RETURN_OBJECT = 0;
 
-	public Object myConfigurationData;
+	protected Object myConfigurationData;
 
-	public Object valueToIntegrate = null;
+	protected Object valueToIntegrate = null;
 
 	protected RoomConfiguration roomConfig = null;
 
 	protected String selectedServer = null;
-	private boolean createMode = false;
+
+	protected boolean createMode = false;
+
 	public WhereToPutConfigurationData whereToPutDataFromChild = null;
 
 
@@ -95,157 +98,195 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
-		bundle.putSerializable(OBJECT_VALUE, (Serializable) myConfigurationData);
-		bundle.putSerializable(WHERE_TO_INTEGRATE, whereToPutDataFromChild);
+		bundle.putSerializable(BUNDLE_OBJECT_VALUE, (Serializable) myConfigurationData);
+		bundle.putSerializable(BUNDLE_WHERE_TO_INTEGRATE, whereToPutDataFromChild);
 		super.onSaveInstanceState(bundle);
 	}
 
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActivity().getActionBar().setDisplayShowHomeEnabled(true);
 
 		setHasOptionsMenu(true);
+
 		if (getArguments().isEmpty() == false) {
-			createMode = getArguments().getBoolean(CREATE_MODE);
-			selectedServer = getArguments().getString(SELECTED_SERVER);
-			this.roomConfig = (RoomConfiguration) getArguments().getSerializable(ROOM_CONFIG);
+			createMode = getArguments().getBoolean(ARG_CREATE_MODE);
+			selectedServer = getArguments().getString(ARG_SELECTED_SERVER);
+			this.roomConfig = (RoomConfiguration) getArguments().getSerializable(ARG_ROOM_CONFIG);
 		}
 
 		if (savedInstanceState != null) {
-			myConfigurationData = savedInstanceState.getSerializable(OBJECT_VALUE);
-			whereToPutDataFromChild = (WhereToPutConfigurationData) savedInstanceState.getSerializable(WHERE_TO_INTEGRATE);
+			myConfigurationData = savedInstanceState.getSerializable(BUNDLE_OBJECT_VALUE);
+			whereToPutDataFromChild = (WhereToPutConfigurationData) savedInstanceState.getSerializable(BUNDLE_WHERE_TO_INTEGRATE);
 		} else {
 			if (createMode) {
 				try {
 					if (myConfigurationData == null) {
-						myConfigurationData = Class.forName(getArguments().getString(CLASS_NAME)).newInstance();
+						myConfigurationData = Class.forName(getArguments().getString(ARG_CLASS_NAME)).newInstance();
 					}
 				} catch (Exception e) {
-					Log.e("EditConfigHandler", "could not create Object in createmode", e);
+					Log.e(LOG, "could not create Object in createmode", e);
 				}
 			} else {
-				myConfigurationData = getArguments().getSerializable(OBJECT_VALUE);
+				myConfigurationData = getArguments().getSerializable(BUNDLE_OBJECT_VALUE);
 			}
 		}
 
-		// integrate object into existing configuration
+		// integrate object into existing configuration after child fragment
+		// closes and has data for us via onIntegrate - callback we do the
+		// integration here after the arguments and bundles have been restored.
+		// the other way it would be possible that this instance here would be
+		// created by android and all values would be null.
 		if (this.valueToIntegrate != null) {
 			this.integrateConfiguration(this.valueToIntegrate);
 		}
 
-		View result = null;
-		try {
-			result = this.createViewByObject(inflater, myConfigurationData, container);
-		} catch (Exception e) {
-			Log.e("editConfigHandler", "an Exception has been raised", e);
-		}
-		return result;
 	}
 
 
-	public View createViewByObject(LayoutInflater inflater, final Object config, ViewGroup container)
-			throws IllegalArgumentException, IllegalAccessException {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_edit_config, container, false);
+		try {
 
-		LinearLayout content = (LinearLayout) scrollView.findViewById(R.id.linearLayoutEditConfigContent);
+			ScrollView result = (ScrollView) inflater.inflate(R.layout.fragment_edit_config, container, false);
 
-		// init the maps for sorted views
-		Map<Integer, Map<Integer, Field>> sortedMap = new TreeMap<Integer, Map<Integer, Field>>();
-		List<Field> unsortedList = new ArrayList<Field>();
-		ClassDescription description = config.getClass().getAnnotation(ClassDescription.class);
-		if (description != null) {
-			for (Group currentGroup : description.groups()) {
-				Map<Integer, Field> category = new TreeMap<Integer, Field>();
-				sortedMap.put(currentGroup.position(), category);
+			LinearLayout content = (LinearLayout) result.findViewById(R.id.linearLayoutEditConfigContent);
+
+			// init the maps for grouped and sorted fields
+			Map<Integer, Map<Integer, Field>> sortedMap = new TreeMap<Integer, Map<Integer, Field>>();
+			// and a simple list for those fields which have no sort description
+			List<Field> unsortedList = new ArrayList<Field>();
+
+			// create groups if class description is present and defines some
+			ClassDescription description = myConfigurationData.getClass().getAnnotation(ClassDescription.class);
+			if (description != null) {
+				for (Group currentGroup : description.groups()) {
+					Map<Integer, Field> category = new TreeMap<Integer, Field>();
+					sortedMap.put(currentGroup.position(), category);
+				}
+			} else {
+				// create a default group
+				sortedMap.put(0, new TreeMap<Integer, Field>());
 			}
-		} else {
-			Map<Integer, Field> defaultCategory = new TreeMap<Integer, Field>();
-			sortedMap.put(0, defaultCategory);
-		}
 
-		for (final Field field : config.getClass().getFields()) {
-			if (field.isAnnotationPresent(TypeDef.class)) {
-				if (field.isAnnotationPresent(Presentation.class)) {
-					Presentation presentation = field.getAnnotation(Presentation.class);
-					sortedMap.get(presentation.groupPosition()).put(presentation.position(), field);
-				} else {
-					unsortedList.add(field);
+			for (final Field field : myConfigurationData.getClass().getFields()) {
+				// only use field with typedef annotation. the rest of the
+				// fields will be ignored
+				if (field.isAnnotationPresent(TypeDef.class)) {
+					if (field.isAnnotationPresent(Presentation.class)) {
+						// put into groups
+						Presentation presentation = field.getAnnotation(Presentation.class);
+						sortedMap.get(presentation.groupPosition()).put(presentation.position(), field);
+					} else {
+						// or to unsorted group if no information for sorting is
+						// present
+						unsortedList.add(field);
+					}
 				}
 			}
-		}
 
-		boolean sortedValuesDrawn = false;
+			// if no sorted values haven been drawn we create a default group on
+			// screen and put all unsorted values in there. if some have been
+			// drawn we put them into a "misc" group. we could do a check at the
+			// beginning if several groups have been filled and so on. but we
+			// render them first and get the information as result of that.
+			boolean sortedValuesDrawn = false;
 
-		for (Integer currentCategoryId : sortedMap.keySet()) {
-			if (sortedMap.get(currentCategoryId).isEmpty() == false) {
+			for (Integer currentCategoryId : sortedMap.keySet()) {
+				if (sortedMap.get(currentCategoryId).isEmpty()) {
+					continue;
+				}
+
 				LinearLayout categoryView = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
 				TextView title = (TextView) categoryView.findViewById(R.id.textViewGroupHeader);
 				TextView descriptionTextView = (TextView) categoryView.findViewById(R.id.textViewGroupDescription);
 				content.addView(categoryView);
+
 				if (currentCategoryId == 0) {
-					// draw allgemein for category 0
+					// draw allgemein for category 0. if an group with id 0 is
+					// described the values will be overwritten in next step
 					title.setText("ALLGEMEIN");
 					descriptionTextView.setVisibility(View.GONE);
-				} else {
-					for (Group currentGroup : description.groups()) {
-						if (currentGroup.position() == currentCategoryId) {
-							title.setText(currentGroup.name());
-							if (currentGroup.description().isEmpty() == false) {
-								descriptionTextView.setText(currentGroup.description());
-							} else {
-								descriptionTextView.setVisibility(View.GONE);
-							}
-							break;
+				}
+
+				// draw the category header and a description if present
+				for (Group currentGroup : description.groups()) {
+					if (currentGroup.position() == currentCategoryId) {
+						title.setText(currentGroup.name());
+						if (currentGroup.description().isEmpty() == false) {
+							descriptionTextView.setText(currentGroup.description());
+							descriptionTextView.setVisibility(View.VISIBLE);
+						} else {
+							descriptionTextView.setVisibility(View.GONE);
 						}
+						break;
 					}
 				}
+
+				// draw all handlers for the fields in this category
 				Map<Integer, Field> values = sortedMap.get(currentCategoryId);
 				for (Field field : values.values()) {
-					addFieldToView(inflater, config, content, field);
+					addFieldToView(inflater, myConfigurationData, content, field);
+
+					// we are shure that the default or a special category have
+					// been used. if there are unsorted values put them into an
+					// additional group later
 					sortedValuesDrawn = true;
 				}
 			}
-		}
 
-		// do the same for unsorted fields
-		if (sortedValuesDrawn && unsortedList.isEmpty() == false) {
-			LinearLayout categoryFurther = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
-			TextView title = (TextView) categoryFurther.findViewById(R.id.textViewGroupHeader);
-			title.setText("WEITERE");
-			TextView descriptionTextView = (TextView) categoryFurther.findViewById(R.id.textViewGroupDescription);
-			descriptionTextView.setVisibility(View.GONE);
-			content.addView(categoryFurther);
-		}
+			// draw a header for unsorted fields if class description provided
+			// categories for the other fields
+			if (sortedValuesDrawn && unsortedList.isEmpty() == false) {
+				LinearLayout categoryFurther = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
+				TextView title = (TextView) categoryFurther.findViewById(R.id.textViewGroupHeader);
+				title.setText("WEITERE");
+				TextView descriptionTextView = (TextView) categoryFurther.findViewById(R.id.textViewGroupDescription);
+				descriptionTextView.setVisibility(View.GONE);
+				content.addView(categoryFurther);
+			}
 
-		for (Field currentField : unsortedList) {
-			addFieldToView(inflater, config, content, currentField);
-		}
+			// draw the handlers
+			for (Field currentField : unsortedList) {
+				addFieldToView(inflater, myConfigurationData, content, currentField);
+			}
 
-		if (sortedValuesDrawn == false && unsortedList.isEmpty()) {
-			TextView tv = new TextView(content.getContext());
-			tv.setText("Dieses Objekt wird nicht konfiguriert");
-			content.addView(tv);
-		}
+			// default text if no fields are annotated
+			if (sortedValuesDrawn == false && unsortedList.isEmpty()) {
+				TextView tv = new TextView(content.getContext());
+				tv.setText("Dieses Objekt wird nicht konfiguriert");
+				content.addView(tv);
+			}
 
-		return scrollView;
+			return result;
+
+		} catch (Exception e) {
+			Log.e(LOG, "could not create View for config", e);
+			return null;
+		}
 	}
 
 
 	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout container, final Field field)
 			throws IllegalAccessException {
-		TypeDef typedef = field.getAnnotation(TypeDef.class);
-		String fieldLabel = null;
 
 		LinearLayout fieldView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_entry, null);
 		container.addView(fieldView);
 
+		TextView title = (TextView) fieldView.findViewById(R.id.textViewTitleOfMap);
+		title.setText(field.getName());
+
 		if (field.getAnnotation(Presentation.class) != null && field.getAnnotation(Presentation.class).name().isEmpty() == false) {
-			fieldLabel = (field.getAnnotation(Presentation.class).name());
+			title.setText((field.getAnnotation(Presentation.class).name()));
+
 			final String description = (field.getAnnotation(Presentation.class)).description();
 			if (description.isEmpty() == false) {
+				// add a help button with the description of this field to title
 				fieldView.findViewById(R.id.imageViewEditEntryHelp).setVisibility(View.VISIBLE);
 				LinearLayout header = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryHeader);
 				header.setOnClickListener(new OnClickListener() {
@@ -257,29 +298,34 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 					}
 				});
 			}
-
-		} else {
-			fieldLabel = field.getName();
 		}
 
+		// a lot of fields have alternative values - spinners, lists and so on.
+		// they are bound in several ways
 		List<String> altValues = null;
+		// a mapping for the alternative values - (user friendly)
 		List<String> altValuesToDisplay = null;
 
 		if (field.getAnnotation(AlternativeValues.class) != null) {
+			// get the binding information from the field anotation first
 			altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class), config.getClass()
 					.getName(), roomConfig);
 			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class),
 					config.getClass().getName(), roomConfig);
 		} else if (field.getDeclaringClass().getAnnotation(AlternativeValues.class) != null) {
+			// if there is no information in the field, descend to the class
+			// that
+			// is held by the field and get the annotation from the class.
+			// Useful if a class is a subclass and needs special value binding
 			altValues = ConfigBindingHelper.getAlternativeValues(
 					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig);
 			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig);
 		}
 
-		TextView title = (TextView) fieldView.findViewById(R.id.textViewTitleOfMap);
-		title.setText(fieldLabel);
+		// draw concrete ui elements for the field value
 		LinearLayout contentArea = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryContent);
+		TypeDef typedef = field.getAnnotation(TypeDef.class);
 
 		if (typedef.fieldType().equals(FieldType.EXPRESSION)) {
 			ExpressionField.createView(this, config, container, field, altValues, contentArea);
@@ -310,11 +356,9 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		}
 
 		if (typedef.fieldType().equals(FieldType.SELECTION_LIST)) {
-
 			SelectionListField.createView(this, config, field, altValues, contentArea);
 		}
 		if (typedef.fieldType().equals(FieldType.SIMPLE_LIST)) {
-
 			SimpleListField.createView(this, config, field, altValues, contentArea, selectedServer, roomConfig);
 		}
 	}
@@ -324,13 +368,10 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menuEntryFinishEditConfiguration:
-			try {
-				if (this.getTargetFragment() != null) {
-					((EditConfigExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedServer,
-							myConfigurationData);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+
+			if (this.getTargetFragment() != null) {
+				((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedServer,
+						myConfigurationData);
 			}
 			getFragmentManager().popBackStack();
 			return true;
@@ -338,7 +379,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 		case android.R.id.home:
 			getFragmentManager().popBackStack();
 			if (this.getTargetFragment() != null) {
-				((EditConfigExitListener) this.getTargetFragment()).onRevertConfiguration(selectedServer, myConfigurationData);
+				((EditConfigOnExitListener) this.getTargetFragment()).onRevertConfiguration(selectedServer, myConfigurationData);
 			}
 			return true;
 
@@ -349,9 +390,11 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 
 
 	/*
-	 * callback on targetfragment. we store the value in a global variable and
-	 * later in lifecycle onCreate will be called. there we call
-	 * integrateConfiguration
+	 * We are listener to our own interface. so we can descent into subobjects
+	 * recursively. We store the value in a global variable. Later in lifecycle
+	 * onCreate will be called. There we call integrateConfiguration(). This is
+	 * needed because android does not guarantee that the instance would be kept
+	 * with all global values until now.
 	 * 
 	 * @see org.ambient.control.processes.IntegrateObjectValueHandler#
 	 * integrateConfiguration(java.lang.Object)
@@ -362,12 +405,28 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 	}
 
 
+	/*
+	 * in that case we just do not copy the result into the config bean.
+	 * 
+	 * @see
+	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
+	 * (java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void onRevertConfiguration(String serverName, Object configuration) {
+		// do not merge the result
+
+	}
+
+
 	public void integrateConfiguration(Object configuration) {
 		try {
-			Class<? extends Object> myObjectClass = myConfigurationData.getClass();
-			Field myField = myObjectClass.getField(whereToPutDataFromChild.fieldName);
+			Class<? extends Object> parentClass = myConfigurationData.getClass();
+			Field myField = parentClass.getField(whereToPutDataFromChild.fieldName);
+
 			if (whereToPutDataFromChild.type.equals(WhereToPutType.FIELD)) {
 				myField.set(myConfigurationData, configuration);
+
 			} else if (whereToPutDataFromChild.type.equals(WhereToPutType.LIST)) {
 				@SuppressWarnings("unchecked")
 				// checked in line above
@@ -377,47 +436,64 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 				} else {
 					list.add(configuration);
 				}
+
 			} else if (whereToPutDataFromChild.type.equals(WhereToPutType.MAP)) {
 				@SuppressWarnings("unchecked")
 				// checked one line above
 				Map<String, Object> map = (Map<String, Object>) myField.get(myConfigurationData);
 				map.put(whereToPutDataFromChild.keyInMap, configuration);
 			}
+
 		} catch (Exception e) {
 			Log.e(LOG, "error trying to integrate data from child into configuration", e);
 		}
+
+		// we do not want to be called again
 		this.valueToIntegrate = null;
 	}
 
 
 	/**
-	 * @param config
-	 * @param field
-	 * @throws IllegalAccessException
+	 * helpermethod to start an fragment transaction and configure all values to
+	 * display the fragment in editmode
+	 * 
+	 * @param fragment
+	 *            targetfragment to
+	 * @param configValueToEdit
+	 * @param selectedServer
+	 * @param roomConfig
 	 */
 	public static void editConfigBean(Fragment fragment, final Object configValueToEdit, final String selectedServer,
 			final RoomConfiguration roomConfig) {
+
+		Bundle args = new Bundle();
+		args.putString(ARG_SELECTED_SERVER, selectedServer);
+		args.putBoolean(ARG_CREATE_MODE, false);
+		args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
+		args.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, (Serializable) configValueToEdit);
+		args.putString(ARG_SELECTED_SERVER, selectedServer);
+
+		EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+		configHandler.setArguments(args);
+		configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
+
 		FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-		EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 		ft.replace(R.id.LayoutMain, configHandler);
-		configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
 		ft.addToBackStack(null);
-		Bundle args = new Bundle();
-		configHandler.setArguments(args);
-		args.putString(SELECTED_SERVER, selectedServer);
-		args.putBoolean(CREATE_MODE, false);
-		args.putSerializable(ROOM_CONFIG, roomConfig);
-		args.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE, (Serializable) configValueToEdit);
-		args.putString(SELECTED_SERVER, selectedServer);
 		ft.commit();
 	}
 
 
 	/**
-	 * @param altValuesForListener
+	 * helper method to edit a config bean if alternative values are already
+	 * knwon.
+	 * 
+	 * @param altValues
 	 * @param alternativeValuesForDisplay
-	 * @param myself
+	 * @param fragment
+	 * @param server
+	 * @param roomConfig
 	 */
 	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
 			final Fragment fragment, final String server, final RoomConfiguration roomConfig) {
@@ -428,25 +504,36 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				Bundle args = new Bundle();
-				args.putString(CLASS_NAME, altValues.get(which));
-				args.putString(SELECTED_SERVER, server);
-				args.putBoolean(CREATE_MODE, true);
-				args.putSerializable(ROOM_CONFIG, roomConfig);
-				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
-				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+				args.putString(ARG_CLASS_NAME, altValues.get(which));
+				args.putString(ARG_SELECTED_SERVER, server);
+				args.putBoolean(ARG_CREATE_MODE, true);
+				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
+
 				EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 				configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
+
+				configHandler.setArguments(args);
+
+				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
+				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 				ft.replace(R.id.LayoutMain, configHandler);
 				ft.addToBackStack(null);
-				configHandler.setArguments(args);
-				configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
 				ft.commit();
 			}
 		});
+
 		builder.create().show();
 	}
 
 
+	/**
+	 * helpermethod to create a config bean from the scratch.
+	 * 
+	 * @param clazz
+	 * @param fragment
+	 * @param server
+	 * @param roomConfiguration
+	 */
 	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String server,
 			final RoomConfiguration roomConfiguration) {
 
@@ -454,22 +541,9 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigExi
 				clazz.getName(), roomConfiguration);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 				clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
+
 		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server,
 				roomConfiguration);
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
-	 * (java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void onRevertConfiguration(String serverName, Object configuration) {
-		// do not merge the result
-
 	}
 
 }
