@@ -77,7 +77,7 @@ public class StringField {
 					try {
 						field.set(config, valueToPaste);
 					} catch (Exception e) {
-						e.printStackTrace();
+						// should not happen
 					}
 				}
 
