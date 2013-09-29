@@ -38,14 +38,17 @@ public class BooleanField {
 	 */
 	public static void createView(final Object config, LinearLayout container, final Field field, LinearLayout contentArea)
 			throws IllegalAccessException {
+
 		final CheckBox checkbox = new CheckBox(container.getContext());
 		contentArea.addView(checkbox);
+
 		checkbox.setChecked(field.getBoolean(config));
 		if (checkbox.isChecked()) {
 			checkbox.setText("aktiviert");
 		} else {
 			checkbox.setText("deaktiviert");
 		}
+
 		checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override

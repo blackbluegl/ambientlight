@@ -28,12 +28,17 @@ import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.annotations.ValueBindingPath;
 
+import android.util.Log;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
 public class ConfigBindingHelper {
+
+	private static final String LOG = "ConfigBindingHelper";
+
 
 	public static List<String> getAlternativeIds(AlternativeIds annotation, Object sourceBean) {
 
@@ -44,7 +49,7 @@ public class ConfigBindingHelper {
 
 
 	public static List<String> getAlternativeValues(AlternativeValues annotation, String className, Object sourceBean) {
-
+		Log.d(LOG, "finding binding for field with type: " + className + " in class: " + sourceBean.getClass().getName());
 		ValueBindingPath[] pathes = annotation.valueBinding();
 		if (pathes.length != 0) {
 			for (ValueBindingPath current : pathes) {
@@ -87,34 +92,28 @@ public class ConfigBindingHelper {
 	}
 
 
-	/**
-	 * @param sourceBean
-	 * @param path
-	 * @return
-	 */
 	@SuppressWarnings("unchecked")
 	private static List<String> getByPathBinding(Object sourceBean, String path) {
 		String[] pathElements = path.split("\\.");
 		Object result = null;
 		try {
-			System.out.println("binding path: " + path + " for bean: " + sourceBean.getClass().getName());
+			Log.d(LOG, "binding path: " + path + " for bean: " + sourceBean.getClass().getName());
 			result = getObjectRecursively(sourceBean, pathElements, 0);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(LOG, "error binding path: " + path, e);
 		}
 
 		if (result instanceof List)
 			return (List<String>) result;
 		else if (result instanceof Set)
-			return new ArrayList((Set) result);
+			return new ArrayList<String>((Set<String>) result);
 		else if (result instanceof String[])
 			return Arrays.asList((String[]) result);
 		else if (result instanceof String) {
 			ArrayList<String> resultArray = new ArrayList<String>();
 			resultArray.add((String) result);
 			return resultArray;
-		}
-		else
+		} else
 			return null;
 	}
 
@@ -122,11 +121,11 @@ public class ConfigBindingHelper {
 	private static Object getObjectRecursively(Object current, String[] path, int positionInPath) throws NoSuchMethodException,
 	IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchFieldException {
 		Object result = null;
-		Class currentClass = current.getClass();
+		Class<?> currentClass = current.getClass();
 		if (path[positionInPath].endsWith(")")) {
 			Method methodToCall = currentClass.getMethod(path[positionInPath].substring(0, path[positionInPath].length() - 2),
-					null);
-			result = methodToCall.invoke(current, null);
+					(Class<?>[]) null);
+			result = methodToCall.invoke(current, (Object[]) null);
 		} else {
 			Field fieldForResult = currentClass.getField(path[positionInPath]);
 			result = fieldForResult.get(current);
@@ -134,8 +133,8 @@ public class ConfigBindingHelper {
 
 		if (positionInPath < path.length - 1) {
 			if (result instanceof Iterable) {
-				ArrayList arrayToReturn = new ArrayList();
-				for (Object currentToDescend : (Iterable) result) {
+				ArrayList<Object> arrayToReturn = new ArrayList<Object>();
+				for (Object currentToDescend : (Iterable<?>) result) {
 					arrayToReturn.add(getObjectRecursively(currentToDescend, path, positionInPath + 1));
 				}
 				return arrayToReturn;

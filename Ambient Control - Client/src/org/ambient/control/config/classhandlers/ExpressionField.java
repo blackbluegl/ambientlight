@@ -47,7 +47,9 @@ public class ExpressionField {
 		// create textfield
 		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(container.getContext());
 		contentArea.addView(input);
+
 		input.setText((String) field.get(config));
+
 		List<String> variablesEnrichedValues = new ArrayList<String>();
 		variablesEnrichedValues.add("#{tokenValue}");
 		for (String current : altValues) {
@@ -59,6 +61,7 @@ public class ExpressionField {
 		input.showDropDown();
 		input.setThreshold(1);
 		input.setTokenizer(new SpaceTokenizer());
+
 		input.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -67,7 +70,7 @@ public class ExpressionField {
 					field.set(config, input.getText().toString());
 					input.showDropDown();
 				} catch (Exception e) {
-					e.printStackTrace();
+					// should not happen
 				}
 			}
 

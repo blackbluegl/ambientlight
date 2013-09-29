@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class BeanField {
 
@@ -50,37 +50,35 @@ public class BeanField {
 	 * @throws IllegalAccessException
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			List<String> altValues, List<String> altValuesToDisplay, LinearLayout contentArea, final String selectedServer,
-			final RoomConfiguration roomConfig) throws IllegalAccessException {
-		final TextView beanView = new TextView(contentArea.getContext());
-		contentArea.addView(beanView);
-		if (field.get(config) != null) {
-			beanView.setText(field.get(config).getClass().getName());
-		} else {
-			beanView.setText("kein Objekt gesetzt");
-		}
-		final List<String> altValuesForListener = altValues;
-		final CharSequence[] alternativeValuesForDisplay = ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay);
+			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
+			final String selectedServer, final RoomConfiguration roomConfig) throws IllegalAccessException {
 
 		WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
 		whereToStore.fieldName = field.getName();
 		whereToStore.type = WhereToPutType.FIELD;
 		context.whereToPutDataFromChild = whereToStore;
 
+		final TextView beanView = new TextView(contentArea.getContext());
+		contentArea.addView(beanView);
+
+		final Object fieldValue = field.get(config);
+
+		if (fieldValue != null) {
+			beanView.setText(fieldValue.getClass().getName());
+		} else {
+			beanView.setText("kein Objekt");
+		}
+
 		beanView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				try {
 
-					if (field.get(config) == null && alternativeValuesForDisplay.length > 0) {
-						EditConfigHandlerFragment.createNewConfigBean(altValuesForListener, alternativeValuesForDisplay, context,
-								selectedServer, roomConfig);
-					} else if (field.get(config) != null) {
-						EditConfigHandlerFragment.editConfigBean(context, field.get(config), selectedServer, roomConfig);
-					}
-				} catch (IllegalAccessException e) {
-
+				if (fieldValue == null && altValuesToDisplay.size() > 0) {
+					EditConfigHandlerFragment.createNewConfigBean(altValues,
+							ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedServer, roomConfig);
+				} else if (fieldValue != null) {
+					EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedServer, roomConfig);
 				}
 			}
 		});
@@ -109,7 +107,7 @@ public class BeanField {
 						inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
 						MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
 						try {
-							if (field.get(config) != null) {
+							if (fieldValue != null) {
 								editItem.setVisible(true);
 							} else {
 								editItem.setVisible(false);
@@ -123,28 +121,28 @@ public class BeanField {
 
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-						try {
-							switch (item.getItemId()) {
 
-							case R.id.menuEntryRemoveConfigurationClass:
+						switch (item.getItemId()) {
 
+						case R.id.menuEntryRemoveConfigurationClass:
+
+							try {
 								field.set(config, null);
-								beanView.setText("kein Objekt gesetzt");
-
-								break;
-
-							case R.id.menuEntryEditConfigurationClass:
-
-								EditConfigHandlerFragment.editConfigBean(context, field.get(config),
-										selectedServer, roomConfig);
-
-								break;
-
+							} catch (Exception e) {
+								// should not happen
 							}
+							beanView.setText("kein Objekt");
 
-						} catch (Exception e) {
-							e.printStackTrace();
+							break;
+
+						case R.id.menuEntryEditConfigurationClass:
+
+							EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedServer, roomConfig);
+
+							break;
+
 						}
+
 						return false;
 					}
 				});

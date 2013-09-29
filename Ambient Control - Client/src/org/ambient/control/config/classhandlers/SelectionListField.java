@@ -16,7 +16,6 @@
 package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +35,7 @@ import android.widget.ListView;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class SelectionListField {
 
@@ -49,43 +48,48 @@ public class SelectionListField {
 	 */
 	public static void createView(EditConfigHandlerFragment context, final Object config, final Field field,
 			List<String> altValues, LinearLayout contentArea) throws IllegalAccessException {
+
 		final ListView list = new ListView(contentArea.getContext());
+		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		contentArea.addView(list);
-		ParameterizedType pt = (ParameterizedType) field.getGenericType();
-		final String containingClass = pt.getActualTypeArguments()[0].toString().substring(6);
-		list.setTag(containingClass);
+
+		// ParameterizedType pt = (ParameterizedType) field.getGenericType();
+		// final String containingClass =
+		// pt.getActualTypeArguments()[0].toString().substring(6);
+		// list.setTag(containingClass);
+
 		@SuppressWarnings("unchecked")
 		// set by FieldType.SELECTION_LIST
 		final List<Object> listContent = (List<Object>) field.get(config);
-		HashMap<Object, Boolean> tempValues = new HashMap<Object, Boolean>();
-		for (Object currentObject : listContent) {
-			tempValues.put(currentObject, true);
-		}
 
+		// show all values incl. potential values that the user may select or
+		// unselect
+		HashMap<Object, Boolean> displayContentMap = new HashMap<Object, Boolean>();
+		for (Object currentObject : listContent) {
+			displayContentMap.put(currentObject, true);
+		}
 		for (Object key : altValues) {
-			if (tempValues.containsKey(key) == false) {
-				tempValues.put(key, false);
+			if (displayContentMap.containsKey(key) == false) {
+				displayContentMap.put(key, false);
 			}
 		}
 
-		List<Object> contentForArrayAdapter = new ArrayList<Object>(tempValues.keySet());
-
+		List<Object> displayContent = new ArrayList<Object>(displayContentMap.keySet());
 		final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(context.getActivity(), R.layout.layout_checkable_list_item,
-				contentForArrayAdapter);
+				displayContent);
+		list.setAdapter(adapter);
 
-		for (Object currentKey : contentForArrayAdapter) {
-			if (tempValues.get(currentKey) == true) {
+		GuiUtils.setListViewHeightBasedOnChildren(list);
+
+		// set checked the values that where stored in listcontent
+		for (Object currentKey : displayContent) {
+			if (displayContentMap.get(currentKey) == true) {
 				LinearLayout rowView = (LinearLayout) adapter.getView(adapter.getPosition(currentKey), null, list);
 				CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkBox1);
 				checkBox.setChecked(true);
 			}
 		}
-
-		list.setAdapter(adapter);
-		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-		GuiUtils.setListViewHeightBasedOnChildren(list);
-		// we skip this if the values are simple and can be handled directly
-		// on the view, like booleans
 
 		list.setOnItemClickListener(new OnItemClickListener() {
 
@@ -94,6 +98,7 @@ public class SelectionListField {
 				CheckBox checkbox = (CheckBox) paramView.findViewById(R.id.checkBox1);
 				checkbox.setChecked(!checkbox.isChecked());
 				Object valueAtPosition = adapter.getItem(paramInt);
+				// sync view with field content
 				if (checkbox.isChecked()) {
 					listContent.add(valueAtPosition);
 				} else {

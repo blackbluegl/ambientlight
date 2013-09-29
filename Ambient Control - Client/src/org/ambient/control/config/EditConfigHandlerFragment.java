@@ -34,6 +34,7 @@ import org.ambient.control.config.classhandlers.SimpleListField;
 import org.ambient.control.config.classhandlers.StringField;
 import org.ambient.control.config.classhandlers.WhereToPutConfigurationData;
 import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
+import org.ambient.util.GuiUtils;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.ClassDescription;
 import org.ambientlight.annotations.FieldType;
@@ -132,9 +133,14 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 					Log.e(LOG, "could not create Object in createmode", e);
 				}
 			} else {
-				myConfigurationData = getArguments().getSerializable(BUNDLE_OBJECT_VALUE);
+				myConfigurationData = GuiUtils.deepCloneSerializeable(getArguments().getSerializable(BUNDLE_OBJECT_VALUE));
 			}
 		}
+	}
+
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		// integrate object into existing configuration after child fragment
 		// closes and has data for us via onIntegrate - callback we do the
@@ -144,12 +150,6 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		if (this.valueToIntegrate != null) {
 			this.integrateConfiguration(this.valueToIntegrate);
 		}
-
-	}
-
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		try {
 
@@ -215,16 +215,18 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 				}
 
 				// draw the category header and a description if present
-				for (Group currentGroup : description.groups()) {
-					if (currentGroup.position() == currentCategoryId) {
-						title.setText(currentGroup.name());
-						if (currentGroup.description().isEmpty() == false) {
-							descriptionTextView.setText(currentGroup.description());
-							descriptionTextView.setVisibility(View.VISIBLE);
-						} else {
-							descriptionTextView.setVisibility(View.GONE);
+				if (description != null) {
+					for (Group currentGroup : description.groups()) {
+						if (currentGroup.position() == currentCategoryId) {
+							title.setText(currentGroup.name());
+							if (currentGroup.description().isEmpty() == false) {
+								descriptionTextView.setText(currentGroup.description());
+								descriptionTextView.setVisibility(View.VISIBLE);
+							} else {
+								descriptionTextView.setVisibility(View.GONE);
+							}
+							break;
 						}
-						break;
 					}
 				}
 

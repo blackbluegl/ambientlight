@@ -37,6 +37,7 @@ public class ColorField {
 	 */
 	public static void createView(final Object config, LinearLayout container, final Field field, LinearLayout contentArea)
 			throws IllegalAccessException {
+
 		ColorPickerView.OnColorChangedListener listener = new ColorPickerView.OnColorChangedListener() {
 
 			@Override
