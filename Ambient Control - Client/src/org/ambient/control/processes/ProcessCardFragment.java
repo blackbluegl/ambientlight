@@ -38,7 +38,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -269,17 +268,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			return true;
 
 		case R.id.menuEntryProcessEdit:
-			EditConfigHandlerFragment fragEdit = new EditConfigHandlerFragment();
-			fragEdit.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-			Bundle arguments = new Bundle();
-			arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, this.selectedProcess);
-			arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
-			arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_SERVER, selectedServer);
-			fragEdit.setArguments(arguments);
-			FragmentTransaction ft2 = getFragmentManager().beginTransaction();
-			ft2.replace(R.id.LayoutMain, fragEdit);
-			ft2.addToBackStack(null);
-			ft2.commit();
+			EditConfigHandlerFragment.editConfigBean(this, this.selectedProcess, this.selectedServer,
+					this.roomService.getRoomConfiguration(selectedServer));
 			return true;
 
 		case R.id.menuEntryProcessRevertNew:
@@ -337,17 +327,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			SceneriesWrapper sceneries = new SceneriesWrapper();
 			sceneries.sceneries = roomService.getRoomConfiguration(selectedServer).getSceneries();
 
-			EditConfigHandlerFragment fragEditSceneries = new EditConfigHandlerFragment();
-			fragEditSceneries.setTargetFragment(this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-			Bundle argumentsSceneries = new Bundle();
-			argumentsSceneries.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, sceneries);
-			argumentsSceneries.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
-			argumentsSceneries.putString(EditConfigHandlerFragment.ARG_SELECTED_SERVER, selectedServer);
-			fragEditSceneries.setArguments(argumentsSceneries);
-			FragmentTransaction ft3 = getFragmentManager().beginTransaction();
-			ft3.replace(R.id.LayoutMain, fragEditSceneries);
-			ft3.addToBackStack(null);
-			ft3.commit();
+			EditConfigHandlerFragment.editConfigBean(this, sceneries, selectedServer,
+					roomService.getRoomConfiguration(selectedServer));
 
 			return true;
 		default:
