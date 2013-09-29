@@ -60,39 +60,42 @@ public class MapField {
 	 * @throws IllegalAccessException
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			List<String> altValues, List<String> altValuesToDisplay, LinearLayout contentArea, final String selectedServer,
-			final RoomConfiguration roomConfig) throws IllegalAccessException {
-		List<String> additionalIds = ConfigBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class), roomConfig);
+			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
+			final String selectedServer, final RoomConfiguration roomConfig) throws IllegalAccessException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);
-		ParameterizedType pt = (ParameterizedType) field.getGenericType();
-		final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
-		list.setTag(containingClass);
+		// list.setTag(containingClass);
 
 		@SuppressWarnings("unchecked")
-		final Map<Object, Object> map = (Map<Object, Object>) field.get(config);
-		final Map<String, Object> arrayMap = new LinkedHashMap<String, Object>();
+		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(config);
+		// show a list with all possible keys to user
+		final Map<String, Object> displayMap = new LinkedHashMap<String, Object>();
 
+		List<String> additionalIds = ConfigBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class), roomConfig);
 		for (String key : additionalIds) {
-			if (map.containsKey(key) == false) {
-				arrayMap.put(key, null);
+			if (fieldValue.containsKey(key) == false) {
+				displayMap.put(key, null);
 			} else {
-				arrayMap.put(key, map.get(key));
+				displayMap.put(key, fieldValue.get(key));
 			}
 		}
 
+		ParameterizedType pt = (ParameterizedType) field.getGenericType();
+		final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
+
 		final EditConfigMapAdapter adapter = new EditConfigMapAdapter(context.getFragmentManager(), context.getActivity(),
-				arrayMap, map, containingClass);
+				displayMap, fieldValue, containingClass);
 		list.setAdapter(adapter);
-		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		GuiUtils.setListViewHeightBasedOnChildren(list);
+
+		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		// we skip this if the values are simple and can be handled directly
-		// on the view, like booleans
+		// in the adapter, like booleans
 		if (containingClass.equals(Boolean.class.getName()) == false) {
-			final List<String> altValuesForListener = altValues;
-			final CharSequence[] alternativeDisplayValuesForListener = ConfigBindingHelper
-					.toCharSequenceArray(altValuesToDisplay);
+
 			list.setOnItemClickListener(new OnItemClickListener() {
 
 				@Override
@@ -106,19 +109,18 @@ public class MapField {
 					whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
 					context.whereToPutDataFromChild = whereToStore;
 
-					if (valueAtPosition == null && alternativeDisplayValuesForListener.length > 0) {
-						EditConfigHandlerFragment.createNewConfigBean(altValuesForListener, alternativeDisplayValuesForListener,
-								context, selectedServer, roomConfig);
+					if (valueAtPosition == null && altValuesToDisplay.size() > 0) {
+						EditConfigHandlerFragment.createNewConfigBean(altValues,
+								ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedServer, roomConfig);
+
 					} else if (valueAtPosition != null) {
-
 						String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
-
-						EditConfigHandlerFragment.editConfigBean(context, map.get(currentText), selectedServer, roomConfig);
-
+						EditConfigHandlerFragment.editConfigBean(context, fieldValue.get(currentText), selectedServer, roomConfig);
 					}
 				}
 			});
 		}
+
 		list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
 			List<Integer> checkedItems = new ArrayList<Integer>();
@@ -131,26 +133,27 @@ public class MapField {
 
 				case R.id.menuEntryRemoveConfigurationClass:
 
-					List<Entry<String, Object>> list = new ArrayList<Entry<String, Object>>();
+					List<Entry<String, Object>> remove = new ArrayList<Entry<String, Object>>();
 					for (Integer position : checkedItems) {
-						list.add(adapter.getItem(position));
+						remove.add(adapter.getItem(position));
 					}
 
-					for (Entry<String, Object> current : list) {
+					for (Entry<String, Object> current : remove) {
 						current.setValue(null);
-						map.remove(current.getKey());
+						fieldValue.remove(current.getKey());
 					}
+
 					adapter.notifyDataSetChanged();
 					break;
 
 				case R.id.menuEntryEditConfigurationClass:
 
-					EditConfigHandlerFragment.editConfigBean(context, adapter.getItem(checkedItems.get(0))
-							.getValue(), selectedServer, roomConfig);
-
+					EditConfigHandlerFragment.editConfigBean(context, adapter.getItem(checkedItems.get(0)).getValue(),
+							selectedServer, roomConfig);
 					break;
 
 				}
+
 				return false;
 			}
 
@@ -160,7 +163,6 @@ public class MapField {
 				MenuInflater inflater = mode.getMenuInflater();
 				inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
 				return true;
-
 			}
 
 
@@ -184,6 +186,7 @@ public class MapField {
 				} else {
 					checkedItems.remove(Integer.valueOf(position));
 				}
+
 				mode.setTitle(checkedItems.size() + " ausgewählt");
 
 				MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);

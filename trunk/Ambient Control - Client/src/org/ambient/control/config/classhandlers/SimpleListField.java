@@ -43,7 +43,7 @@ import android.widget.ListView;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class SimpleListField {
 
@@ -55,40 +55,47 @@ public class SimpleListField {
 	 * @throws IllegalAccessException
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			List<String> altValues, LinearLayout contentArea, final String selectedServer, final RoomConfiguration roomConfig)
-			throws IllegalAccessException {
+			final List<String> altValues, LinearLayout contentArea, final String selectedServer,
+			final RoomConfiguration roomConfig) throws IllegalAccessException {
+
 		final ListView listView = new ListView(contentArea.getContext());
 		contentArea.addView(listView);
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		@SuppressWarnings({ "unchecked" })
 		// set by FieldType.SIMPLE_LIST
 		final List<Object> listContent = (List<Object>) field.get(config);
-		final List<String> altValuesFinal = altValues;
 
+		// create a + button for an empty list so the user can put in his first
+		// object
 		final ImageView createNew = new ImageView(context.getActivity());
 		contentArea.addView(createNew);
 		createNew.setImageResource(R.drawable.content_new);
+
+		if (listContent.size() > 0) {
+			createNew.setVisibility(View.GONE);
+		}
+
 		createNew.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+
 				WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
 				whereToStore.fieldName = field.getName();
 				whereToStore.type = WhereToPutType.LIST;
 				whereToStore.positionInList = 0;
 				context.whereToPutDataFromChild = whereToStore;
 
-				EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-						ConfigBindingHelper.toCharSequenceArray(altValuesFinal), context, selectedServer, roomConfig);
+				EditConfigHandlerFragment.createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValues),
+						context, selectedServer, roomConfig);
 			}
 		});
-		if (listContent.size() > 0) {
-			createNew.setVisibility(View.GONE);
-		}
+
 		final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(context.getActivity(), android.R.layout.simple_list_item_1,
 				listContent);
-
 		listView.setAdapter(adapter);
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		GuiUtils.setListViewHeightBasedOnChildren(listView);
 
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -114,33 +121,43 @@ public class SimpleListField {
 
 				case R.id.menuEntryRemoveConfigurationClass:
 
-					List<Object> list = new ArrayList<Object>();
+					List<Object> remove = new ArrayList<Object>();
 					for (Integer position : checkedItems) {
-						list.add(adapter.getItem(position));
+						remove.add(adapter.getItem(position));
 					}
 
-					for (Object current : list) {
+					for (Object current : remove) {
 						listContent.remove(current);
 					}
+
 					adapter.notifyDataSetChanged();
+
 					if (adapter.isEmpty()) {
 						createNew.setVisibility(View.VISIBLE);
 					}
-					mode.finish();
+
 					GuiUtils.setListViewHeightBasedOnChildren(listView);
+
+					mode.finish();
+
 					break;
+
 				case R.id.menuEntryAddConfigurationClass:
+
 					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.LIST;
 					whereToStore.positionInList = 0;
 					context.whereToPutDataFromChild = whereToStore;
 
-					EditConfigHandlerFragment.createNewConfigBean(altValuesFinal,
-							ConfigBindingHelper.toCharSequenceArray(altValuesFinal), context, selectedServer, roomConfig);
+					EditConfigHandlerFragment.createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValues),
+							context, selectedServer, roomConfig);
+
 					mode.finish();
+
 					break;
 				}
+
 				return false;
 			}
 
@@ -179,5 +196,4 @@ public class SimpleListField {
 			}
 		});
 	}
-
 }

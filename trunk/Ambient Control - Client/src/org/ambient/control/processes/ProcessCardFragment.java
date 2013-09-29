@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.control.rest.RestClient;
 import org.ambient.util.GuiUtils;
@@ -453,23 +453,6 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 				case R.id.menuEntryProcessEditNode:
 					EditConfigHandlerFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedServer,
 							roomService.getRoomConfiguration(selectedServer));
-					// EditConfigHandlerFragment fragEdit = new
-					// EditConfigHandlerFragment();
-					// fragEdit.setTargetFragment(myself,
-					// EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-					// Bundle arguments = new Bundle();
-					// arguments.putSerializable(EditConfigHandlerFragment.OBJECT_VALUE,
-					// drawer.getSelectedNode());
-					// arguments.putBoolean(EditConfigHandlerFragment.CREATE_MODE,
-					// false);
-					// arguments.putString(EditConfigHandlerFragment.SELECTED_SERVER,
-					// selectedServer);
-					// fragEdit.setArguments(arguments);
-					// FragmentTransaction ft2 =
-					// getFragmentManager().beginTransaction();
-					// ft2.replace(R.id.LayoutMain, fragEdit);
-					// ft2.addToBackStack(null);
-					// ft2.commit();
 					break;
 
 				default:

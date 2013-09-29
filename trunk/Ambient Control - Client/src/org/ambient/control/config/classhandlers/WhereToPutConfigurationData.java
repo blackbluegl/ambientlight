@@ -24,11 +24,11 @@ import java.io.Serializable;
  */
 public class WhereToPutConfigurationData implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	public static enum WhereToPutType {
 		FIELD, MAP, LIST
 	}
-
-	private static final long serialVersionUID = 1L;
 
 	public String fieldName;
 	public String keyInMap;

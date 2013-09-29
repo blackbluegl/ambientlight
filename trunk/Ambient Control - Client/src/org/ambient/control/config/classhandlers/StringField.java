@@ -48,14 +48,15 @@ public class StringField {
 	 * @throws IllegalAccessException
 	 */
 	public static void createView(EditConfigHandlerFragment context, final Object config, LinearLayout container,
-			final Field field, List<String> altValues, List<String> altValuesToDisplay, LinearLayout contentArea)
+			final Field field, final List<String> altValues, List<String> altValuesToDisplay, LinearLayout contentArea)
 					throws IllegalAccessException {
+
 		if (field.getAnnotation(AlternativeValues.class) != null) {
 			// create spinner
 
 			Spinner spinner = new Spinner(container.getContext());
 			contentArea.addView(spinner);
-			final List<String> altValuesForListener = altValues;
+
 			final ArrayAdapter<String> adapter = new ArrayAdapter<String>(context.getActivity(),
 					android.R.layout.simple_spinner_item, altValuesToDisplay);
 			adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -65,7 +66,7 @@ public class StringField {
 
 				@Override
 				public void onItemSelected(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-					String valueToPaste = altValuesForListener.get(paramInt);
+					String valueToPaste = altValues.get(paramInt);
 					try {
 						field.set(config, valueToPaste);
 					} catch (Exception e) {
@@ -80,10 +81,12 @@ public class StringField {
 			});
 
 		} else {
+
 			// create textfield
 			final EditText input = new EditText(container.getContext());
 			contentArea.addView(input);
 			input.setText((String) field.get(config));
+
 			input.addTextChangedListener(new TextWatcher() {
 
 				@Override
@@ -91,7 +94,7 @@ public class StringField {
 					try {
 						field.set(config, input.getText().toString());
 					} catch (Exception e) {
-						e.printStackTrace();
+						// should not happen
 					}
 				}
 

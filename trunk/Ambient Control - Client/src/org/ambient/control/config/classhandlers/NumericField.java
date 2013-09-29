@@ -44,10 +44,11 @@ public class NumericField {
 		final double difference = Double.parseDouble(typedef.max()) - min;
 
 		SeekBar seekBar = new SeekBar(container.getContext());
+		contentArea.addView(seekBar);
 		seekBar.setMax(256);
 		double doubleValue = ((((Number) field.get(config)).doubleValue()) - min) / difference;
 		seekBar.setProgress((int) (doubleValue * 256.0));
-		contentArea.addView(seekBar);
+
 		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			@Override
