@@ -15,12 +15,16 @@
 
 package org.ambientlight.device.led;
 
+import java.io.Serializable;
+
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class LedPointConfiguration {
+public class LedPointConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int port;
 	public int xPosition;
