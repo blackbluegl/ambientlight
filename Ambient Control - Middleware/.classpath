@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Ambient Control - Entities"/>
+	<classpathentry kind="lib" path="lib/asm-3.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/grizzly-framework-2.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/grizzly-http-2.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/grizzly-http-server-2.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-jaxrs-1.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-xc-1.9.10.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-core-1.14.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-grizzly2-1.16.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-json-1.14.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-server-1.14.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.4.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LK-35-API"/>
+	<classpathentry kind="lib" path="lib/jeval.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
