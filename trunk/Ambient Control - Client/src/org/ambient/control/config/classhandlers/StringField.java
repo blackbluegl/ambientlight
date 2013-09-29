@@ -62,6 +62,13 @@ public class StringField {
 			adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 			spinner.setAdapter(adapter);
 
+			String selection = (String) field.get(config);
+			int positionOfSelection = altValuesToDisplay.indexOf(selection);
+			if (positionOfSelection < 0) {
+				positionOfSelection = 0;
+			}
+			spinner.setSelection(positionOfSelection);
+
 			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 				@Override

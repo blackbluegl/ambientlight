@@ -309,7 +309,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		List<String> altValuesToDisplay = null;
 
 		if (field.getAnnotation(AlternativeValues.class) != null) {
-			// get the binding information from the field anotation first
+			// get the binding information from the field annotation first
 			altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class), config.getClass()
 					.getName(), roomConfig);
 			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class),
