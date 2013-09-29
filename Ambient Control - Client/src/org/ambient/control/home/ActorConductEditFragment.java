@@ -88,11 +88,11 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				Bundle args = new Bundle();
-				args.putString(CLASS_NAME, altValues.get(which));
-				args.putString(SELECTED_SERVER, server);
-				args.putBoolean(CREATE_MODE, true);
+				args.putString(ARG_CLASS_NAME, altValues.get(which));
+				args.putString(ARG_SELECTED_SERVER, server);
+				args.putBoolean(ARG_CREATE_MODE, true);
 				args.putString(ITEM_NAME, itemName);
-				args.putSerializable(ROOM_CONFIG, roomConfig);
+				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 				ActorConductEditFragment configHandler = new ActorConductEditFragment();

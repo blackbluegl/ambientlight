@@ -20,7 +20,7 @@ package org.ambient.control.config;
  * @author Florian Bornkessel
  *
  */
-public interface EditConfigExitListener {
+public interface EditConfigOnExitListener {
 
 	public void onIntegrateConfiguration(String serverName, Object configuration);
 	public void onRevertConfiguration(String serverName, Object configuration);
