@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ambient.control.rest.RestClient;
-import org.ambient.control.rest.URLUtils;
+import org.ambient.rest.RestClient;
+import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
 import org.ambientlight.room.RoomConfiguration;
 

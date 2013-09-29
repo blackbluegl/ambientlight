@@ -8,7 +8,7 @@ import org.ambient.control.climate.ClimateFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
-import org.ambient.control.rest.URLUtils;
+import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.room.RoomConfiguration;
 

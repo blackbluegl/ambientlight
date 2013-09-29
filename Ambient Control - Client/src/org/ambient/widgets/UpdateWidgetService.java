@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ambient.control.R;
-import org.ambient.control.rest.RestClient;
-import org.ambient.control.rest.URLUtils;
+import org.ambient.rest.RestClient;
+import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.RoomConfiguration;

@@ -20,7 +20,7 @@ import java.util.List;
 import org.ambient.control.R;
 import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.rest.RestClient;
+import org.ambient.rest.RestClient;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
