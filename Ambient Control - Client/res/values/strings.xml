@@ -32,6 +32,6 @@
     <string name="chose_room">Raum:</string>
     <string name="chose_switch">Schalter:</string>
     <string name="button_nfc_program">Anlernen</string>
-    <string name="title_activity_nfcswitch_handler">NFCSwitchHandlerActivity</string>
+    <string name="title_activity_nfcswitch_handler">NFC Schalter</string>
 
 </resources>
