@@ -26,6 +26,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+//TODO adapt to new roomservice
 public class NFCSwitchHandlerActivity extends Activity implements OnInitListener {
 
 	final static String TYPE_SWITCH_EVENT = "switchEvent";
