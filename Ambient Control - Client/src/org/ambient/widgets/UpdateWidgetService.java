@@ -231,18 +231,20 @@ public class UpdateWidgetService extends Service {
 
 
 	private void switchRoom(Intent intent, AppWidgetManager appWidgetManager) {
-		String switchRoom = intent.getExtras().getString("switchClicked");
+		String serverName = intent.getExtras().getString("switchClicked");
 		boolean powerState = intent.getExtras().getBoolean("powerState", false);
 
 		setWidgetToRefreshView();
 
 		try {
-
-			RestClient rest = new RestClient();
+			// TODO getting just the first switch here. later we have to
+			// determine the mainswitch by some attributes
+			String switchName = (roomService.getRoomConfiguration(serverName).getSwitchGenerators().keySet()
+					.toArray(new String[1]))[0];
 			SwitchEventConfiguration event = new SwitchEventConfiguration();
-			event.eventGeneratorName = "RoomSwitch";
+			event.eventGeneratorName = switchName;
 			event.powerState = powerState;
-			rest.sendEvent(switchRoom, event);
+			RestClient.sendEvent(serverName, event);
 		} catch (Exception e) {
 			Log.e(LOG,
 					"error while trying to switch room. maybe the server is down or we are in the wrong wifi net. disableing the widget till next wakeup.",
