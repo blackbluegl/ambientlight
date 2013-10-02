@@ -52,7 +52,9 @@ public class RenderControl {
 		// create Sunset
 		if (lightObject.configuration.actorConductConfiguration instanceof SunSetRenderingProgrammConfiguration) {
 			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.configuration.actorConductConfiguration;
-			renderProgram = new Sunset(config.duration, config.sunStartX, config.sunStartX, config.sunSetX, config.sizeOfSun);
+			renderProgram = new Sunset(config.duration, config.position, config.sunStartX, config.sunStartX, config.sunSetX,
+					config.sizeOfSun,
+					config.gamma);
 		}
 
 		renderProgram.addEffect(transition);
