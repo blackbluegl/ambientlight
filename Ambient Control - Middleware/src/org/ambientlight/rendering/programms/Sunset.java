@@ -19,8 +19,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.Point;
 import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import org.ambientlight.AmbientControlMW;
@@ -36,6 +37,8 @@ public class Sunset extends RenderingProgramm {
 	// position in programm 1 is finished 0 is beginning
 	double position = 0;
 
+	double gamma = 3;
+
 	// duration of sunset in minutes
 	double duration = 0.7;
 
@@ -47,18 +50,20 @@ public class Sunset extends RenderingProgramm {
 
 	double sizeOfSun = 1;
 
-	Color sunStartColor = new Color(255, 255, 255, 255);
-	Color sunSetColor = new Color(230, 180, 120, 255);
-	Color sunStartCoronaColor = new Color(250, 245, 240, 127);
-	Color sunSetCoronaColor = new Color(160, 100, 20, 128);
-	Color sunStartCoronaEndColor = new Color(250, 245, 240, 0);
-	Color sunSetCoronaEndColor = new Color(160, 100, 20, 0);
-	Color borderStartColor = new Color(250, 245, 240, 0);
-	Color borderEndColor = new Color(160, 100, 30, 0);
+	int oldSubSampleStep = -1;
+	int largestSide = 0;
 
-	Color backgroundInnerStart = new Color(250, 250, 250, 0);
+	Color sunStartColor = new Color(255, 255, 255, 255);
+	Color sunSetColor = new Color(255, 230, 200, 255);
+	Color sunStartCoronaColor = new Color(255, 245, 240, 127);
+	Color sunSetCoronaColor = new Color(255, 190, 20, 128);
+	Color sunStartCoronaEndColor = new Color(255, 245, 240, 0);
+	Color sunSetCoronaEndColor = new Color(180, 100, 20, 0);
+	Color borderStartColor = new Color(250, 245, 240, 0);
+	Color borderEndColor = new Color(180, 100, 30, 0);
+
 	Color backgroundBottomStart = new Color(250, 250, 250);
-	Color backgroundBottomEnd = new Color(200, 60, 10);
+	Color backgroundBottomEnd = new Color(255, 128, 0);
 	Color backgroundTopStart = new Color(210, 220, 230);
 	Color backgroundTopEnd = new Color(5, 0, 60);
 
@@ -66,12 +71,15 @@ public class Sunset extends RenderingProgramm {
 	Color backgroundEnd = new Color(22, 33, 120, 0);
 
 
-	public Sunset(double duration, double sunStartX, double sunStartY, double sunSetX, double sizeOfSun) {
+	public Sunset(double duration, double position, double sunStartX, double sunStartY, double sunSetX, double sizeOfSun,
+			double gamma) {
 		this.duration = duration;
+		this.position = position;
 		this.sunStartXPosition = sunStartX;
 		this.sunStartYPosition = sunStartY;
 		this.sunSetXPosition = sunSetX;
 		this.sizeOfSun = sizeOfSun;
+		this.gamma = gamma;
 	}
 
 
@@ -89,13 +97,18 @@ public class Sunset extends RenderingProgramm {
 	 */
 	@Override
 	public BufferedImage renderLightObject(LightObject lightObject) {
+
 		if (hasDirtyRegion() == false)
 			return lightObject.getPixelMap();
-		position = position + getStepWidth();
-		renderSunset(lightObject.getPixelMap());
-		renderSun(lightObject.getPixelMap());
-		renderBackground(lightObject.getPixelMap());
-		return lightObject.getPixelMap();
+
+		largestSide = lightObject.getPixelMap().getHeight() > lightObject.getPixelMap().getWidth() ? lightObject.getPixelMap()
+				.getHeight() : lightObject.getPixelMap().getWidth();
+
+				renderSunset(lightObject.getPixelMap());
+				renderSun(lightObject.getPixelMap());
+				renderBackground(lightObject.getPixelMap());
+
+				return lightObject.getPixelMap();
 	}
 
 
@@ -107,10 +120,28 @@ public class Sunset extends RenderingProgramm {
 	 */
 	@Override
 	public boolean hasDirtyRegion() {
-		// program finished. we do not need any updates anymore
-		if (position > 1 - getStepWidth())
+		if (position > (1 - getStepWidth()))
 			return false;
-		return true;
+		else {
+			boolean render = false;
+			float subampling = (float) (largestSide * position) % 1;
+
+			int subsamplingStep = (int) (subampling / 0.1);
+			if (this.oldSubSampleStep != subsamplingStep) {
+				oldSubSampleStep = subsamplingStep;
+				render = true;
+			}
+
+
+			position = position + getStepWidth();
+			// program finished. we do not need any updates anymore
+
+			if (render)
+				return true;
+			else
+				return false;
+
+		}
 	}
 
 
@@ -120,11 +151,11 @@ public class Sunset extends RenderingProgramm {
 		Color coronaColor = getBlendColor(sunStartCoronaColor, sunSetCoronaColor);
 		Color outerCoronaColor = getBlendColor(sunStartCoronaEndColor, sunSetCoronaEndColor);
 
-		Point center = getPositionOfSun(pixelmap);
-		center.setLocation(center.x, (center.y + pixelmap.getHeight() * 0.1f));
-		Point focus = getPositionOfSun(pixelmap);
-		focus.setLocation(focus.x, focus.y + (pixelmap.getHeight() * 0.2) * position);
-		int rad = pixelmap.getWidth() < pixelmap.getHeight() ? pixelmap.getWidth() : pixelmap.getHeight();
+		Point2D center = getPositionOfSun(pixelmap);
+		center.setLocation(center.getX(), (center.getY() + pixelmap.getHeight() * 0.25f));
+		Point2D focus = getPositionOfSun(pixelmap);
+		focus.setLocation(focus.getX(), focus.getY() + pixelmap.getHeight() * 0.25f + (pixelmap.getHeight() * 0.1) * position);
+		float rad = pixelmap.getWidth() < pixelmap.getHeight() ? pixelmap.getWidth() : pixelmap.getHeight();
 		float radius = (float) (rad * this.sizeOfSun);
 
 		float[] dist = { 0.04f, 0.05f, 0.06f, 0.28f };
@@ -139,19 +170,19 @@ public class Sunset extends RenderingProgramm {
 	private void renderSunset(BufferedImage pixelmap) {
 		Color backgroundTop = getBlendColor(backgroundTopStart, backgroundTopEnd);
 		Color backgroundBottom = getBlendColor(backgroundBottomStart, backgroundBottomEnd);
-		Point beginning = new Point(pixelmap.getWidth() / 2, 0);
-		Point end = new Point(pixelmap.getWidth() / 2, pixelmap.getHeight());
-		Point sun = getPositionOfSun(pixelmap);
+		Point2D beginning = new Point2D.Float(pixelmap.getWidth() / 2, 0);
+		Point2D end = new Point2D.Float(pixelmap.getWidth() / 2, pixelmap.getHeight());
+		Point2D sun = getPositionOfSun(pixelmap);
 		float sunPosition = (float) (sun.getY() / pixelmap.getHeight());
 		if (sunPosition > 1.0f) {
 			sunPosition = 0.9999f;
 		}
 
-		float aboveSun = (float) (sunPosition - (0.3f * (1 - position)));
+		float aboveSun = (float) (sunPosition - (0.5f * (1 - position)));
 		if (aboveSun <= 0f) {
 			aboveSun = 0.0001f;
 		}
-		float underSun = sunPosition + 0.21f;
+		float underSun = sunPosition + 0.11f;
 		if (underSun >= 1.0f) {
 			underSun = 0.9999999f;
 		}
@@ -160,14 +191,16 @@ public class Sunset extends RenderingProgramm {
 		Color[] colors = { backgroundTop, backgroundTop, backgroundBottom, backgroundBottom };
 		LinearGradientPaint paint = new LinearGradientPaint(beginning, end, dist, colors);
 		Graphics2D g = pixelmap.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setPaint(paint);
 		g.fillRect(0, 0, pixelmap.getWidth(), pixelmap.getHeight());
 	}
 
 
 	private void renderBackground(BufferedImage pixelmap) {
-		Point center = getPositionOfSun(pixelmap);
-		center.y = center.y + pixelmap.getHeight() / 2;
+		Point2D center = getPositionOfSun(pixelmap);
+		center.setLocation(center.getX(), center.getY() + pixelmap.getHeight() / 2.0);
 
 		Color blendedColor = getBlendColor(this.backgroundStart, this.backgroundEnd);
 		blendedColor = new Color(blendedColor.getRed(), blendedColor.getGreen(), blendedColor.getBlue(), 0);
@@ -186,15 +219,22 @@ public class Sunset extends RenderingProgramm {
 
 
 	private Color getBlendColor(Color start, Color stop) {
+
 		double weightStart = 1 - position;
 		double weightStop = position;
 
 		double r = weightStart * start.getRed() + weightStop * stop.getRed();
+		r = (255 * (Math.pow(r / 255, gamma)));
 		r = r < 0 ? 0 : r;
+
 		double g = weightStart * start.getGreen() + weightStop * stop.getGreen();
+		g = (255 * (Math.pow(g / 255, gamma)));
 		g = g < 0 ? 0 : g;
+
 		double b = weightStart * start.getBlue() + weightStop * stop.getBlue();
 		b = b < 0 ? 0 : b;
+		b = (255 * (Math.pow(b / 255, gamma)));
+
 		double a = weightStart * start.getAlpha() + weightStop * stop.getAlpha();
 		a = a < 0 ? 0 : a;
 		a = a > 255 ? 255 : a;
@@ -204,15 +244,15 @@ public class Sunset extends RenderingProgramm {
 	}
 
 
-	private Point getPositionOfSun(BufferedImage pixelMap) {
-		int xPosStart = (int) (pixelMap.getWidth() * sunStartXPosition);
-		int xPosEnd = (int) (pixelMap.getWidth() * sunSetXPosition);
-		int yPosStart = (int) (pixelMap.getHeight() * sunStartYPosition);
-		int yPosEnd = pixelMap.getHeight();
+	private Point2D getPositionOfSun(BufferedImage pixelMap) {
+		float xPosStart = (float) (pixelMap.getWidth() * sunStartXPosition);
+		float xPosEnd = (float) (pixelMap.getWidth() * sunSetXPosition);
+		float yPosStart = (float) (pixelMap.getHeight() * sunStartYPosition);
+		float yPosEnd = pixelMap.getHeight();
 
-		int xPos = (int) (xPosStart + ((xPosEnd - xPosStart) * position));
-		int yPos = (int) (yPosStart + ((yPosEnd - yPosStart) * position));
+		float xPos = (float) (xPosStart + ((xPosEnd - xPosStart) * position));
+		float yPos = (float) (yPosStart + ((yPosEnd - yPosStart) * position));
 
-		return new Point(xPos, yPos);
+		return new Point2D.Float(xPos, yPos);
 	}
 }
