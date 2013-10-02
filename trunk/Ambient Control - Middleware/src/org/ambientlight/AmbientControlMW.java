@@ -36,7 +36,7 @@ public class AmbientControlMW {
 	static ProcessFactory processFactory;
 
 
-	static int FREQUENCY = 25;
+	public static final int FREQUENCY = 25;
 
 	static boolean debug = false;
 
