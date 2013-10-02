@@ -21,7 +21,7 @@ public class SunSetRenderingProgrammConfiguration extends RenderingProgramConfig
 
 	@Presentation(position = 1, name = "Starten bei", groupPosition = 1)
 	@TypeDef(min = "0", max = "1")
-	public double position = 1;
+	public double position = 0.0;
 
 	@Presentation(position = 1, name = "Größe der Sonne", groupPosition = 3)
 	@TypeDef(min = "0.1", max = "3")
