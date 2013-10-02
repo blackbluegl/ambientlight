@@ -23,10 +23,11 @@ import java.util.Map;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.home.mapper.AbstractRoomItemViewMapper;
 import org.ambient.control.home.mapper.SimpleColorLightItemViewMapper;
+import org.ambient.control.home.mapper.SunsetLightItemViewMapper;
 import org.ambient.control.home.mapper.SwitchItemViewMapper;
 import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.rest.RestClient;
@@ -40,6 +41,7 @@ import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.AbstractSceneryConfiguration;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 
@@ -651,6 +653,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 		if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
 			result = new TronLightItemViewMapper(lightObjectView, currentConfig.getName(), R.string.program_tron,
+					currentConfig.getPowerState());
+		}
+
+		if (sceneryConfig instanceof SunSetRenderingProgrammConfiguration) {
+			result = new SunsetLightItemViewMapper(lightObjectView, currentConfig.getName(), R.string.program_tron,
 					currentConfig.getPowerState());
 		}
 

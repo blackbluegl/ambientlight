@@ -8,10 +8,12 @@ import org.ambientlight.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.rendering.effects.transitions.FadeInTransition;
 import org.ambientlight.rendering.programms.RenderingProgramm;
 import org.ambientlight.rendering.programms.SimpleColor;
+import org.ambientlight.rendering.programms.Sunset;
 import org.ambientlight.rendering.programms.Tron;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 
 
@@ -45,6 +47,12 @@ public class RenderControl {
 			Color color = new Color(config.rgb);
 			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength, config.sparkleStrength,
 					config.sparkleSize, config.speed, config.lightPointAmount);
+		}
+
+		// create Sunset
+		if (lightObject.configuration.actorConductConfiguration instanceof SunSetRenderingProgrammConfiguration) {
+			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.configuration.actorConductConfiguration;
+			renderProgram = new Sunset(config.duration, config.sunStartX, config.sunStartX, config.sunSetX, config.sizeOfSun);
 		}
 
 		renderProgram.addEffect(transition);

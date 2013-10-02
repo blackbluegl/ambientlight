@@ -31,6 +31,7 @@ import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.scenery.UserSceneryConfiguration;
 import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 
 
@@ -121,13 +122,15 @@ public class CreateTestConfig {
 		rc.actorConfigurations.put(lo.getName(), lo);
 
 		LightObjectConfiguration background = new LightObjectConfiguration();
+		background.setPowerState(true);
 		background.setName("background");
 		background.height = 200;
 		background.layerNumber = 1;
 		background.width = 200;
 		background.xOffsetInRoom = 0;
 		background.yOffsetInRoom = 0;
-		background.actorConductConfiguration = this.createSimpleColor();
+		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
+		background.actorConductConfiguration = sunset;
 		rc.actorConfigurations.put(background.getName(), background);
 
 		SwitchEventGeneratorConfiguration triggerMainSwitch = new SwitchEventGeneratorConfiguration();
