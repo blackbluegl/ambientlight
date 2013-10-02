@@ -126,12 +126,11 @@ public class Sunset extends RenderingProgramm {
 			boolean render = false;
 			float subampling = (float) (largestSide * position) % 1;
 
-			int subsamplingStep = (int) (subampling / 0.1);
+			int subsamplingStep = (int) (subampling / 0.02);
 			if (this.oldSubSampleStep != subsamplingStep) {
 				oldSubSampleStep = subsamplingStep;
 				render = true;
 			}
-
 
 			position = position + getStepWidth();
 			// program finished. we do not need any updates anymore
