@@ -64,11 +64,11 @@ public class Sunset extends RenderingProgramm {
 
 	Color backgroundBottomStart = new Color(250, 250, 250);
 	Color backgroundBottomEnd = new Color(255, 128, 0);
-	Color backgroundTopStart = new Color(210, 220, 230);
-	Color backgroundTopEnd = new Color(5, 0, 60);
+	Color backgroundTopStart = new Color(250, 250, 250);
+	Color backgroundTopEnd = new Color(40, 80, 100);
 
-	Color backgroundStart = new Color(210, 220, 230, 0);
-	Color backgroundEnd = new Color(22, 33, 120, 0);
+	Color backgroundStart = new Color(0, 70, 230, 0);
+	Color backgroundEnd = new Color(0, 128, 255, 0);
 
 
 	public Sunset(double duration, double position, double sunStartX, double sunStartY, double sunSetX, double sizeOfSun,
@@ -177,11 +177,12 @@ public class Sunset extends RenderingProgramm {
 			sunPosition = 0.9999f;
 		}
 
-		float aboveSun = (float) (sunPosition - (0.5f * (1 - position)));
+		float aboveSun = (float) (sunPosition + 0.0f - (0.5f * (1 - position)));
 		if (aboveSun <= 0f) {
 			aboveSun = 0.0001f;
 		}
-		float underSun = sunPosition + 0.11f;
+
+		float underSun = sunPosition + 0.35f;
 		if (underSun >= 1.0f) {
 			underSun = 0.9999999f;
 		}
@@ -199,19 +200,23 @@ public class Sunset extends RenderingProgramm {
 
 	private void renderBackground(BufferedImage pixelmap) {
 		Point2D center = getPositionOfSun(pixelmap);
-		center.setLocation(center.getX(), center.getY() + pixelmap.getHeight() / 2.0);
+		center.setLocation(center.getX(), center.getY() + (pixelmap.getHeight() / 1.5) + 0.0f * pixelmap.getHeight() * position);
 
 		Color blendedColor = getBlendColor(this.backgroundStart, this.backgroundEnd);
-		blendedColor = new Color(blendedColor.getRed(), blendedColor.getGreen(), blendedColor.getBlue(), 0);
+		Color outerColor = getBlendColor(this.backgroundStart, Color.BLACK);
+		// blendedColor = new Color(blendedColor.getRed(),
+		// blendedColor.getGreen(), blendedColor.getBlue(), 0);
 
 		int maxSize = pixelmap.getWidth() > pixelmap.getHeight() ? pixelmap.getWidth() : pixelmap.getHeight();
 
 		float radius = (float) (2.5 * (maxSize - maxSize * position));
 
 		float[] dist = { 0.0f, 1f };
-		Color[] colors = { blendedColor, new Color(0, 0, 0, 200) };
+		Color[] colors = { blendedColor, outerColor };
 		RadialGradientPaint p = new RadialGradientPaint(center, radius, dist, colors);
 		Graphics2D g = pixelmap.createGraphics();
+		// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+		// RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setPaint(p);
 		g.fillRect(0, 0, pixelmap.getWidth(), pixelmap.getHeight());
 	}
