@@ -17,29 +17,32 @@ package org.ambientlight.device.led;
 
 import java.awt.Color;
 
+import org.ambientlight.device.led.color.Color64Bit;
+
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class LedPoint {
 
 	public LedPointConfiguration configuration;
 
-	Integer rgbValue;
+	Color64Bit rgbValue;
 
 
 	public void setPixel(int rgbValue) {
-		this.rgbValue = rgbValue;
+		this.rgbValue = new Color64Bit(new Color(rgbValue), configuration.gammaRed, configuration.gammaGreen,
+				configuration.gammaBlue);
 	}
 
 
 	public Integer getOutputResult() {
-		return rgbValue;
+		return rgbValue.getColor().getRGB();
 	}
 
 
 	public void clear() {
-		this.rgbValue = Color.BLACK.getRGB();
+		this.rgbValue = new Color64Bit(Color.BLACK, configuration.gammaRed, configuration.gammaGreen, configuration.gammaBlue);
 	}
 }

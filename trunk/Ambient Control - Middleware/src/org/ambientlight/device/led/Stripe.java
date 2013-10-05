@@ -3,7 +3,7 @@ package org.ambientlight.device.led;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.device.led.colorcorrection.ColorCorrection;
+import org.ambientlight.device.led.color.DitheringRGB;
 import org.ambientlight.room.StripePart;
 
 
@@ -13,12 +13,12 @@ public class Stripe {
 	List<Integer> pixels;
 	List<StripePart> subStripes;
 
-	private ColorCorrection colorCorrection;
+	private DitheringRGB dithering;
 
 
 	public Stripe(StripeConfiguration configuration) {
 		this.configuration = configuration;
-		this.colorCorrection = new ColorCorrection(configuration.gammaRed, configuration.gammaGreen, configuration.gammaBlue);
+		this.dithering = new DitheringRGB(configuration.gammaRed, configuration.gammaGreen, configuration.gammaBlue);
 		this.clear();
 	}
 
@@ -39,7 +39,7 @@ public class Stripe {
 
 
 	public List<Integer> getOutputResult() {
-		return colorCorrection.getCorrectedColors(pixels);
+		return dithering.getDitheredRGB(pixels);
 	}
 
 

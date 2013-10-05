@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.led.colorcorrection;
+package org.ambientlight.device.led.color;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class DitheringRGB {
 	}
 
 
-	public List<Integer> getCorrectedColors(List<Integer> input) {
+	public List<Integer> getDitheredRGB(List<Integer> input) {
 		if (input == null || input.isEmpty())
 			return input;
 
