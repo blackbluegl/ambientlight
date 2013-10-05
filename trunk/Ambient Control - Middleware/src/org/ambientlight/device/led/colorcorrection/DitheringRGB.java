@@ -24,21 +24,14 @@ import java.util.List;
  * @author Florian Bornkessel
  * 
  */
-public class ColorCorrection {
+public class DitheringRGB {
 
 	float gammaRed = 1f;
 	float gammaGreen = 1f;
 	float gammaBlue = 1f;
 
-	class Color64Bit {
 
-		public int red = 0;
-		public int green = 0;
-		public int blue = 0;
-	}
-
-
-	public ColorCorrection(float gammaRed, float gammaGreen, float GammaBlue) {
+	public DitheringRGB(float gammaRed, float gammaGreen, float GammaBlue) {
 		super();
 		this.gammaRed = gammaRed;
 		this.gammaGreen = gammaGreen;
@@ -51,7 +44,6 @@ public class ColorCorrection {
 			return input;
 
 		List<Color64Bit> result = upsampleColors(input);
-		gammaCorrect(result);
 		return ditherAndDownSample(result);
 	}
 
@@ -61,22 +53,22 @@ public class ColorCorrection {
 		List<Integer> result = new ArrayList<Integer>();
 
 		// fill to dither correctly
-		int fillCount = input.size() % 4;
+		int fillCount = input.size() % 6;
 		if (fillCount > 0) {
-			fillCount = 4 - fillCount;
+			fillCount = 6 - fillCount;
 		}
 		for (int i = 0; i < fillCount; i++) {
-			input.add(0, new Color64Bit());
+			input.add(0, new Color64Bit(new Color(0, 0, 0), gammaRed, gammaGreen, gammaBlue));
 		}
 
-		for (int i = 0; i < input.size(); i = i + 4) {
+		for (int i = 0; i < input.size(); i = i + 6) {
 			List<Integer> red = ditherAndDownsampleValue(new int[] { input.get(i).red, input.get(i + 1).red,
-					input.get(i + 2).red, input.get(i + 3).red });
+					input.get(i + 2).red, input.get(i + 3).red, input.get(i + 4).red, input.get(i + 5).red });
 			List<Integer> green = ditherAndDownsampleValue(new int[] { input.get(i).green, input.get(i + 1).green,
-					input.get(i + 2).green, input.get(i + 3).green });
+					input.get(i + 2).green, input.get(i + 3).green, input.get(i + 4).green, input.get(i + 5).green });
 			List<Integer> blue = ditherAndDownsampleValue(new int[] { input.get(i).blue, input.get(i + 1).blue,
-					input.get(i + 2).blue, input.get(i + 3).blue });
-			for (int y = 0; y < 4; y++) {
+					input.get(i + 2).blue, input.get(i + 3).blue, input.get(i + 4).blue, input.get(i + 5).blue });
+			for (int y = 0; y < 6; y++) {
 				Color color = new Color(red.get(y), green.get(y), blue.get(y));
 				result.add(color.getRGB());
 			}
@@ -107,19 +99,23 @@ public class ColorCorrection {
 			result.add(currentQuantIn256);
 			quantError += errorInHigh;
 		}
-		quantError = quantError / 4;
+		quantError = quantError / 6;
 
-		int[] patternErrorDifuse1 = new int[] { 0, 0, 0, 1 };
-		int[] patternErrorDifuse2 = new int[] { 0, 1, 0, 1 };
-		int[] patternErrorDifuse3 = new int[] { 0, 1, 1, 1 };
-		if (quantError > 0.25 * quantInHigh && quantError < 0.5 * quantInHigh) {
-			addError(result, patternErrorDifuse1);
-		}
-		if (quantError > 0.5 * quantInHigh && quantError < 0.75 * quantInHigh) {
-			addError(result, patternErrorDifuse2);
-		}
-		if (quantError > 0.75 * quantInHigh) {
+		int[] patternErrorDifuse1 = new int[] { 0, 0, 0, 0, 0, 1 };
+		int[] patternErrorDifuse2 = new int[] { 0, 0, 0, 1, 0, 1 };
+		int[] patternErrorDifuse3 = new int[] { 0, 1, 0, 1, 0, 1 };
+		int[] patternErrorDifuse4 = new int[] { 0, 1, 1, 0, 1, 1 };
+		int[] patternErrorDifuse5 = new int[] { 1, 1, 1, 0, 1, 1 };
+		if (quantError > 0.8333 * quantInHigh) {
+			addError(result, patternErrorDifuse5);
+		} else if (quantError > 0.6666 * quantInHigh) {
+			addError(result, patternErrorDifuse4);
+		} else if (quantError > 0.5 * quantInHigh) {
 			addError(result, patternErrorDifuse3);
+		} else if (quantError > 0.3333 * quantInHigh) {
+			addError(result, patternErrorDifuse2);
+		} else if (quantError > 0.1666 * quantInHigh) {
+			addError(result, patternErrorDifuse1);
 		}
 
 		return result;
@@ -133,30 +129,11 @@ public class ColorCorrection {
 	}
 
 
-	private void gammaCorrect(List<Color64Bit> input) {
-		for (Color64Bit current : input) {
-			current.red = (int) (Integer.MAX_VALUE * Math.pow((float) current.red / (float) Integer.MAX_VALUE, gammaRed));
-			current.green = (int) (Integer.MAX_VALUE * (Math.pow((float) current.green / (float) Integer.MAX_VALUE, gammaGreen)));
-			current.blue = (int) (Integer.MAX_VALUE * (Math.pow((float) current.blue / (float) Integer.MAX_VALUE, gammaBlue)));
-		}
-	}
-
-
 	private List<Color64Bit> upsampleColors(List<Integer> input) {
-		List<Color64Bit> result = new ArrayList<ColorCorrection.Color64Bit>();
+		List<Color64Bit> result = new ArrayList<Color64Bit>();
 		for (Integer currentPixel : input) {
 			Color currentColor = new Color(currentPixel);
-			Color64Bit currentResult = new Color64Bit();
-
-			float factorRed = (float) currentColor.getRed() / 255;
-			float factorGreen = (float) currentColor.getGreen() / 255;
-			float factorBlue = (float) currentColor.getBlue() / 255;
-
-			currentResult.red = (int) (factorRed * Integer.MAX_VALUE);
-			currentResult.green = (int) (factorGreen * Integer.MAX_VALUE);
-			currentResult.blue = (int) (factorBlue * Integer.MAX_VALUE);
-
-			result.add(currentResult);
+			result.add(new Color64Bit(currentColor, gammaRed, gammaGreen, gammaBlue));
 		}
 		return result;
 	}
