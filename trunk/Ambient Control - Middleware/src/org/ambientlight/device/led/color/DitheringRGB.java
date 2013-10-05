@@ -104,8 +104,8 @@ public class DitheringRGB {
 		int[] patternErrorDifuse1 = new int[] { 0, 0, 0, 0, 0, 1 };
 		int[] patternErrorDifuse2 = new int[] { 0, 0, 0, 1, 0, 1 };
 		int[] patternErrorDifuse3 = new int[] { 0, 1, 0, 1, 0, 1 };
-		int[] patternErrorDifuse4 = new int[] { 0, 1, 1, 0, 1, 1 };
-		int[] patternErrorDifuse5 = new int[] { 1, 1, 1, 0, 1, 1 };
+		int[] patternErrorDifuse4 = new int[] { 0, 1, 0, 1, 1, 1 };
+		int[] patternErrorDifuse5 = new int[] { 0, 1, 1, 1, 1, 1 };
 		if (quantError > 0.8333 * quantInHigh) {
 			addError(result, patternErrorDifuse5);
 		} else if (quantError > 0.6666 * quantInHigh) {
