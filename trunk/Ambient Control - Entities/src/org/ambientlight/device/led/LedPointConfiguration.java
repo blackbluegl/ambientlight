@@ -29,4 +29,8 @@ public class LedPointConfiguration implements Serializable {
 	public int port;
 	public int xPosition;
 	public int yPosition;
+
+	float gammaRed = 1.0f;
+	float gammaGreen = 1.0f;
+	float gammaBlue = 1.0f;
 }
