@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.led.colorcorrection;
+package org.ambientlight.device.led.color;
 
 import java.awt.Color;
 
