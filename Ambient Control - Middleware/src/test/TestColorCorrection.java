@@ -19,7 +19,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.device.led.colorcorrection.ColorCorrection;
+import org.ambientlight.device.led.color.DitheringRGB;
 
 
 /**
@@ -41,9 +41,10 @@ public class TestColorCorrection {
 			colors.add(c.getRGB());
 			colors.add(c.getRGB());
 			colors.add(c.getRGB());
+			colors.add(c.getRGB());
 
-			ColorCorrection cc = new ColorCorrection(1.6f, 1.6f, 1.6f);
-			List<Integer> result = cc.getCorrectedColors(colors);
+			DitheringRGB cc = new DitheringRGB(1.6f, 1.6f, 1.6f);
+			List<Integer> result = cc.getDitheredRGB(colors);
 			for (Integer current : result) {
 				System.out.println(new Color(current));
 			}
