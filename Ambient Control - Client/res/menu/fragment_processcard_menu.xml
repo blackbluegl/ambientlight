@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/mainMenu"
+        android:icon="@drawable/process"
+        android:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menuEntryProcessValidate"
+                android:icon="@drawable/process_validate"
+                android:showAsAction="ifRoom|withText"
+                android:title="Prozess überprüfen"/>
+            <item
+                android:id="@+id/menuEntryProcessEdit"
+                android:icon="@drawable/content_edit"
+                android:showAsAction="ifRoom|withText"
+                android:title="Eigenschaften bearbeiten"/>
+            <item
+                android:id="@+id/menuEntryProcessAdd"
+                android:icon="@drawable/content_new"
+                android:showAsAction="ifRoom|withText"
+                android:title="Prozess hinzufügen"/>
+            <item
+                android:id="@+id/menuEntryProcessRemove"
+                android:icon="@drawable/content_discard"
+                android:showAsAction="ifRoom|withText"
+                android:title="Prozess entfernen"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menuEntryProcessSave"
+        android:icon="@drawable/content_save"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/button_save"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessRevertNew"
+        android:icon="@drawable/navigation_cancel"
+        android:showAsAction="ifRoom|withText"
+        android:title="Änderungen verwerfen"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menuEntryProcessStart"
+        android:icon="@drawable/play"
+        android:showAsAction="ifRoom|withText"
+         android:visible="false"
+        android:title="Prozess starten"/>
+    <item
+        android:id="@+id/menuEntryProcessStop"
+        android:icon="@drawable/stop"
+        android:showAsAction="ifRoom|withText"
+         android:visible="false"
+        android:title="Prozess stoppen"/>
+    <item
+        android:id="@+id/menuEntryProcessSceneries"
+        android:icon="@drawable/ic_sceneries"
+        android:showAsAction="ifRoom|withText"
+        android:title="Szenarien bearbeiten"
+        android:visible="true"/>
+
+</menu>
