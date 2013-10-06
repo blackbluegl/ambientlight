@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.device.led.ColorConfiguration;
+import org.ambientlight.device.led.color.Color64Bit;
 import org.ambientlight.device.led.color.DitheringRGB;
 
 
@@ -29,24 +31,32 @@ import org.ambientlight.device.led.color.DitheringRGB;
 public class TestColorCorrection {
 
 	public static Color c = new Color(4, 4, 4);
-
+	public static float gamma = 1.0f;
+	public static float value = 1.0f;
 
 	public static void main(String[] args) {
 		for (int i = 0; i < 256; i++) {
 			System.out.println("color with " + i);
-			List<Integer> colors = new ArrayList<Integer>();
+			List<Color64Bit> colors = new ArrayList<Color64Bit>();
 			Color c = new Color(i, i, i);
-			colors.add(c.getRGB());
-			colors.add(c.getRGB());
-			colors.add(c.getRGB());
-			colors.add(c.getRGB());
-			colors.add(c.getRGB());
-			colors.add(c.getRGB());
+			ColorConfiguration config = new ColorConfiguration();
+			config.gammaRed = gamma;
+			config.gammaGreen = gamma;
+			config.gammaBlue = gamma;
+			config.levelRed = value;
+			config.levelBlue = value;
+			config.levelGreen = value;
+			colors.add(new Color64Bit(c, config));
+			colors.add(new Color64Bit(c, config));
+			colors.add(new Color64Bit(c, config));
+			colors.add(new Color64Bit(c, config));
+			colors.add(new Color64Bit(c, config));
+			colors.add(new Color64Bit(c, config));
 
-			DitheringRGB cc = new DitheringRGB(1.6f, 1.6f, 1.6f);
-			List<Integer> result = cc.getDitheredRGB(colors);
-			for (Integer current : result) {
-				System.out.println(new Color(current));
+			DitheringRGB cc = new DitheringRGB();
+			List<Color> result = cc.getDitheredRGB(colors);
+			for (Color current : result) {
+				System.out.println(current);
 			}
 		}
 	}

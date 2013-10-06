@@ -31,7 +31,7 @@ public class SceneryControl {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getInfo() {
-		return "Version:0.12.0";
+		return "Version:0.13.0";
 	}
 
 

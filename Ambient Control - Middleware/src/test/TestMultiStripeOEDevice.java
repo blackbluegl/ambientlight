@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 
 import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver;
+import org.ambientlight.device.led.ColorConfiguration;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripeConfiguration;
 
@@ -20,7 +21,18 @@ public class TestMultiStripeOEDevice {
 		config.port = 2002;
 		device.setConfiguration(config);
 
+		float value = 1.0f;
+		float gamma = 1.0f;
+		ColorConfiguration cConfig = new ColorConfiguration();
+		cConfig.gammaRed = gamma;
+		cConfig.gammaGreen = gamma;
+		cConfig.gammaBlue = gamma;
+		cConfig.levelRed = value;
+		cConfig.levelBlue = value;
+		cConfig.levelGreen = value;
+
 		StripeConfiguration sc = new StripeConfiguration();
+		sc.colorConfiguration = cConfig;
 		sc.pixelAmount = 162;
 		sc.port = 0;
 		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
