@@ -17,9 +17,7 @@ public class StripeConfiguration implements Serializable {
 	public int port;
 	public int pixelAmount;
 
-	public float gammaRed = 1.0f;
-	public float gammaGreen = 1.0f;
-	public float gammaBlue = 1.0f;
+	public ColorConfiguration colorConfiguration;
 
 	public List<StripePartConfiguration> stripeParts = new ArrayList<StripePartConfiguration>();
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.device.drivers.DummySwitchDeviceConfiguration;
+import org.ambientlight.device.led.ColorConfiguration;
 import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.device.led.StripePartConfiguration;
 import org.ambientlight.process.EventProcessConfiguration;
@@ -87,7 +88,19 @@ public class CreateTestConfig {
 		rc.deviceConfigurations.add(switchingBridge);
 		rc.deviceConfigurations.add(dc);
 
+		float value = 1.0f;
+		float gamma = 1.0f;
+		ColorConfiguration cConfig = new ColorConfiguration();
+		cConfig.gammaRed = gamma;
+		cConfig.gammaGreen = gamma;
+		cConfig.gammaBlue = gamma;
+		cConfig.levelRed = value;
+		cConfig.levelBlue = value;
+		cConfig.levelGreen = value;
+
 		StripeConfiguration sc = new StripeConfiguration();
+		sc.colorConfiguration = cConfig;
+
 		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
 		sc.pixelAmount = 162;
 		sc.port = 0;

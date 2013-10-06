@@ -20,15 +20,16 @@ import java.io.Serializable;
 
 /**
  * @author Florian Bornkessel
- * 
  */
-public class LedPointConfiguration implements Serializable {
+public class ColorConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public int port;
-	public int xPosition;
-	public int yPosition;
+	public float gammaRed = 1.0f;
+	public float gammaGreen = 1.0f;
+	public float gammaBlue = 1.0f;
+	public float levelRed = 1.0f;
+	public float levelGreen = 1.0f;
+	public float levelBlue = 1.0f;
 
-	public ColorConfiguration colorConfiguration;
 }

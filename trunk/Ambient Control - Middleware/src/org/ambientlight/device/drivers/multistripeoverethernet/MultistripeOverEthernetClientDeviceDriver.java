@@ -94,7 +94,7 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 			byte[] dataArray = new byte[current.configuration.pixelAmount * 3];
 
 			for (int y = 0; y < current.configuration.pixelAmount; y++) {
-				Color color = new Color(current.getOutputResult().get(y));
+				Color color = current.getOutputResult().get(y);
 				dataArray[3 * y] = (byte) (color.getRed() & 0xFF);
 				dataArray[3 * y + 1] = (byte) (color.getGreen() & 0xFF);
 				dataArray[3 * y + 2] = (byte) (color.getBlue() & 0xFF);

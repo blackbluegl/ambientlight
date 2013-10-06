@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.device.led.ColorConfiguration;
+
 
 /**
  * @author Florian Bornkessel
@@ -26,39 +28,36 @@ import java.util.List;
  */
 public class DitheringRGB {
 
-	float gammaRed = 1f;
-	float gammaGreen = 1f;
-	float gammaBlue = 1f;
 
-
-	public DitheringRGB(float gammaRed, float gammaGreen, float GammaBlue) {
-		super();
-		this.gammaRed = gammaRed;
-		this.gammaGreen = gammaGreen;
-		this.gammaBlue = GammaBlue;
+	public List<Color> getDitheredRGB(List<Color64Bit> input) {
+		if (input == null)
+			return new ArrayList<Color>();
+		return ditherAndDownSample(input);
 	}
 
 
-	public List<Integer> getDitheredRGB(List<Integer> input) {
-		if (input == null || input.isEmpty())
-			return input;
+	private List<Color> ditherAndDownSample(List<Color64Bit> input) {
 
-		List<Color64Bit> result = upsampleColors(input);
-		return ditherAndDownSample(result);
-	}
+		if(input ==null||input.isEmpty())
+			return new ArrayList<Color>();
 
-
-	private List<Integer> ditherAndDownSample(List<Color64Bit> input) {
-
-		List<Integer> result = new ArrayList<Integer>();
+		List<Color> result = new ArrayList<Color>();
 
 		// fill to dither correctly
 		int fillCount = input.size() % 6;
 		if (fillCount > 0) {
 			fillCount = 6 - fillCount;
 		}
+		ColorConfiguration config =new ColorConfiguration();
+		config.gammaRed=input.get(0).gammaRed;
+		config.gammaGreen=input.get(0).gammaGreen;
+		config.gammaBlue=input.get(0).gammaBlue;
+		config.levelRed = input.get(0).levelRed;
+		config.levelGreen = input.get(0).levelGreen;
+		config.levelBlue = input.get(0).levelBlue;
+
 		for (int i = 0; i < fillCount; i++) {
-			input.add(0, new Color64Bit(new Color(0, 0, 0), gammaRed, gammaGreen, gammaBlue));
+			input.add(0, new Color64Bit(new Color(0, 0, 0), config));
 		}
 
 		for (int i = 0; i < input.size(); i = i + 6) {
@@ -70,7 +69,7 @@ public class DitheringRGB {
 					input.get(i + 2).blue, input.get(i + 3).blue, input.get(i + 4).blue, input.get(i + 5).blue });
 			for (int y = 0; y < 6; y++) {
 				Color color = new Color(red.get(y), green.get(y), blue.get(y));
-				result.add(color.getRGB());
+				result.add(color);
 			}
 		}
 
@@ -126,15 +125,5 @@ public class DitheringRGB {
 		for (int i = 0; i < result.size(); i++) {
 			result.set(i, result.get(i) + patternErrorDifuse1[i]);
 		}
-	}
-
-
-	private List<Color64Bit> upsampleColors(List<Integer> input) {
-		List<Color64Bit> result = new ArrayList<Color64Bit>();
-		for (Integer currentPixel : input) {
-			Color currentColor = new Color(currentPixel);
-			result.add(new Color64Bit(currentColor, gammaRed, gammaGreen, gammaBlue));
-		}
-		return result;
 	}
 }

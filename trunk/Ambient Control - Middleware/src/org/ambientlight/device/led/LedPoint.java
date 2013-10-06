@@ -32,17 +32,16 @@ public class LedPoint {
 
 
 	public void setPixel(int rgbValue) {
-		this.rgbValue = new Color64Bit(new Color(rgbValue), configuration.gammaRed, configuration.gammaGreen,
-				configuration.gammaBlue);
+		this.rgbValue = new Color64Bit(new Color(rgbValue), configuration.colorConfiguration);
 	}
 
 
-	public Integer getOutputResult() {
-		return rgbValue.getColor().getRGB();
+	public Color getOutputResult() {
+		return rgbValue.getColor();
 	}
 
 
 	public void clear() {
-		this.rgbValue = new Color64Bit(Color.BLACK, configuration.gammaRed, configuration.gammaGreen, configuration.gammaBlue);
+		this.rgbValue = new Color64Bit(Color.BLACK, configuration.colorConfiguration);
 	}
 }

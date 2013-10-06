@@ -12,8 +12,8 @@ import org.ambientlight.device.led.Stripe;
 public class DummyDeviceDriver implements LedStripeDeviceDriver {
 
 	List<Stripe> myStripes = new ArrayList<Stripe>();
-	BufferedImage stripeContet;
 	BufferedImageDisplayOutput display;
+	BufferedImage stripeContet;
 
 
 	public DummyDeviceDriver() {
@@ -50,15 +50,15 @@ public class DummyDeviceDriver implements LedStripeDeviceDriver {
 		for(int i= 0;i<this.myStripes.size();i++){
 			Stripe currentStripe = this.myStripes.get(i);
 			for(int y=0;y<currentStripe.configuration.pixelAmount;y++){
-				this.stripeContet.setRGB(y*3+0, i*3+0, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+1, i*3+0, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+2, i*3+0, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+0, i*3+1, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+1, i*3+1, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+2, i*3+1, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+0, i*3+2, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+1, i*3+2, currentStripe.getOutputResult().get(y));	
-				this.stripeContet.setRGB(y*3+2, i*3+2, currentStripe.getOutputResult().get(y));	
+				this.stripeContet.setRGB(y * 3 + 0, i * 3 + 0, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 1, i * 3 + 0, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 2, i * 3 + 0, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 0, i * 3 + 1, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 1, i * 3 + 1, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 2, i * 3 + 1, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 0, i * 3 + 2, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 1, i * 3 + 2, currentStripe.getOutputResult().get(y).getRGB());
+				this.stripeContet.setRGB(y * 3 + 2, i * 3 + 2, currentStripe.getOutputResult().get(y).getRGB());
 			}
 		}
 		display.setImageContent(this.stripeContet);
