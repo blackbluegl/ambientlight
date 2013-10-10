@@ -20,10 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -42,7 +38,6 @@ public class UpdateWidgetService extends Service {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			Log.i(LOG, "roomService connected");
-
 			roomService = ((RoomConfigService.MyBinder) binder).getService();
 			updateWidget();
 		}
@@ -51,7 +46,6 @@ public class UpdateWidgetService extends Service {
 		@Override
 		public void onServiceDisconnected(ComponentName className) {
 			Log.i(LOG, "roomService disconnected. setting Widget to disabled");
-
 			roomService = null;
 			setWidgetToDisabledView();
 		}
@@ -65,16 +59,6 @@ public class UpdateWidgetService extends Service {
 		private static final String LOG = "UpdateWidgetService.BroadCastReceiver";
 
 
-		private boolean isRunningInEmulator() {
-			boolean inEmulator = false;
-			String brand = Build.BRAND;
-			if (brand.compareTo("generic_x86") == 0) {
-				inEmulator = true;
-			}
-			return inEmulator;
-		}
-
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
@@ -84,24 +68,6 @@ public class UpdateWidgetService extends Service {
 			if (action.equals(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG)) {
 				Log.i(LOG, "updateWidget because of BROADCAST_INTENT_UPDATE_ROOMCONFIG");
 				updateWidget();
-			}
-
-			// user is present
-			if (action.equals(Intent.ACTION_USER_PRESENT)) {
-				Log.i(LOG, "updateWidget because of ACTION_USER_PRESENT");
-				updateWidget();
-			}
-
-			// wlan on, wlan reset,fm on
-			if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION) && isConnectedToWifi(context)) {
-				Log.i(LOG, "updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
-				updateWidget();
-			}
-
-			// fm off, wlan off, wlan lost
-			if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !isConnectedToWifi(context) && !isRunningInEmulator()) {
-				Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
-				setWidgetToDisabledView();
 			}
 		}
 	};
@@ -119,9 +85,6 @@ public class UpdateWidgetService extends Service {
 		Log.i(LOG, "onCreated Called");
 		bindService(new Intent(this, RoomConfigService.class), roomServiceConnection, Context.BIND_AUTO_CREATE);
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_USER_PRESENT);
-		filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		filter.addAction(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG);
 		registerReceiver(receiver, filter);
 	}
@@ -146,13 +109,6 @@ public class UpdateWidgetService extends Service {
 			return START_STICKY;
 		}
 
-		// if there is no connection set widget to disabled view
-		if (this.isConnectedToWifi(getApplicationContext()) == false && Build.BRAND.startsWith("generic") == false) {
-			Log.i(LOG, "onStartCommand: No wifi available. Disableing the widget. This should not be nescessary");
-			setWidgetToDisabledView();
-			return START_STICKY;
-		}
-
 		// handle click event from widget
 		if (intent.getAction().contains(INTENT_SWITCH_CLICKED)) {
 			switchRoom(intent, appWidgetManager);
@@ -170,8 +126,10 @@ public class UpdateWidgetService extends Service {
 
 
 	private void updateWidget() {
-		if (this.roomService == null)
+		if (this.roomService == null) {
+			this.setWidgetToDisabledView();
 			return;
+		}
 
 		ComponentName thisWidget = new ComponentName(this, RoomSwitchesWidgetProvider.class);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
@@ -187,7 +145,9 @@ public class UpdateWidgetService extends Service {
 			config.put(currentServer, roomConfig);
 		}
 
-		String[] serverNames = URLUtils.ANDROID_ADT_SERVERS;
+		if (config.isEmpty()) {
+			this.setWidgetToDisabledView();
+		}
 
 		for (int widgetId : allWidgetIds) {
 
@@ -195,7 +155,7 @@ public class UpdateWidgetService extends Service {
 					R.layout.widget_roomscenery_switch);
 			remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
 
-			for (String room : serverNames) {
+			for (String room : config.keySet()) {
 				RoomConfiguration roomConfig = config.get(room);
 				boolean switchOn = false;
 				for (ActorConfiguration current : roomConfig.actorConfigurations.values()) {
@@ -291,13 +251,6 @@ public class UpdateWidgetService extends Service {
 			remoteViews.addView(R.id.layout_widget_roomswitches, switchIcon);
 			appWidgetManager.updateAppWidget(widgetId, remoteViews);
 		}
-	}
-
-
-	private boolean isConnectedToWifi(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo info = cm.getActiveNetworkInfo();
-		return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
 	}
 
 }

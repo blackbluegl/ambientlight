@@ -24,11 +24,9 @@ import android.content.Intent;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class StartRoomConfigServiceReceiver extends  BroadcastReceiver {
-
-	public static final String INTENT_START = "org.ambientcontrol.callback.startService";
+public class StartRoomConfigServiceReceiver extends BroadcastReceiver {
 
 	/*
 	 * (non-Javadoc)
