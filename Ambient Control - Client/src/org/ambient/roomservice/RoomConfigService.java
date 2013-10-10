@@ -34,13 +34,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
 
-//TODO implement rpc interface to respond directly to client requests and do not wait for anymore for long network requests
 /**
  * @author Florian Bornkessel
  * 
@@ -78,15 +80,36 @@ public class RoomConfigService extends Service {
 
 			String action = intent.getAction();
 
-			if (action.equals(Intent.ACTION_SCREEN_ON)) {
+			if (isConnectedToWifi(context) == false) {
+				Log.i(LOG, " update event occoured but no wifi available. reset all roomconfigs and notify listeners.");
+				roomConfiguration.clear();
+
+			} else if (action.equals(Intent.ACTION_SCREEN_ON)) {
 				Log.i(LOG, " startCallBackServer and reload roomConfigurations because of ACTION_SCREEN_ON");
 				startCallBackServer();
-				initAllRoomConfigurations();
+				initAllRoomConfigurations(true);
+
+			} else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+				Log.i(LOG, " stopCallBackServer because of ACTION_SCREEN_OFF");
+				stopCallBackServer(true);
+				roomConfiguration.clear();
+
+			} else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION) && isConnectedToWifi(context)) {
+				// wlan on, wlan reset,fm on
+				Log.i(LOG, "updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
+				initAllRoomConfigurations(true);
+				startCallBackServer();
+
+			} else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !isConnectedToWifi(context)) {
+
+				// fm off, wlan off, wlan lost
+				Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
+				stopCallBackServer(false);
+				roomConfiguration.clear();
 			}
 
-			if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-				Log.i(LOG, " stopCallBackServer because of ACTION_SCREEN_OFF");
-				stopCallBackServer();
+			for (String currentServer : roomConfiguration.keySet()) {
+				notifyListener(currentServer);
 			}
 		}
 	};
@@ -94,35 +117,33 @@ public class RoomConfigService extends Service {
 
 	// update request from server
 	public synchronized void updateRoomConfigForRoomName(String roomName) {
+
+		// todo extract servername
+		String serverName = roomNameServerMapping.get(roomName);
+
 		try {
-			// todo extract servername
-			String serverName = roomNameServerMapping.get(roomName);
-			invalidateRoomConfigForServer(serverName);
+			RoomConfiguration roomConfig = RestClient.getRoom(serverName);
+			// update Model
+			roomConfiguration.put(serverName, roomConfig);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(LOG, "invalidate failed. set roomConfig to null for: " + serverName, e);
+			roomConfiguration.put(serverName, null);
 		}
+		// send BroadcastMessage to listeners who might be interested
+		notifyListener(serverName);
+
 	}
 
 
 	/**
 	 * @param serverName
-	 * @throws Exception
 	 */
-	public void invalidateRoomConfigForServer(String serverName) {
-		try {
-			RoomConfiguration roomConfig = RestClient.getRoom(serverName);
-			// update Model
-			roomConfiguration.put(serverName, roomConfig);
-
-			// send BroadcastMessage to listeners who might be interested
-			Intent intent = new Intent();
-			intent.setAction(BROADCAST_INTENT_UPDATE_ROOMCONFIG);
-			intent.putExtra(EXTRA_ROOMCONFIG, roomConfig);
-			intent.putExtra(EXTRA_SERVERNAME, serverName);
-			sendBroadcast(intent);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private void notifyListener(String serverName) {
+		Intent intent = new Intent();
+		intent.setAction(BROADCAST_INTENT_UPDATE_ROOMCONFIG);
+		intent.putExtra(EXTRA_ROOMCONFIG, roomConfiguration.get(serverName));
+		intent.putExtra(EXTRA_SERVERNAME, serverName);
+		sendBroadcast(intent);
 	}
 
 
@@ -146,29 +167,42 @@ public class RoomConfigService extends Service {
 	@Override
 	public void onCreate() {
 		Log.i(LOG, "onCreated Called");
-		startCallBackServer();
 		// register filter for sytem actions that will call us later
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
+		filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
 		registerReceiver(receiver, filter);
 
+		if (isConnectedToWifi(this) == false) {
+			Log.i(LOG, "no wifi available. callback server will not be started");
+			return;
+		}
+
 		// initially load all RoomConfigurations
-		initAllRoomConfigurations();
+		initAllRoomConfigurations(false);
+
+		startCallBackServer();
 	}
 
 
 	/**
 	 * 
 	 */
-	private void initAllRoomConfigurations() {
+	private void initAllRoomConfigurations(boolean notifyListeners) {
 		for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
+
 			try {
 				RoomConfiguration config = RestClient.getRoom(currentServer);
 				roomConfiguration.put(currentServer, config);
-				roomNameServerMapping.put(config.roomName, currentServer);
+				if (config != null) {
+					roomNameServerMapping.put(config.roomName, currentServer);
+				}
 			} catch (Exception e) {
 				Log.e(LOG, "error initializing room", e);
+				roomConfiguration.put(currentServer, null);
 			}
 		}
 	}
@@ -178,7 +212,7 @@ public class RoomConfigService extends Service {
 	public void onDestroy() {
 		Log.i(LOG, "onDestroy Called");
 		unregisterReceiver(receiver);
-		stopCallBackServer();
+		stopCallBackServer(true);
 		super.onDestroy();
 	}
 
@@ -187,14 +221,22 @@ public class RoomConfigService extends Service {
 	 * 
 	 */
 	private synchronized void startCallBackServer() {
+
 		// start socketServer
 		if (callbackSocketServer == null) {
 			callbackSocketServer = new CallbackSocketServerRunnable(this);
 			new Thread(callbackSocketServer).start();
+
 			String hostname = getIpAdress() + ":4321";
-			RestClient rest = new RestClient();
 			for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
-				rest.registerCallback(currentServer, hostname);
+				try {
+					if (RestClient.registerCallback(currentServer, hostname) == false) {
+						roomConfiguration.put(currentServer, null);
+					}
+				} catch (Exception e) {
+					Log.e(LOG, "error trying to register callback. Ommiting server and remove the configuration.");
+					roomConfiguration.put(currentServer, null);
+				}
 			}
 		}
 	}
@@ -203,13 +245,16 @@ public class RoomConfigService extends Service {
 	/**
 	 * 
 	 */
-	private synchronized void stopCallBackServer() {
+	private synchronized void stopCallBackServer(boolean notifyServers) {
 		if (callbackSocketServer != null) {
 			try {
-				String hostname = getIpAdress() + ":4321";
-				RestClient rest = new RestClient();
-				for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
-					rest.unregisterCallback(currentServer, hostname);
+
+				if (notifyServers == true) {
+					String hostname = getIpAdress() + ":4321";
+
+					for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
+						RestClient.unregisterCallback(currentServer, hostname);
+					}
 				}
 				callbackSocketServer.stop();
 			} catch (IOException e) {
@@ -261,5 +306,26 @@ public class RoomConfigService extends Service {
 		Log.d(LOG, "IP Adress for callback is: " + ipAddressString);
 
 		return ipAddressString;
+	}
+
+
+	private boolean isConnectedToWifi(Context context) {
+
+		if (isRunningInEmulator())
+			return true;
+
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info = cm.getActiveNetworkInfo();
+		return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
+	}
+
+
+	private boolean isRunningInEmulator() {
+		boolean inEmulator = false;
+		String brand = Build.BRAND;
+		if (brand.compareTo("generic_x86") == 0) {
+			inEmulator = true;
+		}
+		return inEmulator;
 	}
 }

@@ -7,21 +7,24 @@ import org.springframework.web.client.RestTemplate;
 import android.os.AsyncTask;
 
 
-public class RegisterCallbackTask extends AsyncTask<Object, Void, Void> {
+public class RegisterCallbackTask extends AsyncTask<Object, Void, Boolean> {
 
 	private final String URL = "/callback/client";
 
 
 	@Override
-	protected Void doInBackground(Object... params) {
+	protected Boolean doInBackground(Object... params) {
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
 		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 
 		String eventSenderURL = URLUtils.getBaseUrl((String) params[0]) + URL;
-		restTemplate.put(eventSenderURL, params[1]);
-
-		return null;
+		try {
+			restTemplate.put(eventSenderURL, params[1]);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }

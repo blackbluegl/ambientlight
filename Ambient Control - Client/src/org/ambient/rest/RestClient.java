@@ -12,20 +12,21 @@ import org.ambientlight.scenery.actor.ActorConductConfiguration;
 
 public class RestClient {
 
-	public static RoomConfiguration getRoom(String hostName) throws Exception {
+	public static RoomConfiguration getRoom(String hostName) throws InterruptedException, ExecutionException {
 		GetRoomTask task = new GetRoomTask();
 		task.execute(hostName);
 		return (RoomConfiguration) task.get();
 	}
 
 
-	public void registerCallback(String hostName, String ipAndPort) {
+	public static Boolean registerCallback(String hostName, String ipAndPort) throws InterruptedException, ExecutionException {
 		RegisterCallbackTask task = new RegisterCallbackTask();
 		task.execute(hostName, ipAndPort);
+		return task.get();
 	}
 
 
-	public void unregisterCallback(String hostName, String ipAndPort) {
+	public static void unregisterCallback(String hostName, String ipAndPort) {
 		UnregisterCallbackTask task = new UnregisterCallbackTask();
 		task.execute(hostName, ipAndPort);
 	}

@@ -143,6 +143,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 			ProgressBar bar = (ProgressBar) roomContainerView.findViewById(R.id.progressBar);
 			bar.setTag("progressBar" + currentServer);
+
+			LinearLayout bottomBar = (LinearLayout) roomContainerView.findViewById(R.id.roomBottomBar);
+			bottomBar.setTag("bottomBar" + currentServer);
 		}
 
 		return myHomeScrollView;
@@ -220,11 +223,12 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		// would run into trouble
 		if (isVisible() == false)
 			return;
-
-		updateRoomContent(serverName);
-
-		this.enableEventListener(serverName);
-
+		if (config != null) {
+			updateRoomContent(serverName);
+			this.enableEventListener(serverName);
+		} else {
+			disableEventListener(serverName, false);
+		}
 		updateRoofTop();
 
 	}
@@ -260,8 +264,10 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	private void updateRoomContent(String currentServer) {
 
 		RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
-		if (roomConfig == null)
+		if (roomConfig == null) {
+			disableEventListener(currentServer, false);
 			return;
+		}
 
 		if (this.configuredlightObjects != null && this.configuredlightObjects.get(currentServer) != null) {
 			this.configuredlightObjects.get(currentServer).clear();
@@ -344,7 +350,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 					event.eventGeneratorName = "RoomSceneryEventGenerator";
 					event.sceneryName = selectedScenery;
 					RestClient.sendEvent(serverName, event);
-					disableEventListener(serverName);
+					disableEventListener(serverName, true);
 				}
 			}
 
@@ -539,7 +545,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 			@Override
 			public void onClick(View v) {
 				try {
-					disableEventListener(serverName);
+					disableEventListener(serverName, true);
 					SwitchEventConfiguration event = new SwitchEventConfiguration();
 					event.eventGeneratorName = currentEventGenerator.getName();
 					event.powerState = powerStateSwitch.isChecked();
@@ -595,15 +601,23 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private void disableEventListener(String serverName) {
-		ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
-		bar.setVisibility(ProgressBar.VISIBLE);
+	private void disableEventListener(String serverName, boolean showWaitScreen) {
+		if (showWaitScreen) {
+			ProgressBar bar = (ProgressBar) roomsContainerView.findViewWithTag("progressBar" + serverName);
+			bar.setVisibility(ProgressBar.VISIBLE);
+		}
 		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
 		roomContent.setVisibility(TableLayout.INVISIBLE);
 
-		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
-			mapper.setEventListenerDisabled(true);
+		LinearLayout bottomBar = (LinearLayout) roomsContainerView.findViewWithTag("bottomBar" + serverName);
+		bottomBar.setVisibility(View.GONE);
+
+		if (this.configuredlightObjects != null && this.configuredlightObjects.get(serverName) != null) {
+			for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
+				mapper.setEventListenerDisabled(true);
+			}
 		}
+
 	}
 
 
@@ -613,6 +627,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 		TableLayout roomContent = (TableLayout) roomsContainerView.findViewWithTag("roomContent" + serverName);
 		roomContent.setVisibility(TableLayout.VISIBLE);
+
+		LinearLayout bottomBar = (LinearLayout) roomsContainerView.findViewWithTag("bottomBar" + serverName);
+		bottomBar.setVisibility(View.VISIBLE);
 
 		for (AbstractRoomItemViewMapper mapper : configuredlightObjects.get(serverName)) {
 			mapper.setEventListenerDisabled(false);
