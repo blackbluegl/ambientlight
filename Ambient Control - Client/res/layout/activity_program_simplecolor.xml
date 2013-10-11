@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutEditScSimpleColor"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:id="@+id/scrollViewSimpleColorEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/defaultmargin"
+        android:layout_marginRight="@dimen/defaultmargin" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <de.devmil.common.ui.color.ColorSelectorView
+                android:id="@+id/colorSelectorView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="-2dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="2dp"
+                android:gravity="center_vertical|center_horizontal|center" >
+            </de.devmil.common.ui.color.ColorSelectorView>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
