@@ -147,6 +147,7 @@ public class UpdateWidgetService extends Service {
 
 		if (config.isEmpty()) {
 			this.setWidgetToDisabledView();
+			return;
 		}
 
 		for (int widgetId : allWidgetIds) {
