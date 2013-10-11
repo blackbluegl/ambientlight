@@ -80,18 +80,18 @@ public class RoomConfigService extends Service {
 
 			String action = intent.getAction();
 
-			if (isConnectedToWifi(context) == false) {
-				Log.i(LOG, " update event occoured but no wifi available. reset all roomconfigs and notify listeners.");
-				roomConfiguration.clear();
-
-			} else if (action.equals(Intent.ACTION_SCREEN_ON)) {
+			if (action.equals(Intent.ACTION_SCREEN_ON) && isConnectedToWifi(context)) {
 				Log.i(LOG, " startCallBackServer and reload roomConfigurations because of ACTION_SCREEN_ON");
 				startCallBackServer();
 				initAllRoomConfigurations(true);
 
 			} else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
 				Log.i(LOG, " stopCallBackServer because of ACTION_SCREEN_OFF");
-				stopCallBackServer(true);
+				if (isConnectedToWifi(context)) {
+					stopCallBackServer(true);
+				} else {
+					stopCallBackServer(false);
+				}
 				roomConfiguration.clear();
 
 			} else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION) && isConnectedToWifi(context)) {
@@ -108,7 +108,7 @@ public class RoomConfigService extends Service {
 				roomConfiguration.clear();
 			}
 
-			for (String currentServer : roomConfiguration.keySet()) {
+			for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
 				notifyListener(currentServer);
 			}
 		}
