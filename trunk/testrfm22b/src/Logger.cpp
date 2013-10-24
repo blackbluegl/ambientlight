@@ -59,9 +59,10 @@ void Logger::loop() {
 			myfile << "\n";
 	//	}
 	}
+
 	myfile.close();
 	rf->spiWrite(RF22_REG_0D_GPIO_CONFIGURATION2, 0x13);
-
+	system ("/usr/local/bin/gpio edge 24 none") ;
 }
 
 void Logger::handleInterrupt() {
