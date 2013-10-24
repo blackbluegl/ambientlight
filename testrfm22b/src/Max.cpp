@@ -126,21 +126,58 @@ int main(int argc, const char* argv[]) {
 		}
 		printf("logging %d samples\n", samples);
 		fflush(stdout);
+
+		const uint8_t sync[] = {
+			  0x12,
+			  0xAB,
+			  0xCB,
+			  0xA8,
+			};
+			rf.setSyncWords(sync,0x4);
+
+
 		rf.setModeRx();
 		Logger logging(&rf,samples);
 		logging.loop();
 		std::cout << "finished";
 	} else {
 
+		const uint8_t sync[] = {
+		  0x55,
+		  0x55,
+		  0x55,
+		  0x55,
+		};
+		uint8_t length=50;
+		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, length);
+		rf.setSyncWords(sync,0x4);
+
+
+		uint8_t data[50];
+		for(int i=0;i<50;i++){
+			data[i]=0x55;
+		}
+		rf.send(data,length);
+		rf.send(data,length);
+		rf.send(data,length);
+		rf.send(data,length);
+		rf.send(data,length);
+		rf.send(data,length);
+		rf.send(data,length);
+		rf.send(data,length);
+
+
+		rf.waitPacketSent();
+	//	delay(5);
+		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, 20);
+		const uint8_t sync_words[] = {
+		  0xc6,
+		  0x26,
+		  0xc6,
+		  0x26,
+		};
+		rf.setSyncWords(sync_words,4);
 		uint8_t sendData[14] = { 0xf4, 0xc4, 0x18, 0xda, 0xef, 0xa, 0xf1, 0x22, 0x7f, 0xb1, 0xd3, 0x12, 0xde, 0xde };
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
-		rf.send(sendData, 14);
 		rf.send(sendData, 14);
 
 		delay(100);
