@@ -131,8 +131,18 @@ int main(int argc, const char* argv[]) {
 		logging.loop();
 		std::cout << "finished";
 	} else {
+
 		uint8_t sendData[14] = { 0xf4, 0xc4, 0x18, 0xda, 0xef, 0xa, 0xf1, 0x22, 0x7f, 0xb1, 0xd3, 0x12, 0xde, 0xde };
 		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+		rf.send(sendData, 14);
+
 		delay(100);
 		rf.init();
 		delay(100);
