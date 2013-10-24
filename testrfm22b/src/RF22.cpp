@@ -96,7 +96,7 @@ bool RF22::init() {
 	// Set up interrupt handler
 	if (_interrupt == 0) {
 		_RF22ForInterrupt[0] = this;
-		//attaching interrupt to gpio pins. 6 is real 25 5 is in real 24. both should be free. export with "gpio  export 25 in"
+		//attaching interrupt to gpio pins. see wiringPi.com -> gpio chart
 		wiringPiISR(6, INT_EDGE_FALLING, RF22::isr0);
 	} else if (_interrupt == 1) {
 		_RF22ForInterrupt[1] = this;
@@ -126,7 +126,7 @@ bool RF22::init() {
 	// and all such messages will be accepted. This permits the out-of the box
 	// RF22 config to act as an unaddresed, unreliable datagram service
 	spiWrite(RF22_REG_32_HEADER_CONTROL1, RF22_BCEN_HEADER3 | RF22_HDCH_HEADER3);
-	spiWrite(RF22_REG_33_HEADER_CONTROL2, RF22_HDLEN_4 | RF22_SYNCLEN_2);
+	spiWrite(RF22_REG_33_HEADER_CONTROL2, RF22_HDLEN_4 | RF22_SYNCLEN_2| 0x1);
 	setPreambleLength(8);
 	uint8_t syncwords[] = { 0x2d, 0xd4 };
 	setSyncWords(syncwords, sizeof(syncwords));
