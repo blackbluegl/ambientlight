@@ -148,8 +148,8 @@ int main(int argc, const char* argv[]) {
 		  0x55,
 		  0x55,
 		};
-		uint8_t length=50;
-		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, length);
+		uint8_t fakePreamblelength=50;
+		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, fakePreamblelength);
 		rf.setSyncWords(sync,0x4);
 
 
@@ -157,19 +157,18 @@ int main(int argc, const char* argv[]) {
 		for(int i=0;i<50;i++){
 			data[i]=0x55;
 		}
-		rf.send(data,length);
-		rf.send(data,length);
-		rf.send(data,length);
-		rf.send(data,length);
-		rf.send(data,length);
-		rf.send(data,length);
-		rf.send(data,length);
-		rf.send(data,length);
+		rf.send(data,fakePreamblelength);
+		rf.send(data,fakePreamblelength);
+		rf.send(data,fakePreamblelength);
+		rf.send(data,fakePreamblelength);
+		rf.send(data,fakePreamblelength);
+		rf.send(data,fakePreamblelength);
+		rf.send(data,fakePreamblelength);
+	//	rf.send(data,length);
 
 
+		//prepare modem
 		rf.waitPacketSent();
-	//	delay(5);
-		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, 20);
 		const uint8_t sync_words[] = {
 		  0xc6,
 		  0x26,
@@ -177,19 +176,34 @@ int main(int argc, const char* argv[]) {
 		  0x26,
 		};
 		rf.setSyncWords(sync_words,4);
-		uint8_t sendData[14] = { 0xf4, 0xc4, 0x18, 0xda, 0xef, 0xa, 0xf1, 0x22, 0x7f, 0xb1, 0xd3, 0x12, 0xde, 0xde };
-		rf.send(sendData, 14);
 
-		delay(100);
-		rf.init();
-		delay(100);
+		//prepare message
+		uint8_t length=14;
+		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, length);
+		//uint8_t sendData[14] = { 0xf4, 0xc4, 0x18, 0xda, 0xef, 0xa, 0xf1, 0x22, 0x7f, 0xb1, 0xd3, 0x12, 0xde, 0xde};
+		uint8_t sendData[14] = {length-3, 0x25, 0x5 , 0x40 , 0x2 , 0x8f , 0xc2 , 0x6 , 0x95 , 0xcb , 0x1 , 0x2b , 0x0 , 0x0};
+
+		//create crc
+		uint16_t scrc = calc_crc(sendData, length - 2);
+		sendData[length-2] = scrc >> 8;
+		sendData[length-1] = scrc & 0xff;
+
+		//dewhitening
+		xor_pn9(sendData,length);
+
+		//send message
+		rf.send(sendData, length);
+		rf.waitPacketSent();
+
+		//prepare rx
+		rf.spiWrite(RF22_REG_3E_PACKET_LENGTH, 20);
+
+		//rx
 		while (true) {
 			loop();
 			delay(1);
 			fflush(stdout);
 		}
-//	uint8_t sendData[11] = { 0xf4, 0xc4, 0x18, 0xda, 0xef, 0xa, 0xf1, 0x22, 0x7f, 0xb1, 0xd3, 0x12, 0xde, 0xde, 0xa, 0x30, 0x60,
-//			0x29, 0x5c, 0xb0 };
 	}
 }
 

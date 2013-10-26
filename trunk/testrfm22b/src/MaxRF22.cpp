@@ -22,7 +22,7 @@ const RF22::ModemConfig config =
 	.reg_6e = 0x51,  //datarate 1 15:8
 	.reg_6f = 0xEC,//datarate 2 7:0 == 10kbps
 
-	.reg_70 = 0x20, // low datarate and mancheseter inversion... there is a possibility to inverse the preamble?!
+	.reg_70 = 0x20, // datarate below 30kbps.
 	.reg_71 = RF22_DTMOD_FIFO | RF22_MODTYP_FSK, //fifo fsk as it sais. for me: direct mode via spi pin is possible to set here
 	.reg_72 = 0x1e,//frequence derivation 18750
 };
