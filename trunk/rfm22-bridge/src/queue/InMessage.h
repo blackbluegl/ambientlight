@@ -11,7 +11,8 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "OutMessage.h"
+
+#include "Enums.h"
 
 class InMessage {
 public:
@@ -19,7 +20,7 @@ public:
 	virtual ~InMessage();
 
 	std::string correlation;
-	DispatcherType dispatchTo;
+	Enums::DispatcherType dispatchTo;
 	std::vector<uint8_t> payload;
 
 };

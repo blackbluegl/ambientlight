@@ -8,17 +8,29 @@
 #ifndef SOCKETHANDLER_H_
 #define SOCKETHANDLER_H_
 
-#include "Correlation.h"
+
 #include "../queue/InMessage.h"
+#include <vector>
+#include <string>
+#include "../queue/QeueManager.h"
+
+class Correlation;
+class QueueManager;
 
 class SocketHandler {
 public:
-	SocketHandler(Correlation correlationTable);
+	SocketHandler(Correlation *correlation, QeueManager *queues, int sockedId);
 	virtual ~SocketHandler();
-	void sendMessage(InMessage message);
+	int sendMessage(InMessage message);
+	int socketId;
 
 private:
-	Correlation correlation;
+	Correlation *correlation;
+	QeueManager *queueManager;
+	std::string readLine(int socked);
+	std::vector<uint8_t> readPayload(int socked, unsigned int length);
+
+	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::string commandValues);
 };
 
 #endif /* SOCKETHANDLER_H_ */
