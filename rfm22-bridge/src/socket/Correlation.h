@@ -8,22 +8,28 @@
 #ifndef CORRELATION_H_
 #include <string>
 #include <map>
+#include "SocketHandler.h"
 
 using namespace std;
 #define CORRELATION_H_
 
+class SocketHandler;
+
 class Correlation {
 public:
+	map<int,SocketHandler*> correlationMapSocketHandler;
+
 	Correlation();
-
-	int getSocketForID(string correlatorId);
-	void registerSocket(int socket, string correlatorId);
-	void unregisterSocket(int socket);
-
 	virtual ~Correlation();
 
+	SocketHandler* getSocketForID(string correlatorId);
+	void registerSocket(SocketHandler *socketHandler, vector<string> correlatorIds);
+	void unregisterSocket(int socket);
+
+
 private:
-	map<string,int> correlation;
+
+	map<string,int> correlationCorrelator;
 };
 
 #endif /* CORRELATION_H_ */

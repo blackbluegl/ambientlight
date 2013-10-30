@@ -7,18 +7,20 @@
 
 #ifndef QEUEMANAGER_H_
 #define QEUEMANAGER_H_
-#include "../socket/SocketHandler.h"
+
 #include "OutMessage.h"
 #include "InMessage.h"
 #include "../dispatcher/RFMDispatcher.h"
+#include "../socket/Correlation.h"
 #include <vector>
 #include <map>
 
 class RFMDispatcher;
+class SocketHandler;
 
 class QeueManager {
 public:
-	QeueManager(SocketHandler *ipCallBack, RFMDispatcher *dispatcher);
+	QeueManager(Correlation *correlation, RFMDispatcher *dispatcher);
 	virtual ~QeueManager();
 
 	void startQeues();
@@ -27,7 +29,7 @@ public:
 	void postInMessage(InMessage message);
 
 private:
-	SocketHandler *callbackHandler;
+	Correlation *correlation;
 	RFMDispatcher *dispatcher;
 
 	std::vector<OutMessage> outQeue;

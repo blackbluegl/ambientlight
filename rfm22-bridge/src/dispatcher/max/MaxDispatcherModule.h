@@ -12,6 +12,7 @@
 #include "../RFMDispatcher.h"
 #include "../../queue/OutMessage.h"
 
+class OutMessage;
 
 class MaxDispatcherModule: public DispatcherModule {
 public:

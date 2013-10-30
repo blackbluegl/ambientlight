@@ -17,6 +17,3 @@ OutMessage::~OutMessage() {
 }
 
 
-std::vector< uint8_t >  OutMessage::getPayLoad(){
-	return payload;
-}

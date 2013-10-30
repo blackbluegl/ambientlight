@@ -13,29 +13,40 @@ Correlation::Correlation() {
 Correlation::~Correlation() {
 }
 
-int Correlation::getSocketForID(string correlatorId) {
+SocketHandler* Correlation::getSocketForID(string correlatorId) {
 
-	if (correlation.find(correlatorId) == correlation.end()) {
-		return -1;
+	if(correlationCorrelator.find(correlatorId)==correlationCorrelator.end()){
+		return NULL;
 	}
-	return correlation.find(correlatorId)->second;
+	int socketId = correlationCorrelator.find(correlatorId)->second;
+
+	if (correlationMapSocketHandler.find(socketId) == correlationMapSocketHandler.end()) {
+		return NULL;
+	}
+	return correlationMapSocketHandler.find(socketId)->second;
 }
 
-void Correlation::registerSocket(int socket, string correlatorId) {
-	correlation.insert(pair<string, int>(correlatorId, socket));
+void Correlation::registerSocket(SocketHandler *socketHandler, vector<string> correlatorIds) {
+	for (unsigned int i = 0; i < correlatorIds.size(); i++) {
+		correlationCorrelator.insert(pair<string, int>(correlatorIds.at(i), socketHandler->socketId));
+	}
+
+	correlationMapSocketHandler.insert(pair<int,SocketHandler*>(socketHandler->socketId,socketHandler));
 }
 
 void Correlation::unregisterSocket(int socket) {
+	vector<string> eraseEntries;
 
-	string correlator ="";
-	  for (map<string,int>::iterator it=correlation.begin(); it!=correlation.end(); ++it){
-		    if( it->second==socket){
-		    	correlator= it->first;
-		    }
-	  }
-	  if(correlator==""){
-		  return;
-	  }
-	  correlation.erase(correlator);
+	for (map<string, int>::iterator it = correlationCorrelator.begin(); it != correlationCorrelator.end(); ++it) {
+		if (it->second == socket) {
+			eraseEntries.push_back(it->first);
+		}
+	}
+
+	for (unsigned int i = 0; i < eraseEntries.size(); i++) {
+		correlationCorrelator.erase(eraseEntries.at(i));
+	}
+
+	correlationMapSocketHandler.erase(socket);
 }
 

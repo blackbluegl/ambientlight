@@ -16,9 +16,9 @@ pthread_cond_t conditionOutQueueFilled = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutexLockInQueue = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t conditionInQueueFilled = PTHREAD_COND_INITIALIZER;
 
-QeueManager::QeueManager(SocketHandler *ipCallBack, RFMDispatcher *rfmDispatcher) {
-	callbackHandler = ipCallBack;
-	dispatcher=rfmDispatcher;
+QeueManager::QeueManager(Correlation *correlation, RFMDispatcher *rfmDispatcher) {
+	this->correlation = correlation;
+	dispatcher = rfmDispatcher;
 }
 
 QeueManager::~QeueManager() {
@@ -50,7 +50,7 @@ void QeueManager::postOutMessage(OutMessage message) {
 }
 
 void* QeueManager::handleInMessagesWrap(void* arg) {
-	((QeueManager*) arg)->handleOutMessages();
+	((QeueManager*) arg)->handleInMessages();
 	return 0;
 }
 
@@ -61,7 +61,16 @@ void QeueManager::handleInMessages() {
 
 		while (inEnqueueAt > inReadAt) {
 			InMessage msg = inQeue[inReadAt + 1];
-			callbackHandler->sendMessage(msg);
+			SocketHandler *socketHandler = this->correlation->getSocketForID(msg.correlation);
+			if (socketHandler != NULL) {
+				socketHandler->sendMessage(msg);
+			} else {
+				//broadcast to everybody
+				for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
+						it != this->correlation->correlationMapSocketHandler.end(); ++it) {
+					it->second->sendMessage(msg);
+				}
+			}
 			inReadAt++;
 		}
 		pthread_mutex_unlock(&mutexLockInQueue);
@@ -84,7 +93,7 @@ void* QeueManager::informInQueueFilledWrap(void* arg) {
 	return 0;
 }
 
-void QeueManager::informInQueueFilled(){
+void QeueManager::informInQueueFilled() {
 	pthread_mutex_lock(&mutexLockInQueue);
 	pthread_cond_signal(&conditionInQueueFilled);
 	pthread_mutex_unlock(&mutexLockInQueue);
@@ -94,5 +103,4 @@ void QeueManager::startQeues() {
 	pthread_t outThread, inThread;
 	pthread_create(&outThread, NULL, QeueManager::handleOutMessagesWrap, this);
 	pthread_create(&inThread, NULL, QeueManager::handleInMessagesWrap, this);
-
 }

@@ -10,20 +10,19 @@
 
 #include <stdint.h>
 #include <vector>
+#include <string>
+#include "Enums.h"
 
-enum DispatcherType {
-	MAX, ELRO
-};
+
 
 class OutMessage {
 public:
 	OutMessage();
 	virtual ~OutMessage();
-	DispatcherType dispatchTo;
-	std::vector< uint8_t >  getPayLoad();
-
+	Enums::DispatcherType dispatchTo;
+	std::vector<uint8_t> payLoad;
 private:
-	std::vector<uint8_t> payload;
+
 };
 
 #endif /* OUTMESSAGE_H_ */

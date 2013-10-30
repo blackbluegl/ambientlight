@@ -8,29 +8,32 @@
 #ifndef RFMDISPATCHER_H_
 #define RFMDISPATCHER_H_
 
-#include "../queue/OutMessage.h"
+//#include "../queue/OutMessage.h"
 #include "../queue/QeueManager.h"
 #include "DispatcherModule.h"
 #include "../queue/InMessage.h"
 #include "../rfm22/RF22.h"
+#include "../queue/Enums.h"
+#include <map>
 class QeueManager;
 class DispatcherModule;
 class RF22;
+class OutMessage;
 
 class RFMDispatcher {
 public:
-	RFMDispatcher(QeueManager *queues);
+	RFMDispatcher(QeueManager *queues, RF22 *rfm22);
 	virtual ~RFMDispatcher();
 
 	void dispatchOutMessage(OutMessage message);
 	void dispatchInMessage(InMessage message);
 private:
-	const DispatcherType defaultDispatcher = MAX;
+	const Enums::DispatcherType defaultDispatcher = Enums::MAX;
 
 	QeueManager *queueManager;
-	DispatcherType lastDispatcher;
-	std::map<DispatcherType, DispatcherModule> dispatchers;
-	//RF22 rfm22;
+	Enums::DispatcherType lastDispatcher;
+	std::map<Enums::DispatcherType, DispatcherModule> dispatchers;
+	RF22 *rfm22;
 
 	void initRFM22();
 };

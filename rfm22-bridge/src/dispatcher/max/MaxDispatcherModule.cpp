@@ -10,7 +10,7 @@
 #include "../../rfm22/RF22.h"
 #include "Crc.h"
 #include "Pn9.h"
-#include "../../queue/OutMessage.h"
+//#include "../../queue/OutMessage.h"
 #include <vector>
 #include "../../queue/InMessage.h"
 #include "MaxRFProto.h"
@@ -47,7 +47,7 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	}
 
 	//create message
-	unsigned int length = message.getPayLoad().size() + 3;
+	unsigned int length = message.payLoad.size() + 3;
 	uint8_t sendData[length];
 	rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, length);
 
@@ -55,8 +55,8 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	sendData[0] = length - 3;
 
 	//set payload
-	for (unsigned int i = 0; i < message.getPayLoad().size(); i++) {
-		sendData[i + 1] = message.getPayLoad().at(i);
+	for (unsigned int i = 0; i < message.payLoad.size(); i++) {
+		sendData[i + 1] = message.payLoad.at(i);
 	}
 
 	//create crc in the last 2 bytes
@@ -113,7 +113,7 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 
 
 	InMessage message;
-	message.dispatchTo = MAX;
+	message.dispatchTo = Enums::MAX;
 	message.correlation=rfMessage->addr_from;
 	for(uint8_t i=1;i<len-2;i++){
 		message.payload.push_back(data[i]);
