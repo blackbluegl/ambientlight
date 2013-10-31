@@ -9,7 +9,7 @@
 
 //static_assert(PN9_LEN >= RF22_MAX_MESSAGE_LEN, "Not enough pn9 bytes defined");
 
-MaxRF22 rf(0x00);
+MaxRF22 rf(0x00,0x00);
 
 void printStatus() {
 	for (unsigned int i = 0; i < lengthof(devices); ++i) {
