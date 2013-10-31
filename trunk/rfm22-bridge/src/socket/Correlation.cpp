@@ -26,12 +26,11 @@ SocketHandler* Correlation::getSocketForID(string correlatorId) {
 	return correlationMapSocketHandler.find(socketId)->second;
 }
 
-void Correlation::registerSocket(SocketHandler *socketHandler, vector<string> correlatorIds) {
-	for (unsigned int i = 0; i < correlatorIds.size(); i++) {
-		correlationCorrelator.insert(pair<string, int>(correlatorIds.at(i), socketHandler->socketId));
-	}
+void Correlation::registerSocket(SocketHandler *socketHandler, string correlatorId) {
 
-	correlationMapSocketHandler.insert(pair<int,SocketHandler*>(socketHandler->socketId,socketHandler));
+	correlationCorrelator.insert(pair<string, int>(correlatorId, socketHandler->socketId));
+
+	correlationMapSocketHandler.insert(pair<int, SocketHandler*>(socketHandler->socketId,socketHandler));
 }
 
 void Correlation::unregisterSocket(int socket) {

@@ -14,9 +14,12 @@
 #include "../socket/Correlation.h"
 #include <vector>
 #include <map>
+#include "../socket/SocketHandler.h"
 
 class RFMDispatcher;
-class SocketHandler;
+
+class Correlation;
+
 
 class QeueManager {
 public:
