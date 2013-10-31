@@ -27,6 +27,9 @@ Enums::MessageCommandType Enums::stringToMessageCommandTypeEnum(std::string comm
 	if ("RFM_SEND_MESSAGE" == command) {
 		return RFM_SEND_MESSAGE;
 	}
+	if("CLOSE_CONNECTION" == command){
+		return CLOSE_CONNECTION;
+	}
 	return UNKNOWN_COMMAND;
 }
 

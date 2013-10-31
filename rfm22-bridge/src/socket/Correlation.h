@@ -6,12 +6,13 @@
  */
 
 #ifndef CORRELATION_H_
+#define CORRELATION_H_
 #include <string>
 #include <map>
 #include "SocketHandler.h"
 
 using namespace std;
-#define CORRELATION_H_
+
 
 class SocketHandler;
 
@@ -23,7 +24,7 @@ public:
 	virtual ~Correlation();
 
 	SocketHandler* getSocketForID(string correlatorId);
-	void registerSocket(SocketHandler *socketHandler, vector<string> correlatorIds);
+	void registerSocket(SocketHandler *socketHandler, string correlatorId);
 	void unregisterSocket(int socket);
 
 

@@ -50,6 +50,9 @@ SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int 
 	}
 }
 
+SocketHandler::~SocketHandler() {
+}
+
 void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::string commandValues) {
 	std::string::size_type prevPos = 0, pos = 0;
 	pos = commandValues.find('|', pos);
@@ -59,11 +62,25 @@ void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::
 	outMessage.payLoad = readPayload(this->socketId, length);
 	outMessage.dispatchTo = dispatcherType;
 	this->queueManager->postOutMessage(outMessage);
+
 	send(socketId, "OK", 2, 0);
 }
 
-SocketHandler::~SocketHandler() {
-	// TODO Auto-generated destructor stub
+void SocketHandler::handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues) {
+	std::string::size_type prevPos = 0, pos = 0;
+	pos = commandValues.find('|', pos);
+	std::string correlation(Enums::enumToString(dispatcherType)+"_"+commandValues.substr(prevPos, pos - prevPos));
+
+	this->correlation->registerSocket(this,correlation);
+	send(socketId, "OK", 2, 0);
+}
+
+void SocketHandler::handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues) {
+	send(socketId, "OK", 2, 0);
+}
+
+void SocketHandler::handleCloseConnection(Enums::DispatcherType dispatcherType, std::string commandValues) {
+	send(socketId, "OK", 2, 0);
 }
 
 std::string SocketHandler::readLine(int socked) {

@@ -8,14 +8,13 @@
 #ifndef SOCKETHANDLER_H_
 #define SOCKETHANDLER_H_
 
-
 #include "../queue/InMessage.h"
 #include <vector>
 #include <string>
-#include "../queue/QeueManager.h"
+
 
 class Correlation;
-class QueueManager;
+class QeueManager;
 
 class SocketHandler {
 public:
@@ -31,6 +30,10 @@ private:
 	std::vector<uint8_t> readPayload(int socked, unsigned int length);
 
 	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::string commandValues);
+	void handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues);
+	void handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues);
+	void handleCloseConnection(Enums::DispatcherType dispatcherType, std::string commandValues);
+
 };
 
 #endif /* SOCKETHANDLER_H_ */
