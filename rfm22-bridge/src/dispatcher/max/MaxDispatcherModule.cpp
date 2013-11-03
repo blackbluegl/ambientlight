@@ -15,11 +15,11 @@
 #include "../../queue/InMessage.h"
 #include "MaxRFProto.h"
 #include <iostream>
+#include <sstream>
 
-MaxDispatcherModule::~MaxDispatcherModule(){
+MaxDispatcherModule::~MaxDispatcherModule() {
 
 }
-
 
 bool MaxDispatcherModule::init(RF22 *rf22) {
 	rf22->setModemRegisters(&maxModemConfig);
@@ -107,15 +107,18 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 		std::cout << "Packet is invalid" << "\r\n";
 		return;
 	} else {
-		std::cout << "got MAX! Message: " << rfMessage->type_to_str(rfMessage->type)
-				<< " from " << rfMessage->addr_from << " to " << rfMessage->addr_to << "\r\n";
+		std::cout << "got MAX! Message: " << rfMessage->type_to_str(rfMessage->type) << " from " << rfMessage->addr_from << " to "
+				<< rfMessage->addr_to << "\r\n";
 	}
-
 
 	InMessage message;
 	message.dispatchTo = Enums::MAX;
-	message.correlation=rfMessage->addr_from;
-	for(uint8_t i=1;i<len-2;i++){
+
+	std::stringstream fromStream;
+	fromStream << rfMessage->addr_from;
+
+	message.correlation = "MAX_" + fromStream.str();
+	for (uint8_t i = 1; i < len - 2; i++) {
 		message.payload.push_back(data[i]);
 	}
 

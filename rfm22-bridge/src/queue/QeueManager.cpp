@@ -65,7 +65,7 @@ void QeueManager::handleInMessages() {
 			if (socketHandler != NULL) {
 				socketHandler->sendMessage(msg);
 			} else {
-				//broadcast to everybody
+				//broadcast to everybody TODO does not work jet
 				for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
 						it != this->correlation->correlationMapSocketHandler.end(); ++it) {
 					it->second->sendMessage(msg);

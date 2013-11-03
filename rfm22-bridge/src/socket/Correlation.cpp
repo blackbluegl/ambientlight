@@ -29,8 +29,6 @@ SocketHandler* Correlation::getSocketForID(string correlatorId) {
 void Correlation::registerCorrelation(SocketHandler *socketHandler, string correlatorId) {
 
 	correlationCorrelator.insert(pair<string, int>(correlatorId, socketHandler->socketId));
-
-	correlationMapSocketHandler.insert(pair<int, SocketHandler*>(socketHandler->socketId,socketHandler));
 }
 
 void Correlation::unRegisterCorrelation(SocketHandler *socketHandler, string correlatorId) {
@@ -51,5 +49,11 @@ void Correlation::unregisterSocket(int socket) {
 	}
 
 	correlationMapSocketHandler.erase(socket);
+}
+
+void Correlation::registerSocket(SocketHandler *socketHandler) {
+
+	correlationMapSocketHandler.insert(pair<int, SocketHandler*>(socketHandler->socketId,socketHandler));
+
 }
 

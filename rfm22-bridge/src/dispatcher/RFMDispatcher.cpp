@@ -12,7 +12,7 @@
 
 RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
 	this->rfm22 = rfm22;
-	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule>(Enums::MAX, MaxDispatcherModule(this)));
+	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule*>(Enums::MAX, new MaxDispatcherModule(this)));
 	lastDispatcher = defaultDispatcher;
 }
 
@@ -20,27 +20,28 @@ RFMDispatcher::~RFMDispatcher() {
 }
 
 void RFMDispatcher::dispatchOutMessage(OutMessage message) {
-	DispatcherModule module = dispatchers.at(message.dispatchTo);
+	DispatcherModule* module = dispatchers.at(message.dispatchTo);
 
 	if (lastDispatcher != message.dispatchTo) {
 		//dispatchermodule is different. reinit sending module
-		module.init(rfm22);
+		module->init(rfm22);
 		lastDispatcher = message.dispatchTo;
 	}
 
-	module.switchToTX(rfm22);
-	module.sendMessage(rfm22, message);
+	module->switchToTX(rfm22);
+	module->sendMessage(rfm22, message);
 
 	//now set module to rx
 	if (lastDispatcher != defaultDispatcher) {
 		//change back to default dispatchermodule
 		module = dispatchers.at(defaultDispatcher);
-		module.init(rfm22);
+		module->init(rfm22);
 		lastDispatcher = defaultDispatcher;
+		rfm22->setDispatcherModule(module);
 	}
 
 	//wait for new messages
-	module.switchToRx(rfm22);
+	module->switchToRx(rfm22);
 }
 
 void RFMDispatcher::dispatchInMessage(InMessage message) {
@@ -52,8 +53,10 @@ void RFMDispatcher::initRFM22() {
 		perror("could not connect to rfm22 module!");
 		exit(1);
 	}
-	DispatcherModule module = dispatchers.at(defaultDispatcher);
-	module.init(rfm22);
-	module.switchToRx(rfm22);
+
+	DispatcherModule* module = dispatchers.at(defaultDispatcher);
+	rfm22->setDispatcherModule(module);
+	module->init(rfm22);
+	module->switchToRx(rfm22);
 }
 

@@ -24,6 +24,7 @@
 
 SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int socketId) {
 	this->correlation = correlation;
+	this->correlation->registerSocket(this);
 	this->queueManager = queues;
 	this->socketId = socketId;
 }
@@ -135,8 +136,8 @@ std::vector<uint8_t> SocketHandler::readPayload(int socked, unsigned int length)
 }
 
 int SocketHandler::sendMessage(InMessage message) {
-
-	std::string dispatchMessage = Enums::enumToString(message.dispatchTo) + "|";
+	TODO convert to int to string to have it working again
+	std::string dispatchMessage = Enums::enumToString(message.dispatchTo) + "|"+message.payload.size()+"|"+"\n";
 	for (unsigned int i = 0; i < message.payload.size(); i++) {
 		dispatchMessage += message.payload.at(i);
 	}
