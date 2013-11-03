@@ -19,45 +19,57 @@
 #include "../queue/Enums.h"
 #include "../queue/CommandMessage.h"
 #include "../queue/OutMessage.h"
+#include "../queue/QeueManager.h"
+#include <iostream>
 
-SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int sockedId) {
+SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int socketId) {
 	this->correlation = correlation;
 	this->queueManager = queues;
 	this->socketId = socketId;
-	while (true) {
-		std::string commandValues = readLine(socketId);
-
-		std::string::size_type prevPos = 0, pos = 0;
-
-		pos = commandValues.find('|', pos);
-		std::string command(commandValues.substr(prevPos, pos - prevPos));
-		Enums::MessageCommandType commandType = Enums::stringToMessageCommandTypeEnum(command);
-		prevPos = ++pos;
-
-		if (commandType == Enums::UNKNOWN_COMMAND) {
-			send(socketId, "NOK", 3, 0);
-			continue;
-		}
-
-		pos = commandValues.find('|', pos);
-		std::string typeString(commandValues.substr(prevPos, pos - prevPos));
-		Enums::DispatcherType dispatcherType = Enums::stringToEnum(typeString);
-		prevPos = ++pos;
-
-		if (commandType == Enums::RFM_SEND_MESSAGE) {
-			this->handleRFMMessage(dispatcherType, commandValues.substr(prevPos));
-		}
-	}
 }
 
 SocketHandler::~SocketHandler() {
 }
 
-void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::string commandValues) {
-	std::string::size_type prevPos = 0, pos = 0;
-	pos = commandValues.find('|', pos);
-	std::string lengthString(commandValues.substr(prevPos, pos - prevPos));
-	int length = atoi(lengthString.c_str());
+void* SocketHandler::handleOutMessagesWrap(void* arg) {
+	SocketHandler* myself = (SocketHandler*) arg;
+
+	while (true) {
+
+		std::vector<std::string> commandValues = myself->getValuesOfMessage(myself->readLine(myself->socketId));
+
+		if (commandValues.size() < 3) {
+			send(myself->socketId, "NOK", 3, 0);
+			continue;
+		}
+
+		Enums::MessageCommandType commandType = Enums::stringToMessageCommandTypeEnum(commandValues.at(0));
+
+		if (commandType == Enums::UNKNOWN_COMMAND) {
+			send(myself->socketId, "NOK", 3, 0);
+			continue;
+		}
+
+		Enums::DispatcherType dispatcherType = Enums::stringToEnum(commandValues.at(1));
+
+		if (commandType == Enums::RFM_SEND_MESSAGE) {
+			myself->handleRFMMessage(dispatcherType, commandValues);
+		} else if (commandType == Enums::REGISTER_CORRELATION) {
+			myself->handleRegisterCorrelation(dispatcherType, commandValues);
+		} else if (commandType == Enums::UNREGISTER_CORRELATION) {
+			myself->handleUnRegisterCorrelation(dispatcherType, commandValues);
+		} else if (commandType == Enums::CLOSE_CONNECTION) {
+			myself->handleCloseConnection(dispatcherType, commandValues);
+			delete myself;
+			return 0;
+		}
+	}
+	return 0;
+}
+
+void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
+
+	int length = atoi(commandValues.at(3).c_str());
 	OutMessage outMessage;
 	outMessage.payLoad = readPayload(this->socketId, length);
 	outMessage.dispatchTo = dispatcherType;
@@ -66,28 +78,28 @@ void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::
 	send(socketId, "OK", 2, 0);
 }
 
-void SocketHandler::handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues) {
-	std::string::size_type prevPos = 0, pos = 0;
-	pos = commandValues.find('|', pos);
-	std::string correlation(Enums::enumToString(dispatcherType)+"_"+commandValues.substr(prevPos, pos - prevPos));
-
-	this->correlation->registerSocket(this,correlation);
+void SocketHandler::handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
+	std::string correlation(Enums::enumToString(dispatcherType) + "_" + commandValues.at(2));
+	this->correlation->registerCorrelation(this, correlation);
 	send(socketId, "OK", 2, 0);
 }
 
-void SocketHandler::handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues) {
+void SocketHandler::handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
+	std::string correlation(Enums::enumToString(dispatcherType) + "_" + commandValues.at(2));
+	this->correlation->unRegisterCorrelation(this, correlation);
 	send(socketId, "OK", 2, 0);
 }
 
-void SocketHandler::handleCloseConnection(Enums::DispatcherType dispatcherType, std::string commandValues) {
+void SocketHandler::handleCloseConnection(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
+	this->correlation->unregisterSocket(this->socketId);
 	send(socketId, "OK", 2, 0);
+	close(socketId);
 }
 
 std::string SocketHandler::readLine(int socked) {
 	ssize_t rc;
 	char c;
 	std::string buffer = "";
-
 	do {
 		if ((rc = read(socked, &c, +1)) == 1) {
 			buffer.append(&c);
@@ -100,6 +112,7 @@ std::string SocketHandler::readLine(int socked) {
 	if (rc < 0) {
 		//error("error reading message");
 	}
+	cout << buffer;
 	return buffer;
 }
 
@@ -131,3 +144,16 @@ int SocketHandler::sendMessage(InMessage message) {
 	return send(socketId, dispatchMessage.c_str(), dispatchMessage.size(), 0);
 }
 
+std::vector<std::string> SocketHandler::getValuesOfMessage(std::string commandValues) {
+	std::vector<std::string> results;
+	std::string::size_type prevPos = 0, pos = 0;
+	while (pos != std::string::npos) {
+		pos = commandValues.find('|', pos);
+		if (pos == std::string::npos) {
+			break;
+		}
+		results.push_back(commandValues.substr(prevPos, pos - prevPos));
+		prevPos = ++pos;
+	}
+	return results;
+}

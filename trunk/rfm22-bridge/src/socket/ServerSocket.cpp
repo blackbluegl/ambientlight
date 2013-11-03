@@ -15,16 +15,17 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <iostream>
 
 ServerSocket::ServerSocket(Correlation *correlation, QeueManager *queues) {
 	this->correlation = correlation;
-	this->queueManager=queues;
+	this->queueManager = queues;
 }
 
 ServerSocket::~ServerSocket() {
 }
 
-void ServerSocket::listen(int portNumber) {
+void ServerSocket::listenForMessages(int portNumber) {
 
 	int serverSocked, socketHandlerSocked;
 	socklen_t clilen;
@@ -41,19 +42,35 @@ void ServerSocket::listen(int portNumber) {
 	serv_addr.sin_port = htons(portNumber);
 	if (bind(serverSocked, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 		error("ERROR on binding");
-	listen(serverSocked);
+
+	if (listen(serverSocked, 1024) < 0) {
+		error("Error calling listen()");
+	}
+
 	clilen = sizeof(cli_addr);
 	//for now on we wait forever
 	while (true) {
 		socketHandlerSocked = accept(serverSocked, (struct sockaddr *) &cli_addr, &clilen);
-
 		if (socketHandlerSocked < 0)
 			error("ERROR on accept");
 
-		SocketHandler sockedHandler(this->correlation,this->queueManager, socketHandlerSocked);
+
+		SocketHandler* socketHandler = new SocketHandler(this->correlation, this->queueManager, socketHandlerSocked);
+//
+//		socketHandler->handleOutMessagesWrap(socketHandler);
+
+//		SocketHandler socketHandler(this->correlation, this->queueManager, socketHandlerSocked);
+//		socketHandler.handleOutMessagesWrap(&socketHandler);
+
+		pthread_attr_t tattr;
+		/* set the thread detach state */
+		pthread_attr_setdetachstate(&tattr, PTHREAD_CREATE_DETACHED);
+
+		pthread_t createThread;
+		pthread_create(&createThread, NULL, SocketHandler::handleOutMessagesWrap, socketHandler);
 	}
 
-	close (serverSocked);
+	close(serverSocked);
 }
 
 void ServerSocket::error(const char *msg) {
