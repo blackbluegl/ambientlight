@@ -12,16 +12,19 @@
 #include <vector>
 #include <string>
 
-
 class Correlation;
 class QeueManager;
 
+
+
 class SocketHandler {
 public:
-	SocketHandler(Correlation *correlation, QeueManager *queues, int sockedId);
+	SocketHandler(Correlation *correlation, QeueManager *queues, int socketId);
+	int socketId;
+	static void* handleOutMessagesWrap(void* arg);
 	virtual ~SocketHandler();
 	int sendMessage(InMessage message);
-	int socketId;
+
 
 private:
 	Correlation *correlation;
@@ -29,10 +32,15 @@ private:
 	std::string readLine(int socked);
 	std::vector<uint8_t> readPayload(int socked, unsigned int length);
 
-	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::string commandValues);
-	void handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues);
-	void handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::string commandValues);
-	void handleCloseConnection(Enums::DispatcherType dispatcherType, std::string commandValues);
+	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
+	void handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
+	void handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
+	void handleCloseConnection(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
+
+	std::vector<std::string> getValuesOfMessage(std::string commandValues);
+
+
+
 
 };
 

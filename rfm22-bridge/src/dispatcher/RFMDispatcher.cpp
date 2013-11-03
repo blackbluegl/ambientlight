@@ -10,12 +10,10 @@
 #include <map>
 #include "../queue/Enums.h"
 
-
-RFMDispatcher::RFMDispatcher(QeueManager *queues, RF22 *rfm22 ) {
-	this->queueManager = queues;
-	this->rfm22=rfm22;
-	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule>(Enums::MAX,MaxDispatcherModule(this)));
-	lastDispatcher=defaultDispatcher;
+RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
+	this->rfm22 = rfm22;
+	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule>(Enums::MAX, MaxDispatcherModule(this)));
+	lastDispatcher = defaultDispatcher;
 }
 
 RFMDispatcher::~RFMDispatcher() {
@@ -25,20 +23,20 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 	DispatcherModule module = dispatchers.at(message.dispatchTo);
 
 	if (lastDispatcher != message.dispatchTo) {
-	//dispatchermodule is different. reinit sending module
+		//dispatchermodule is different. reinit sending module
 		module.init(rfm22);
-		lastDispatcher=message.dispatchTo;
+		lastDispatcher = message.dispatchTo;
 	}
 
 	module.switchToTX(rfm22);
-	module.sendMessage(rfm22,message);
+	module.sendMessage(rfm22, message);
 
 	//now set module to rx
-	if(lastDispatcher!=defaultDispatcher){
+	if (lastDispatcher != defaultDispatcher) {
 		//change back to default dispatchermodule
-		module=dispatchers.at(defaultDispatcher);
+		module = dispatchers.at(defaultDispatcher);
 		module.init(rfm22);
-		lastDispatcher=defaultDispatcher;
+		lastDispatcher = defaultDispatcher;
 	}
 
 	//wait for new messages
@@ -50,6 +48,12 @@ void RFMDispatcher::dispatchInMessage(InMessage message) {
 }
 
 void RFMDispatcher::initRFM22() {
-	rfm22->init();
+	if (rfm22->init() == false) {
+		perror("could not connect to rfm22 module!");
+		exit(1);
+	}
+	DispatcherModule module = dispatchers.at(defaultDispatcher);
+	module.init(rfm22);
+	module.switchToRx(rfm22);
 }
 

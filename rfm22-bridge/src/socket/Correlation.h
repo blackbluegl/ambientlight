@@ -24,7 +24,8 @@ public:
 	virtual ~Correlation();
 
 	SocketHandler* getSocketForID(string correlatorId);
-	void registerSocket(SocketHandler *socketHandler, string correlatorId);
+	void registerCorrelation(SocketHandler *socketHandler, string correlatorId);
+	void unRegisterCorrelation(SocketHandler *socketHandler, string correlatorId);
 	void unregisterSocket(int socket);
 
 

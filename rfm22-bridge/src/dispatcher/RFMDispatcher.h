@@ -22,20 +22,22 @@ class OutMessage;
 
 class RFMDispatcher {
 public:
-	RFMDispatcher(QeueManager *queues, RF22 *rfm22);
+	RFMDispatcher(RF22 *rfm22);
+	QeueManager *queueManager;
 	virtual ~RFMDispatcher();
 
 	void dispatchOutMessage(OutMessage message);
 	void dispatchInMessage(InMessage message);
+
+	void initRFM22();
+
 private:
 	const Enums::DispatcherType defaultDispatcher = Enums::MAX;
 
-	QeueManager *queueManager;
 	Enums::DispatcherType lastDispatcher;
 	std::map<Enums::DispatcherType, DispatcherModule> dispatchers;
 	RF22 *rfm22;
 
-	void initRFM22();
 };
 
 #endif /* RFMDISPATCHER_H_ */

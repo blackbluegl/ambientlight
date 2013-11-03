@@ -13,12 +13,15 @@
 class Correlation;
 
 class ServerSocket {
+
 public:
 	ServerSocket(Correlation *correlation, QeueManager *queues);
 	virtual ~ServerSocket();
 
-	void listen(int portNumber);
+	void listenForMessages(int portNumber);
+
 private:
+
 	Correlation *correlation;
 	QeueManager *queueManager;
 
