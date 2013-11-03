@@ -21,9 +21,10 @@ int main(int argc, const char* argv[]) {
 		QeueManager queues(&correlation, &dispatcher);
 		dispatcher.queueManager = &queues;
 		ServerSocket socketServer(&correlation,&queues);
-		socketServer.listenForMessages(port);
 
+		queues.startQeues();
 		dispatcher.initRFM22();
+		socketServer.listenForMessages(port);
 	}
 }
 

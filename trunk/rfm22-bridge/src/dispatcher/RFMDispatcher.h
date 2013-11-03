@@ -35,7 +35,7 @@ private:
 	const Enums::DispatcherType defaultDispatcher = Enums::MAX;
 
 	Enums::DispatcherType lastDispatcher;
-	std::map<Enums::DispatcherType, DispatcherModule> dispatchers;
+	std::map<Enums::DispatcherType, DispatcherModule*> dispatchers;
 	RF22 *rfm22;
 
 };
