@@ -10,6 +10,7 @@
 #include "../socket/SocketHandler.h"
 #include "../dispatcher/RFMDispatcher.h"
 #include "../socket/SockedException.h"
+#include <iostream>
 
 pthread_mutex_t mutexLockOutQueue = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t conditionOutQueueFilled = PTHREAD_COND_INITIALIZER;
@@ -67,14 +68,13 @@ void QeueManager::handleInMessages() {
 				if (socketHandler != NULL) {
 					socketHandler->handleInMessage(msg);
 				} else {
-					//broadcast to everybody TODO does not work jet
 					for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
 							it != this->correlation->correlationMapSocketHandler.end(); ++it) {
 						it->second->handleInMessage(msg);
 					}
 				}
 			} catch (SockedException &ex) {
-				SocketHandler::handleCloseConnection(socketHandler);
+				cout << "QueueManager handleInMessages(): sockedHandler has no valid connection anymore. removal should be applied by the corresponding thread";
 			}
 			inReadAt++;
 		}

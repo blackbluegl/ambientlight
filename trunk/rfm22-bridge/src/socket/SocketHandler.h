@@ -23,9 +23,7 @@ public:
 	SocketHandler(Correlation *correlation, QeueManager *queues, int socketId);
 	virtual ~SocketHandler();
 	int socketId;
-
 	static void* handleCommands(void* arg);
-	static void handleCloseConnection(SocketHandler* socketHandler);
 
 	void handleInMessage(InMessage message);
 
@@ -34,6 +32,8 @@ private:
 	QeueManager *queueManager;
 	std::string readLine(int socked);
 	std::vector<uint8_t> readBytes(int socked, unsigned int length);
+
+	static void handleCloseConnection(SocketHandler* socketHandler);
 
 	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
 	void handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
