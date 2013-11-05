@@ -54,20 +54,14 @@ void ServerSocket::listenForMessages(int portNumber) {
 		if (socketHandlerSocked < 0)
 			error("ERROR on accept");
 
-
 		SocketHandler* socketHandler = new SocketHandler(this->correlation, this->queueManager, socketHandlerSocked);
-//
-//		socketHandler->handleOutMessagesWrap(socketHandler);
-
-//		SocketHandler socketHandler(this->correlation, this->queueManager, socketHandlerSocked);
-//		socketHandler.handleOutMessagesWrap(&socketHandler);
 
 		pthread_attr_t tattr;
 		/* set the thread detach state */
 		pthread_attr_setdetachstate(&tattr, PTHREAD_CREATE_DETACHED);
 
 		pthread_t createThread;
-		pthread_create(&createThread, NULL, SocketHandler::handleOutMessagesWrap, socketHandler);
+		pthread_create(&createThread, NULL, SocketHandler::handleCommands, socketHandler);
 	}
 
 	close(serverSocked);
