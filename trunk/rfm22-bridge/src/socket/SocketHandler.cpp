@@ -21,6 +21,10 @@
 #include "../queue/OutMessage.h"
 #include "../queue/QeueManager.h"
 #include <iostream>
+#include <sstream>
+#include "SockedException.h"
+
+
 
 SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int socketId) {
 	this->correlation = correlation;
@@ -32,39 +36,46 @@ SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int 
 SocketHandler::~SocketHandler() {
 }
 
-void* SocketHandler::handleOutMessagesWrap(void* arg) {
+void* SocketHandler::handleCommands(void* arg) {
 	SocketHandler* myself = (SocketHandler*) arg;
 
-	while (true) {
+	try {
+		while (true) {
 
-		std::vector<std::string> commandValues = myself->getValuesOfMessage(myself->readLine(myself->socketId));
+			std::vector<std::string> commandValues = myself->getValuesOfMessage(myself->readLine(myself->socketId));
 
-		if (commandValues.size() < 3) {
-			send(myself->socketId, "NOK", 3, 0);
-			continue;
+			if (commandValues.size() < 1) {
+				send(myself->socketId, "NOK", 3, 0);
+				continue;
+			}
+
+			Enums::MessageCommandType commandType = Enums::stringToMessageCommandTypeEnum(commandValues.at(0));
+
+			if (commandType == Enums::UNKNOWN_COMMAND) {
+				send(myself->socketId, "NOK", 3, 0);
+				continue;
+			}
+
+			if (commandType == Enums::CLOSE_CONNECTION) {
+				handleCloseConnection(myself);
+				return 0;
+			}
+
+			Enums::DispatcherType dispatcherType = Enums::stringToEnum(commandValues.at(1));
+
+			if (commandType == Enums::RFM_SEND_MESSAGE) {
+				myself->handleRFMMessage(dispatcherType, commandValues);
+			} else if (commandType == Enums::REGISTER_CORRELATION) {
+				myself->handleRegisterCorrelation(dispatcherType, commandValues);
+			} else if (commandType == Enums::UNREGISTER_CORRELATION) {
+				myself->handleUnRegisterCorrelation(dispatcherType, commandValues);
+			}
 		}
-
-		Enums::MessageCommandType commandType = Enums::stringToMessageCommandTypeEnum(commandValues.at(0));
-
-		if (commandType == Enums::UNKNOWN_COMMAND) {
-			send(myself->socketId, "NOK", 3, 0);
-			continue;
-		}
-
-		Enums::DispatcherType dispatcherType = Enums::stringToEnum(commandValues.at(1));
-
-		if (commandType == Enums::RFM_SEND_MESSAGE) {
-			myself->handleRFMMessage(dispatcherType, commandValues);
-		} else if (commandType == Enums::REGISTER_CORRELATION) {
-			myself->handleRegisterCorrelation(dispatcherType, commandValues);
-		} else if (commandType == Enums::UNREGISTER_CORRELATION) {
-			myself->handleUnRegisterCorrelation(dispatcherType, commandValues);
-		} else if (commandType == Enums::CLOSE_CONNECTION) {
-			myself->handleCloseConnection(dispatcherType, commandValues);
-			delete myself;
-			return 0;
-		}
+	} catch (SockedException &e) {
+		cout << "SocketHandler handleCommands(): caught sockedException!\n";
+		handleCloseConnection(myself);
 	}
+
 	return 0;
 }
 
@@ -72,29 +83,40 @@ void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::
 
 	int length = atoi(commandValues.at(3).c_str());
 	OutMessage outMessage;
-	outMessage.payLoad = readPayload(this->socketId, length);
+	outMessage.payLoad = readBytes(this->socketId, length);
 	outMessage.dispatchTo = dispatcherType;
 	this->queueManager->postOutMessage(outMessage);
 
-	send(socketId, "OK", 2, 0);
+	if (send(socketId, "OK", 2, 0) < 0) {
+		SockedException ex;
+		throw ex;
+	}
 }
 
 void SocketHandler::handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
 	std::string correlation(Enums::enumToString(dispatcherType) + "_" + commandValues.at(2));
 	this->correlation->registerCorrelation(this, correlation);
-	send(socketId, "OK", 2, 0);
+	if (send(socketId, "OK", 2, 0) < 0) {
+		SockedException ex;
+		throw ex;
+	}
 }
 
 void SocketHandler::handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
 	std::string correlation(Enums::enumToString(dispatcherType) + "_" + commandValues.at(2));
 	this->correlation->unRegisterCorrelation(this, correlation);
-	send(socketId, "OK", 2, 0);
+	if (send(socketId, "OK", 2, 0) < 0) {
+		SockedException ex;
+		throw ex;
+	}
 }
 
-void SocketHandler::handleCloseConnection(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
-	this->correlation->unregisterSocket(this->socketId);
-	send(socketId, "OK", 2, 0);
-	close(socketId);
+void SocketHandler::handleCloseConnection(SocketHandler* socketHandler) {
+	cout << "SocketHandler handleCloseConnection(): closing connection\n";
+	socketHandler->correlation->unregisterSocket(socketHandler->socketId);
+	send(socketHandler->socketId, "OK", 2, 0);
+	close(socketHandler->socketId);
+	delete socketHandler;
 }
 
 std::string SocketHandler::readLine(int socked) {
@@ -111,13 +133,15 @@ std::string SocketHandler::readLine(int socked) {
 	} while (rc > 0);
 
 	if (rc < 0) {
-		//error("error reading message");
+		cout << "SocketHandler readLine(): error reading socked!\n";
+		SockedException ex;
+		throw ex;
 	}
-	cout << buffer;
+	cout << "SocketHandler readLine(): " << buffer << "\n";
 	return buffer;
 }
 
-std::vector<uint8_t> SocketHandler::readPayload(int socked, unsigned int length) {
+std::vector<uint8_t> SocketHandler::readBytes(int socked, unsigned int length) {
 	ssize_t rc;
 
 	uint8_t data[length];
@@ -125,7 +149,9 @@ std::vector<uint8_t> SocketHandler::readPayload(int socked, unsigned int length)
 	rc = read(socked, data, length);
 
 	if (rc < 0) {
-		//error("error reading message");
+		cout << "SocketHandler readBytes(): error reading socked!\n";
+		SockedException ex;
+		throw ex;
 	}
 
 	for (unsigned int i = 0; i < length; i++) {
@@ -135,14 +161,20 @@ std::vector<uint8_t> SocketHandler::readPayload(int socked, unsigned int length)
 	return result;
 }
 
-int SocketHandler::sendMessage(InMessage message) {
-	TODO convert to int to string to have it working again
-	std::string dispatchMessage = Enums::enumToString(message.dispatchTo) + "|"+message.payload.size()+"|"+"\n";
+void SocketHandler::handleInMessage(InMessage message) {
+
+	std::stringstream fromStream;
+	fromStream << message.payload.size();
+	std::string size = fromStream.str();
+	std::string dispatchMessage = Enums::enumToString(message.dispatchTo) + "|" + size + "|" + "\n";
 	for (unsigned int i = 0; i < message.payload.size(); i++) {
 		dispatchMessage += message.payload.at(i);
 	}
 
-	return send(socketId, dispatchMessage.c_str(), dispatchMessage.size(), 0);
+	if (send(socketId, dispatchMessage.c_str(), dispatchMessage.size(), 0) < 0) {
+		SockedException ex;
+		throw ex;
+	}
 }
 
 std::vector<std::string> SocketHandler::getValuesOfMessage(std::string commandValues) {

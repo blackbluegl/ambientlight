@@ -12,7 +12,6 @@
 #include <errno.h>
 #include <iostream>
 
-
 // Interrupt vectors for the 2 Arduino interrupt pins
 // Each interrupt can be handled by a different instance of RF22, allowing you to have
 // 2 RF22s per Arduino
@@ -126,7 +125,7 @@ bool RF22::init() {
 	// and all such messages will be accepted. This permits the out-of the box
 	// RF22 config to act as an unaddresed, unreliable datagram service
 	spiWrite(RF22_REG_32_HEADER_CONTROL1, RF22_BCEN_HEADER3 | RF22_HDCH_HEADER3);
-	spiWrite(RF22_REG_33_HEADER_CONTROL2, RF22_HDLEN_4 | RF22_SYNCLEN_2| 0x1);
+	spiWrite(RF22_REG_33_HEADER_CONTROL2, RF22_HDLEN_4 | RF22_SYNCLEN_2 | 0x1);
 	setPreambleLength(8);
 	uint8_t syncwords[] = { 0x2d, 0xd4 };
 	setSyncWords(syncwords, sizeof(syncwords));
@@ -166,13 +165,13 @@ bool RF22::init() {
 	return true;
 }
 
-void RF22::setDispatcherModule(DispatcherModule *dispatcherModule){
-	this->dispatcher=dispatcherModule;
+void RF22::setDispatcherModule(DispatcherModule *dispatcherModule) {
+	this->dispatcher = dispatcherModule;
 }
 
 // C++ level interrupt handler for this instance
 void RF22::handleInterrupt() {
-	printf("\n");
+	printf("RF22 handleInterrupt(): ");
 	uint8_t _lastInterruptFlags[2];
 	// Read the interrupt flags which clears the interrupt
 	spiBurstRead(RF22_REG_03_INTERRUPT_STATUS1, _lastInterruptFlags, 2);
@@ -257,6 +256,8 @@ void RF22::handleInterrupt() {
 		_lastRssi = spiRead(RF22_REG_26_RSSI);
 		//	clearRxBuf();
 	}
+	printf("\n");
+	fflush(stdout);
 }
 
 // These are low level functions that call the interrupt handler for the correct

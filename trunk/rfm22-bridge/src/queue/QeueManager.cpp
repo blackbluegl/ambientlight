@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include "../socket/SocketHandler.h"
 #include "../dispatcher/RFMDispatcher.h"
+#include "../socket/SockedException.h"
 
 pthread_mutex_t mutexLockOutQueue = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t conditionOutQueueFilled = PTHREAD_COND_INITIALIZER;
@@ -62,14 +63,18 @@ void QeueManager::handleInMessages() {
 		while (inEnqueueAt > inReadAt) {
 			InMessage msg = inQeue[inReadAt + 1];
 			SocketHandler *socketHandler = this->correlation->getSocketForID(msg.correlation);
-			if (socketHandler != NULL) {
-				socketHandler->sendMessage(msg);
-			} else {
-				//broadcast to everybody TODO does not work jet
-				for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
-						it != this->correlation->correlationMapSocketHandler.end(); ++it) {
-					it->second->sendMessage(msg);
+			try {
+				if (socketHandler != NULL) {
+					socketHandler->handleInMessage(msg);
+				} else {
+					//broadcast to everybody TODO does not work jet
+					for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
+							it != this->correlation->correlationMapSocketHandler.end(); ++it) {
+						it->second->handleInMessage(msg);
+					}
 				}
+			} catch (SockedException &ex) {
+				SocketHandler::handleCloseConnection(socketHandler);
 			}
 			inReadAt++;
 		}
