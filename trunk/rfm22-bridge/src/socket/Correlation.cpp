@@ -35,11 +35,14 @@ void Correlation::unRegisterCorrelation(SocketHandler *socketHandler, string cor
 	correlationCorrelator.erase(correlatorId);
 }
 
-void Correlation::unregisterSocket(int socket) {
+void Correlation::unregisterSocket(int sockedId) {
+
+	correlationMapSocketHandler.erase(sockedId);
+
 	vector<string> eraseEntries;
 
 	for (map<string, int>::iterator it = correlationCorrelator.begin(); it != correlationCorrelator.end(); ++it) {
-		if (it->second == socket) {
+		if (it->second == sockedId) {
 			eraseEntries.push_back(it->first);
 		}
 	}
@@ -48,7 +51,6 @@ void Correlation::unregisterSocket(int socket) {
 		correlationCorrelator.erase(eraseEntries.at(i));
 	}
 
-	correlationMapSocketHandler.erase(socket);
 }
 
 void Correlation::registerSocket(SocketHandler *socketHandler) {

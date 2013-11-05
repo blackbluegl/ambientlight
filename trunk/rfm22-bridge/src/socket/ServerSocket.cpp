@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <iostream>
+#include <signal.h>
 
 ServerSocket::ServerSocket(Correlation *correlation, QeueManager *queues) {
 	this->correlation = correlation;
@@ -49,6 +50,8 @@ void ServerSocket::listenForMessages(int portNumber) {
 
 	clilen = sizeof(cli_addr);
 	//for now on we wait forever
+
+//	signal (SIGPIPE, SIG_IGN);
 	while (true) {
 		socketHandlerSocked = accept(serverSocked, (struct sockaddr *) &cli_addr, &clilen);
 		if (socketHandlerSocked < 0)
@@ -62,6 +65,7 @@ void ServerSocket::listenForMessages(int portNumber) {
 
 		pthread_t createThread;
 		pthread_create(&createThread, NULL, SocketHandler::handleCommands, socketHandler);
+		std::cout << "ServerSocked listenForMessages(): created new socked with id: "<<socketHandlerSocked <<"\n";
 	}
 
 	close(serverSocked);
@@ -71,3 +75,5 @@ void ServerSocket::error(const char *msg) {
 	perror(msg);
 	exit(1);
 }
+
+

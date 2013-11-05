@@ -24,13 +24,11 @@
 #include <sstream>
 #include "SockedException.h"
 
-
-
 SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int socketId) {
 	this->correlation = correlation;
-	this->correlation->registerSocket(this);
 	this->queueManager = queues;
 	this->socketId = socketId;
+	this->correlation->registerSocket(this);
 }
 
 SocketHandler::~SocketHandler() {
@@ -45,14 +43,20 @@ void* SocketHandler::handleCommands(void* arg) {
 			std::vector<std::string> commandValues = myself->getValuesOfMessage(myself->readLine(myself->socketId));
 
 			if (commandValues.size() < 1) {
-				send(myself->socketId, "NOK", 3, 0);
+				if (send(myself->socketId, "NOK", 3, MSG_NOSIGNAL) < 0) {
+					SockedException ex;
+					throw ex;
+				}
 				continue;
 			}
 
 			Enums::MessageCommandType commandType = Enums::stringToMessageCommandTypeEnum(commandValues.at(0));
 
 			if (commandType == Enums::UNKNOWN_COMMAND) {
-				send(myself->socketId, "NOK", 3, 0);
+				if (send(myself->socketId, "NOK", 3, MSG_NOSIGNAL) < 0) {
+					SockedException ex;
+					throw ex;
+				}
 				continue;
 			}
 
@@ -113,9 +117,9 @@ void SocketHandler::handleUnRegisterCorrelation(Enums::DispatcherType dispatcher
 
 void SocketHandler::handleCloseConnection(SocketHandler* socketHandler) {
 	cout << "SocketHandler handleCloseConnection(): closing connection\n";
-	socketHandler->correlation->unregisterSocket(socketHandler->socketId);
-	send(socketHandler->socketId, "OK", 2, 0);
+	send(socketHandler->socketId, "OK", 2, MSG_NOSIGNAL);
 	close(socketHandler->socketId);
+	socketHandler->correlation->unregisterSocket(socketHandler->socketId);
 	delete socketHandler;
 }
 
@@ -171,7 +175,7 @@ void SocketHandler::handleInMessage(InMessage message) {
 		dispatchMessage += message.payload.at(i);
 	}
 
-	if (send(socketId, dispatchMessage.c_str(), dispatchMessage.size(), 0) < 0) {
+	if (send(socketId, dispatchMessage.c_str(), dispatchMessage.size(), MSG_NOSIGNAL) < 0) {
 		SockedException ex;
 		throw ex;
 	}
