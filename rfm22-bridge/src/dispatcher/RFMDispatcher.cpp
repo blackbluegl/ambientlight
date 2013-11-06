@@ -8,6 +8,7 @@
 #include "RFMDispatcher.h"
 #include "max/MaxDispatcherModule.h"
 #include <map>
+#include <iostream>
 #include "../queue/Enums.h"
 
 RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
@@ -20,6 +21,7 @@ RFMDispatcher::~RFMDispatcher() {
 }
 
 void RFMDispatcher::dispatchOutMessage(OutMessage message) {
+	cout << "RFMDispatcher dispatchOutMessage(): dispatching message of type" << Enums::enumToString(message.dispatchTo) << "\n";
 	DispatcherModule* module = dispatchers.at(message.dispatchTo);
 
 	if (lastDispatcher != message.dispatchTo) {
@@ -38,6 +40,8 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 		module->init(rfm22);
 		lastDispatcher = defaultDispatcher;
 		rfm22->setDispatcherModule(module);
+		cout << "RFMDispatcher dispatchOutMessage(): waiting for new messages. changed back to dispatcher type"
+				<< Enums::enumToString(defaultDispatcher) << "\n";
 	}
 
 	//wait for new messages

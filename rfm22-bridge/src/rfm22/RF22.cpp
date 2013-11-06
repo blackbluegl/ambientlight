@@ -171,13 +171,12 @@ void RF22::setDispatcherModule(DispatcherModule *dispatcherModule) {
 
 // C++ level interrupt handler for this instance
 void RF22::handleInterrupt() {
-	printf("RF22 handleInterrupt(): ");
 	uint8_t _lastInterruptFlags[2];
 	// Read the interrupt flags which clears the interrupt
 	spiBurstRead(RF22_REG_03_INTERRUPT_STATUS1, _lastInterruptFlags, 2);
 
 	if (_lastInterruptFlags[0] & RF22_IFFERROR) {
-		printf("IFFERROR");
+		cout << "RFM22 handleInterrupt(): IFFERROR\n";
 		resetFifos(); // Clears the interrupt
 		if (_mode == RF22_MODE_TX) {
 			restartTransmit();
@@ -191,18 +190,18 @@ void RF22::handleInterrupt() {
 	if (_lastInterruptFlags[0] & RF22_ITXFFAEM) {
 		// See if more data has to be loaded into the Tx FIFO
 		sendNextFragment();
-		printf("ITXFFAEM");
+		cout << "RFM22 handleInterrupt(): ITXFFAEM\n";
 	}
 	if (_lastInterruptFlags[0] & RF22_IRXFFAFULL) {
 		// Caution, any delay here may cause a FF overflow
 		// Read some data from the Rx FIFO
 		readNextFragment();
-		printf("IRXFFAFULL");
+		cout << "RFM22 handleInterrupt(): IRXFFAFULL\n";
 	}
 	if (_lastInterruptFlags[0] & RF22_IEXT) {
 		// This is not enabled by the base code, but users may want to enable it
 		handleExternalInterrupt();
-		printf("IEXT");
+		cout << "RFM22 handleInterrupt(): IEXT\n";
 	}
 	if (_lastInterruptFlags[1] & RF22_IWUT) {
 		// This is not enabled by the base code, but users may want to enable it
@@ -216,7 +215,7 @@ void RF22::handleInterrupt() {
 		_mode = RF22_MODE_IDLE;
 	}
 	if (_lastInterruptFlags[0] & RF22_IPKVALID) {
-		printf("IPKVALID");
+		cout << "RFM22 handleInterrupt(): IPKVALID\n";
 		fflush(stdout);
 		uint8_t len = spiRead(RF22_REG_4B_RECEIVED_PACKET_LENGTH);
 
@@ -244,7 +243,7 @@ void RF22::handleInterrupt() {
 		dispatcher->receiveMessage(this);
 	}
 	if (_lastInterruptFlags[0] & RF22_ICRCERROR) {
-		printf("ICRCERR");
+		cout << "RFM22 handleInterrupt(): ICRCERR\n";
 		_rxBad++;
 		clearRxBuf();
 		resetRxFifo();
@@ -252,12 +251,10 @@ void RF22::handleInterrupt() {
 		setModeRx(); // Keep trying
 	}
 	if (_lastInterruptFlags[1] & RF22_IPREAVAL) {
-		printf("IPREAVAL");
+		cout << "RFM22 handleInterrupt(): IPREAVAL\n";
 		_lastRssi = spiRead(RF22_REG_26_RSSI);
 		//	clearRxBuf();
 	}
-	printf("\n");
-	fflush(stdout);
 }
 
 // These are low level functions that call the interrupt handler for the correct

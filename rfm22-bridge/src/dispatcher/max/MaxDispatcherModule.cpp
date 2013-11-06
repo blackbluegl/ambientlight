@@ -107,7 +107,7 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 		std::cout << "Packet is invalid" << "\r\n";
 		return;
 	} else {
-		std::cout << "got MAX! Message: " << rfMessage->type_to_str(rfMessage->type) << " from " << rfMessage->addr_from << " to "
+		std::cout << "MaxDispatcherModule receiveMessage(): got MAX! Message: " << rfMessage->type_to_str(rfMessage->type) << " from " << rfMessage->addr_from << " to "
 				<< rfMessage->addr_to << "\r\n";
 	}
 
