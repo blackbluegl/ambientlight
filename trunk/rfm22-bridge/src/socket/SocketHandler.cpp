@@ -129,7 +129,7 @@ std::string SocketHandler::readLine(int socked) {
 	std::string buffer = "";
 	do {
 		if ((rc = read(socked, &c, +1)) == 1) {
-			buffer.append(&c);
+			buffer.append(&c,1);
 			if (c == '\n') {
 				break;
 			}
