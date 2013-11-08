@@ -51,9 +51,16 @@ public class MaxMessage extends Message {
 	}
 
 
+	public MaxMessageType getMessageType(){
+		if (payload.length < 3)
+			return MaxMessageType.UNKNOWN;
+		else
+			return MaxMessageType.forCode(payload[2]);
+	}
+
 	@Override
 	public String toString() {
-		return "MaxMessage from: " + getFromAdress() + " to: " + getToAdress();
+		return "MaxMessage: " + getMessageType() + " from: " + getFromAdress() + " to: " + getToAdress();
 
 	}
 
