@@ -24,9 +24,11 @@ import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.NFCTagSwitchEventConfiguration;
 import org.ambientlight.process.events.SceneryEntryEventConfiguration;
 import org.ambientlight.process.events.SwitchEventConfiguration;
 import org.ambientlight.room.entities.EventGenerator;
+import org.ambientlight.room.entities.NFCTagSwitchEventGenerator;
 import org.ambientlight.room.entities.SceneryEventGenerator;
 import org.ambientlight.room.entities.SwitchEventGenerator;
 
@@ -51,6 +53,11 @@ public class EventReceiver {
 		if (event instanceof SwitchEventConfiguration) {
 			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEventConfiguration) event);
 		}
+
+		if (event instanceof NFCTagSwitchEventConfiguration) {
+			((NFCTagSwitchEventGenerator) eventGen).switchEventOccured((NFCTagSwitchEventConfiguration) event);
+		}
+
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 		return Response.status(200).build();
 	}

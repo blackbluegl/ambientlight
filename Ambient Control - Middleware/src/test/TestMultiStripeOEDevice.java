@@ -18,7 +18,7 @@ public class TestMultiStripeOEDevice {
 		MultiStripeOverEthernetClientDeviceConfiguration config = new MultiStripeOverEthernetClientDeviceConfiguration();
 		config.hostName = "ambi-schlafen";
 		// config.hostName = "localhost";
-		config.port = 2002;
+		config.port = 30000;
 		device.setConfiguration(config);
 
 		float value = 1.0f;
