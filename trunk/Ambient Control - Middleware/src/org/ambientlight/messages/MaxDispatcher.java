@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.ambientlight.messages.max.MaxMessage;
+import org.ambientlight.messages.max.MaxMessageType;
+import org.ambientlight.messages.max.MaxThermostatStateMessage;
 
 
 /**
@@ -91,7 +93,15 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	public Message parseMessage(byte[] input) {
 		MaxMessage message = new MaxMessage();
 		message.payload = input;
-		return message;
+
+		MaxMessage result = new MaxMessage();
+		if (message.getMessageType() == MaxMessageType.THERMOSTAT_STATE) {
+			result = new MaxThermostatStateMessage();
+		}
+
+		result.payload = input;
+
+		return result;
 	}
 
 

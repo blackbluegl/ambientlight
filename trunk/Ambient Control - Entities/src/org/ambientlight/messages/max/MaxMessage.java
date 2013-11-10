@@ -21,11 +21,13 @@ import org.ambientlight.messages.Message;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class MaxMessage extends Message {
 
-	public byte[] payload;
+	public byte[] payload = new byte[12];
+
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -37,32 +39,55 @@ public class MaxMessage extends Message {
 	}
 
 
-	public int getFromAdress(){
+	public Integer getFromAdress() {
 		if (payload.length < 7)
-			return 0;
+			return null;
 		return byteArrayToInt(payload, 3, 3);
 	}
 
 
-	public int getToAdress() {
+	public Integer getToAdress() {
 		if (payload.length < 10)
-			return 0;
+			return null;
 		return byteArrayToInt(payload, 6, 3);
 	}
 
 
-	public MaxMessageType getMessageType(){
+	public MaxMessageType getMessageType() {
 		if (payload.length < 3)
 			return MaxMessageType.UNKNOWN;
 		else
 			return MaxMessageType.forCode(payload[2]);
 	}
 
+
+	public Integer getSequenceNumber() {
+		if (payload.length < 1)
+			return null;
+		return payload[0] & 0xFF;
+	}
+
+
+	public Integer getFlags() {
+		if (payload.length < 1)
+			return null;
+		return payload[1] & 0xFF;
+	}
+
+
+	public Integer getGroupNumber() {
+		if (payload.length < 10)
+			return null;
+		return payload[9] & 0xFF;
+	}
+
+
 	@Override
 	public String toString() {
-		return "MaxMessage: " + getMessageType() + " from: " + getFromAdress() + " to: " + getToAdress();
-
+		return "MaxMessage: " + getMessageType() + " - SeqNr: " + getSequenceNumber() + " from: " + getFromAdress() + " to: "
+				+ getToAdress() + " with groupId: " + getGroupNumber() + " Flags: 0x" + Integer.toHexString(getFlags());
 	}
+
 
 	public static int byteArrayToInt(byte[] b, int offset, int length) {
 		int value = 0;

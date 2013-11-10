@@ -25,7 +25,6 @@ import org.ambientlight.device.drivers.RemoteHostConfiguration;
  */
 public class DispatcherManager {
 
-
 	public void createDispatcher(final RemoteHostConfiguration config, final QeueManager queueManager) {
 
 		new Thread(new Runnable() {
@@ -61,8 +60,7 @@ public class DispatcherManager {
 		} catch (Exception e) {
 
 			System.out.println("DispatcherManager connectDispatcher(): could not connect Dispatcher: "
-					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
-			e.printStackTrace();
+					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName + ". Retrying.");
 			boolean connected = false;
 			while (connected == false) {
 				try {
@@ -70,7 +68,8 @@ public class DispatcherManager {
 					connected = dispatcher.reconnect();
 					if (!connected) {
 						System.out.println("DispatcherManager connectDispatcher(): could not reconnect Dispatcher: "
-								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
+								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName
+								+ ". Retrying.");
 					}
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
@@ -98,6 +97,8 @@ public class DispatcherManager {
 
 							dispatcher.closeConnection();
 							dispatcher.connect();
+							System.out.println("DispatcherManager startHeartBeatCheck(): Connection recovered for Dispatcher: "
+									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 						}
 
 					} catch (Exception e) {
@@ -139,23 +140,25 @@ public class DispatcherManager {
 							qeueManager.putInMessage(inMessage);
 						}
 					} catch (Exception e) {
-						dispatcher.sendLock.lock();
-
-						System.out.println("DispatcherManager startReceiveMessages(): Connection lost. Reconnecting Dispatcher: "
+						// dispatcher.sendLock.lock();
+						//
+						// System.out.println("DispatcherManager startReceiveMessages(): Connection lost. Reconnecting Dispatcher: "
+						// + dispatcher.getClass().getSimpleName() + " to: " +
+						// dispatcher.configuration.hostName);
+						//
+						// if (dispatcher.reconnect()) {
+						// System.out.println("DispatcherManager startReceiveMessages(): Connection recovered. Dispatcher: "
+						// + dispatcher.getClass().getSimpleName() + " to: " +
+						// dispatcher.configuration.hostName);
+						// dispatcher.sendLock.lock();
+						// } else {
+						System.out
+						.println("DispatcherManager startReceiveMessages(): No connection. Waiting for reconnect by HeartbeatChecker. Dispatcher: "
 								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
+						// dispatcher.sendLock.lock();
+						// }
 
-						if (dispatcher.reconnect()) {
-							System.out.println("DispatcherManager startReceiveMessages(): Connection recovered. Dispatcher: "
-									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
-							dispatcher.sendLock.lock();
-						} else {
-							System.out
-							.println("DispatcherManager startReceiveMessages(): Connection could not recovered. Waiting for Heartbeat. Dispatcher: "
-									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
-							dispatcher.sendLock.lock();
-						}
-
-						dispatcher.sendLock.unlock();
+						// dispatcher.sendLock.unlock();
 
 						try {
 							Thread.sleep(10000);
