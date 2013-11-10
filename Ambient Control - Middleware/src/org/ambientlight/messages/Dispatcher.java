@@ -62,7 +62,7 @@ public abstract class Dispatcher {
 		try {
 			socket.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Dispatcher closeConnection(): error while closing connection: ");
 		}
 	}
 }
