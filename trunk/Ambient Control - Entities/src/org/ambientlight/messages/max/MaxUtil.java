@@ -67,4 +67,24 @@ public class MaxUtil {
 
 		return result;
 	}
+
+
+	public static int byteArrayToInt(byte[] b, int offset, int length) {
+		int value = 0;
+		for (int i = 0; i < length; i++) {
+			int shift = (length - 1 - i) * 8;
+			value += (b[i + offset] & 0x000000FF) << shift;
+		}
+		return value;
+	}
+
+
+	public static byte[] intToByteArray(int a) {
+		byte[] ret = new byte[4];
+		ret[3] = (byte) (a & 0xFF);
+		ret[2] = (byte) ((a >> 8) & 0xFF);
+		ret[1] = (byte) ((a >> 16) & 0xFF);
+		ret[0] = (byte) ((a >> 24) & 0xFF);
+		return ret;
+	}
 }

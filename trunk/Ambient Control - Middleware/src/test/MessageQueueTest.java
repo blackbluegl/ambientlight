@@ -15,10 +15,16 @@
 
 package test;
 
+import java.util.ArrayList;
+
 import org.ambientlight.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager;
+import org.ambientlight.messages.max.MaxMessageType;
+import org.ambientlight.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.messages.max.MaxThermostateMode;
 
 
 /**
@@ -27,7 +33,7 @@ import org.ambientlight.messages.QeueManager;
  */
 public class MessageQueueTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		QeueManager manager = new QeueManager();
 		MessageDump dump = new MessageDump();
 		manager.registerMessageListener(DispatcherType.MAX, dump);
@@ -40,5 +46,19 @@ public class MessageQueueTest {
 		df.createDispatcher(config, manager);
 		manager.startQeues();
 
+		MaxSetTemperatureMessage tempMsg = new MaxSetTemperatureMessage();
+		tempMsg.setFlags(0x5);
+		tempMsg.setFromAdress(167874);
+		tempMsg.setToAdress(431563);
+		tempMsg.setGroupNumber(1);
+		tempMsg.setMessageType(MaxMessageType.SET_TEMPERATURE);
+		tempMsg.setMode(MaxThermostateMode.AUTO);
+		tempMsg.setSequenceNumber(37);
+		tempMsg.setTemp(22.5f);
+
+		ArrayList<Message> out = new ArrayList<Message>();
+		out.add(tempMsg);
+		Thread.sleep(1500);
+		// manager.putOutMessages(out);
 	}
 }

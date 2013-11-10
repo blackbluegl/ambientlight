@@ -25,6 +25,8 @@ import org.ambientlight.messages.Message;
  */
 public class MaxMessage extends Message {
 
+	public static int MAX_SEQUENCE_NUMBER = 255;
+
 	protected byte[] payload = new byte[12];
 
 
@@ -52,14 +54,30 @@ public class MaxMessage extends Message {
 	public Integer getFromAdress() {
 		if (payload.length < 7)
 			return null;
-		return byteArrayToInt(payload, 3, 3);
+		return MaxUtil.byteArrayToInt(payload, 3, 3);
+	}
+
+
+	public void setFromAdress(int adress) {
+		byte[] result = MaxUtil.intToByteArray(adress);
+		payload[3] = result[1];
+		payload[4] = result[2];
+		payload[5] = result[3];
 	}
 
 
 	public Integer getToAdress() {
 		if (payload.length < 10)
 			return null;
-		return byteArrayToInt(payload, 6, 3);
+		return MaxUtil.byteArrayToInt(payload, 6, 3);
+	}
+
+
+	public void setToAdress(int adress) {
+		byte[] result = MaxUtil.intToByteArray(adress);
+		payload[6] = result[1];
+		payload[7] = result[2];
+		payload[8] = result[3];
 	}
 
 
@@ -71,10 +89,22 @@ public class MaxMessage extends Message {
 	}
 
 
+	public void setMessageType(MaxMessageType messageType) {
+		payload[2] = messageType.byteValue;
+	}
+
+
 	public Integer getSequenceNumber() {
 		if (payload.length < 1)
 			return null;
 		return payload[0] & 0xFF;
+	}
+
+
+	public void setSequenceNumber(int seqNumber) throws IllegalArgumentException {
+		if (seqNumber > MAX_SEQUENCE_NUMBER)
+			throw new IllegalArgumentException("sequenceNumber is greater MAX_SEQUENCE_NUMBER");
+		payload[0] = (byte) seqNumber;
 	}
 
 
@@ -85,10 +115,20 @@ public class MaxMessage extends Message {
 	}
 
 
+	public void setFlags(int flags) {
+		payload[1] = (byte) flags;
+	}
+
+
 	public Integer getGroupNumber() {
 		if (payload.length < 10)
 			return null;
 		return payload[9] & 0xFF;
+	}
+
+
+	public void setGroupNumber(int groupNumber) {
+		payload[9] = (byte) groupNumber;
 	}
 
 
@@ -99,22 +139,5 @@ public class MaxMessage extends Message {
 	}
 
 
-	public static int byteArrayToInt(byte[] b, int offset, int length) {
-		int value = 0;
-		for (int i = 0; i < length; i++) {
-			int shift = (length - 1 - i) * 8;
-			value += (b[i + offset] & 0x000000FF) << shift;
-		}
-		return value;
-	}
 
-
-	public static byte[] intToByteArray(int a) {
-		byte[] ret = new byte[4];
-		ret[3] = (byte) (a & 0xFF);
-		ret[2] = (byte) ((a >> 8) & 0xFF);
-		ret[1] = (byte) ((a >> 16) & 0xFF);
-		ret[0] = (byte) ((a >> 24) & 0xFF);
-		return ret;
-	}
 }
