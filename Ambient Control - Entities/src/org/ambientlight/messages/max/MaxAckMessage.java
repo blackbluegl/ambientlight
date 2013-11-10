@@ -15,6 +15,7 @@
 
 package org.ambientlight.messages.max;
 
+import java.util.Arrays;
 import java.util.Date;
 
 
@@ -22,67 +23,66 @@ import java.util.Date;
  * @author Florian Bornkessel
  * 
  */
-public class MaxThermostatStateMessage extends MaxMessage {
-
-	public static final int MAX_VALVE_POSITION = 64;
+public class MaxAckMessage extends MaxMessage {
 
 
-	public MaxThermostatStateMessage() {
-		payload = new byte[16];
+	public MaxAckMessage() {
+		payload = new byte[17];
+	}
+
+
+	@Override
+	public byte[] getPayload() {
+		if (getAckType() == MaxAckType.CUBE)
+			return Arrays.copyOf(payload, 11);
+		return payload;
+	}
+
+
+	MaxAckType getAckType() {
+		return MaxAckType.forCode(payload[10]);
 	}
 
 
 	public MaxThermostateMode getMode() {
-		return MaxThermostateMode.forCode(payload[10] & 0x3);
+		return MaxThermostateMode.forCode(payload[11] & 0x3);
 	}
 
 
 	public boolean getDST() {
-		return (payload[10] >> 2 & 0x1) > 0 ? true : false;
+		return (payload[11] >> 2 & 0x1) > 0 ? true : false;
 	}
 
 
 	public boolean isLocked() {
-		return (payload[10] >> 5 & 0x1) > 0 ? true : false;
+		return (payload[11] >> 5 & 0x1) > 0 ? true : false;
 	}
+
 
 	public boolean hadRfError() {
 		return (payload[10] >> 6 & 0x1) > 0 ? true : false;
 	}
 
+
 	public boolean isBatteryLow() {
-		return (payload[10] >> 7) > 0 ? true : false;
+		return (payload[11] >> 7) > 0 ? true : false;
 	}
 
 
 	public int getValvePosition() {
-		return payload[11] & 0xff;
+		return payload[12] & 0xff;
 	}
 
 
 	public float getSetTemp() {
-		return (payload[12] & 0xff) / 2;
-	}
-
-
-	/**
-	 * the actual temperature will be returned if mode is not TEMPORARY. Because
-	 * the bytes will be used elsewhere for the UntilTime.
-	 * 
-	 * @return
-	 */
-	public Float getActualTemp() {
-		if (this.getMode() == MaxThermostateMode.TEMPORARY)
-			return null;
-		int tempRaw = ((payload[13] & 0x1) << 8) + payload[14] & 0xff;
-		return tempRaw / 10.0f;
+		return (payload[13] & 0xff) / 2;
 	}
 
 
 	public Date getTemporaryUntil() {
 		if (this.getMode() != MaxThermostateMode.TEMPORARY)
 			return null;
-		byte[] time = new byte[] { payload[13], payload[14], payload[15] };
+		byte[] time = new byte[] { payload[14], payload[15], payload[16] };
 		return MaxUtil.parseUntilTime(time);
 	}
 
@@ -91,6 +91,7 @@ public class MaxThermostatStateMessage extends MaxMessage {
 	public String toString() {
 		String parent = super.toString() + "\n";
 		String myString = "Mode: " + getMode() + "\n";
+		myString += "AckType: " + getAckType() + "\n";
 		myString += "Until: " + getTemporaryUntil() + "\n";
 		myString += "DST: " + getDST() + "\n";
 		myString += "Locked: " + isLocked() + "\n";
@@ -98,7 +99,6 @@ public class MaxThermostatStateMessage extends MaxMessage {
 		myString += "RF-Error: " + isBatteryLow() + "\n";
 		myString += "ValvePos: " + getValvePosition() + "\n";
 		myString += "Set Temp: " + getSetTemp() + "\n";
-		myString += "Act Temp: " + getActualTemp() + "\n";
 		return parent + myString;
 	}
 }
