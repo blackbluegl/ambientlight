@@ -15,6 +15,7 @@
 
 package org.ambientlight.messages.max;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -38,8 +39,32 @@ public class MaxUtil {
 		int hours = (int) TimeUnit.MINUTES.toHours(timeInMinutes);
 		int minutes = (int) TimeUnit.MINUTES.toMinutes(timeInMinutes) - (int) TimeUnit.HOURS.toMinutes(hours);
 
-		GregorianCalendar calendar = new GregorianCalendar(Locale.GERMANY);
+		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.set(year, month - 1, day, hours, minutes, 00);
 		return calendar.getTime();
+	}
+
+
+	public static byte[] getUntilTime(Date until) {
+		byte[] result = new byte[3];
+		GregorianCalendar untilCalendar = new GregorianCalendar(Locale.GERMANY);
+		untilCalendar.setTime(until);
+
+		int day = untilCalendar.get(Calendar.DAY_OF_MONTH);
+		result[0] = (byte) (day);
+
+		int year = untilCalendar.get(Calendar.YEAR) - 2000;
+		result[1] = (byte) (year & 0xff);
+
+		int month = untilCalendar.get(Calendar.MONTH) + 1;
+		result[0] = (byte) (month << 4 & 0xE0 | result[0]);
+		result[1] = (byte) ((month << 7) | result[1]);
+
+		int halfHourFromMinute = untilCalendar.get(Calendar.MINUTE) / 30;
+		int halfHours = untilCalendar.get(Calendar.HOUR_OF_DAY) * 2;
+		int timeAmount = halfHourFromMinute + halfHours;
+		result[2] = (byte) timeAmount;
+
+		return result;
 	}
 }

@@ -25,7 +25,17 @@ import org.ambientlight.messages.Message;
  */
 public class MaxMessage extends Message {
 
-	public byte[] payload = new byte[12];
+	protected byte[] payload = new byte[12];
+
+
+	public byte[] getPayload() {
+		return payload;
+	}
+
+
+	public void setPayload(byte[] payload) {
+		this.payload = payload;
+	}
 
 
 	/*
