@@ -16,10 +16,12 @@
 package org.ambientlight.messages;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
+import org.ambientlight.messages.max.MaxAckMessage;
 import org.ambientlight.messages.max.MaxMessage;
-import org.ambientlight.messages.max.MaxMessageType;
+import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
 
 
@@ -42,13 +44,12 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	@Override
 	public boolean deliverMessage(Message message) {
 		try {
+			String header = "RFM_SEND_MESSAGE|" + message.getDispatcherType() + "|" + ((MaxMessage) message).getPayload().length
+					+ "|\n";
+			PrintStream ps = new PrintStream(socket.getOutputStream());
+			ps.print(header);
 			socket.getOutputStream().write(getByteStreamFromMaxMessage((MaxMessage) message));
 			socket.getOutputStream().flush();
-			String answer = readLine();
-			if ("NOK".equals(answer)) {
-				System.out.println("MaxDispatcher deliverMessage(): message was responded with NOK!");
-				return false;
-			}
 		} catch (Exception e) {
 			System.out.println("MaxDispatcher deliverMessage(): was unable to send data!");
 			reconnect();
@@ -92,14 +93,24 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	@Override
 	public Message parseMessage(byte[] input) {
 		MaxMessage message = new MaxMessage();
-		message.payload = input;
+		message.setPayload(input);
 
 		MaxMessage result = new MaxMessage();
-		if (message.getMessageType() == MaxMessageType.THERMOSTAT_STATE) {
+		switch (message.getMessageType()) {
+		case THERMOSTAT_STATE:
 			result = new MaxThermostatStateMessage();
+			break;
+		case SET_TEMPERATURE:
+			result = new MaxSetTemperatureMessage();
+			break;
+		case ACK:
+			result = new MaxAckMessage();
+			break;
+		default:
+			result = new MaxMessage();
 		}
 
-		result.payload = input;
+		result.setPayload(input);
 
 		return result;
 	}
@@ -127,7 +138,7 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
 
 	byte[] getByteStreamFromMaxMessage(MaxMessage message) {
-		return message.payload;
+		return message.getPayload();
 	}
 
 

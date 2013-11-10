@@ -24,7 +24,7 @@ import java.util.Map;
  * 
  */
 public enum MaxAckType {
-	THERMOSTATE(0x01), CUBE(0x01);
+	THERMOSTATE(0x01), CUBE(0x00);
 
 	public final int byteValue;
 
