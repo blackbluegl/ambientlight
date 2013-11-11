@@ -13,30 +13,28 @@
    limitations under the License.
  */
 
-package test;
-
-import java.util.Date;
-
-import org.ambientlight.messages.Message;
-import org.ambientlight.messages.MessageListener;
-
+package org.ambientlight.messages.max;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MessageDump implements MessageListener {
+public class MaxConfigureWeekProgramm extends MaxMessage {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#handleMessage(org.ambientlight
-	 * .messages.Message)
-	 */
-	@Override
-	public void handleMessage(Message message) {
-
-		System.out.println((new Date(System.currentTimeMillis()).toString() + " - new Message:\n" + message.toString()) + "\n");
+	public MaxConfigureWeekProgramm() {
+		setFlags(FLAGS_NONE);
+		payload = new byte[25];// 23 for second part
 	}
+
+
+	public MaxDayInWeek getDayIndWeek() {
+		return (MaxDayInWeek.forCode(payload[10]));
+	}
+
+
+	public void setDay(MaxDayInWeek day) {
+		payload[10] = day.byteValue;
+	}
+
+
 }

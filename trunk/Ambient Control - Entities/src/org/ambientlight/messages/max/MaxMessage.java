@@ -27,6 +27,11 @@ public class MaxMessage extends Message {
 
 	public static int MAX_SEQUENCE_NUMBER = 255;
 
+	public static final int FLAGS_NONE = 0x0;
+	public static final int FLAG_REQUEST = 0x4;
+	public static final int FLAG_0X1 = 0x1;
+	public static final int FLAG_RESPONSE = 0x2;
+
 	protected byte[] payload = new byte[12];
 
 
@@ -130,7 +135,6 @@ public class MaxMessage extends Message {
 	// public void setGroupNumber(int groupNumber) {
 	// payload[9] = (byte) groupNumber;
 	// }
-
 
 	@Override
 	public String toString() {
