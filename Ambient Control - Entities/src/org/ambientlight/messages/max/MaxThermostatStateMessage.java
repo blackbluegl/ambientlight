@@ -29,7 +29,9 @@ public class MaxThermostatStateMessage extends MaxMessage {
 
 	public MaxThermostatStateMessage() {
 		payload = new byte[16];
+		setMessageType(MaxMessageType.THERMOSTAT_STATE);
 	}
+
 
 
 	public MaxThermostateMode getMode() {
