@@ -61,7 +61,4 @@ public class MaxTimeInformationMessage extends MaxMessage {
 		String result = "\nTime: " + getTime().toString();
 		return (parent + result);
 	}
-
-	// $year - 100, $day, $hour, $min | (($mon & 0x0C) << 4),
-	// $sec | (($mon & 0x03) << 6)));
 }
