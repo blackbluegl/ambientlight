@@ -23,6 +23,7 @@ import org.ambientlight.messages.max.MaxAckMessage;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
+import org.ambientlight.messages.max.MaxTimeInformationMessage;
 
 
 /**
@@ -106,6 +107,8 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 		case ACK:
 			result = new MaxAckMessage();
 			break;
+		case TIME_INFORMATION:
+			result = new MaxTimeInformationMessage();
 		default:
 			result = new MaxMessage();
 		}
