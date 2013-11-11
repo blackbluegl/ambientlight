@@ -50,7 +50,7 @@ public class MessageQueueTest {
 		tempMsg.setFlags(0x5);
 		tempMsg.setFromAdress(167874);
 		tempMsg.setToAdress(431563);
-		tempMsg.setGroupNumber(1);
+		// tempMsg.setGroupNumber(1);
 		tempMsg.setMessageType(MaxMessageType.SET_TEMPERATURE);
 		tempMsg.setMode(MaxThermostateMode.AUTO);
 		tempMsg.setSequenceNumber(37);

@@ -153,7 +153,7 @@ public class DispatcherManager {
 						// dispatcher.sendLock.lock();
 						// } else {
 						System.out
-						.println("DispatcherManager startReceiveMessages(): No connection. Waiting for reconnect by HeartbeatChecker. Dispatcher: "
+								.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect. Dispatcher: "
 								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 						// dispatcher.sendLock.lock();
 						// }

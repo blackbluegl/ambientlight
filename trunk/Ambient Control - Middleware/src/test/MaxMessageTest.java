@@ -16,9 +16,11 @@
 package test;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
+import org.ambientlight.messages.max.MaxTimeInformationMessage;
 
 
 /**
@@ -44,6 +46,12 @@ public class MaxMessageTest {
 		temp.setTemporaryUntil(cal.getTime());
 
 		System.out.println(temp);
+
+		MaxTimeInformationMessage time = new MaxTimeInformationMessage();
+		Date now = new Date(System.currentTimeMillis());
+		time.setTime(now);
+		System.out.println(time);
+
 	}
 
 }
