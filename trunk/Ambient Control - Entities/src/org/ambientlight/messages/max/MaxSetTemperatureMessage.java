@@ -31,7 +31,7 @@ public class MaxSetTemperatureMessage extends MaxMessage {
 
 	public MaxSetTemperatureMessage() {
 		payload = new byte[14];
-		payload[2] = MaxMessageType.SET_TEMPERATURE.byteValue;
+		setMessageType(MaxMessageType.SET_TEMPERATURE);
 	}
 
 

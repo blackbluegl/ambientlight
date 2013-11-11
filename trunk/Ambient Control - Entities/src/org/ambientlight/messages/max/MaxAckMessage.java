@@ -27,6 +27,7 @@ public class MaxAckMessage extends MaxMessage {
 
 	public MaxAckMessage() {
 		payload = new byte[17];
+		setMessageType(MaxMessageType.ACK);
 	}
 
 
