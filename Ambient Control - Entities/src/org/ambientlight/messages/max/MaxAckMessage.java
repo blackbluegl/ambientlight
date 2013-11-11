@@ -25,7 +25,6 @@ import java.util.Date;
  */
 public class MaxAckMessage extends MaxMessage {
 
-
 	public MaxAckMessage() {
 		payload = new byte[17];
 	}
@@ -33,7 +32,7 @@ public class MaxAckMessage extends MaxMessage {
 
 	@Override
 	public byte[] getPayload() {
-		if (getAckType() == MaxAckType.CUBE)
+		if (getAckType() == MaxAckType.ACK_SIMPLE || getAckType() == MaxAckType.ACK_INVALID_MESSAGE)
 			return Arrays.copyOf(payload, 11);
 		return payload;
 	}

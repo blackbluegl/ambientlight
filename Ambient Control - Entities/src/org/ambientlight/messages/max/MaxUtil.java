@@ -87,4 +87,14 @@ public class MaxUtil {
 		ret[0] = (byte) ((a >> 24) & 0xFF);
 		return ret;
 	}
+
+
+	public static String getHexString(byte[] b) {
+		String result = "";
+		for (int i = 0; i < b.length; i++) {
+			result += "0x" + String.format("%02X", b[i] & 0xFF) + " ";
+		}
+		return result;
+	}
+
 }
