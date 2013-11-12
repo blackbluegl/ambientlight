@@ -38,7 +38,7 @@ private:
 	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
 	void handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
 	void handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
-
+	void handlePing();
 	std::vector<std::string> getValuesOfMessage(std::string commandValues);
 
 };
