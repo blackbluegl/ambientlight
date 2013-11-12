@@ -34,14 +34,6 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 		private float temp;
 
 
-		// # Format of weekprofile: 16 bit integer (high byte first) for every
-		// control point, 13 control points for every day
-		// # each 16 bit integer value is parsed as
-		// # int time =
-		// # int hour = (time / 60) % 24;
-		// # int minute = time % 60;
-		// # int temperature = ;
-
 		public DayEntry(byte high, byte low) {
 			int value = MaxUtil.byteArrayToInt(new byte[] { high, low }, 0, 2);
 			int timeInMinutes = (value & 0x1FF) * 5;
