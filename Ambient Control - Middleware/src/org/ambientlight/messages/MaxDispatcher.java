@@ -20,6 +20,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.ambientlight.messages.max.MaxAckMessage;
+import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
@@ -109,6 +110,10 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			break;
 		case TIME_INFORMATION:
 			result = new MaxTimeInformationMessage();
+			break;
+		case CONFIG_WEEK_PROFILE:
+			result = new MaxConfigureWeekProgrammMessage();
+			break;
 		default:
 			result = new MaxMessage();
 		}

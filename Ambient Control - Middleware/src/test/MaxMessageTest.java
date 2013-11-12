@@ -18,6 +18,8 @@ package test;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
+import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
@@ -25,7 +27,7 @@ import org.ambientlight.messages.max.MaxTimeInformationMessage;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class MaxMessageTest {
 
@@ -52,6 +54,14 @@ public class MaxMessageTest {
 		time.setTime(now);
 		System.out.println(time);
 
-	}
+		MaxConfigureWeekProgrammMessage week = new MaxConfigureWeekProgrammMessage();
+		week.setSecondPart(false);
+		week.setDay(MaxDayInWeek.SUNDAY);
+		week.addEntry(week.new DayEntry(5, 29, 13.5f));
+		week.addEntry(week.new DayEntry(21, 29, 23.5f));
 
+		MaxConfigureWeekProgrammMessage week2 = new MaxConfigureWeekProgrammMessage();
+		week2.setPayload(week.getPayload());
+		System.out.println(week2.toString());
+	}
 }
