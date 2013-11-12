@@ -54,7 +54,7 @@ public enum MaxDayInWeek {
 	}
 
 
-	public static MaxDayInWeek forCode(int code) {
+	public static MaxDayInWeek forCode(byte code) {
 		return byteCodeMap.get(code);
 	}
 }
