@@ -61,8 +61,14 @@ void QeueManager::handleInMessages() {
 		pthread_mutex_lock(&mutexLockInQueue);
 		pthread_cond_wait(&conditionInQueueFilled, &mutexLockInQueue);
 
-		while (inEnqueueAt > inReadAt) {
-			InMessage msg = inQeue[inReadAt + 1];
+		while (inEnqueueAt != inReadAt) {
+
+			inReadAt++;
+			if(inReadAt==100){
+				inReadAt=0;
+			}
+
+			InMessage msg = inQeue[inReadAt];
 			SocketHandler *socketHandler = this->correlation->getSocketForID(msg.correlation);
 			try {
 				if (socketHandler != NULL) {
@@ -76,7 +82,6 @@ void QeueManager::handleInMessages() {
 			} catch (SockedException &ex) {
 				cout << "QueueManager handleInMessages(): sockedHandler has no valid connection anymore. removal should be applied by the corresponding thread";
 			}
-			inReadAt++;
 		}
 		pthread_mutex_unlock(&mutexLockInQueue);
 	}

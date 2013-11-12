@@ -30,6 +30,9 @@ Enums::MessageCommandType Enums::stringToMessageCommandTypeEnum(std::string comm
 	if("CLOSE_CONNECTION" == command){
 		return CLOSE_CONNECTION;
 	}
+	if("PING" == command){
+		return PING;
+	}
 	return UNKNOWN_COMMAND;
 }
 
@@ -58,16 +61,5 @@ Enums::DispatcherType Enums::stringToEnum(std::string dispatchType) {
 	return Enums::UNKNOWN;
 }
 
-Enums::MessageCommandType stringToMessageCommandTypeEnum(std::string command) {
-	if ("REGISTER_CORRELATION" == command) {
-		return Enums::REGISTER_CORRELATION;
-	}
-	if ("UNREGISTER_CORRELATION" == command) {
-		return Enums::UNREGISTER_CORRELATION;
-	}
-	if ("RFM_SEND_MESSAGE" == command) {
-		return Enums::RFM_SEND_MESSAGE;
-	}
-	return Enums::UNKNOWN_COMMAND;
-}
+
 
