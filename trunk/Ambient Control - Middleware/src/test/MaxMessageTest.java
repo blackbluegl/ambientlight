@@ -18,6 +18,7 @@ package test;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
@@ -63,5 +64,18 @@ public class MaxMessageTest {
 		MaxConfigureWeekProgrammMessage week2 = new MaxConfigureWeekProgrammMessage();
 		week2.setPayload(week.getPayload());
 		System.out.println(week2.toString());
+
+		MaxConfigValveMessage valve = new MaxConfigValveMessage();
+		valve.setBoostDuration(23);
+		valve.setBoostValvePosition(100);
+		MaxConfigValveMessage.DecalcEntry decalc = valve.new DecalcEntry();
+		decalc.day = MaxDayInWeek.FRIDAY;
+		decalc.hour = 23;
+		valve.setDecalc(decalc);
+		valve.setMaxValvePosition(300);
+		valve.setValveOffset(256);
+
+		System.out.println(valve);
+
 	}
 }
