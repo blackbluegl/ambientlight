@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.ambientlight.messages.max.MaxConfigValveMessage;
+import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
@@ -76,6 +77,9 @@ public class MaxMessageTest {
 		valve.setValveOffset(256);
 
 		System.out.println(valve);
+
+		MaxConfigureTemperaturesMessage temps = new MaxConfigureTemperaturesMessage();
+		System.out.println(temps);
 
 	}
 }

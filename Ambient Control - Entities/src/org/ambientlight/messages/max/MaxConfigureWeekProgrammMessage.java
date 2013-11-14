@@ -49,10 +49,10 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 			this.min = min;
 			int tempInt = (int) (temp * 2);
 			this.temp = tempInt / 2.0f;
-			if (this.temp > MaxSetTemperatureMessage.MAX_TEMPERATUR) {
-				this.temp = MaxSetTemperatureMessage.MAX_TEMPERATUR;
-			} else if (this.temp < MaxSetTemperatureMessage.MIN_TEMPERATUR) {
-				this.temp = MaxSetTemperatureMessage.MIN_TEMPERATUR;
+			if (this.temp > MaxConfigureTemperaturesMessage.MAX_TEMPERATURE) {
+				this.temp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
+			} else if (this.temp < MaxConfigureTemperaturesMessage.MIN_TEMPERATURE) {
+				this.temp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
 			}
 		}
 

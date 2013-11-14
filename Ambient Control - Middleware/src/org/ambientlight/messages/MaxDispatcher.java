@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import org.ambientlight.messages.max.MaxAckMessage;
 import org.ambientlight.messages.max.MaxConfigValveMessage;
+import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
@@ -117,6 +118,9 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			break;
 		case CONFIG_VALVE:
 			result = new MaxConfigValveMessage();
+			break;
+		case CONFIG_TEMPERATURES:
+			result = new MaxConfigureTemperaturesMessage();
 			break;
 		default:
 			result = new MaxMessage();
