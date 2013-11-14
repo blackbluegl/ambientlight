@@ -25,9 +25,6 @@ import java.util.Date;
  */
 public class MaxSetTemperatureMessage extends MaxMessage {
 
-	public static final float MAX_TEMPERATUR = 31.5f;
-	public static final float MIN_TEMPERATUR = 4.5f;
-
 
 	public MaxSetTemperatureMessage() {
 		payload = new byte[14];
@@ -51,11 +48,11 @@ public class MaxSetTemperatureMessage extends MaxMessage {
 
 
 	public void setTemp(float temp) {
-		if (temp > MAX_TEMPERATUR) {
-			temp = MAX_TEMPERATUR;
+		if (temp > MaxConfigureTemperaturesMessage.MAX_TEMPERATURE) {
+			temp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
 		}
-		if (temp < MIN_TEMPERATUR) {
-			temp = MIN_TEMPERATUR;
+		if (temp < MaxConfigureTemperaturesMessage.MIN_TEMPERATURE) {
+			temp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
 		}
 		int amount = (int) (temp / 0.5f);
 		payload[10] = (byte) (amount | payload[10]);
