@@ -13,24 +13,20 @@
    limitations under the License.
  */
 
-package org.ambientlight.messages.max;
+package org.ambientlight.room.actors;
+
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxRemoveGroupIdMessage extends MaxMessage {
+public class ThermostatConfiguration {
 
-	public final static int DEFAULT_GROUP_ID = 0;
-	public final static int MAX_GROUP_ID = 255;
-
-
-	// there are two types. a repairing and a pairing
-
-	public MaxRemoveGroupIdMessage() {
-		payload = new byte[11];
-		setMessageType(MaxMessageType.REMOVE_GROUP_ID);
-		payload[10] = DEFAULT_GROUP_ID;
-	}
+	public String label;
+	public int adress;
+	public String firmware;
+	public String serial;
+	public float offset;
 
 }

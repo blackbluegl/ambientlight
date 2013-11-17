@@ -45,7 +45,7 @@ public class MaxShutterContactStateMessage extends MaxMessage {
 	@Override
 	public String toString() {
 		String parent = super.toString();
-		String current = new String("open: " + isOpen() + "\nRfError: " + hadRfError() + "\nbatteryLow: " + isBatteryLow());
+		String current = new String("Open: " + isOpen() + "\nRfError: " + hadRfError() + "\nBatteryLow: " + isBatteryLow());
 		return parent + "\n" + current;
 	}
 }

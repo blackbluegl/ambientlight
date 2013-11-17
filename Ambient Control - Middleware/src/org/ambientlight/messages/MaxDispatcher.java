@@ -23,6 +23,7 @@ import org.ambientlight.messages.max.MaxAckMessage;
 import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
+import org.ambientlight.messages.max.MaxFactoryResetMessage;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
@@ -32,6 +33,7 @@ import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxShutterContactStateMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.messages.max.MaxWakeUpMessage;
 
 
 /**
@@ -141,6 +143,12 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			break;
 		case SHUTTER_CONTACT_STATE:
 			result = new MaxShutterContactStateMessage();
+			break;
+		case WAKE_UP:
+			result = new MaxWakeUpMessage();
+			break;
+		case RESET:
+			result = new MaxFactoryResetMessage();
 			break;
 		default:
 			result = new MaxMessage();

@@ -19,34 +19,15 @@ package org.ambientlight.messages.max;
  * @author Florian Bornkessel
  * 
  */
-public class MaxSetGroupIdMessage extends MaxMessage {
+public class MaxWakeUpMessage extends MaxMessage {
 
-	public final static int DEFAULT_GROUP_ID = 0;
-	public final static int MAX_GROUP_ID = 255;
+	private static final byte WAKE_UP_CALL = 0x3F;
 
 
-	// there are two types. a repairing and a pairing
-
-	public MaxSetGroupIdMessage() {
+	public MaxWakeUpMessage() {
 		payload = new byte[11];
-		setMessageType(MaxMessageType.SET_GROUP_ID);
+		setMessageType(MaxMessageType.WAKE_UP);
+		payload[10] = WAKE_UP_CALL;
 	}
 
-
-	public void setGroupId(int groupId) {
-		payload[10] = (byte) groupId;
-	}
-
-
-	public int getGroupId() {
-		return payload[10] & 0xFF;
-	}
-
-
-	@Override
-	public String toString() {
-		String parent = super.toString();
-		String current = "GroupId: " + getGroupId();
-		return parent + "\n" + current;
-	}
 }

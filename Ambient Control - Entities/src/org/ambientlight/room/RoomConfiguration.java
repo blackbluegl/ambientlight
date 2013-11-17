@@ -26,6 +26,9 @@ public class RoomConfiguration implements Serializable {
 	public String roomName;
 	public int width;
 	public int height;
+
+	public ClimateConfiguration climate;
+
 	public Map<String, ActorConfiguration> actorConfigurations = new HashMap<String, ActorConfiguration>();
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
 	public List<EventProcessConfiguration> processes = new ArrayList<EventProcessConfiguration>();

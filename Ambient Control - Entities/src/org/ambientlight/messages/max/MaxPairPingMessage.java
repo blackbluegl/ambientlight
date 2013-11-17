@@ -29,11 +29,6 @@ public class MaxPairPingMessage extends MaxMessage {
 	}
 
 
-	@Override
-	public byte[] getPayload() {
-		return payload;
-	}
-
 
 	public boolean isReconnecting() {
 		if (super.getToAdress().equals(0))
