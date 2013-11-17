@@ -26,6 +26,8 @@ import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
+import org.ambientlight.messages.max.MaxRemoveGroupIdMessage;
+import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
@@ -129,6 +131,12 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			break;
 		case PAIR_PONG:
 			result = new MaxPairPongMessage();
+			break;
+		case SET_GROUP_ID:
+			result = new MaxSetGroupIdMessage();
+			break;
+		case REMOVE_GROUP_ID:
+			result = new MaxRemoveGroupIdMessage();
 			break;
 		default:
 			result = new MaxMessage();

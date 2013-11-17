@@ -45,8 +45,8 @@ public class MaxPairPingMessage extends MaxMessage {
 
 	public String getFirmware() {
 		int firmware = getPayload()[10] & 0xFF;
-		int major = firmware / 16;
-		int minor = firmware % 16;
+		int major = firmware >> 0x04;
+		int minor = firmware & 0x0F;
 		return major + "." + minor;
 	}
 
