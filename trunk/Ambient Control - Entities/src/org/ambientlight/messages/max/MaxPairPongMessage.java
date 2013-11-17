@@ -19,13 +19,14 @@ package org.ambientlight.messages.max;
  * @author Florian Bornkessel
  * 
  */
-public class MaxPairPing extends MaxMessage {
+public class MaxPairPongMessage extends MaxMessage {
 
 	// there are two types. a repairing and a pairing
 
-	public MaxPairPing() {
-		payload = new byte[23];
-		setMessageType(MaxMessageType.PAIR_PING);
+	public MaxPairPongMessage() {
+		payload = new byte[11];
+		setMessageType(MaxMessageType.PAIR_PONG);
+		payload[10] = DeviceType.CUBE.byteValue;
 	}
 
 
@@ -35,46 +36,15 @@ public class MaxPairPing extends MaxMessage {
 	}
 
 
-	public boolean isReconnecting() {
-		if (super.getToAdress().equals(0))
-			return true;
-		else
-			return false;
-	}
-
-
-	public String getFirmware() {
-		int firmware = getPayload()[10] & 0xFF;
-		int major = firmware / 16;
-		int minor = firmware % 16;
-		return major + "." + minor;
-	}
-
-
 	public DeviceType getDeviceType() {
-		return DeviceType.forCode(getPayload()[11]);
-	}
-
-
-	public boolean isValid() {
-		return (payload[12] & 0xFF) == 0xFF ? true : false;
-	}
-
-
-	public String getSerial() {
-		StringBuilder result = new StringBuilder();
-		for (int i = 13; i < payload.length; i++) {
-			result.append((char) payload[i]);
-		}
-		return result.toString();
+		return DeviceType.forCode(getPayload()[10]);
 	}
 
 
 	@Override
 	public String toString() {
 		String parent = super.toString();
-		String current = "isReconnecting: " + isReconnecting() + "\nfirmware: " + getFirmware()
-				+ "\nDeviceType: " + getDeviceType() + "\nisValid: " + isValid() + "\nSerial: " + getSerial();
+		String current = "DeviceType: " + getDeviceType();
 		return parent + "\n" + current;
 	}
 }
