@@ -38,16 +38,16 @@ public enum MaxMessageType {
 		this.byteValue = byteValue;
 	}
 
-	private static final Map<Byte, MaxMessageType> BY_CODE_MAP = new LinkedHashMap<Byte, MaxMessageType>();
+	private static final Map<Byte, MaxMessageType> MAPPING = new LinkedHashMap<Byte, MaxMessageType>();
 
 	static {
 		for (MaxMessageType rae : MaxMessageType.values()) {
-			BY_CODE_MAP.put(rae.byteValue, rae);
+			MAPPING.put(rae.byteValue, rae);
 		}
 	}
 
 
 	public static MaxMessageType forCode(byte code) {
-		return BY_CODE_MAP.get(code);
+		return MAPPING.get(code);
 	}
 }

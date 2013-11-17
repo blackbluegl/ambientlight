@@ -24,6 +24,7 @@ import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxMessage;
+import org.ambientlight.messages.max.MaxPairPing;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
@@ -121,6 +122,9 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			break;
 		case CONFIG_TEMPERATURES:
 			result = new MaxConfigureTemperaturesMessage();
+			break;
+		case PAIR_PING:
+			result = new MaxPairPing();
 			break;
 		default:
 			result = new MaxMessage();

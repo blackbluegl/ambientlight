@@ -22,6 +22,7 @@ import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxDayInWeek;
+import org.ambientlight.messages.max.MaxPairPing;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
@@ -79,7 +80,31 @@ public class MaxMessageTest {
 		System.out.println(valve);
 
 		MaxConfigureTemperaturesMessage temps = new MaxConfigureTemperaturesMessage();
+		temps.setComfortTemp(44);
+		temps.setEcoTemp(0);
+		temps.setMaxTemp(2000);
+		temps.setMinTemp(-22);
+		temps.setOffsetTemp(44);
+		temps.setWindowOpenTemp(-2);
+		temps.setWindowOpenTime(100);
 		System.out.println(temps);
 
+		MaxPairPing ping = new MaxPairPing();
+		ping.setToAdress(2879);
+		ping.getPayload()[10] = 0x16;
+		ping.getPayload()[11] = 0x01;
+		ping.getPayload()[12] = (byte) 0xFF;
+		ping.getPayload()[13] = 0x4A;
+		ping.getPayload()[14] = 0x48;
+		ping.getPayload()[15] = 0x41;
+		ping.getPayload()[16] = 0x30;
+		ping.getPayload()[17] = 0x30;
+		ping.getPayload()[18] = 0x30;
+		ping.getPayload()[19] = 0x38;
+		ping.getPayload()[20] = 0x32;
+		ping.getPayload()[21] = 0x39;
+		ping.getPayload()[22] = 0x32;
+
+		System.out.println(ping);
 	}
 }
