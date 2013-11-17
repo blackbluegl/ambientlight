@@ -24,6 +24,8 @@ import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
+import org.ambientlight.messages.max.MaxRemoveGroupIdMessage;
+import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
@@ -109,5 +111,12 @@ public class MaxMessageTest {
 
 		MaxPairPongMessage pong = new MaxPairPongMessage();
 		System.out.println(pong);
+
+		MaxSetGroupIdMessage setGroup = new MaxSetGroupIdMessage();
+		setGroup.setGroupId(201);
+		System.out.println(setGroup);
+
+		MaxRemoveGroupIdMessage removeGroup = new MaxRemoveGroupIdMessage();
+		System.out.println(removeGroup);
 	}
 }
