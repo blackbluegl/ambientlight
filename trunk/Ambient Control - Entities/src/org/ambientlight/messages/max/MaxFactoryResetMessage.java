@@ -19,34 +19,10 @@ package org.ambientlight.messages.max;
  * @author Florian Bornkessel
  * 
  */
-public class MaxSetGroupIdMessage extends MaxMessage {
+public class MaxFactoryResetMessage extends MaxMessage {
 
-	public final static int DEFAULT_GROUP_ID = 0;
-	public final static int MAX_GROUP_ID = 255;
-
-
-	// there are two types. a repairing and a pairing
-
-	public MaxSetGroupIdMessage() {
-		payload = new byte[11];
-		setMessageType(MaxMessageType.SET_GROUP_ID);
-	}
-
-
-	public void setGroupId(int groupId) {
-		payload[10] = (byte) groupId;
-	}
-
-
-	public int getGroupId() {
-		return payload[10] & 0xFF;
-	}
-
-
-	@Override
-	public String toString() {
-		String parent = super.toString();
-		String current = "GroupId: " + getGroupId();
-		return parent + "\n" + current;
+	public MaxFactoryResetMessage() {
+		payload = new byte[10];
+		setMessageType(MaxMessageType.RESET);
 	}
 }

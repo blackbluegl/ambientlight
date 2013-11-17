@@ -30,11 +30,6 @@ public class MaxPairPongMessage extends MaxMessage {
 	}
 
 
-	@Override
-	public byte[] getPayload() {
-		return payload;
-	}
-
 
 	public DeviceType getDeviceType() {
 		return DeviceType.forCode(getPayload()[10]);

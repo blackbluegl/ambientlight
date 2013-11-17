@@ -30,6 +30,7 @@ import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxShutterContactStateMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.messages.max.MaxWakeUpMessage;
 
 
 /**
@@ -123,5 +124,7 @@ public class MaxMessageTest {
 		MaxShutterContactStateMessage shutter = new MaxShutterContactStateMessage();
 		shutter.getPayload()[10] = (byte) 0xC1;
 		System.out.println(shutter);
+
+		System.out.println(new MaxWakeUpMessage());
 	}
 }

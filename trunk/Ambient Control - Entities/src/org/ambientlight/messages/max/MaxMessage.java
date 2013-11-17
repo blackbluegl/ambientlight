@@ -32,7 +32,7 @@ public class MaxMessage extends Message {
 	public static final int FLAG_0X1 = 0x1;
 	public static final int FLAG_RESPONSE = 0x2;
 
-	protected byte[] payload = new byte[12];
+	protected byte[] payload = new byte[10];
 
 
 	public byte[] getPayload() {
