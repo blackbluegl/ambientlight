@@ -27,6 +27,7 @@ import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRemoveGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.messages.max.MaxShutterContactStateMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 
@@ -118,5 +119,9 @@ public class MaxMessageTest {
 
 		MaxRemoveGroupIdMessage removeGroup = new MaxRemoveGroupIdMessage();
 		System.out.println(removeGroup);
+
+		MaxShutterContactStateMessage shutter = new MaxShutterContactStateMessage();
+		shutter.getPayload()[10] = (byte) 0xC1;
+		System.out.println(shutter);
 	}
 }
