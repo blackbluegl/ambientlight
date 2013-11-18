@@ -15,6 +15,7 @@
 
 package org.ambientlight.room;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,18 +31,18 @@ import org.ambientlight.messages.max.MaxThermostateMode;
  */
 public class ClimateConfiguration {
 
+	public int vCubeAdress;
 	public int groupId;
 	public MaxThermostateMode mode;
+	public Date temporaryUntilDate;
 	public float setTemp;
-
-	public int windowOpenTime = 60;
 	public float comfortTemperatur = 21.0f;
 	public float ecoTemperatur = 17.0f;
 	public float windowOpenTemperatur = 12.0f;
 	public int windowOpenTimeMins = 15;
 	public int boostDurationMins = 60;
-	public int boostValvePosition = 100;
-	public int valveOffset = 0;
+	public int boostValvePositionPercent = 100;
+	public int valveOffsetPercent = 0;
 
 	public Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
 }

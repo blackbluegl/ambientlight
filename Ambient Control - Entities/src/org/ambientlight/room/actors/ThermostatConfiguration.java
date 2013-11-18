@@ -19,8 +19,8 @@ package org.ambientlight.room.actors;
 
 /**
  * @author Florian Bornkessel
- * 
  */
+* 
 public class ThermostatConfiguration {
 
 	public String label;
