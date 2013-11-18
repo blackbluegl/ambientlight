@@ -15,11 +15,71 @@
 
 package org.ambientlight.climate;
 
+import java.io.IOException;
+import java.util.Date;
+
+import org.ambientlight.AmbientControlMW;
+import org.ambientlight.messages.Message;
+import org.ambientlight.messages.MessageListener;
+import org.ambientlight.messages.max.MaxMessage;
+import org.ambientlight.messages.max.MaxThermostatStateMessage;
+import org.ambientlight.room.ClimateConfiguration;
+import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.entities.Thermostat;
+
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class ClimateManager {
+public class ClimateManager implements MessageListener {
 
+	public ClimateConfiguration config;
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.messages.MessageListener#handleMessage(org.ambientlight
+	 * .messages.Message)
+	 */
+	@Override
+	public void handleMessage(Message message) {
+		if (message instanceof MaxMessage == false) {
+			System.out.println("ClimateManager handleMessage(): Errror! Got unknown message: " + message);
+			if (message instanceof MaxThermostatStateMessage) {
+				handleThermostatState((MaxThermostatStateMessage) message);
+			}
+			return;
+		}
+	}
+
+
+	/**
+	 * @param message
+	 * @throws IOException
+	 */
+	private void handleThermostatState(MaxThermostatStateMessage message) throws IOException {
+		Thermostat thermostat = AmbientControlMW.getRoom().getThermostats().get(message.getFromAdress());
+		if (thermostat == null) {
+			System.out.println("ClimateManager handleThermostatState(): got request from unknown device: adress="
+					+ message.getFromAdress());
+			return;
+		}
+		thermostat.batteryLow = message.isBatteryLow();
+		thermostat.isLocked = message.isLocked();
+		thermostat.lastUpdate = new Date(System.currentTimeMillis());
+
+		// TODO notify EventManager for new messured temperatur
+		thermostat.temperatur = message.getActualTemp();
+
+		config.mode = message.getMode();
+		config.temporaryUntilDate = message.getTemporaryUntil();
+		config.setTemp = message.getSetTemp();
+
+		RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
+				AmbientControlMW.getRoomConfigFileName());
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+	}
 }

@@ -20,6 +20,7 @@ import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.EventSensor;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.Sensor;
+import org.ambientlight.room.entities.Thermostat;
 
 
 /**
@@ -42,6 +43,8 @@ public class Room {
 	private List<DeviceDriver> devices;
 
 	private List<LightObject> lightObjects;
+
+	private Map<Integer, Thermostat> thermostats;
 
 	private BufferedImage roomBitMap;
 
@@ -134,4 +137,15 @@ public class Room {
 		EventGenerator possibleGenerator = this.eventGenerators.get(name);
 		return (possibleGenerator instanceof EventSensor ? (EventSensor) possibleGenerator : null);
 	}
+
+
+	public Map<Integer, Thermostat> getThermostats() {
+		return thermostats;
+	}
+
+
+	public void setThermostats(Map<Integer, Thermostat> thermostats) {
+		this.thermostats = thermostats;
+	}
+
 }

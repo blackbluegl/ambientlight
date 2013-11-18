@@ -15,6 +15,8 @@
 
 package org.ambientlight.room.entities;
 
+import java.util.Date;
+
 import org.ambientlight.room.actors.ThermostatConfiguration;
 
 
@@ -26,6 +28,11 @@ public class Thermostat implements Sensor {
 
 	public ThermostatConfiguration config;
 
+	public Date lastUpdate;
+	public float temperatur;
+	public boolean batteryLow;
+	public boolean rfError;
+	public boolean isLocked;
 
 	/*
 	 * (non-Javadoc)
@@ -35,7 +42,7 @@ public class Thermostat implements Sensor {
 	@Override
 	public Object getValue() {
 		// TODO Auto-generated method stub
-		return null;
+		return temperatur;
 	}
 
 }
