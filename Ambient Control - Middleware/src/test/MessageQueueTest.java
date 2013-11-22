@@ -17,7 +17,7 @@ package test;
 
 import java.util.ArrayList;
 
-import org.ambientlight.device.drivers.MaxVCubeDeviceConfiguration;
+import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;

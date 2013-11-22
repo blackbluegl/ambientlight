@@ -17,6 +17,7 @@ package org.ambientlight.device.led;
 
 import java.awt.Color;
 
+import org.ambientlight.config.device.led.LedPointConfiguration;
 import org.ambientlight.device.led.color.Color64Bit;
 
 

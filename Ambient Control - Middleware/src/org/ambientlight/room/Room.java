@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.climate.ClimateManager;
+import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;

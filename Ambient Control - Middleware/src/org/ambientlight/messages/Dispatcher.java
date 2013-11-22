@@ -20,7 +20,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.ambientlight.device.drivers.RemoteHostConfiguration;
+import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 
 
 /**

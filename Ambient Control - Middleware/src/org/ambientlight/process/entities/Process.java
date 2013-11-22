@@ -3,11 +3,11 @@ package org.ambientlight.process.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ambientlight.process.EventProcessConfiguration;
+import org.ambientlight.config.process.EventProcessConfiguration;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.process.eventmanager.IEventListener;
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.handler.DataTypeValidation;
 
 
 public class Process implements IEventListener {

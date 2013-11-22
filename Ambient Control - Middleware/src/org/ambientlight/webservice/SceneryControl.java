@@ -13,16 +13,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.room.ISwitchableRoomItem;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.ISwitchableRoomItem;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.actors.LightObjectConfiguration;
+import org.ambientlight.config.room.actors.SwitchObjectConfiguration;
+import org.ambientlight.config.room.eventgenerator.EventGeneratorConfiguration;
+import org.ambientlight.config.scenery.actor.ActorConductConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.scenery.actor.switching.SwitchingConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.actors.LightObjectConfiguration;
-import org.ambientlight.room.actors.SwitchObjectConfiguration;
 import org.ambientlight.room.entities.LightObject;
-import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
-import org.ambientlight.scenery.actor.ActorConductConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.scenery.actor.switching.SwitchingConfiguration;
 
 
 //TODO should be better named: entitiy Control

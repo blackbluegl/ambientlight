@@ -23,9 +23,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.events.SceneryEntryEvent;
-import org.ambientlight.process.events.SwitchEvent;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.process.events.SceneryEntryEvent;
+import org.ambientlight.config.process.events.SwitchEvent;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.SceneryEventGenerator;
 import org.ambientlight.room.entities.SwitchEventGenerator;

@@ -15,7 +15,7 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.room.actors.ThermostatConfiguration;
+import org.ambientlight.config.room.actors.ThermostatConfiguration;
 
 
 /**

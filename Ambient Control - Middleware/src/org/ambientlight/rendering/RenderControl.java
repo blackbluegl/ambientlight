@@ -3,6 +3,10 @@ package org.ambientlight.rendering;
 import java.awt.Color;
 import java.util.List;
 
+import org.ambientlight.config.scenery.actor.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.rendering.effects.RenderingEffect;
 import org.ambientlight.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.rendering.effects.transitions.FadeInTransition;
@@ -11,10 +15,6 @@ import org.ambientlight.rendering.programms.SimpleColor;
 import org.ambientlight.rendering.programms.Sunset;
 import org.ambientlight.rendering.programms.Tron;
 import org.ambientlight.room.entities.LightObject;
-import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 
 
 public class RenderControl {

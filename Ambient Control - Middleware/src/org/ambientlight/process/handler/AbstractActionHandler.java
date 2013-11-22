@@ -2,6 +2,7 @@ package org.ambientlight.process.handler;
 
 import java.util.List;
 
+import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.process.entities.Token;
 
 

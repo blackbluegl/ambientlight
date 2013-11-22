@@ -3,7 +3,7 @@ package test;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
+import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.device.drivers.switchoverethernet.SwitchDeviceOverEthernetDriver;
 
 public class TestRFMOEDevice {

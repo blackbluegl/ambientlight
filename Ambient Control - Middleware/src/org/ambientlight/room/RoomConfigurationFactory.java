@@ -8,16 +8,17 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.device.drivers.DeviceConfiguration;
-import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
-import org.ambientlight.device.led.StripeConfiguration;
-import org.ambientlight.device.led.StripePartConfiguration;
-import org.ambientlight.room.actors.ActorConfiguration;
-import org.ambientlight.room.actors.LightObjectConfiguration;
-import org.ambientlight.room.actors.SwitchObjectConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.config.device.drivers.DeviceConfiguration;
+import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
+import org.ambientlight.config.device.led.StripeConfiguration;
+import org.ambientlight.config.device.led.StripePartConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.actors.ActorConfiguration;
+import org.ambientlight.config.room.actors.LightObjectConfiguration;
+import org.ambientlight.config.room.actors.SwitchObjectConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
 
 import com.thoughtworks.xstream.XStream;
 

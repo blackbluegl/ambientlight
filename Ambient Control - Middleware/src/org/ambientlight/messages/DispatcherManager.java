@@ -15,8 +15,8 @@
 
 package org.ambientlight.messages;
 
-import org.ambientlight.device.drivers.MaxVCubeDeviceConfiguration;
-import org.ambientlight.device.drivers.RemoteHostConfiguration;
+import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
+import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 
 
 /**

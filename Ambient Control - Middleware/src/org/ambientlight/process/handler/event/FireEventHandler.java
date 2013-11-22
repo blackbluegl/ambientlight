@@ -16,8 +16,9 @@
 package org.ambientlight.process.handler.event;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.events.Event;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
 

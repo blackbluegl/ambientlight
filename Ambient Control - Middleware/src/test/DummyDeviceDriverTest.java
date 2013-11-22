@@ -2,9 +2,9 @@ package test;
 
 import java.awt.Color;
 
+import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.device.drivers.dummy.DummyDeviceDriver;
 import org.ambientlight.device.led.Stripe;
-import org.ambientlight.device.led.StripeConfiguration;
 
 public class DummyDeviceDriverTest {
 

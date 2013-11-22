@@ -15,10 +15,10 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.events.SceneryEntryEvent;
-import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.scenery.UserSceneryConfiguration;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.process.events.SceneryEntryEvent;
+import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfiguration;
+import org.ambientlight.config.scenery.UserSceneryConfiguration;
 
 
 /**

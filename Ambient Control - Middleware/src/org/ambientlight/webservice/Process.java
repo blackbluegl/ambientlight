@@ -28,14 +28,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.EventProcessConfiguration;
-import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
-import org.ambientlight.process.handler.DataTypeValidation;
-import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
-import org.ambientlight.process.validation.HandlerDataTypeValidation;
-import org.ambientlight.process.validation.ValidationResult;
+import org.ambientlight.config.process.EventProcessConfiguration;
+import org.ambientlight.config.process.NodeConfiguration;
+import org.ambientlight.config.process.ProcessConfiguration;
+import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
+import org.ambientlight.ws.process.validation.ValidationResult;
 
 
 /**
