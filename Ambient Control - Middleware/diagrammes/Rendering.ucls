@@ -1,1488 +1,453 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.4" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" language="java" name="org.ambientlight.webservice.Callback" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/webservice/Callback.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="163" x="47" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="2" language="java" name="org.ambientlight.webservice.Process" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/webservice/Process.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="169" width="316" x="604" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="3" language="java" name="org.ambientlight.webservice.SceneryControl" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/webservice/SceneryControl.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="169" width="491" x="2371" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="4" language="java" name="org.ambientlight.webservice.EventReceiver" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/webservice/EventReceiver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="97" width="236" x="1201" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="5" language="java" name="org.ambientlight.room.entities.EventSensor" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/EventSensor.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="611" y="2372"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="6" language="java" name="org.ambientlight.room.entities.SwitchEventGenerator" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/SwitchEventGenerator.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="284" x="1071" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="7" language="java" name="org.ambientlight.room.entities.AlarmGenerator" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/AlarmGenerator.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="97" width="235" x="47" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="8" language="java" name="org.ambientlight.room.entities.NFCTagSwitchEventGenerator" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/NFCTagSwitchEventGenerator.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="115" width="321" x="710" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="9" language="java" name="org.ambientlight.room.entities.Thermostat" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/Thermostat.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1590" y="1726"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="10" language="java" name="org.ambientlight.room.entities.LightObject" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/LightObject.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="241" width="285" x="4434" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="11" language="java" name="org.ambientlight.room.entities.SceneryEventGenerator" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/SceneryEventGenerator.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="348" x="322" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="12" language="java" name="org.ambientlight.room.entities.EventGenerator" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/EventGenerator.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1163" y="1745"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="13" language="java" name="org.ambientlight.room.entities.Sensor" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/Sensor.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1570" y="1989"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="14" language="java" name="org.ambientlight.room.RoomFactory" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/RoomFactory.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="169" width="499" x="2942" y="498"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="15" language="java" name="org.ambientlight.room.Room" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/Room.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="367" width="307" x="2310" y="1024"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="16" language="java" name="org.ambientlight.room.StripePart" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/StripePart.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="115" width="206" x="4782" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="17" language="java" name="org.ambientlight.room.RoomConfigurationFactory" 
+  <class id="1" language="java" name="org.ambientlight.room.RoomConfigurationFactory" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/room/RoomConfigurationFactory.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="151" width="294" x="2037" y="37"/>    
+    <position height="241" width="294" x="1366" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="18" language="java" name="org.ambientlight.rendering.util.ImageUtil" project="Ambient Control - Middleware" 
+  <class id="2" language="java" name="org.ambientlight.room.RoomFactory" project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/RoomFactory.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="205" width="499" x="1700" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="org.ambientlight.room.Room" project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/Room.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="2945" y="-330"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="org.ambientlight.room.StripePart" project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/StripePart.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="3289" y="639"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="org.ambientlight.rendering.util.ImageUtil" project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/util/ImageUtil.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="151" width="314" x="250" y="37"/>    
+    <position height="-1" width="-1" x="1168" y="119"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="19" language="java" name="org.ambientlight.rendering.util.StripePixelMapping" 
+  <class id="6" language="java" name="org.ambientlight.rendering.util.StripePixelMapping" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/util/StripePixelMapping.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="133" width="213" x="5270" y="1024"/>    
+    <position height="-1" width="-1" x="3165" y="468"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="20" language="java" name="org.ambientlight.rendering.util.StripeUtil" 
-    project="Ambient Control - Middleware" 
+  <class id="7" language="java" name="org.ambientlight.rendering.util.StripeUtil" project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/util/StripeUtil.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="133" width="360" x="1637" y="37"/>    
+    <position height="133" width="360" x="41" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="21" language="java" name="org.ambientlight.rendering.programms.Tron.CrossWay" 
+  <class id="8" language="java" name="org.ambientlight.rendering.programms.Tron.CrossWay" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="3606" y="3166"/>    
+    <position height="-1" width="-1" x="3010" y="1596"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="22" language="java" name="org.ambientlight.rendering.programms.Tron" project="Ambient Control - Middleware" 
+  <class id="9" language="java" name="org.ambientlight.rendering.programms.Tron" project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="3930" y="2958"/>    
+    <position height="-1" width="-1" x="2822" y="910"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="23" language="java" name="org.ambientlight.rendering.programms.SimpleColor" 
+  <class id="10" language="java" name="org.ambientlight.rendering.programms.SimpleColor" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/SimpleColor.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="151" width="248" x="3026" y="1431"/>    
+    <position height="-1" width="-1" x="1985" y="716"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="24" language="java" name="org.ambientlight.rendering.programms.RenderingProgramm" 
+  <class id="11" language="java" name="org.ambientlight.rendering.programms.RenderingProgramm" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/RenderingProgramm.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="3844" y="1181"/>    
+    <position height="169" width="256" x="2194" y="390"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="25" language="java" name="org.ambientlight.rendering.programms.Tron.Token.Velocity" 
+  <class id="12" language="java" name="org.ambientlight.rendering.programms.Tron.Token.Velocity" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="3565" y="2972"/>    
+    <position height="-1" width="-1" x="3309" y="1606"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="26" language="java" name="org.ambientlight.rendering.programms.Tron.Token" 
+  <class id="13" language="java" name="org.ambientlight.rendering.programms.Tron.Token" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="3664" y="3152"/>    
+    <position height="-1" width="-1" x="3156" y="1329"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="27" language="java" name="org.ambientlight.rendering.programms.Tron.PixelColorMapping" 
+  <class id="14" language="java" name="org.ambientlight.rendering.programms.Tron.PixelColorMapping" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="151" width="167" x="4346" y="2108"/>    
+    <position height="-1" width="-1" x="2458" y="1608"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="28" language="java" name="org.ambientlight.rendering.programms.Sunset" 
+  <class id="15" language="java" name="org.ambientlight.rendering.programms.Sunset" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Sunset.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="637" width="310" x="3314" y="1431"/>    
+    <position height="-1" width="-1" x="2330" y="959"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="29" language="java" name="org.ambientlight.rendering.programms.Tron.Lane" 
+  <class id="16" language="java" name="org.ambientlight.rendering.programms.Tron.Lane" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="115" width="189" x="4553" y="2108"/>    
+    <position height="-1" width="-1" x="2709" y="1589"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="30" language="java" name="org.ambientlight.rendering.effects.transitions.FadeOutTransition" 
+  <interface id="17" language="java" name="org.ambientlight.rendering.effects.transitions.FadeOutTransition" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/FadeOutTransition.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="61" width="197" x="2878" y="2407"/>    
+    <position height="-1" width="-1" x="1584" y="853"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="31" language="java" name="org.ambientlight.rendering.effects.transitions.Transition" 
+  <interface id="18" language="java" name="org.ambientlight.rendering.effects.transitions.Transition" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/Transition.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="79" width="197" x="3233" y="2108"/>    
+    <position height="-1" width="-1" x="1434" y="687"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="32" language="java" name="org.ambientlight.rendering.effects.transitions.SimpleFadeOutTransitionImpl" 
+  <class id="19" language="java" name="org.ambientlight.rendering.effects.transitions.SimpleFadeOutTransitionImpl" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/SimpleFadeOutTransitionImpl.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="205" width="283" x="2448" y="2108"/>    
+    <position height="-1" width="-1" x="1585" y="1067"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="33" language="java" name="org.ambientlight.rendering.effects.transitions.SimpleFadeInTransitionImpl" 
+  <class id="20" language="java" name="org.ambientlight.rendering.effects.transitions.SimpleFadeInTransitionImpl" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/SimpleFadeInTransitionImpl.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="187" width="283" x="2125" y="2108"/>    
+    <position height="-1" width="-1" x="1282" y="1059"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="34" language="java" name="org.ambientlight.rendering.effects.transitions.FadeInTransition" 
+  <interface id="21" language="java" name="org.ambientlight.rendering.effects.transitions.FadeInTransition" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/FadeInTransition.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="61" width="197" x="2641" y="2407"/>    
+    <position height="-1" width="-1" x="1281" y="853"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="35" language="java" name="org.ambientlight.rendering.effects.RenderingEffectFactory" 
+  <class id="22" language="java" name="org.ambientlight.rendering.effects.RenderingEffectFactory" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/RenderingEffectFactory.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="133" width="264" x="2310" y="707"/>    
+    <position height="-1" width="-1" x="1250" y="-169"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="36" language="java" name="org.ambientlight.rendering.effects.RenderingEffect" 
+  <interface id="23" language="java" name="org.ambientlight.rendering.effects.RenderingEffect" 
     project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/RenderingEffect.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="97" width="283" x="3664" y="1431"/>    
+    <position height="-1" width="-1" x="1604" y="474"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="37" language="java" name="org.ambientlight.rendering.RenderControl" project="Ambient Control - Middleware" 
+  <class id="24" language="java" name="org.ambientlight.rendering.RenderControl" project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/RenderControl.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="151" width="531" x="2310" y="498"/>    
+    <position height="-1" width="-1" x="720" y="120"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="38" language="java" name="org.ambientlight.rendering.Renderer" project="Ambient Control - Middleware" 
+  <class id="25" language="java" name="org.ambientlight.rendering.Renderer" project="Ambient Control - Middleware" 
     file="/Ambient Control - Middleware/src/org/ambientlight/rendering/Renderer.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="277" width="356" x="4434" y="707"/>    
+    <position height="313" width="356" x="2770" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="39" language="java" name="org.ambientlight.process.handler.expression.DecissionActionHandler" 
+  <class id="26" language="java" name="org.ambientlight.webservice.SceneryControl" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/expression/DecissionActionHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="151" width="225" x="1288" y="2951"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="40" language="java" name="org.ambientlight.process.handler.expression.ExpressionActionHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/expression/ExpressionActionHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="151" width="238" x="1288" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="41" language="java" name="org.ambientlight.process.handler.event.FireEventHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/event/FireEventHandler.java" binary="false" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/webservice/SceneryControl.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="97" width="172" x="1778" y="2652"/>    
+    <position height="187" width="491" x="2239" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="42" language="java" name="org.ambientlight.process.handler.event.EventGeneratorSensorAdapterHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/event/EventGeneratorSensorAdapterHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="115" width="297" x="2645" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="43" language="java" name="org.ambientlight.process.handler.event.EventToBooleanHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/event/EventToBooleanHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="97" width="172" x="1566" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="44" language="java" name="org.ambientlight.process.handler.actor.ConfigurationChangeHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/actor/ConfigurationChangeHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="115" width="285" x="2320" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="45" language="java" name="org.ambientlight.process.handler.actor.PowerStateHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/actor/PowerStateHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="133" width="290" x="1990" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="46" language="java" name="org.ambientlight.process.handler.AbstractActionHandler" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/AbstractActionHandler.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="151" width="236" x="1931" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="47" language="java" name="org.ambientlight.process.handler.ActionHandlerException" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/handler/ActionHandlerException.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="79" width="201" x="960" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="48" language="java" name="org.ambientlight.process.eventmanager.IEventListener" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/eventmanager/IEventListener.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="79" width="207" x="2771" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="49" language="java" name="org.ambientlight.process.eventmanager.IEventManagerClient" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/eventmanager/IEventManagerClient.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="79" width="187" x="1376" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="50" language="java" name="org.ambientlight.process.eventmanager.EventManager" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/eventmanager/EventManager.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="151" width="302" x="1589" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="51" language="java" name="org.ambientlight.process.eventmanager.IEventManager" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/eventmanager/IEventManager.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="79" width="256" x="1603" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="52" language="java" name="org.ambientlight.process.entities.Process" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/entities/Process.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="169" width="207" x="2310" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="53" language="java" name="org.ambientlight.process.entities.Node" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/entities/Node.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="154" x="1931" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="54" language="java" name="org.ambientlight.process.entities.Token" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/entities/Token.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="133" width="175" x="3018" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="55" language="java" name="org.ambientlight.process.ProcessFactory" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/process/ProcessFactory.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="169" width="279" x="2902" y="707"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="56" language="java" name="org.ambientlight.messages.Dispatcher" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/messages/Dispatcher.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="223" width="217" x="6500" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="57" language="java" name="org.ambientlight.messages.MaxDispatcher" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/messages/MaxDispatcher.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="205" width="287" x="6500" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="58" language="java" name="org.ambientlight.messages.QeueManager" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/messages/QeueManager.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="313" width="339" x="6654" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="59" language="java" name="org.ambientlight.messages.InDispatcher" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/messages/InDispatcher.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="97" width="180" x="6500" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="60" language="java" name="org.ambientlight.messages.MessageListener" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/messages/MessageListener.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="79" width="177" x="6283" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="61" language="java" name="org.ambientlight.messages.DispatcherManager" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/messages/DispatcherManager.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="169" width="333" x="6757" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="62" language="java" name="org.ambientlight.device.led.color.Color64Bit" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/led/color/Color64Bit.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="259" width="200" x="5240" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="63" language="java" name="org.ambientlight.device.led.color.DitheringRGB" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/led/color/DitheringRGB.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="151" width="280" x="4782" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="64" language="java" name="org.ambientlight.device.led.LedPoint" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/led/LedPoint.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="151" width="200" x="5697" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="65" language="java" name="org.ambientlight.device.led.Stripe" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/led/Stripe.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="187" width="201" x="4782" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="66" language="java" 
-    name="org.ambientlight.device.drivers.switchoverethernet.SwitchDeviceOverEthernetDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/switchoverethernet/SwitchDeviceOverEthernetDriver.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="133" width="331" x="6283" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="67" language="java" 
-    name="org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/multistripeoverethernet/MultistripeOverEthernetClientDeviceDriver.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="259" width="331" x="5028" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="68" language="java" name="org.ambientlight.device.drivers.lk35.LK35ClientDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/lk35/LK35ClientDeviceDriver.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="259" width="258" x="5593" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="69" language="java" name="org.ambientlight.device.drivers.dummyswitching.DummySwitchingDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/dummyswitching/DummySwitchingDeviceDriver.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="115" width="331" x="5912" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="70" language="java" name="org.ambientlight.device.drivers.dummy.DummyDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/dummy/DummyDeviceDriver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="4182" y="2120"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="71" language="java" name="org.ambientlight.device.drivers.DeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/DeviceDriver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="61" width="139" x="4759" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="72" language="java" name="org.ambientlight.device.drivers.SwtichDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/SwtichDeviceDriver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="97" width="331" x="5912" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="73" language="java" name="org.ambientlight.device.drivers.LedStripeDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/LedStripeDeviceDriver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="258" x="5028" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="74" language="java" name="org.ambientlight.device.drivers.AnimateableLedDevice" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/AnimateableLedDevice.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="154" x="5399" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="75" language="java" name="org.ambientlight.device.drivers.LedPointDeviceDriver" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/LedPointDeviceDriver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="115" width="258" x="5399" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="76" language="java" name="org.ambientlight.device.drivers.DeviceDriverFactory" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/device/drivers/DeviceDriverFactory.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="133" width="354" x="3221" y="707"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="77" language="java" name="org.ambientlight.debug.BufferedImageDisplayOutput" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/debug/BufferedImageDisplayOutput.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="151" width="228" x="3470" y="2407"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="78" language="java" name="org.ambientlight.debug.BufferedImageDisplayOutput.ImageBackgroundPanel" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/debug/BufferedImageDisplayOutput.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="133" width="217" x="3470" y="2652"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="79" language="java" name="org.ambientlight.climate.ClimateManager" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/climate/ClimateManager.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="133" width="311" x="4938" y="1431"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="80" language="java" name="org.ambientlight.callback.CallBackManager" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/callback/CallBackManager.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1068" y="1405"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="81" language="java" name="org.ambientlight.RenderingTask" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/RenderingTask.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="133" width="136" x="3470" y="2108"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="82" language="java" name="org.ambientlight.AmbientControlMW" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/AmbientControlMW.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="421" width="281" x="2902" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="83" language="java" name="org.ambientlight.WebserviceTask" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/WebserviceTask.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="115" width="120" x="1477" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <association id="84">    
-    <end type="SOURCE" refId="64" navigable="false">      
-      <attribute id="85" name="rgbValue"/>      
-      <multiplicity id="86" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="62" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="87">    
-    <end type="SOURCE" refId="55" navigable="false">      
-      <attribute id="88" name="room"/>      
-      <multiplicity id="89" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="90">    
-    <end type="SOURCE" refId="68"/>    
-    <end type="TARGET" refId="75"/>  
-  </realization>  
-  <realization id="91">    
-    <end type="SOURCE" refId="67"/>    
-    <end type="TARGET" refId="73"/>  
-  </realization>  
-  <generalization id="92">    
-    <end type="SOURCE" refId="44"/>    
-    <end type="TARGET" refId="46"/>  
+  <nesting id="27">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="12"/>  
+  </nesting>  
+  <generalization id="28">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="11"/>  
   </generalization>  
-  <association id="93">    
-    <bendpoint x="1939" y="1431"/>    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="94" name="sensors"/>      
-      <multiplicity id="95" minimum="0" maximum="2147483647"/>    
+  <generalization id="29">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="11"/>  
+  </generalization>  
+  <association id="30">    
+    <end type="SOURCE" refId="25" navigable="false">      
+      <attribute id="31" name="stripePixelMapping">        
+        <position height="17" width="99" x="2994" y="375"/>      
+      </attribute>      
+      <multiplicity id="32" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="13" navigable="true"/>    
+    <end type="TARGET" refId="6" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="96">    
-    <end type="SOURCE" refId="26" navigable="false">      
-      <attribute id="97" name="velocity"/>      
-      <multiplicity id="98" minimum="0" maximum="1"/>    
+  <association id="33">    
+    <end type="SOURCE" refId="25" navigable="false">      
+      <attribute id="34" name="room">        
+        <position height="17" width="34" x="2907" y="-52"/>      
+      </attribute>      
+      <multiplicity id="35" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="25" navigable="true"/>    
+    <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="99">    
-    <end type="SOURCE" refId="53" navigable="false">      
-      <attribute id="100" name="handler"/>      
-      <multiplicity id="101" minimum="0" maximum="1"/>    
+  <association id="36">    
+    <end type="SOURCE" refId="22" navigable="false">      
+      <attribute id="37" name="room"/>      
+      <multiplicity id="38" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="46" navigable="true"/>    
+    <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="102">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="103" name="eventGenerators"/>      
-      <multiplicity id="104" minimum="0" maximum="2147483647"/>    
+  <association id="39">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="40" name="velocity"/>      
+      <multiplicity id="41" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="12" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="105">    
-    <end type="SOURCE" refId="22"/>    
-    <end type="TARGET" refId="27"/>  
+  <nesting id="42">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="16"/>  
   </nesting>  
-  <generalization id="106">    
-    <end type="SOURCE" refId="34"/>    
-    <end type="TARGET" refId="31"/>  
-  </generalization>  
-  <association id="107">    
-    <end type="SOURCE" refId="22" navigable="false">      
-      <attribute id="108" name="tokens"/>      
-      <multiplicity id="109" minimum="0" maximum="2147483647"/>    
+  <association id="43">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="44" name="effect"/>      
+      <multiplicity id="45" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="26" navigable="true"/>    
+    <end type="TARGET" refId="23" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="110">    
-    <bendpoint x="1385" y="2108"/>    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="111" name="eventManager"/>      
-      <multiplicity id="112" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="49" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="113">    
-    <end type="SOURCE" refId="69"/>    
-    <end type="TARGET" refId="72"/>  
-  </realization>  
-  <generalization id="114">    
-    <end type="SOURCE" refId="74"/>    
-    <end type="TARGET" refId="71"/>  
-  </generalization>  
-  <association id="115">    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="116" name="deviceFactory"/>      
-      <multiplicity id="117" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="76" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="118">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="119" name="devices"/>      
-      <multiplicity id="120" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="71" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="121">    
-    <end type="SOURCE" refId="41"/>    
-    <end type="TARGET" refId="46"/>  
-  </generalization>  
-  <association id="122">    
-    <end type="SOURCE" refId="82" navigable="false">      
-      <attribute id="123" name="renderControl"/>      
-      <multiplicity id="124" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="37" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="125">    
-    <end type="SOURCE" refId="77" navigable="false">      
-      <attribute id="126" name="imageBackground"/>      
-      <multiplicity id="127" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="78" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="128">    
-    <end type="SOURCE" refId="58" navigable="false">      
-      <attribute id="129" name="messageListeners"/>      
-      <multiplicity id="130" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="60" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="131">    
-    <end type="SOURCE" refId="81" navigable="false">      
-      <attribute id="132" name="debugRoomDisplay"/>      
-      <multiplicity id="133" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="77" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="134">    
-    <end type="SOURCE" refId="58" navigable="false">      
-      <attribute id="135" name="dispatcherManager"/>      
-      <multiplicity id="136" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="61" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="137">    
-    <end type="SOURCE" refId="56" navigable="false">      
-      <attribute id="138" name="queueManager"/>      
-      <multiplicity id="139" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="58" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <nesting id="140">    
-    <end type="SOURCE" refId="77"/>    
-    <end type="TARGET" refId="78"/>  
+  <nesting id="46">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="14"/>  
   </nesting>  
-  <generalization id="141">    
-    <end type="SOURCE" refId="42"/>    
-    <end type="TARGET" refId="46"/>  
-  </generalization>  
-  <realization id="142">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="5"/>  
+  <association id="47">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="48" name="stripePart"/>      
+      <multiplicity id="49" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="50">    
+    <end type="SOURCE" refId="20"/>    
+    <end type="TARGET" refId="21"/>  
   </realization>  
-  <generalization id="143">    
-    <end type="SOURCE" refId="72"/>    
-    <end type="TARGET" refId="71"/>  
-  </generalization>  
-  <association id="144">    
-    <bendpoint x="4443" y="1024"/>    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="145" name="queueDeleteLightObjects"/>      
-      <multiplicity id="146" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="147">    
-    <end type="SOURCE" refId="45"/>    
-    <end type="TARGET" refId="46"/>  
-  </generalization>  
-  <association id="148">    
-    <bendpoint x="5881" y="1024"/>    
-    <bendpoint x="5881" y="1431"/>    
-    <bendpoint x="5881" y="2108"/>    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="149" name="ledPoints"/>      
-      <multiplicity id="150" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="64" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="151">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="12"/>  
-  </generalization>  
-  <association id="152">    
-    <end type="SOURCE" refId="58" navigable="false">      
-      <attribute id="153" name="outDispatchers"/>      
-      <multiplicity id="154" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="56" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="155">    
-    <end type="SOURCE" refId="52" navigable="false">      
-      <attribute id="156" name="eventManager"/>      
-      <multiplicity id="157" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="50" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="158">    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="159" name="processFactory"/>      
-      <multiplicity id="160" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="55" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="161">    
-    <end type="SOURCE" refId="26" navigable="false">      
-      <attribute id="162" name="lasTakenCrossWays"/>      
-      <multiplicity id="163" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="21" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="164">    
-    <end type="SOURCE" refId="57"/>    
-    <end type="TARGET" refId="59"/>  
-  </realization>  
-  <realization id="165">    
-    <end type="SOURCE" refId="66"/>    
-    <end type="TARGET" refId="72"/>  
-  </realization>  
-  <association id="166">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="167" name="callBackMananger"/>      
-      <multiplicity id="168" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="80" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="169">    
-    <bendpoint x="5279" y="1431"/>    
-    <end type="SOURCE" refId="19" navigable="false">      
-      <attribute id="170" name="stripePart"/>      
-      <multiplicity id="171" minimum="0" maximum="1"/>    
+  <nesting id="51">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="13"/>  
+  </nesting>  
+  <association id="52">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="53" name="lanes"/>      
+      <multiplicity id="54" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="16" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="172">    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="173" name="renderLightObjectMapping"/>      
-      <multiplicity id="174" minimum="0" maximum="2147483647"/>    
+  <association id="55">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="56" name="lasTakenCrossWays">        
+        <position height="17" width="109" x="3067" y="1490"/>      
+      </attribute>      
+      <multiplicity id="57" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="24" navigable="true"/>    
+    <end type="TARGET" refId="8" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="175">    
-    <end type="SOURCE" refId="70" navigable="false">      
-      <attribute id="176" name="myStripes"/>      
-      <multiplicity id="177" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="65" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="178">    
-    <end type="SOURCE" refId="52"/>    
-    <end type="TARGET" refId="48"/>  
-  </realization>  
-  <association id="179">    
-    <end type="SOURCE" refId="22" navigable="false">      
-      <attribute id="180" name="pixelMapping"/>      
-      <multiplicity id="181" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="27" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="182">    
-    <end type="SOURCE" refId="16" navigable="false">      
-      <attribute id="183" name="stripe"/>      
-      <multiplicity id="184" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="65" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="185">    
-    <end type="SOURCE" refId="24" navigable="false">      
-      <attribute id="186" name="effect"/>      
-      <multiplicity id="187" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="36" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="188">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="5"/>  
-  </realization>  
-  <association id="189">    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="190" name="stripePixelMapping"/>      
-      <multiplicity id="191" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="19" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="192">    
-    <end type="SOURCE" refId="50"/>    
-    <end type="TARGET" refId="49"/>  
-  </realization>  
-  <association id="193">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="194" name="climateManager"/>      
-      <multiplicity id="195" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="79" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="196">    
-    <end type="SOURCE" refId="70" navigable="false">      
-      <attribute id="197" name="display"/>      
-      <multiplicity id="198" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="77" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="199">    
-    <end type="SOURCE" refId="57"/>    
-    <end type="TARGET" refId="56"/>  
-  </generalization>  
-  <generalization id="200">    
-    <end type="SOURCE" refId="40"/>    
-    <end type="TARGET" refId="46"/>  
-  </generalization>  
-  <association id="201">    
-    <bendpoint x="3677" y="498"/>    
-    <end type="SOURCE" refId="82" navigable="false">      
-      <attribute id="202" name="renderer"/>      
-      <multiplicity id="203" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="38" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="204">    
-    <end type="SOURCE" refId="65" navigable="false">      
-      <attribute id="205" name="pixels"/>      
-      <multiplicity id="206" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="62" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="207">    
-    <bendpoint x="1960" y="1431"/>    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="208" name="eventManager"/>      
-      <multiplicity id="209" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="50" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="210">    
-    <end type="SOURCE" refId="73"/>    
-    <end type="TARGET" refId="74"/>  
-  </generalization>  
-  <association id="211">    
-    <end type="SOURCE" refId="35" navigable="false">      
-      <attribute id="212" name="room"/>      
-      <multiplicity id="213" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="214">    
-    <bendpoint x="2911" y="498"/>    
-    <end type="SOURCE" refId="82" navigable="false">      
-      <attribute id="215" name="processFactory"/>      
-      <multiplicity id="216" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="55" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="217">    
-    <end type="SOURCE" refId="65" navigable="false">      
-      <attribute id="218" name="subStripes"/>      
-      <multiplicity id="219" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="16" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="220">    
-    <end type="SOURCE" refId="67" navigable="false">      
-      <attribute id="221" name="stripes"/>      
-      <multiplicity id="222" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="65" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="223">    
-    <end type="SOURCE" refId="68" navigable="false">      
-      <attribute id="224" name="points"/>      
-      <multiplicity id="225" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="64" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="226">    
-    <end type="SOURCE" refId="37" navigable="false">      
-      <attribute id="227" name="effectFactory"/>      
-      <multiplicity id="228" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="35" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="229">    
-    <end type="SOURCE" refId="65" navigable="false">      
-      <attribute id="230" name="dithering"/>      
-      <multiplicity id="231" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="63" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="232">    
-    <end type="SOURCE" refId="39"/>    
-    <end type="TARGET" refId="40"/>  
-  </generalization>  
-  <association id="233">    
-    <end type="SOURCE" refId="52" navigable="false">      
-      <attribute id="234" name="token"/>      
-      <multiplicity id="235" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="54" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="236">    
-    <end type="SOURCE" refId="79"/>    
-    <end type="TARGET" refId="60"/>  
-  </realization>  
-  <generalization id="237">    
-    <end type="SOURCE" refId="30"/>    
-    <end type="TARGET" refId="31"/>  
-  </generalization>  
-  <realization id="238">    
-    <end type="SOURCE" refId="70"/>    
-    <end type="TARGET" refId="73"/>  
-  </realization>  
-  <realization id="239">    
-    <end type="SOURCE" refId="33"/>    
-    <end type="TARGET" refId="34"/>  
-  </realization>  
-  <realization id="240">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="5"/>  
-  </realization>  
-  <association id="241">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="242" name="thermostats"/>      
-      <multiplicity id="243" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="9" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="244">    
-    <end type="SOURCE" refId="50"/>    
-    <end type="TARGET" refId="51"/>  
-  </realization>  
-  <generalization id="245">    
-    <end type="SOURCE" refId="23"/>    
-    <end type="TARGET" refId="24"/>  
-  </generalization>  
-  <nesting id="246">    
-    <end type="SOURCE" refId="22"/>    
-    <end type="TARGET" refId="26"/>  
-  </nesting>  
-  <nesting id="247">    
-    <end type="SOURCE" refId="22"/>    
-    <end type="TARGET" refId="29"/>  
-  </nesting>  
-  <association id="248">    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="249" name="room"/>      
-      <multiplicity id="250" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="251">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="12"/>  
-  </generalization>  
-  <association id="252">    
-    <bendpoint x="2871" y="498"/>    
-    <bendpoint x="2871" y="707"/>    
-    <end type="SOURCE" refId="82" navigable="false">      
-      <attribute id="253" name="room"/>      
-      <multiplicity id="254" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <nesting id="255">    
-    <end type="SOURCE" refId="26"/>    
-    <end type="TARGET" refId="25"/>  
-  </nesting>  
-  <association id="256">    
-    <end type="SOURCE" refId="52" navigable="false">      
-      <attribute id="257" name="nodes"/>      
-      <multiplicity id="258" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="53" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="259">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="260" name="lightObjects"/>      
-      <multiplicity id="261" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="262">    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="263" name="stripeParts"/>      
-      <multiplicity id="264" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="16" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="265">    
-    <end type="SOURCE" refId="22"/>    
-    <end type="TARGET" refId="24"/>  
-  </generalization>  
-  <generalization id="266">    
-    <end type="SOURCE" refId="31"/>    
-    <end type="TARGET" refId="36"/>  
-  </generalization>  
-  <generalization id="267">    
-    <end type="SOURCE" refId="28"/>    
-    <end type="TARGET" refId="24"/>  
-  </generalization>  
-  <association id="268">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="269" name="processes"/>      
-      <multiplicity id="270" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="52" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="271">    
-    <end type="SOURCE" refId="82" navigable="false">      
-      <attribute id="272" name="roomFactory"/>      
-      <multiplicity id="273" minimum="0" maximum="1"/>    
+  <association id="58">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="59" name="pixelMapping"/>      
+      <multiplicity id="60" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="14" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="274">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="12"/>  
-  </generalization>  
-  <generalization id="275">    
-    <end type="SOURCE" refId="43"/>    
-    <end type="TARGET" refId="46"/>  
-  </generalization>  
-  <generalization id="276">    
-    <end type="SOURCE" refId="75"/>    
-    <end type="TARGET" refId="74"/>  
-  </generalization>  
-  <realization id="277">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="13"/>  
+  <realization id="61">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="17"/>  
   </realization>  
-  <realization id="278">    
-    <end type="SOURCE" refId="32"/>    
-    <end type="TARGET" refId="30"/>  
-  </realization>  
-  <generalization id="279">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="12"/>  
-  </generalization>  
-  <association id="280">    
-    <end type="SOURCE" refId="22" navigable="false">      
-      <attribute id="281" name="lanes"/>      
-      <multiplicity id="282" minimum="0" maximum="2147483647"/>    
+  <association id="62">    
+    <end type="SOURCE" refId="25" navigable="false">      
+      <attribute id="63" name="renderLightObjectMapping">        
+        <position height="17" width="134" x="2488" y="413"/>      
+      </attribute>      
+      <multiplicity id="64" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="29" navigable="true"/>    
+    <end type="TARGET" refId="11" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <generalization id="65">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="18"/>  
+  </generalization>  
+  <generalization id="66">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="18"/>  
+  </generalization>  
+  <association id="67">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="68" name="tokens"/>      
+      <multiplicity id="69" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="70">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="23"/>  
+  </generalization>  
+  <association id="71">    
+    <end type="SOURCE" refId="24" navigable="false">      
+      <attribute id="72" name="effectFactory">        
+        <position height="17" width="76" x="1016" y="-101"/>      
+      </attribute>      
+      <multiplicity id="73" minimum="0" maximum="1">        
+        <position height="15" width="23" x="1128" y="-87"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="22" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="74">    
+    <bendpoint x="2840" y="1290"/>    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="75" name="crossWays">        
+        <position height="17" width="66" x="2895" y="1505"/>      
+      </attribute>      
+      <multiplicity id="76" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="77">    
+    <bendpoint x="2895" y="1275"/>    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="8"/>  
+  </nesting>  
+  <generalization id="78">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="11"/>  
+  </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    
