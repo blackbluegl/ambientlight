@@ -22,7 +22,7 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.ValueBindingPath;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.validation.HandlerDataTypeValidation;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
 /**

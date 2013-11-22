@@ -10,8 +10,8 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.validation.HandlerDataTypeValidation;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
 @HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA }, generates = DataTypeValidation.CREATES_NO_DATA)

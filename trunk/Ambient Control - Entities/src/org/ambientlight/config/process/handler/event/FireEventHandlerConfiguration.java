@@ -23,7 +23,7 @@ import org.ambientlight.annotations.Value;
 import org.ambientlight.config.process.events.Event;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.validation.HandlerDataTypeValidation;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
 /**
