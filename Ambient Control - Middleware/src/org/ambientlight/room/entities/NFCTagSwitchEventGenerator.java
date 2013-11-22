@@ -15,8 +15,8 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.process.events.EventConfiguration;
-import org.ambientlight.process.events.NFCTagSwitchEventConfiguration;
+import org.ambientlight.process.events.Event;
+import org.ambientlight.process.events.NFCTagSwitchEvent;
 import org.ambientlight.room.eventgenerator.NFCTagSwitchEventGeneratorConfiguration;
 
 
@@ -26,9 +26,9 @@ import org.ambientlight.room.eventgenerator.NFCTagSwitchEventGeneratorConfigurat
  */
 public class NFCTagSwitchEventGenerator extends EventGenerator implements EventSensor {
 
-	public void switchEventOccured(NFCTagSwitchEventConfiguration event) {
-		NFCTagSwitchEventConfiguration correlation = new NFCTagSwitchEventConfiguration();
-		correlation.eventGeneratorName = config.name;
+	public void switchEventOccured(NFCTagSwitchEvent event) {
+		NFCTagSwitchEvent correlation = new NFCTagSwitchEvent();
+		correlation.sourceName = config.name;
 		eventManager.onEvent(event);
 
 		((NFCTagSwitchEventGeneratorConfiguration) this.config).setPowerState(event.powerState);
@@ -42,10 +42,10 @@ public class NFCTagSwitchEventGenerator extends EventGenerator implements EventS
 	 * @see org.ambientlight.room.entities.EventSensor#getValue()
 	 */
 	@Override
-	public EventConfiguration getValue() {
+	public Event getValue() {
 		// TODO Auto-generated method stub
-		NFCTagSwitchEventConfiguration config = new NFCTagSwitchEventConfiguration();
-		config.eventGeneratorName = this.config.name;
+		NFCTagSwitchEvent config = new NFCTagSwitchEvent();
+		config.sourceName = this.config.name;
 		config.powerState = ((NFCTagSwitchEventGeneratorConfiguration) this.config).getPowerState();
 		return config;
 	}

@@ -23,12 +23,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.events.EventConfiguration;
-import org.ambientlight.process.events.NFCTagSwitchEventConfiguration;
-import org.ambientlight.process.events.SceneryEntryEventConfiguration;
-import org.ambientlight.process.events.SwitchEventConfiguration;
+import org.ambientlight.process.events.Event;
+import org.ambientlight.process.events.SceneryEntryEvent;
+import org.ambientlight.process.events.SwitchEvent;
 import org.ambientlight.room.entities.EventGenerator;
-import org.ambientlight.room.entities.NFCTagSwitchEventGenerator;
 import org.ambientlight.room.entities.SceneryEventGenerator;
 import org.ambientlight.room.entities.SwitchEventGenerator;
 
@@ -44,18 +42,14 @@ public class EventReceiver {
 	@Path("/event")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response handleEvent(EventConfiguration event) {
-		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(event.eventGeneratorName));
-		if (event instanceof SceneryEntryEventConfiguration) {
-			((SceneryEventGenerator) eventGen).sceneryEntryEventOccured((SceneryEntryEventConfiguration) event);
+	public Response handleEvent(Event event) {
+		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(event.sourceName));
+		if (event instanceof SceneryEntryEvent) {
+			((SceneryEventGenerator) eventGen).sceneryEntryEventOccured((SceneryEntryEvent) event);
 		}
 
-		if (event instanceof SwitchEventConfiguration) {
-			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEventConfiguration) event);
-		}
-
-		if (event instanceof NFCTagSwitchEventConfiguration) {
-			((NFCTagSwitchEventGenerator) eventGen).switchEventOccured((NFCTagSwitchEventConfiguration) event);
+		if (event instanceof SwitchEvent) {
+			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEvent) event);
 		}
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();

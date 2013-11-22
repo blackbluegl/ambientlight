@@ -4,8 +4,11 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 
 
-public class NFCTagSwitchEventConfiguration extends EventConfiguration {
+public class SwitchEvent extends Event {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean powerState;
@@ -14,7 +17,7 @@ public class NFCTagSwitchEventConfiguration extends EventConfiguration {
 
 	@Override
 	public String toString() {
-		String value = "NFCTag-Schalter: " + eventGeneratorName + " im Zustand: ";
+		String value = "Schalter: " + sourceName + " im Zustand: ";
 		return powerState ? value + "ein" : value + "aus";
 	}
 
@@ -23,7 +26,7 @@ public class NFCTagSwitchEventConfiguration extends EventConfiguration {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((eventGeneratorName == null) ? 0 : eventGeneratorName.hashCode());
+		result = prime * result + ((sourceName == null) ? 0 : sourceName.hashCode());
 		result = prime * result + (powerState ? 1231 : 1237);
 		return result;
 	}
@@ -37,11 +40,11 @@ public class NFCTagSwitchEventConfiguration extends EventConfiguration {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NFCTagSwitchEventConfiguration other = (NFCTagSwitchEventConfiguration) obj;
-		if (eventGeneratorName == null) {
-			if (other.eventGeneratorName != null)
+		SwitchEvent other = (SwitchEvent) obj;
+		if (sourceName == null) {
+			if (other.sourceName != null)
 				return false;
-		} else if (!eventGeneratorName.equals(other.eventGeneratorName))
+		} else if (!sourceName.equals(other.sourceName))
 			return false;
 		if (powerState != other.powerState)
 			return false;

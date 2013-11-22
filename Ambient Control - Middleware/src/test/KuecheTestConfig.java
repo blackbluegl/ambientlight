@@ -10,8 +10,8 @@ import org.ambientlight.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.device.led.LedPointConfiguration;
 import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.events.SceneryEntryEventConfiguration;
-import org.ambientlight.process.events.SwitchEventConfiguration;
+import org.ambientlight.process.events.SceneryEntryEvent;
+import org.ambientlight.process.events.SwitchEvent;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration;
@@ -20,7 +20,7 @@ import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration
 import org.ambientlight.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.handler.expression.ExpressionConfiguration;
-import org.ambientlight.room.IUserRoomItem;
+import org.ambientlight.room.ISwitchableRoomItem;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -39,8 +39,8 @@ public class KuecheTestConfig {
 	public static void main(String[] args) throws IOException {
 		DeviceDriverFactory df = new DeviceDriverFactory();
 		KuecheTestConfig test = new KuecheTestConfig();
-
-		RoomConfigurationFactory.saveRoomConfiguration(test.getTestRoom(), "Kochen");
+		RoomConfigurationFactory.beginTransaction();
+		RoomConfigurationFactory.commitTransaction(test.getTestRoom(), "Kochen");
 	}
 
 
@@ -89,12 +89,12 @@ public class KuecheTestConfig {
 		roomSwitchProcess.run = true;
 		roomSwitchProcess.id = "Licht schalten";
 		rc.processes.add(roomSwitchProcess);
-		SwitchEventConfiguration triggerConfOn = new SwitchEventConfiguration();
-		triggerConfOn.eventGeneratorName = triggerMainSwitch.name;
+		SwitchEvent triggerConfOn = new SwitchEvent();
+		triggerConfOn.sourceName = triggerMainSwitch.name;
 		triggerConfOn.powerState = true;
 
-		SwitchEventConfiguration triggerConfOff = new SwitchEventConfiguration();
-		triggerConfOff.eventGeneratorName = triggerMainSwitch.name;
+		SwitchEvent triggerConfOff = new SwitchEvent();
+		triggerConfOff.sourceName = triggerMainSwitch.name;
 		triggerConfOff.powerState = false;
 
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOn);
@@ -142,7 +142,7 @@ public class KuecheTestConfig {
 
 		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
 		changeConfigFor.add(lo);
-		ArrayList<IUserRoomItem> turnLightOnFor = new ArrayList<IUserRoomItem>();
+		ArrayList<ISwitchableRoomItem> turnLightOnFor = new ArrayList<ISwitchableRoomItem>();
 		turnLightOnFor.add(lo);
 
 		createUserScenario(rc, userScenario, changeConfigFor, turnLightOnFor);
@@ -152,7 +152,7 @@ public class KuecheTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
-			List<LightObjectConfiguration> lo, List<IUserRoomItem> itemsToPutOn) {
+			List<LightObjectConfiguration> lo, List<ISwitchableRoomItem> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -160,9 +160,9 @@ public class KuecheTestConfig {
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
 
-		SceneryEntryEventConfiguration triggerSceneryChange = new SceneryEntryEventConfiguration();
+		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent();
 		triggerSceneryChange.sceneryName = "Kochen";
-		triggerSceneryChange.eventGeneratorName = "RoomSceneryEventGenerator";
+		triggerSceneryChange.sourceName = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
@@ -176,7 +176,7 @@ public class KuecheTestConfig {
 		switchNode.id = 1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		for (IUserRoomItem current : itemsToPutOn) {
+		for (ISwitchableRoomItem current : itemsToPutOn) {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;

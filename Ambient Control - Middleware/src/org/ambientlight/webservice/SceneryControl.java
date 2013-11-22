@@ -1,6 +1,7 @@
 package org.ambientlight.webservice;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -12,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.room.IUserRoomItem;
+import org.ambientlight.room.ISwitchableRoomItem;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -31,7 +32,7 @@ public class SceneryControl {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getInfo() {
-		return "Version:0.13.0";
+		return "Version:0.14.0";
 	}
 
 
@@ -49,6 +50,8 @@ public class SceneryControl {
 			return Response.status(500).build();
 		}
 
+		RoomConfigurationFactory.beginTransaction();
+
 		if (itemConfiguration instanceof RenderingProgramConfiguration) {
 			// update renderer
 			LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(itemName);
@@ -57,18 +60,28 @@ public class SceneryControl {
 					AmbientControlMW.getRenderer(), (RenderingProgramConfiguration) itemConfiguration, lightObject);
 		} else if (itemConfiguration instanceof SwitchingConfiguration) {
 			// nothing todo so far
-		} else
+		} else {
+			try {
+				RoomConfigurationFactory.commitTransaction();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			return Response.status(500).build();
+		}
 
 		// update running model
 		AmbientControlMW.getRoom().config.actorConfigurations.get(itemName).actorConductConfiguration = itemConfiguration;
 
 		// persist model
-		RoomConfiguration persistetConfig;
+		// RoomConfiguration persistetConfig;
 		try {
-			persistetConfig = RoomConfigurationFactory.getRoomConfigByName(AmbientControlMW.getRoomConfigFileName());
-			persistetConfig.actorConfigurations.get(itemName).actorConductConfiguration = itemConfiguration;
-			RoomConfigurationFactory.saveRoomConfiguration(persistetConfig, AmbientControlMW.getRoomConfigFileName());
+			// persistetConfig =
+			// RoomConfigurationFactory.getRoomConfigByName(AmbientControlMW.getRoomConfigFileName());
+			// persistetConfig.actorConfigurations.get(itemName).actorConductConfiguration
+			// = itemConfiguration;
+			// RoomConfigurationFactory.saveRoomConfiguration(persistetConfig,
+			// AmbientControlMW.getRoomConfigFileName());
+			RoomConfigurationFactory.commitTransaction();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -85,12 +98,10 @@ public class SceneryControl {
 	public synchronized Response createOrUpdateEventGeneratorConfig(@PathParam("id") String eventGeneratorName,
 			EventGeneratorConfiguration config) {
 		System.out.println("SceneryControl: saving eventGeneratorConfig");
+		RoomConfigurationFactory.beginTransaction();
 		AmbientControlMW.getRoom().config.eventGeneratorConfigurations.put(eventGeneratorName, config);
-		// TODO this saves the complete state. do it like in
-		// updateconductconfiguration to just save the given part
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
-					AmbientControlMW.getRoomConfigFileName());
+			RoomConfigurationFactory.commitTransaction();
 			System.out.println("SceneryControl: saving eventGeneratorConfig finished");
 
 			return Response.status(200).build();
@@ -109,6 +120,13 @@ public class SceneryControl {
 	}
 
 
+	@GET
+	@Path("/config/userRoomItems")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Map<String, ISwitchableRoomItem> getUserRoomItems() {
+		return AmbientControlMW.getRoom().config.getUserRoomItems();
+	}
+
 	@PUT
 	@Path("/control/room/items/{itemName}/state")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -118,7 +136,7 @@ public class SceneryControl {
 		System.out.println("SceneryControlWS:  setting power state for " + itemName + " to " + powerState);
 
 		try {
-			IUserRoomItem config = this.getRoomConfiguration().getUserRoomItems().get(itemName);
+			ISwitchableRoomItem config = this.getRoomConfiguration().getUserRoomItems().get(itemName);
 
 			if (config instanceof LightObjectConfiguration) {
 				// update renderer

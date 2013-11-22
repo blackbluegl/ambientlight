@@ -9,7 +9,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
-import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.Event;
 
 
 public class EventProcessConfiguration extends ProcessConfiguration implements Serializable {
@@ -21,6 +21,6 @@ public class EventProcessConfiguration extends ProcessConfiguration implements S
 	@AlternativeValues(values = {
 			@Value(displayName = "Schalter Ereignis", value = "org.ambientlight.process.events.SwitchEventConfiguration"),
 			@Value(displayName = "Szenerie Ereignis", value = "org.ambientlight.process.events.SceneryEntryEventConfiguration") })
-	public List<EventConfiguration> eventTriggerConfigurations = new ArrayList<EventConfiguration>();
+	public List<Event> eventTriggerConfigurations = new ArrayList<Event>();
 
 };

@@ -18,12 +18,14 @@ package org.ambientlight.messages.max;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.ambientlight.messages.AckResponseMessage;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxAckMessage extends MaxMessage {
+public class MaxAckMessage extends MaxMessage implements AckResponseMessage {
 
 	public MaxAckMessage() {
 		payload = new byte[17];
@@ -39,7 +41,7 @@ public class MaxAckMessage extends MaxMessage {
 	}
 
 
-	MaxAckType getAckType() {
+	public MaxAckType getAckType() {
 		return MaxAckType.forCode(payload[10]);
 	}
 
@@ -100,5 +102,16 @@ public class MaxAckMessage extends MaxMessage {
 		myString += "ValvePos: " + getValvePosition() + "\n";
 		myString += "Set Temp: " + getSetTemp() + "\n";
 		return parent + myString;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckResponseMessage#getCorrelator()
+	 */
+	@Override
+	public String getCorrelator() {
+		return String.valueOf(getSequenceNumber());
 	}
 }

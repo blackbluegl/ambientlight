@@ -12,8 +12,7 @@ import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
-import org.ambientlight.scenery.AbstractSceneryConfiguration;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import org.ambientlight.room.sensor.SensorConfiguration;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -29,23 +28,30 @@ public class RoomConfiguration implements Serializable {
 
 	public ClimateConfiguration climate;
 
+	Map<String, SensorConfiguration> sensors;
 	public Map<String, ActorConfiguration> actorConfigurations = new HashMap<String, ActorConfiguration>();
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
 	public List<EventProcessConfiguration> processes = new ArrayList<EventProcessConfiguration>();
 	public Map<String, EventGeneratorConfiguration> eventGeneratorConfigurations = new HashMap<String, EventGeneratorConfiguration>();
+	public SceneryEventGeneratorConfiguration sceneryEventGenerator;
 
 
-	public Map<String, IUserRoomItem> getUserRoomItems() {
-		Map<String, IUserRoomItem> result = new HashMap<String, IUserRoomItem>();
+	public Map<String, SensorConfiguration> getSensors() {
+		return sensors;
+	}
+
+
+	public Map<String, ISwitchableRoomItem> getUserRoomItems() {
+		Map<String, ISwitchableRoomItem> result = new HashMap<String, ISwitchableRoomItem>();
 		for (ActorConfiguration actorConfig : actorConfigurations.values()) {
-			if (actorConfig instanceof IUserRoomItem) {
+			if (actorConfig instanceof ISwitchableRoomItem) {
 				result.put(actorConfig.getName(), actorConfig);
 			}
 		}
 
 		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations.values()) {
-			if (eventGeneratorConfiguration instanceof IUserRoomItem) {
-				result.put(((IUserRoomItem) eventGeneratorConfiguration).getName(), (IUserRoomItem) eventGeneratorConfiguration);
+			if (eventGeneratorConfiguration instanceof ISwitchableRoomItem) {
+				result.put(((ISwitchableRoomItem) eventGeneratorConfiguration).getName(), (ISwitchableRoomItem) eventGeneratorConfiguration);
 			}
 		}
 
@@ -66,35 +72,8 @@ public class RoomConfiguration implements Serializable {
 	}
 
 
-	public Map<String, SceneryEventGeneratorConfiguration> getSceneryEventGenerator() {
-		Map<String, SceneryEventGeneratorConfiguration> result = new HashMap<String, SceneryEventGeneratorConfiguration>();
-
-		for (EventGeneratorConfiguration eventGeneratorConfiguration : eventGeneratorConfigurations.values()) {
-			if (eventGeneratorConfiguration instanceof SceneryEventGeneratorConfiguration) {
-				result.put(((SceneryEventGeneratorConfiguration) eventGeneratorConfiguration).name,
-						(SceneryEventGeneratorConfiguration) eventGeneratorConfiguration);
-			}
-		}
-		return result;
-	}
-
-
-	public List<AbstractSceneryConfiguration> getSceneries() {
-		ArrayList<AbstractSceneryConfiguration> result = new ArrayList<AbstractSceneryConfiguration>();
-		for (SceneryEventGeneratorConfiguration current : getSceneryEventGenerator().values()) {
-			result.addAll(current.sceneries);
-		}
-		return result;
-	}
-
-
-	@JsonIgnore
-	public AbstractSceneryConfiguration getCurrentScenery() {
-
-		for (SceneryEventGeneratorConfiguration eventGen : getSceneryEventGenerator().values())
-			// we assume that there is only one per room
-			return eventGen.currentScenery;
-		return null;
+	public SceneryEventGeneratorConfiguration getSceneryEventGeneratorConfiguration() {
+		return sceneryEventGenerator;
 	}
 
 }

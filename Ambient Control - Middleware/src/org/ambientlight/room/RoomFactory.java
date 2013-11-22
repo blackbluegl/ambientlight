@@ -13,13 +13,13 @@ import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.process.eventmanager.EventManager;
+import org.ambientlight.process.events.AlarmEvent;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.entities.AlarmGenerator;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.SceneryEventGenerator;
-import org.ambientlight.room.entities.Sensor;
 import org.ambientlight.room.entities.SwitchEventGenerator;
 import org.ambientlight.room.eventgenerator.AlarmEventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
@@ -59,8 +59,6 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
-		// init sensors
-		room.sensors = new HashMap<String, Sensor>();
 
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
@@ -92,6 +90,8 @@ public class RoomFactory {
 			EventGenerator generator = null;
 			if (currentConfig instanceof AlarmEventGeneratorConfiguration) {
 				generator = new AlarmGenerator();
+				AlarmEventGeneratorConfiguration alarmConfig = (AlarmEventGeneratorConfiguration) currentConfig;
+				((AlarmGenerator) generator).createAlarm(new AlarmEvent(alarmConfig.hour, alarmConfig.min, alarmConfig.name));
 			}
 			if (currentConfig instanceof SwitchEventGeneratorConfiguration) {
 				generator = new SwitchEventGenerator();

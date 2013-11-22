@@ -13,22 +13,18 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.eventmanager;
+package org.ambientlight.room.entities;
 
-import org.ambientlight.process.events.Event;
+import org.ambientlight.room.actors.MaxComponentConfiguration;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface IEventManager {
+public class ShutterContact extends MaxComponent {
 
+	public MaxComponentConfiguration config;
 
-
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, Event triggerConfig);
+	public boolean isOpen = false;
 }

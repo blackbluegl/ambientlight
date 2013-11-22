@@ -28,12 +28,22 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class QeueManager {
 
+	public enum State {
+		PENDING, SENDING, SENT, AWAITING_RESPONSE, SEND_ERROR, TIMED_OUT, RETRIEVED_ANSWER;
+	}
+
+	private class MessageEntry {
+
+		Message message;
+		State state = State.PENDING;
+	}
+
 	public DispatcherManager dispatcherManager;
 
 	HashMap<DispatcherType, Dispatcher> outDispatchers = new HashMap<DispatcherType, Dispatcher>();
 	HashMap<DispatcherType, MessageListener> messageListeners = new HashMap<DispatcherType, MessageListener>();
 
-	ArrayList<Message> outQueue = new ArrayList<Message>();
+	ArrayList<MessageEntry> outQueue = new ArrayList<MessageEntry>();
 	ArrayList<Message> inQeue = new ArrayList<Message>();
 
 	ReentrantLock outLock = new ReentrantLock();
@@ -72,21 +82,14 @@ public class QeueManager {
 					inLock.lock();
 					try {
 						hasInMessages.await();
-
-						for (Message inMessage : inQeue) {
-							MessageListener listener = messageListeners.get(inMessage.getDispatcherType());
-							if (listener != null) {
-								listener.handleMessage(inMessage);
-							}
-						}
-						inQeue.clear();
-
+						handleInMessages();
 					} catch (InterruptedException e) {
 					} finally {
 						inLock.unlock();
 					}
 				}
 			}
+
 		}).start();
 	}
 
@@ -103,7 +106,23 @@ public class QeueManager {
 
 	public void putOutMessages(List<Message> messages) {
 		outLock.lock();
-		outQueue.addAll(messages);
+		List<MessageEntry> entries = new ArrayList<QeueManager.MessageEntry>();
+		for (Message current : messages) {
+			MessageEntry entry = new MessageEntry();
+			entry.message = current;
+			entries.add(entry);
+		}
+		outQueue.addAll(entries);
+		hasOutMessages.signal();
+		outLock.unlock();
+	}
+
+
+	public void putOutMessage(Message message) {
+		MessageEntry entry = new MessageEntry();
+		entry.message = message;
+		outLock.lock();
+		outQueue.add(entry);
 		hasOutMessages.signal();
 		outLock.unlock();
 	}
@@ -118,19 +137,100 @@ public class QeueManager {
 
 
 	private boolean handleOutMessages() {
-
-		List<Message> messagesToRemove = new ArrayList<Message>();
-		for (Message outMessage : outQueue) {
-
-			if (dispatcherManager.dispatchMessage(outDispatchers.get(outMessage.getDispatcherType()), outMessage)) {
-				messagesToRemove.add(outMessage);
+		boolean sendFailureOccured = false;
+		outLock.lock();
+		List<MessageEntry> messagesToRemove = new ArrayList<MessageEntry>();
+		for (MessageEntry out : outQueue) {
+			if (out.state == State.AWAITING_RESPONSE) {
+				continue;
 			}
+			out.state = State.SENDING;
+			if (dispatcherManager.dispatchMessage(outDispatchers.get(out.message.getDispatcherType()), out.message)) {
+				if (out.message instanceof AckRequestMessage) {
+					out.state = State.AWAITING_RESPONSE;
+				} else {
+					out.state = State.SENT;
+					messagesToRemove.add(out);
+				}
+			} else {
+				out.state = State.SEND_ERROR;
+				sendFailureOccured = true;
+			}
+
 		}
 		outQueue.removeAll(messagesToRemove);
-		if (outQueue.isEmpty() == false)
+		outLock.unlock();
+
+		this.startWatchDogForWaitingMessages();
+
+		// if an error while sending occoured we have to retry sending again
+		if (sendFailureOccured)
 			return false;
 		else
 			return true;
+	}
+
+
+	private void handleInMessages() {
+		for (Message inMessage : inQeue) {
+			MessageListener listener = messageListeners.get(inMessage.getDispatcherType());
+			if (listener == null) {
+				continue;
+			}
+			if (inMessage instanceof AckResponseMessage) {
+				// there maybe an outMessage waiting for
+				// this message
+				MessageEntry foundRequest = getAwaitingRequestMessageForInMessage(inMessage, listener);
+				if (foundRequest != null) {
+					foundRequest.state = State.RETRIEVED_ANSWER;
+					listener.handleResponseMessages(foundRequest.state, inMessage, foundRequest.message);
+
+				} else {
+					System.out
+					.println("QeueManager - inQeue: an AckResponseMessage arrived but there was no request message that listened (anymore): "
+							+ inMessage);
+				}
+			} else {
+				listener.handleMessage(inMessage);
+			}
+
+		}
+		inQeue.clear();
+	}
+
+
+	private void startWatchDogForWaitingMessages() {
+		outLock.lock();
+		for (final MessageEntry current : outQueue) {
+			if (current.state == State.AWAITING_RESPONSE) {
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						int retries = 0;
+						while (((AckRequestMessage) current.message).getRetryCount() > retries) {
+							retries++;
+							try {
+								Thread.sleep(((AckRequestMessage) current.message).getTimeOutSec() * 1000);
+							} catch (InterruptedException e) {
+							}
+							if (current.state == State.RETRIEVED_ANSWER) {
+								// got an answer and that whas handled by
+								// inQeue.
+								// Just stop watching.
+							}
+							return;
+						}
+						// Retries elapsed without any success. Set to TimedOut
+						// and reporting error to client
+						current.state = State.TIMED_OUT;
+						messageListeners.get(current.message.getDispatcherType()).handleResponseMessages(current.state, null,
+								current.message);
+					}
+				}).start();
+			}
+		}
+		outLock.unlock();
 	}
 
 
@@ -147,5 +247,23 @@ public class QeueManager {
 				hasOutMessages.signal();
 			}
 		}).start();
+	}
+
+
+	/**
+	 * @param inMessage
+	 * @param listener
+	 * @return
+	 */
+	private MessageEntry getAwaitingRequestMessageForInMessage(Message inMessage, MessageListener listener) {
+		outLock.lock();
+		for (MessageEntry entry : outQueue) {
+			if (entry.state == State.AWAITING_RESPONSE
+					&& ((AckRequestMessage) entry.message).getCorrelation().equals(
+							((AckResponseMessage) inMessage).getCorrelator()) == true)
+				return entry;
+		}
+		outLock.unlock();
+		return null;
 	}
 }

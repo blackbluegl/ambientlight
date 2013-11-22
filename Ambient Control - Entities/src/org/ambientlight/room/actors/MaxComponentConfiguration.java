@@ -13,22 +13,25 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.eventmanager;
+package org.ambientlight.room.actors;
 
-import org.ambientlight.process.events.Event;
+import java.util.Date;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface IEventManager {
+public abstract class MaxComponentConfiguration {
 
+	public String label;
+	public int adress;
+	public String firmware;
+	public String serial;
+	public Date lastUpdate;
+	public boolean rfError = false;
+	public boolean timedOut = false;
+	public boolean invalidArgument = false;
+	public boolean batteryLow = false;
 
-
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, Event triggerConfig);
 }

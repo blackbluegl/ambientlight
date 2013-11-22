@@ -18,13 +18,14 @@ package org.ambientlight.messages.max;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.ambientlight.messages.AckRequestMessage;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxSetTemperatureMessage extends MaxMessage {
-
+public class MaxSetTemperatureMessage extends MaxMessage implements AckRequestMessage {
 
 	public MaxSetTemperatureMessage() {
 		payload = new byte[14];
@@ -95,5 +96,40 @@ public class MaxSetTemperatureMessage extends MaxMessage {
 		result += "Mode: " + getMode() + "\n";
 		result += "Until: " + getTemporaryUntil();
 		return parent + result;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getRetryTimeSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		return 5;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		if (getSequenceNumber() == null)
+			return null;
+		return getSequenceNumber().toString();
 	}
 }

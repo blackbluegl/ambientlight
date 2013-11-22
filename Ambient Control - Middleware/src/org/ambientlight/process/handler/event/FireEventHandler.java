@@ -17,7 +17,7 @@ package org.ambientlight.process.handler.event;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Token;
-import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.Event;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
 
@@ -37,9 +37,9 @@ public class FireEventHandler extends AbstractActionHandler {
 	 */
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
-		EventConfiguration event = ((FireEventHandlerConfiguration) this.config).event;
+		Event event = ((FireEventHandlerConfiguration) this.config).event;
 		if (((FireEventHandlerConfiguration) this.config).useFromToken || event == null) {
-			event = (EventConfiguration) token.data;
+			event = (Event) token.data;
 		}
 
 		AmbientControlMW.getRoom().eventManager.onEvent(event);

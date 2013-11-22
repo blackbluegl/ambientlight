@@ -27,6 +27,9 @@ import org.ambientlight.scenery.AbstractSceneryConfiguration;
  */
 public class SceneryEventGeneratorConfiguration extends EventGeneratorConfiguration {
 
+
+	private static final long serialVersionUID = 1L;
+
 	public AbstractSceneryConfiguration currentScenery;
 	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
 
