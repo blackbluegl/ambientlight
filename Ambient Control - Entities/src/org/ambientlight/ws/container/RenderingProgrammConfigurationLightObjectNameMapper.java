@@ -1,6 +1,6 @@
 package org.ambientlight.ws.container;
 
-import org.ambientlight.scenery.actor.ActorConductConfiguration;
+import org.ambientlight.config.scenery.actor.ActorConductConfiguration;
 
 
 public class RenderingProgrammConfigurationLightObjectNameMapper {
