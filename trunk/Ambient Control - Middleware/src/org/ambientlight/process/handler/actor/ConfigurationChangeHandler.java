@@ -1,11 +1,12 @@
 package org.ambientlight.process.handler.actor;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
+import org.ambientlight.config.scenery.actor.ActorConductConfiguration;
+import org.ambientlight.config.scenery.actor.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.room.entities.LightObject;
-import org.ambientlight.scenery.actor.ActorConductConfiguration;
-import org.ambientlight.scenery.actor.renderingprogram.RenderingProgramConfiguration;
 
 
 public class ConfigurationChangeHandler extends AbstractActionHandler {

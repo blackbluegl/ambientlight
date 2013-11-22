@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.ambientlight.process.events.AlarmEvent;
+import org.ambientlight.config.process.events.AlarmEvent;
 
 
 /**

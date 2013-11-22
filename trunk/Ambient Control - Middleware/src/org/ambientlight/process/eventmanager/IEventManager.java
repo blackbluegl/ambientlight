@@ -15,7 +15,7 @@
 
 package org.ambientlight.process.eventmanager;
 
-import org.ambientlight.process.events.Event;
+import org.ambientlight.config.process.events.Event;
 
 
 /**

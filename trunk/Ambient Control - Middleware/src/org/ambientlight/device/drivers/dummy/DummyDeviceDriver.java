@@ -4,9 +4,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.debug.BufferedImageDisplayOutput;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
-import org.ambientlight.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.device.led.Stripe;
 
 public class DummyDeviceDriver implements LedStripeDeviceDriver {

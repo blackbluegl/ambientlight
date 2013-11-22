@@ -1,6 +1,6 @@
 package org.ambientlight.process.entities;
 
-import org.ambientlight.process.handler.DataTypeValidation;
+import org.ambientlight.config.process.handler.DataTypeValidation;
 
 
 public class Token {

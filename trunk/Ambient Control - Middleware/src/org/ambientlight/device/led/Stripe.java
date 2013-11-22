@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.device.led.color.Color64Bit;
 import org.ambientlight.device.led.color.DitheringRGB;
 import org.ambientlight.room.StripePart;

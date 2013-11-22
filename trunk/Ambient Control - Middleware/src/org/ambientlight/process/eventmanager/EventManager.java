@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.process.events.AlarmEvent;
-import org.ambientlight.process.events.Event;
+import org.ambientlight.config.process.events.AlarmEvent;
+import org.ambientlight.config.process.events.Event;
 import org.ambientlight.room.entities.AlarmGenerator;
 
 

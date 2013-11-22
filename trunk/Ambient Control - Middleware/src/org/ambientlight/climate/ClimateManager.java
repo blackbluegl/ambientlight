@@ -21,6 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.process.events.AlarmEvent;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.room.ClimateConfiguration;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
 import org.ambientlight.messages.QeueManager.State;
@@ -33,9 +36,6 @@ import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 import org.ambientlight.process.eventmanager.IEventListener;
-import org.ambientlight.process.events.AlarmEvent;
-import org.ambientlight.process.events.Event;
-import org.ambientlight.room.ClimateConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.entities.MaxComponent;
 import org.ambientlight.room.entities.ShutterContact;
@@ -107,15 +107,17 @@ public class ClimateManager implements MessageListener, IEventListener {
 		RoomConfigurationFactory.beginTransaction();
 		int adress = ((MaxMessage) request).getToAdress();
 		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(adress);
+
 		if (state == State.TIMED_OUT) {
 
 			device.config.timedOut = true;
 			System.out
 			.println("Climate Manager - handleResponseMessage(): Error! Got Timeout for Device: " + device.config.label);
+
 		} else if (state == State.RETRIEVED_ANSWER && response instanceof MaxAckMessage
 				&& ((MaxAckMessage) response).getAckType() == MaxAckType.ACK_INVALID_MESSAGE) {
-			device.config.invalidArgument = true;
 
+			device.config.invalidArgument = true;
 			System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.config.label
 					+ " got invalid Arguments from ClimateManager!");
 		}

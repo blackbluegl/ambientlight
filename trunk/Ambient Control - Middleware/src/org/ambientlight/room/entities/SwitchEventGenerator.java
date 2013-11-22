@@ -15,9 +15,9 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.events.SwitchEvent;
-import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.process.events.SwitchEvent;
+import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
 
 /**

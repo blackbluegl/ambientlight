@@ -15,9 +15,9 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.process.events.Event;
-import org.ambientlight.process.events.NFCTagSwitchEvent;
-import org.ambientlight.room.eventgenerator.NFCTagSwitchEventGeneratorConfiguration;
+import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.process.events.NFCTagSwitchEvent;
+import org.ambientlight.config.room.eventgenerator.NFCTagSwitchEventGeneratorConfiguration;
 
 
 /**

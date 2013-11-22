@@ -5,17 +5,17 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 import java.util.Timer;
 
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.actors.ActorConfiguration;
+import org.ambientlight.config.room.actors.LightObjectConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.rendering.RenderControl;
 import org.ambientlight.rendering.Renderer;
 import org.ambientlight.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.room.Room;
-import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.RoomFactory;
-import org.ambientlight.room.actors.ActorConfiguration;
-import org.ambientlight.room.actors.LightObjectConfiguration;
 
 public class AmbientControlMW {
 

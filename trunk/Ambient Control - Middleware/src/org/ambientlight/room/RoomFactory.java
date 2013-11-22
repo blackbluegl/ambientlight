@@ -8,23 +8,24 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.device.drivers.DeviceConfiguration;
+import org.ambientlight.config.device.drivers.DeviceConfiguration;
+import org.ambientlight.config.process.events.AlarmEvent;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.actors.ActorConfiguration;
+import org.ambientlight.config.room.actors.LightObjectConfiguration;
+import org.ambientlight.config.room.eventgenerator.AlarmEventGeneratorConfiguration;
+import org.ambientlight.config.room.eventgenerator.EventGeneratorConfiguration;
+import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfiguration;
+import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.process.eventmanager.EventManager;
-import org.ambientlight.process.events.AlarmEvent;
-import org.ambientlight.room.actors.ActorConfiguration;
-import org.ambientlight.room.actors.LightObjectConfiguration;
 import org.ambientlight.room.entities.AlarmGenerator;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.SceneryEventGenerator;
 import org.ambientlight.room.entities.SwitchEventGenerator;
-import org.ambientlight.room.eventgenerator.AlarmEventGeneratorConfiguration;
-import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
-import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
 
 
 public class RoomFactory {

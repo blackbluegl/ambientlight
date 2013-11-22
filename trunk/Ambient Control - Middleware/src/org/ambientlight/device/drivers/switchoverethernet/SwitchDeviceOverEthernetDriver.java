@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-import org.ambientlight.device.drivers.SwitchDeviceOverEthernetConfiguration;
+import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
 
 public class SwitchDeviceOverEthernetDriver implements SwtichDeviceDriver{

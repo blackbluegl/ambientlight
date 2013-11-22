@@ -1,11 +1,13 @@
 package org.ambientlight.process.handler.actor;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
+import org.ambientlight.config.room.ISwitchableRoomItem;
+import org.ambientlight.config.room.actors.LightObjectConfiguration;
+import org.ambientlight.config.room.actors.SwitchObjectConfiguration;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.room.ISwitchableRoomItem;
-import org.ambientlight.room.actors.LightObjectConfiguration;
-import org.ambientlight.room.actors.SwitchObjectConfiguration;
 import org.ambientlight.room.entities.LightObject;
 
 

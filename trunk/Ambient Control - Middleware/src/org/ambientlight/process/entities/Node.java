@@ -1,6 +1,6 @@
 package org.ambientlight.process.entities;
 
-import org.ambientlight.process.NodeConfiguration;
+import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
 

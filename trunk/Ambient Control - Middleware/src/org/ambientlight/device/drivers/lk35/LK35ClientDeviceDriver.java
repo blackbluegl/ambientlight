@@ -22,9 +22,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.device.drivers.LK35CLientDeviceConfiguration;
+import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
+import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
-import org.ambientlight.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.device.led.LedPoint;
 import org.lk35.api.LK35ColorHandler;
 import org.lk35.api.LK35ColorHandlerImpl;

@@ -11,9 +11,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
+import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
-import org.ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
-import org.ambientlight.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.device.led.Stripe;
 
 

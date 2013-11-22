@@ -19,7 +19,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.device.led.ColorConfiguration;
+import org.ambientlight.config.device.led.ColorConfiguration;
 
 
 /**
