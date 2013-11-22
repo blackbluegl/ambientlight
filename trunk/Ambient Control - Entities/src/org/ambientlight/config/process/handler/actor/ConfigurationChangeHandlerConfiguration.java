@@ -10,7 +10,7 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.scenery.actor.ActorConductConfiguration;
+import org.ambientlight.config.scenery.actor.ActorConductConfiguration;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
