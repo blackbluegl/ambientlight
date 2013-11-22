@@ -17,7 +17,7 @@ package org.ambientlight.config.process.handler.event;
 
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.validation.HandlerDataTypeValidation;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
 /**
