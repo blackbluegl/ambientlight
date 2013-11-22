@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.entities.Node;
 import org.ambientlight.process.entities.Process;
 import org.ambientlight.process.handler.AbstractActionHandler;
@@ -99,12 +98,10 @@ public class ProcessFactory {
 		Process result = createProcess((EventProcessConfiguration) processConfig);
 		room.processes.add(result);
 		result.start();
-		// TODO this saves the complete state. do it like in
-		// updateconductconfiguration to just save the given part
-		// persist model
+
+		RoomConfigurationFactory.beginTransaction();
 		processConfig.run = true;
-		RoomConfigurationFactory.saveRoomConfiguration(room.config,
-				AmbientControlMW.getRoomConfigFileName());
+		RoomConfigurationFactory.commitTransaction();
 		System.out.println("ProcessFactory: started process successfully: " + processConfig.id);
 	}
 
@@ -137,12 +134,9 @@ public class ProcessFactory {
 
 		runningProcess.suspend();
 		room.processes.remove(runningProcess);
-		// TODO this saves the complete state. do it like in
-		// updateconductconfiguration to just save the given part
-		// persist model
+		RoomConfigurationFactory.beginTransaction();
 		processConfig.run = false;
-		RoomConfigurationFactory.saveRoomConfiguration(room.config,
-				AmbientControlMW.getRoomConfigFileName());
+		RoomConfigurationFactory.commitTransaction();
 		System.out.println("ProcessFactory: stopped process successfully: " + processConfig.id);
 	}
 

@@ -97,6 +97,8 @@ public class Process {
 		ValidationResult result = this.validateProcess(process);
 		if (result.resultIsValid() == false)
 			return result;
+
+		RoomConfigurationFactory.beginTransaction();
 		Integer positionToReplace = null;
 		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(process.id)) {
@@ -111,14 +113,11 @@ public class Process {
 		} else {
 			AmbientControlMW.getRoom().config.processes.add(process);
 		}
-		// TODO this saves the complete state. do it like in
-		// updateconductconfiguration to just save the given part
+
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
-					AmbientControlMW.getRoomConfigFileName());
+			RoomConfigurationFactory.commitTransaction();
 		} catch (IOException e) {
 			e.printStackTrace();
-
 			return Response.status(500).build();
 		}
 
@@ -133,6 +132,7 @@ public class Process {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object deleteProcess(@PathParam(value = "id") String id) {
+		RoomConfigurationFactory.beginTransaction();
 		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(id)) {
 				stopProcess(id);
@@ -140,11 +140,9 @@ public class Process {
 				break;
 			}
 		}
-		// TODO this saves the complete state. do it like in
-		// updateconductconfiguration to just save the given part
+
 		try {
-			RoomConfigurationFactory.saveRoomConfiguration(AmbientControlMW.getRoom().config,
-					AmbientControlMW.getRoomConfigFileName());
+			RoomConfigurationFactory.commitTransaction();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();

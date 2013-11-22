@@ -15,12 +15,14 @@
 
 package org.ambientlight.messages;
 
-
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public interface MessageListener {
 
 	public void handleMessage(Message message);
+
+
+	public void handleResponseMessages(QeueManager.State state, Message response, Message request);
 }

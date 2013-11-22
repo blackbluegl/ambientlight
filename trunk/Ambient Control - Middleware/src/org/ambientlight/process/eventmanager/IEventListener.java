@@ -1,10 +1,10 @@
 package org.ambientlight.process.eventmanager;
 
-import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.Event;
 
 
 public interface IEventListener {
 
-	public void handleEvent(EventConfiguration event);
+	public void handleEvent(Event event);
 
 }

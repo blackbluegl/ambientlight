@@ -6,7 +6,7 @@ import java.util.Map;
 import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.process.eventmanager.IEventListener;
-import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.Event;
 import org.ambientlight.process.handler.DataTypeValidation;
 
 
@@ -20,7 +20,7 @@ public class Process implements IEventListener {
 
 	public void start() {
 		// wait until event happens
-		for (EventConfiguration event : config.eventTriggerConfigurations) {
+		for (Event event : config.eventTriggerConfigurations) {
 			eventManager.register(this, event);
 		}
 	}
@@ -28,14 +28,14 @@ public class Process implements IEventListener {
 
 	public void suspend() {
 		// wait until event happens
-		for (EventConfiguration event : config.eventTriggerConfigurations) {
+		for (Event event : config.eventTriggerConfigurations) {
 			eventManager.unregister(this, event);
 		}
 	}
 
 
 	@Override
-	public void handleEvent(EventConfiguration event) {
+	public void handleEvent(Event event) {
 		token = new Token();
 		token.nextNodeId = getFirstNode();
 

@@ -15,8 +15,6 @@
 
 package org.ambientlight.room.entities;
 
-import java.util.Date;
-
 import org.ambientlight.room.actors.ThermostatConfiguration;
 
 
@@ -24,15 +22,16 @@ import org.ambientlight.room.actors.ThermostatConfiguration;
  * @author Florian Bornkessel
  * 
  */
-public class Thermostat implements Sensor {
+public class Thermostat extends MaxComponent implements Sensor {
 
-	public ThermostatConfiguration config;
+	public ThermostatConfiguration getConfig() {
+		return (ThermostatConfiguration) config;
+	}
 
-	public Date lastUpdate;
 	public float temperatur;
-	public boolean batteryLow;
-	public boolean rfError;
 	public boolean isLocked;
+
+
 
 	/*
 	 * (non-Javadoc)

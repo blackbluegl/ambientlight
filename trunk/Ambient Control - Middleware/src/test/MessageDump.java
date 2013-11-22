@@ -19,6 +19,7 @@ import java.util.Date;
 
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
+import org.ambientlight.messages.QeueManager.State;
 
 
 /**
@@ -38,5 +39,20 @@ public class MessageDump implements MessageListener {
 	public void handleMessage(Message message) {
 
 		System.out.println((new Date(System.currentTimeMillis()).toString() + " - new Message:\n" + message.toString()) + "\n");
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.messages.MessageListener#handleResponseMessages(org.
+	 * ambientlight.messages.QeueManager.State,
+	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
+	 */
+	@Override
+	public void handleResponseMessages(State state, Message response, Message request) {
+		// TODO Auto-generated method stub
+
 	}
 }

@@ -2,13 +2,13 @@ package org.ambientlight.room.actors;
 
 import java.io.Serializable;
 
-import org.ambientlight.room.IUserRoomItem;
+import org.ambientlight.room.ISwitchableRoomItem;
 import org.ambientlight.scenery.actor.ActorConductConfiguration;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public abstract class ActorConfiguration implements IUserRoomItem, Serializable {
+public abstract class ActorConfiguration implements ISwitchableRoomItem, Serializable {
 
 	private static final long serialVersionUID = 1L;
 

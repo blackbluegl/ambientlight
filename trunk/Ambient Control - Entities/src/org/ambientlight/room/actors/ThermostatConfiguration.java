@@ -20,13 +20,11 @@ package org.ambientlight.room.actors;
 /**
  * @author Florian Bornkessel
  */
-* 
-public class ThermostatConfiguration {
 
-	public String label;
-	public int adress;
-	public String firmware;
-	public String serial;
+public class ThermostatConfiguration extends MaxComponentConfiguration {
+
+
+
 	public float offset;
 
 }

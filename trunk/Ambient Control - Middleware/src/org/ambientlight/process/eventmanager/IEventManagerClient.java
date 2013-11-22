@@ -15,7 +15,7 @@
 
 package org.ambientlight.process.eventmanager;
 
-import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.Event;
 
 
 
@@ -27,5 +27,5 @@ import org.ambientlight.process.events.EventConfiguration;
 public interface IEventManagerClient {
 
 
-	void onEvent(EventConfiguration event);
+	void onEvent(Event event);
 }

@@ -44,5 +44,7 @@ public class ClimateConfiguration {
 	public int boostValvePositionPercent = 100;
 	public int valveOffsetPercent = 0;
 
+	public boolean windowOpen = false;
+
 	public Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
 }

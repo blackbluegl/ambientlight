@@ -14,13 +14,14 @@ import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
+import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.entities.Process;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.EventSensor;
 import org.ambientlight.room.entities.LightObject;
+import org.ambientlight.room.entities.MaxComponent;
 import org.ambientlight.room.entities.Sensor;
-import org.ambientlight.room.entities.Thermostat;
 
 
 /**
@@ -32,11 +33,12 @@ public class Room {
 
 	public ClimateManager climateManager;
 
+	public QeueManager qeueManager;
+
 	public CallBackManager callBackMananger;
 
 	public EventManager eventManager;
 
-	public Map<String, Sensor> sensors;
 
 	public Map<String, EventGenerator> eventGenerators;
 
@@ -44,7 +46,7 @@ public class Room {
 
 	private List<LightObject> lightObjects;
 
-	private Map<Integer, Thermostat> thermostats;
+	private Map<Integer, MaxComponent> maxComponents;
 
 	private BufferedImage roomBitMap;
 
@@ -52,42 +54,51 @@ public class Room {
 
 	public List<Process> processes;
 
+	public Map<String, Sensor> sensors;
+
 	public BufferedImage getRoomBitMap() {
 		return roomBitMap;
 	}
+
 
 	public void setRoomBitMap(BufferedImage roomBitMap) {
 		this.roomBitMap = roomBitMap;
 	}
 
+
 	public List<DeviceDriver> getDevices() {
 		return devices;
 	}
+
 
 	public void setDevices(List<DeviceDriver> devices) {
 		this.devices = devices;
 	}
 
+
 	public List<LightObject> getLightObjectsInRoom() {
 		return lightObjects;
 	}
 
-	public LightObject getLightObjectByName(String name){
-		for (LightObject current : this.lightObjects){
+
+	public LightObject getLightObjectByName(String name) {
+		for (LightObject current : this.lightObjects) {
 			if (name.equals(current.configuration.getName()))
 				return current;
 		}
 		return null;
 	}
 
+
 	public void setLightObjectsInRoom(List<LightObject> lightObjectsInRoom) {
 		this.lightObjects = lightObjectsInRoom;
 	}
 
+
 	public List<StripePart> getAllStripePartsInRoom() {
 		List<StripePart> result = new ArrayList<StripePart>();
 		for (DeviceDriver currentDevice : devices) {
-			if(currentDevice instanceof LedStripeDeviceDriver){
+			if (currentDevice instanceof LedStripeDeviceDriver) {
 				LedStripeDeviceDriver currentLedStripeDevice = (LedStripeDeviceDriver) currentDevice;
 				for (Stripe currentStripe : currentLedStripeDevice.getAllStripes()) {
 					result.addAll(currentStripe.getStripeParts());
@@ -111,9 +122,10 @@ public class Room {
 
 
 	public SwtichDeviceDriver getSwitchingDevice() {
-		// TODO actually we use the first found device. later a correlation between the device and the switches could be possible
-		for(DeviceDriver currentDevice : this.devices){
-			if(currentDevice instanceof SwtichDeviceDriver)
+		// TODO actually we use the first found device. later a correlation
+		// between the device and the switches could be possible
+		for (DeviceDriver currentDevice : this.devices) {
+			if (currentDevice instanceof SwtichDeviceDriver)
 				return (SwtichDeviceDriver) currentDevice;
 		}
 
@@ -123,7 +135,7 @@ public class Room {
 
 	public List<AnimateableLedDevice> getLedAnimateableDevices() {
 		List<AnimateableLedDevice> result = new ArrayList<AnimateableLedDevice>();
-		for(DeviceDriver currentDevice : this.devices){
+		for (DeviceDriver currentDevice : this.devices) {
 			if (currentDevice instanceof AnimateableLedDevice) {
 				result.add((AnimateableLedDevice) currentDevice);
 			}
@@ -139,13 +151,12 @@ public class Room {
 	}
 
 
-	public Map<Integer, Thermostat> getThermostats() {
-		return thermostats;
+	public Map<Integer, MaxComponent> getMaxComponents() {
+		return maxComponents;
 	}
 
 
-	public void setThermostats(Map<Integer, Thermostat> thermostats) {
-		this.thermostats = thermostats;
+	public void setMaxComponents(Map<Integer, MaxComponent> maxComponents) {
+		this.maxComponents = maxComponents;
 	}
-
 }

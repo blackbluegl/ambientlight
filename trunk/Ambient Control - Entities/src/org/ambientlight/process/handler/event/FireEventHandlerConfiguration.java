@@ -20,7 +20,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
-import org.ambientlight.process.events.EventConfiguration;
+import org.ambientlight.process.events.Event;
 import org.ambientlight.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.process.handler.DataTypeValidation;
 import org.ambientlight.process.validation.HandlerDataTypeValidation;
@@ -43,5 +43,5 @@ public class FireEventHandlerConfiguration extends AbstractActionHandlerConfigur
 	@AlternativeValues(values = {
 			@Value(displayName = "Scenario wescheln", value = "org.ambientlight.process.events.SceneryEntryEventConfiguration"),
 			@Value(displayName = "Schalter umlegen", value = "org.ambientlight.process.events.SwitchEventConfiguration") })
-	public EventConfiguration event;
+	public Event event;
 }

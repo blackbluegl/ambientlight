@@ -13,8 +13,8 @@ import org.ambientlight.device.led.StripeConfiguration;
 import org.ambientlight.device.led.StripePartConfiguration;
 import org.ambientlight.process.EventProcessConfiguration;
 import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.events.SceneryEntryEventConfiguration;
-import org.ambientlight.process.events.SwitchEventConfiguration;
+import org.ambientlight.process.events.SceneryEntryEvent;
+import org.ambientlight.process.events.SwitchEvent;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration;
@@ -23,7 +23,7 @@ import org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration
 import org.ambientlight.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.handler.expression.ExpressionConfiguration;
-import org.ambientlight.room.IUserRoomItem;
+import org.ambientlight.room.ISwitchableRoomItem;
 import org.ambientlight.room.RoomConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.actors.LightObjectConfiguration;
@@ -46,7 +46,7 @@ public class CreateTestConfig {
 		DeviceDriverFactory df = new DeviceDriverFactory();
 		CreateTestConfig test = new CreateTestConfig();
 
-		RoomConfigurationFactory.saveRoomConfiguration(test.getTestRoom(), "default");
+		RoomConfigurationFactory.commitTransaction(test.getTestRoom(), "default");
 	}
 
 
@@ -172,12 +172,12 @@ public class CreateTestConfig {
 		roomSwitchProcess.run = true;
 		roomSwitchProcess.id = "roomSwitch";
 		rc.processes.add(roomSwitchProcess);
-		SwitchEventConfiguration triggerConfOn = new SwitchEventConfiguration();
-		triggerConfOn.eventGeneratorName = triggerMainSwitch.name;
+		SwitchEvent triggerConfOn = new SwitchEvent();
+		triggerConfOn.sourceName = triggerMainSwitch.name;
 		triggerConfOn.powerState = true;
 
-		SwitchEventConfiguration triggerConfOff = new SwitchEventConfiguration();
-		triggerConfOff.eventGeneratorName = triggerMainSwitch.name;
+		SwitchEvent triggerConfOff = new SwitchEvent();
+		triggerConfOff.sourceName = triggerMainSwitch.name;
 		triggerConfOff.powerState = false;
 
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOn);
@@ -226,7 +226,7 @@ public class CreateTestConfig {
 		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
 		changeConfigFor.add(background);
 		changeConfigFor.add(lo);
-		ArrayList<IUserRoomItem> turnLightOnFor = new ArrayList<IUserRoomItem>();
+		ArrayList<ISwitchableRoomItem> turnLightOnFor = new ArrayList<ISwitchableRoomItem>();
 		turnLightOnFor.add(background);
 		turnLightOnFor.add(sw1);
 		turnLightOnFor.add(triggerMainSwitch);
@@ -238,7 +238,7 @@ public class CreateTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
-			List<LightObjectConfiguration> lo, List<IUserRoomItem> itemsToPutOn) {
+			List<LightObjectConfiguration> lo, List<ISwitchableRoomItem> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -246,9 +246,9 @@ public class CreateTestConfig {
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
 
-		SceneryEntryEventConfiguration triggerSceneryChange = new SceneryEntryEventConfiguration();
+		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent();
 		triggerSceneryChange.sceneryName = "scenario1";
-		triggerSceneryChange.eventGeneratorName = "RoomSceneryEventGenerator";
+		triggerSceneryChange.sourceName = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
@@ -262,7 +262,7 @@ public class CreateTestConfig {
 		switchNode.id = 1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		for (IUserRoomItem current : itemsToPutOn) {
+		for (ISwitchableRoomItem current : itemsToPutOn) {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;

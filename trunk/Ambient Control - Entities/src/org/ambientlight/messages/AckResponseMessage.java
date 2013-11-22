@@ -13,22 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.eventmanager;
-
-import org.ambientlight.process.events.Event;
+package org.ambientlight.messages;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface IEventManager {
+public interface AckResponseMessage {
 
-
-
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, Event triggerConfig);
+	public String getCorrelator();
 }

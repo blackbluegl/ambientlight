@@ -1,9 +1,14 @@
 package org.ambientlight.room.eventgenerator;
 
-import org.ambientlight.room.IUserRoomItem;
+import org.ambientlight.room.ISwitchableRoomItem;
 
 
-public class UserEventGeneratorConfiguration extends EventGeneratorConfiguration  implements IUserRoomItem {
+public class SwitchableEventGeneratorConfiguration extends EventGeneratorConfiguration  implements ISwitchableRoomItem {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	boolean powerState;
 
 	@Override

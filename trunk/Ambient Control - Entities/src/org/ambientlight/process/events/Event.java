@@ -10,7 +10,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public abstract class EventConfiguration implements Serializable {
+public abstract class Event implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,6 +19,6 @@ public abstract class EventConfiguration implements Serializable {
 	@AlternativeValues(valueBinding = {
 			@ValueBindingPath(forSubClass = "org.ambientlight.process.events.SceneryEntryEventConfiguration", valueBinding = "getSceneryEventGenerator().keySet()"),
 			@ValueBindingPath(forSubClass = "org.ambientlight.process.events.SwitchEventConfiguration", valueBinding = "getSwitchGenerators().keySet()") })
-	public String eventGeneratorName;
+	public String sourceName;
 
 }

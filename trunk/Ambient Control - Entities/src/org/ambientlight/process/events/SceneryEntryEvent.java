@@ -6,8 +6,12 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.ValueBindingPath;
 
 
-public class SceneryEntryEventConfiguration extends EventConfiguration {
+public class SceneryEntryEvent extends Event {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@TypeDef(fieldType = FieldType.STRING)
 	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "getSceneries().id") })
 	public String sceneryName;
@@ -23,7 +27,7 @@ public class SceneryEntryEventConfiguration extends EventConfiguration {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((eventGeneratorName == null) ? 0 : eventGeneratorName.hashCode());
+		result = prime * result + ((sourceName == null) ? 0 : sourceName.hashCode());
 		result = prime * result + ((sceneryName == null) ? 0 : sceneryName.hashCode());
 		return result;
 	}
@@ -36,11 +40,11 @@ public class SceneryEntryEventConfiguration extends EventConfiguration {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SceneryEntryEventConfiguration other = (SceneryEntryEventConfiguration) obj;
-		if (eventGeneratorName == null) {
-			if (other.eventGeneratorName != null)
+		SceneryEntryEvent other = (SceneryEntryEvent) obj;
+		if (sourceName == null) {
+			if (other.sourceName != null)
 				return false;
-		} else if (!eventGeneratorName.equals(other.eventGeneratorName))
+		} else if (!sourceName.equals(other.sourceName))
 			return false;
 		if (sceneryName == null) {
 			if (other.sceneryName != null)

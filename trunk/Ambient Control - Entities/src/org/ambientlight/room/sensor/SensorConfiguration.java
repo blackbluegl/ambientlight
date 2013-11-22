@@ -13,22 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.eventmanager;
-
-import org.ambientlight.process.events.Event;
+package org.ambientlight.room.sensor;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface IEventManager {
+public abstract class SensorConfiguration {
 
-
-
-	/**
-	 * @param eventListener
-	 * @param triggerConfig
-	 */
-	void register(IEventListener eventListener, Event triggerConfig);
+	public String id;
 }

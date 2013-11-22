@@ -20,13 +20,11 @@ package org.ambientlight.room.entities;
  * @author Florian Bornkessel
  *
  */
-// TODO implement Sensors here. They will not be part of the process but will
-// spend values for processing to the actionhandlers
+
 public interface Sensor {
 
 	/**
 	 * @return
 	 */
 	Object getValue();
-
 }
