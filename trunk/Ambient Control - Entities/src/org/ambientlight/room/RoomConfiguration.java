@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambientlight.device.drivers.DeviceConfiguration;
-import org.ambientlight.process.EventProcessConfiguration;
+import org.ambientlight.config.device.drivers.DeviceConfiguration;
+import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.room.actors.ActorConfiguration;
 import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
 import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
