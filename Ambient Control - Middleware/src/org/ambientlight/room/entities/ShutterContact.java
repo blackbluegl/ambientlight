@@ -27,4 +27,5 @@ public class ShutterContact extends MaxComponent {
 	public MaxComponentConfiguration config;
 
 	public boolean isOpen = false;
+
 }
