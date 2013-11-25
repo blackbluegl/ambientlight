@@ -49,12 +49,20 @@ public class MaxSetTemperatureMessage extends MaxMessage implements AckRequestMe
 
 
 	public void setTemp(float temp) {
+		if (getMode() == MaxThermostateMode.AUTO)
+			return;
+
 		if (temp > MaxConfigureTemperaturesMessage.MAX_TEMPERATURE) {
 			temp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
 		}
 		if (temp < MaxConfigureTemperaturesMessage.MIN_TEMPERATURE) {
 			temp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
 		}
+		setTempWithoutChecks(temp);
+	}
+
+
+	private void setTempWithoutChecks(float temp) {
 		int amount = (int) (temp / 0.5f);
 		payload[10] = (byte) (amount | payload[10]);
 	}
@@ -68,6 +76,9 @@ public class MaxSetTemperatureMessage extends MaxMessage implements AckRequestMe
 	public void setMode(MaxThermostateMode mode) {
 		int value = mode.byteValue << 6;
 		payload[10] = (byte) (value | payload[10]);
+		if (mode == MaxThermostateMode.AUTO) {
+			setTempWithoutChecks(0.0f);
+		}
 	}
 
 
