@@ -32,9 +32,9 @@ public class MaxPairPingMessage extends MaxMessage {
 
 	public boolean isReconnecting() {
 		if (super.getToAdress().equals(0))
-			return true;
-		else
 			return false;
+		else
+			return true;
 	}
 
 
