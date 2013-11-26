@@ -13,27 +13,15 @@
    limitations under the License.
  */
 
-package org.ambientlight.messages;
+package org.ambientlight.messages.max;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import org.ambientlight.messages.max.MaxAckMessage;
-import org.ambientlight.messages.max.MaxConfigValveMessage;
-import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
-import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
-import org.ambientlight.messages.max.MaxFactoryResetMessage;
-import org.ambientlight.messages.max.MaxMessage;
-import org.ambientlight.messages.max.MaxPairPingMessage;
-import org.ambientlight.messages.max.MaxPairPongMessage;
-import org.ambientlight.messages.max.MaxRemoveGroupIdMessage;
-import org.ambientlight.messages.max.MaxSetGroupIdMessage;
-import org.ambientlight.messages.max.MaxSetTemperatureMessage;
-import org.ambientlight.messages.max.MaxShutterContactStateMessage;
-import org.ambientlight.messages.max.MaxThermostatStateMessage;
-import org.ambientlight.messages.max.MaxTimeInformationMessage;
-import org.ambientlight.messages.max.MaxWakeUpMessage;
+import org.ambientlight.messages.Dispatcher;
+import org.ambientlight.messages.InDispatcher;
+import org.ambientlight.messages.Message;
 
 
 /**
@@ -55,8 +43,13 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	@Override
 	public boolean deliverMessage(Message message) {
 		try {
-			String header = "RFM_SEND_MESSAGE|" + message.getDispatcherType() + "|" + ((MaxMessage) message).getPayload().length
-					+ "|\n";
+
+			String header = message.getCommand() + "|" + message.getDispatcherType() + "|";
+			if (message.getValue() != null) {
+				header = header + message.getValue() + "|";
+			}
+			header = header + "\n";
+
 			PrintStream ps = new PrintStream(socket.getOutputStream());
 			ps.print(header);
 			socket.getOutputStream().write(getByteStreamFromMaxMessage((MaxMessage) message));
@@ -149,6 +142,12 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			break;
 		case RESET:
 			result = new MaxFactoryResetMessage();
+			break;
+		case ADD_LINK_PARTNER:
+			result = new MaxAddLinkPartnerMessage();
+			break;
+		case REMOVE_LINK_PARTNER:
+			result = new MaxRemoveLinkPartnerMessage();
 			break;
 		default:
 			result = new MaxMessage();

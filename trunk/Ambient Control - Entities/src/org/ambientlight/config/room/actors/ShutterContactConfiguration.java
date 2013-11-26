@@ -15,11 +15,25 @@
 
 package org.ambientlight.config.room.actors;
 
+import org.ambientlight.messages.max.DeviceType;
+
 
 /**
  * @author Florian Bornkessel
  *
  */
 public class ShutterContactConfiguration extends MaxComponentConfiguration {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType
+	 * ()
+	 */
+	@Override
+	public DeviceType getDeviceType() {
+		return DeviceType.SHUTTER_CONTACT;
+	}
 
 }

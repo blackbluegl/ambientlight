@@ -42,7 +42,7 @@ public abstract class Dispatcher {
 	public abstract boolean deliverMessage(Message message);
 
 
-	void connect() throws UnknownHostException, IOException {
+	public void connect() throws UnknownHostException, IOException {
 		socket = new Socket(this.configuration.hostName, this.configuration.port);
 	}
 

@@ -29,7 +29,7 @@ public class MaxMessage extends Message {
 
 	public static final int FLAGS_NONE = 0x0;
 	public static final int FLAG_REQUEST = 0x4;
-	public static final int FLAG_0X1 = 0x1;
+	public static final int FLAG_REQUEST_FROM_CUBE = 0x1;
 	public static final int FLAG_RESPONSE = 0x2;
 
 	protected byte[] payload = new byte[10];
@@ -141,6 +141,29 @@ public class MaxMessage extends Message {
 		return "MaxMessage: " + getMessageType() + " - SeqNr: " + getSequenceNumber() + " from: " + getFromAdress() + " to: "
 				+ getToAdress() + " with groupId: " + getGroupNumber() + " Flags: 0x" + Integer.toHexString(getFlags())
 				+ "\nPayload: " + MaxUtil.getHexString(payload);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.Message#getCommand()
+	 */
+	@Override
+	public String getCommand() {
+		return "RFM_SEND_MESSAGE";
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.Message#getValue()
+	 */
+	@Override
+	public String getValue() {
+		// TODO Auto-generated method stub
+		return String.valueOf(payload.length);
 	}
 
 }
