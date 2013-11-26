@@ -13,33 +13,38 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.actors;
+package org.ambientlight.messages.max;
 
-import org.ambientlight.messages.max.DeviceType;
-
+import org.ambientlight.messages.Message;
+import org.ambientlight.messages.WaitForResponseCondition;
 
 
 /**
  * @author Florian Bornkessel
+ * 
  */
+public class WaitForShutterContactCondition extends WaitForResponseCondition {
 
-public class ThermostatConfiguration extends MaxComponentConfiguration {
+	private Integer shutterAdress = 0;
+
+	Message responseMessage;
 
 
-
-	public float offset;
+	public WaitForShutterContactCondition(int shutterAdress) {
+		this.shutterAdress = shutterAdress;
+	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType
-	 * ()
+	 * @see org.ambientlight.messages.Condition#fullfilled(java.lang.Object)
 	 */
 	@Override
-	public DeviceType getDeviceType() {
-		return DeviceType.HEATING_THERMOSTAT;
+	public boolean fullfilled(Message compare) {
+		if (compare instanceof MaxShutterContactStateMessage
+				&& ((MaxShutterContactStateMessage) compare).getFromAdress().equals(shutterAdress))
+			return true;
+		return false;
 	}
-
 }

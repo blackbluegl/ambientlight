@@ -21,9 +21,9 @@ import org.ambientlight.messages.Message;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class RegisterCorrelatorMessage extends Message {
+public class UnRegisterCorrelatorMessage extends Message {
 
 	private DispatcherType dispatcherType;
 	private String correlator;
@@ -62,7 +62,7 @@ public class RegisterCorrelatorMessage extends Message {
 	 */
 	@Override
 	public String getCommand() {
-		return "REGISTER_CORRELATION";
+		return "UNREGISTER_CORRELATION";
 	}
 
 
@@ -76,5 +76,4 @@ public class RegisterCorrelatorMessage extends Message {
 		// TODO Auto-generated method stub
 		return getCorrelator();
 	}
-
 }

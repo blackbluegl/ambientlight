@@ -15,18 +15,11 @@
 
 package org.ambientlight.messages;
 
-
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public abstract class Message {
+public abstract class WaitForResponseCondition {
 
-	public abstract DispatcherType getDispatcherType();
-
-
-	public abstract String getCommand();
-
-
-	public abstract String getValue();
+	public abstract boolean fullfilled(Message message);
 }

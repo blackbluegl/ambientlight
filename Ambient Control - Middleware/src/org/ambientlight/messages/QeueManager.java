@@ -29,11 +29,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class QeueManager {
 
 	public enum State {
-		PENDING, SENDING, SENT, AWAITING_RESPONSE, SEND_ERROR, TIMED_OUT, RETRIEVED_ANSWER;
+		PENDING, SENDING, SENT, WAITING_FOR_CONDITION, AWAITING_RESPONSE, SEND_ERROR, TIMED_OUT, RETRIEVED_ANSWER;
 	}
 
 	private class MessageEntry {
 
+		WaitForResponseCondition condition;
 		Message message;
 		State state = State.PENDING;
 	}
@@ -119,8 +120,17 @@ public class QeueManager {
 
 
 	public void putOutMessage(Message message) {
+		putOutMessage(message, null);
+	}
+
+
+	public void putOutMessage(Message message, WaitForResponseCondition waitCondition) {
 		MessageEntry entry = new MessageEntry();
 		entry.message = message;
+		entry.condition = waitCondition;
+		if (waitCondition != null) {
+			entry.state = State.WAITING_FOR_CONDITION;
+		}
 		outLock.lock();
 		outQueue.add(entry);
 		hasOutMessages.signal();
@@ -141,7 +151,7 @@ public class QeueManager {
 		outLock.lock();
 		List<MessageEntry> messagesToRemove = new ArrayList<MessageEntry>();
 		for (MessageEntry out : outQueue) {
-			if (out.state == State.AWAITING_RESPONSE) {
+			if (out.state == State.AWAITING_RESPONSE || out.state == State.WAITING_FOR_CONDITION) {
 				continue;
 			}
 			out.state = State.SENDING;
@@ -177,6 +187,9 @@ public class QeueManager {
 			if (listener == null) {
 				continue;
 			}
+
+			handleConditionalOutMessageForResponse(inMessage);
+
 			if (inMessage instanceof AckResponseMessage) {
 				// there maybe an outMessage waiting for
 				// this message
@@ -265,5 +278,22 @@ public class QeueManager {
 		}
 		outLock.unlock();
 		return null;
+	}
+
+
+	/**
+	 * @param inMessage
+	 * @param listener
+	 * @return
+	 */
+	private void handleConditionalOutMessageForResponse(Message inMessage) {
+		outLock.lock();
+		for (MessageEntry entry : outQueue) {
+			if (entry.state == State.WAITING_FOR_CONDITION && entry.condition.fullfilled(inMessage)) {
+				entry.state = State.PENDING;
+			}
+		}
+		hasOutMessages.signal();
+		outLock.unlock();
 	}
 }

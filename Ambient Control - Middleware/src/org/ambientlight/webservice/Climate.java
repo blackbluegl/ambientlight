@@ -16,7 +16,6 @@
 package org.ambientlight.webservice;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -29,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.climate.ClimateManager;
+import org.ambientlight.ws.container.TemperaturMode;
 
 
 /**
@@ -39,13 +39,13 @@ import org.ambientlight.climate.ClimateManager;
 public class Climate {
 
 	@POST
-	@Path("/temperatur/{temp}")
+	@Path("/mode")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setTemperatur(@PathParam(value = "temp") float temp, Date until) {
+	public Response setTemperatur(TemperaturMode mode) {
 		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 		try {
-			manager.setTemperatur(temp, until);
+			manager.setMode(mode.temp, mode.mode, mode.until);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -63,6 +63,42 @@ public class Climate {
 		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		manager.startPairingMode();
+
+		return Response.status(200).build();
+	}
+
+
+	@GET
+	@Path("/unregister/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response unregister(@PathParam("id") int adress) {
+		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+
+		try {
+			manager.setFactoryResetDevice(adress);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
+
+		return Response.status(200).build();
+	}
+
+
+	@POST
+	@Path("/currentWeekProfile")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setCurrentWeekProfile(String profile) {
+		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+
+		try {
+			manager.setCurrentProfile(profile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
 
 		return Response.status(200).build();
 	}

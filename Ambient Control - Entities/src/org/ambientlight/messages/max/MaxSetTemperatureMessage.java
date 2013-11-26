@@ -30,7 +30,7 @@ public class MaxSetTemperatureMessage extends MaxMessage implements AckRequestMe
 	public MaxSetTemperatureMessage() {
 		payload = new byte[14];
 		setMessageType(MaxMessageType.SET_TEMPERATURE);
-		setFlags(FLAG_REQUEST | FLAG_0X1);
+		setFlags(FLAG_REQUEST | FLAG_REQUEST_FROM_CUBE);
 	}
 
 

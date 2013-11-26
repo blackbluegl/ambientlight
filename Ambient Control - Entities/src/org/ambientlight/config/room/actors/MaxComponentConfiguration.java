@@ -17,12 +17,16 @@ package org.ambientlight.config.room.actors;
 
 import java.util.Date;
 
+import org.ambientlight.messages.max.DeviceType;
+
 
 /**
  * @author Florian Bornkessel
  *
  */
 public abstract class MaxComponentConfiguration {
+
+	public abstract DeviceType getDeviceType();
 
 	public String label;
 	public int adress;
