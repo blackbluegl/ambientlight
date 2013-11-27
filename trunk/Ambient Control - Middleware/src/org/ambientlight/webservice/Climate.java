@@ -15,8 +15,6 @@
 
 package org.ambientlight.webservice;
 
-import java.io.IOException;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -44,12 +42,8 @@ public class Climate {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setTemperatur(TemperaturMode mode) {
 		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
-		try {
-			manager.setMode(mode.temp, mode.mode, mode.until);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Response.status(500).build();
-		}
+
+		manager.setMode(mode.temp, mode.mode, mode.until);
 
 		return Response.status(200).build();
 	}

@@ -21,9 +21,15 @@ import org.ambientlight.messages.Message;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class RegisterCorrelatorMessage extends Message {
+
+	public RegisterCorrelatorMessage(DispatcherType dispatcherType, String correlator) {
+		super();
+		this.dispatcherType = dispatcherType;
+		this.correlator = correlator;
+	}
 
 	private DispatcherType dispatcherType;
 	private String correlator;

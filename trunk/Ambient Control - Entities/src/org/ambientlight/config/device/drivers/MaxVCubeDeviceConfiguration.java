@@ -22,6 +22,5 @@ package org.ambientlight.config.device.drivers;
  */
 public class MaxVCubeDeviceConfiguration extends RemoteHostConfiguration {
 
-	public int cubeId;
 
 }

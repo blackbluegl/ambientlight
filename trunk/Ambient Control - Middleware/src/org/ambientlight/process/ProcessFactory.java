@@ -15,7 +15,6 @@
 
 package org.ambientlight.process;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +76,7 @@ public class ProcessFactory {
 	}
 
 
-	public synchronized void startProcess(String processId) throws IOException {
+	public synchronized void startProcess(String processId) {
 		ProcessConfiguration processConfig = null;
 		for (ProcessConfiguration currentProcess : room.config.processes) {
 			if (currentProcess.id.equals(processId)) {
@@ -109,7 +108,7 @@ public class ProcessFactory {
 	}
 
 
-	public synchronized void stopProcess(String processId) throws IOException {
+	public synchronized void stopProcess(String processId) {
 		ProcessConfiguration processConfig = null;
 		for (ProcessConfiguration currentProcess : room.config.processes) {
 			if (currentProcess.id.equals(processId)) {

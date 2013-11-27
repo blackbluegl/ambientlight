@@ -26,7 +26,7 @@ import java.util.Map;
 public enum DeviceType {
 
 	CUBE((byte) 0x00), HEATING_THERMOSTAT((byte) 0x01), HEATING_THERMOSTAT_PLUS((byte) 0x02), WALL_MOUNTED_THERMOSTAT((byte) 0x03), SHUTTER_CONTACT(
-			(byte) 0x10), PUSH_BUTTON((byte) 0x5);
+			(byte) 0x04), PUSH_BUTTON((byte) 0x5);
 
 	private static final Map<Byte, DeviceType> MAPPING = new LinkedHashMap<Byte, DeviceType>();
 

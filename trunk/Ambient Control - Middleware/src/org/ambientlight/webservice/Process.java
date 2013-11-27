@@ -15,8 +15,6 @@
 
 package org.ambientlight.webservice;
 
-import java.io.IOException;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -114,12 +112,7 @@ public class Process {
 			AmbientControlMW.getRoom().config.processes.add(process);
 		}
 
-		try {
-			RoomConfigurationFactory.commitTransaction();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Response.status(500).build();
-		}
+		RoomConfigurationFactory.commitTransaction();
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
@@ -141,12 +134,7 @@ public class Process {
 			}
 		}
 
-		try {
-			RoomConfigurationFactory.commitTransaction();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Response.status(500).build();
-		}
+		RoomConfigurationFactory.commitTransaction();
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 

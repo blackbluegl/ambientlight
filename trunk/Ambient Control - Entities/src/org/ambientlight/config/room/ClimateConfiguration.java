@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
+import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
-import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxThermostateMode;
 
@@ -34,15 +34,16 @@ import org.ambientlight.messages.max.MaxThermostateMode;
  */
 public class ClimateConfiguration {
 
-	public int vCubeAdress;
-	public int groupId;
-	public MaxThermostateMode mode;
+	public int vCubeAdress = 0;
+	public int groupId = 0;
+	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public Date temporaryUntilDate;
-	public float setTemp;
+	public float setTemp = 22.0f;
 	public float comfortTemperatur = 21.0f;
 	public float ecoTemperatur = 17.0f;
 	public float maxTemp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
 	public float minTemp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
+	public float defaultOffset = MaxConfigureTemperaturesMessage.DEFAULT_OFFSET;
 
 	public float windowOpenTemperatur = 12.0f;
 	public int windowOpenTimeMins = 15;
@@ -55,7 +56,7 @@ public class ClimateConfiguration {
 
 	public boolean windowOpen = false;
 
-	public String currentWeekProfile;
+	public String currentWeekProfile = "default";
 
 	public Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
 	public Map<Integer, MaxComponentConfiguration> devices = new HashMap<Integer, MaxComponentConfiguration>();

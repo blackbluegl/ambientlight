@@ -3,10 +3,13 @@ package test;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
+import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
@@ -22,6 +25,7 @@ import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfig
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
+import org.ambientlight.config.room.ClimateConfiguration;
 import org.ambientlight.config.room.ISwitchableRoomItem;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.actors.LightObjectConfiguration;
@@ -33,6 +37,8 @@ import org.ambientlight.config.scenery.actor.renderingprogram.SimpleColorRenderi
 import org.ambientlight.config.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.scenery.actor.switching.SwitchingConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.messages.max.DayEntry;
+import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.RoomConfigurationFactory;
 
 
@@ -43,6 +49,7 @@ public class CreateTestConfig {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		RoomConfigurationFactory.beginTransaction();
 		DeviceDriverFactory df = new DeviceDriverFactory();
 		CreateTestConfig test = new CreateTestConfig();
 
@@ -83,8 +90,59 @@ public class CreateTestConfig {
 		// ledPoint2.port = 2;
 		// lk35.configuredLeds.add(ledPoint2);
 
+		ClimateConfiguration climate = new ClimateConfiguration();
+		climate.vCubeAdress = 167874;
+		climate.groupId = 1;
 
+		List<DayEntry> mon = new ArrayList<DayEntry>();
+		DayEntry mon1 = new DayEntry(22, 0, 22.0f);
+		mon.add(mon1);
 
+		List<DayEntry> tue = new ArrayList<DayEntry>();
+		DayEntry tue1 = new DayEntry(22, 0, 22.0f);
+		tue.add(tue1);
+
+		List<DayEntry> wed = new ArrayList<DayEntry>();
+		DayEntry wed1 = new DayEntry(22, 0, 22.0f);
+		wed.add(wed1);
+
+		List<DayEntry> thu = new ArrayList<DayEntry>();
+		DayEntry thu1 = new DayEntry(22, 0, 22.0f);
+		thu.add(thu1);
+
+		List<DayEntry> fri = new ArrayList<DayEntry>();
+		DayEntry fri1 = new DayEntry(22, 0, 22.0f);
+		fri.add(fri1);
+
+		List<DayEntry> sat = new ArrayList<DayEntry>();
+		DayEntry sat1 = new DayEntry(22, 0, 22.0f);
+		sat.add(sat1);
+
+		List<DayEntry> sun = new ArrayList<DayEntry>();
+		DayEntry sun1 = new DayEntry(22, 0, 22.0f);
+		sun.add(sun1);
+		HashMap<MaxDayInWeek, List<DayEntry>> weekProfile = new HashMap<MaxDayInWeek, List<DayEntry>>();
+		weekProfile.put(MaxDayInWeek.MONDAY, mon);
+		weekProfile.put(MaxDayInWeek.TUESDAY, tue);
+		weekProfile.put(MaxDayInWeek.WEDNESDAY, wed);
+		weekProfile.put(MaxDayInWeek.THURSDAY, thu);
+		weekProfile.put(MaxDayInWeek.FRIDAY, fri);
+		weekProfile.put(MaxDayInWeek.SATURDAY, sat);
+		weekProfile.put(MaxDayInWeek.SUNDAY, sun);
+
+		Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
+		weekProfiles.put("default", weekProfile);
+		climate.weekProfiles = weekProfiles;
+		climate.currentWeekProfile = "default";
+
+		rc.climate = climate;
+
+		MaxVCubeDeviceConfiguration rfmConfig = new MaxVCubeDeviceConfiguration();
+
+		rfmConfig.hostName = "ambischlafen";
+		rfmConfig.port = 30000;
+
+		rc.deviceConfigurations.add(rfmConfig);
 		rc.deviceConfigurations.add(switchingBridge);
 		rc.deviceConfigurations.add(dc);
 
@@ -266,7 +324,6 @@ public class CreateTestConfig {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;
-
 
 		process.nodes.put(0, startNode);
 		process.nodes.put(1, switchNode);

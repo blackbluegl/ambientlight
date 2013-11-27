@@ -36,18 +36,26 @@ public class RoomConfigurationFactory {
 	}
 
 
-	public static void commitTransaction() throws IOException {
+	public static void commitTransaction() {
 		try {
 			saveRoomConfiguration(AmbientControlMW.getRoom().config, AmbientControlMW.getRoomConfigFileName());
+		} catch (IOException e) {
+			System.out.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk!");
+			System.exit(1);
+
 		} finally {
 			saveLock.unlock();
 		}
 	}
 
 
-	public static void commitTransaction(RoomConfiguration config, String fileName) throws IOException {
+	public static void commitTransaction(RoomConfiguration config, String fileName) {
 		try {
 			saveRoomConfiguration(config, fileName);
+		} catch (IOException e) {
+			System.out.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk!");
+			System.exit(1);
+
 		} finally {
 			saveLock.unlock();
 		}

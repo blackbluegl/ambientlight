@@ -106,6 +106,9 @@ public class QeueManager {
 
 
 	public void putOutMessages(List<Message> messages) {
+		if (messages == null || messages.size() == 0)
+			return;
+
 		outLock.lock();
 		List<MessageEntry> entries = new ArrayList<QeueManager.MessageEntry>();
 		for (Message current : messages) {
@@ -125,6 +128,9 @@ public class QeueManager {
 
 
 	public void putOutMessage(Message message, WaitForResponseCondition waitCondition) {
+		if (message == null)
+			return;
+
 		MessageEntry entry = new MessageEntry();
 		entry.message = message;
 		entry.condition = waitCondition;
@@ -197,16 +203,10 @@ public class QeueManager {
 				if (foundRequest != null) {
 					foundRequest.state = State.RETRIEVED_ANSWER;
 					listener.handleResponseMessages(foundRequest.state, inMessage, foundRequest.message);
-
-				} else {
-					System.out
-					.println("QeueManager - inQeue: an AckResponseMessage arrived but there was no request message that listened (anymore): "
-							+ inMessage);
 				}
 			} else {
 				listener.handleMessage(inMessage);
 			}
-
 		}
 		inQeue.clear();
 	}

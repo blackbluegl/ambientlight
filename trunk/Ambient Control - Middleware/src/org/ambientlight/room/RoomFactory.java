@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ambientlight.callback.CallBackManager;
+import org.ambientlight.climate.ClimateManager;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.process.events.AlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -19,6 +20,8 @@ import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfigur
 import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.room.entities.AlarmGenerator;
@@ -45,6 +48,9 @@ public class RoomFactory {
 
 		room.config = roomConfig;
 
+		// start queueManager
+		room.qeueManager = new QeueManager();
+
 		// init CallbackManager
 		CallBackManager callbackManager = new CallBackManager();
 		room.callBackMananger = callbackManager;
@@ -56,7 +62,7 @@ public class RoomFactory {
 		// initialize the device drivers
 		List<DeviceDriver> devices = new ArrayList<DeviceDriver>();
 		for (DeviceConfiguration currentDeviceConfig : roomConfig.deviceConfigurations) {
-			devices.add(this.initializeDevice(currentDeviceConfig));
+			devices.add(this.initializeDevice(currentDeviceConfig, room));
 		}
 		room.setDevices(devices);
 
@@ -74,6 +80,15 @@ public class RoomFactory {
 		room.eventManager = new EventManager();
 
 		createEventGenerators(room, room.eventManager);
+
+		//init ClimateManager
+		if(roomConfig.climate!=null){
+			iterate throug the max Components to create instances of the devices first
+			TODO problem. we wait for messages but are not ready. we have to extract an initMethod.
+			room.climateManager=new ClimateManager();
+					room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
+
+		}
 
 		return room;
 	}
@@ -144,9 +159,9 @@ public class RoomFactory {
 	}
 
 
-	private DeviceDriver initializeDevice(DeviceConfiguration deviceConfig) throws UnknownHostException, IOException {
+	private DeviceDriver initializeDevice(DeviceConfiguration deviceConfig, Room room) throws UnknownHostException, IOException {
 
-		DeviceDriver device = deviceFactory.createByName(deviceConfig);
+		DeviceDriver device = deviceFactory.createByName(deviceConfig, room);
 
 		return device;
 	}
