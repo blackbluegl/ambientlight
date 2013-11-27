@@ -18,7 +18,6 @@ package org.ambientlight.messages.max;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -27,96 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 
-	public class DayEntry {
 
-		private int hour;
-		private int min;
-		private float temp;
-
-
-		public DayEntry(byte high, byte low) {
-			int value = MaxUtil.byteArrayToInt(new byte[] { high, low }, 0, 2);
-			int timeInMinutes = (value & 0x1FF) * 5;
-			temp = ((value >> 9) & 0x3F) / 2.0f;
-
-			hour = (int) TimeUnit.MINUTES.toHours(timeInMinutes);
-			min = (int) TimeUnit.MINUTES.toMinutes(timeInMinutes) - (int) TimeUnit.HOURS.toMinutes(hour);
-		}
-
-
-		public DayEntry(int hour, int min, float temp) {
-			this.hour = hour;
-			this.min = min;
-			int tempInt = (int) (temp * 2);
-			this.temp = tempInt / 2.0f;
-			if (this.temp > MaxConfigureTemperaturesMessage.MAX_TEMPERATURE) {
-				this.temp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
-			} else if (this.temp < MaxConfigureTemperaturesMessage.MIN_TEMPERATURE) {
-				this.temp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
-			}
-		}
-
-
-		byte[] getByteCode() {
-			int amountOfDay = (hour * 60 + min) / 5;
-			int temp = (int) (this.temp * 2);
-			int result = (temp << 9) | amountOfDay;
-			byte intValue[] = MaxUtil.intToByteArray(result);
-			return new byte[] { intValue[2], intValue[3] };
-		}
-
-
-		public int getHour() {
-			return hour;
-		}
-
-
-		public int getMin() {
-			return min;
-		}
-
-
-		public float getTemp() {
-			return temp;
-		}
-
-
-		@Override
-		public String toString() {
-			return "DayEntry: until " + hour + ":" + min + ", " + temp + "°C";
-		}
-
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + hour;
-			result = prime * result + min;
-			result = prime * result + Float.floatToIntBits(temp);
-			return result;
-		}
-
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			DayEntry other = (DayEntry) obj;
-			if (hour != other.hour)
-				return false;
-			if (min != other.min)
-				return false;
-			if (Float.floatToIntBits(temp) != Float.floatToIntBits(other.temp))
-				return false;
-			return true;
-		}
-
-	}
 
 	private List<DayEntry> entries = new ArrayList<DayEntry>();
 

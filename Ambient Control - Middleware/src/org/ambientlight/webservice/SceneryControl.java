@@ -61,11 +61,9 @@ public class SceneryControl {
 		} else if (itemConfiguration instanceof SwitchingConfiguration) {
 			// nothing todo so far
 		} else {
-			try {
-				RoomConfigurationFactory.commitTransaction();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+			RoomConfigurationFactory.commitTransaction();
+
 			return Response.status(500).build();
 		}
 
@@ -100,15 +98,11 @@ public class SceneryControl {
 		System.out.println("SceneryControl: saving eventGeneratorConfig");
 		RoomConfigurationFactory.beginTransaction();
 		AmbientControlMW.getRoom().config.eventGeneratorConfigurations.put(eventGeneratorName, config);
-		try {
-			RoomConfigurationFactory.commitTransaction();
-			System.out.println("SceneryControl: saving eventGeneratorConfig finished");
 
-			return Response.status(200).build();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Response.status(500).build();
-		}
+		RoomConfigurationFactory.commitTransaction();
+		System.out.println("SceneryControl: saving eventGeneratorConfig finished");
+
+		return Response.status(200).build();
 	}
 
 
@@ -126,6 +120,7 @@ public class SceneryControl {
 	public Map<String, ISwitchableRoomItem> getUserRoomItems() {
 		return AmbientControlMW.getRoom().config.getUserRoomItems();
 	}
+
 
 	@PUT
 	@Path("/control/room/items/{itemName}/state")

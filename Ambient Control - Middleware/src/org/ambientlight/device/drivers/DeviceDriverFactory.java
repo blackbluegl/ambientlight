@@ -5,10 +5,12 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
+import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
@@ -21,12 +23,18 @@ import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEt
 import org.ambientlight.device.drivers.switchoverethernet.SwitchDeviceOverEthernetDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
+import org.ambientlight.room.Room;
 import org.ambientlight.room.StripePart;
 
 
 public class DeviceDriverFactory {
 
-	public DeviceDriver createByName(DeviceConfiguration dc) throws UnknownHostException, IOException {
+	public DeviceDriver createByName(DeviceConfiguration dc, Room room) throws UnknownHostException, IOException {
+
+		if (dc instanceof MaxVCubeDeviceConfiguration) {
+			System.out.println("DeviceDriverFactory: init MaxVCube device");
+			AmbientControlMW.getRfmDispatcher().createDispatcher((MaxVCubeDeviceConfiguration) dc, room.qeueManager);
+		}
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");
