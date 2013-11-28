@@ -190,7 +190,7 @@ void RF22::handleInterrupt() {
 	if (_lastInterruptFlags[0] & RF22_ITXFFAEM) {
 		// See if more data has to be loaded into the Tx FIFO
 		sendNextFragment();
-		cout << "RFM22 handleInterrupt(): ITXFFAEM\n";
+		//cout << "RFM22 handleInterrupt(): ITXFFAEM\n";
 	}
 	if (_lastInterruptFlags[0] & RF22_IRXFFAFULL) {
 		// Caution, any delay here may cause a FF overflow
