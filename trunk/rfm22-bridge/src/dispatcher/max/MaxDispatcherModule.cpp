@@ -41,8 +41,11 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 
 void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 
-	//sometimes a preamble of 1 second is necessary to wake up the device.
-	if (sendLongPreamble(rf22)) {
+	//send short preemble if last Send was not longer than 4  seconds in the past
+	time_t now;
+	now = time(NULL);
+	if (lastSendTimeStamp + 4 < now) {
+		sendLongPreamble (rf22);
 		//do count used timeslots for 1% rule
 	}
 
@@ -70,6 +73,8 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	//send message
 	rf22->send(sendData, length);
 	rf22->waitPacketSent();
+
+	lastSendTimeStamp = time(NULL);
 }
 
 void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
@@ -107,8 +112,8 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 		std::cout << "Packet is invalid" << "\r\n";
 		return;
 	} else {
-		std::cout << "MaxDispatcherModule receiveMessage(): got MAX! Message: " << rfMessage->type_to_str(rfMessage->type) << " from " << rfMessage->addr_from << " to "
-				<< rfMessage->addr_to << "\r\n";
+		std::cout << "MaxDispatcherModule receiveMessage(): got MAX! Message: " << rfMessage->type_to_str(rfMessage->type)
+				<< " from " << rfMessage->addr_from << " to " << rfMessage->addr_to << "\r\n";
 	}
 
 	InMessage message;

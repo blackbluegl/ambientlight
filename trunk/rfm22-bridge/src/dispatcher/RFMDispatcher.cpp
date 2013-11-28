@@ -10,6 +10,7 @@
 #include <map>
 #include <iostream>
 #include "../queue/Enums.h"
+#include <unistd.h>
 
 RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
 	this->rfm22 = rfm22;
@@ -46,6 +47,9 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 
 	//wait for new messages
 	module->switchToRx(rfm22);
+	//at least wait a second for incomming messages
+	usleep(1500000);
+	cout << "RFMDispatcher dispatchOutMessage(): dispatched a message.\n";
 }
 
 void RFMDispatcher::dispatchInMessage(InMessage message) {

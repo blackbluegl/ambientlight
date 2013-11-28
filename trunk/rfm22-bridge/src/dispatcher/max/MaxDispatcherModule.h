@@ -18,8 +18,7 @@ class MaxDispatcherModule: public DispatcherModule {
 public:
 	MaxDispatcherModule(RFMDispatcher *rfmDispatcher) :
 			DispatcherModule(rfmDispatcher) {
-	}
-	;
+	};
 	virtual ~MaxDispatcherModule();
 
 	bool init(RF22 *rf22);
@@ -52,6 +51,8 @@ private:
 	const uint8_t incommingMessageLength=30;
 
 	bool sendLongPreamble(RF22 *rf22);
+
+	time_t lastSendTimeStamp;
 
 };
 
