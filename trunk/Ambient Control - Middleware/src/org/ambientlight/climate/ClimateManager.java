@@ -90,6 +90,10 @@ public class ClimateManager implements MessageListener {
 
 	public ClimateManager() {
 
+	}
+
+
+	public void init() {
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
@@ -106,7 +110,6 @@ public class ClimateManager implements MessageListener {
 
 		setMode(config.setTemp, config.mode, config.temporaryUntilDate);
 	}
-
 
 	/*
 	 * (non-Javadoc)
