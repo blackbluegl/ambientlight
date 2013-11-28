@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 import java.util.Timer;
 
+import org.ambientlight.climate.ClimateFactory;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.actors.ActorConfiguration;
 import org.ambientlight.config.room.actors.LightObjectConfiguration;
@@ -93,6 +94,10 @@ public class AmbientControlMW {
 		roomFactory = new RoomFactory(deviceFactory, processFactory);
 
 		room = roomFactory.initRoom(roomConfiguration);
+
+		ClimateFactory climateFactory = new ClimateFactory();
+		climateFactory.initClimateManager();
+
 		processFactory = new ProcessFactory(room);
 		processFactory.initProcesses();
 

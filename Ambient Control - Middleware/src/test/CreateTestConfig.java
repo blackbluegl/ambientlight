@@ -139,7 +139,7 @@ public class CreateTestConfig {
 
 		MaxVCubeDeviceConfiguration rfmConfig = new MaxVCubeDeviceConfiguration();
 
-		rfmConfig.hostName = "ambischlafen";
+		rfmConfig.hostName = "ambi-schlafen";
 		rfmConfig.port = 30000;
 
 		rc.deviceConfigurations.add(rfmConfig);

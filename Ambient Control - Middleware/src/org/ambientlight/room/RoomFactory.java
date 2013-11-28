@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.climate.ClimateManager;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.process.events.AlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -20,7 +20,6 @@ import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfigur
 import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.process.eventmanager.EventManager;
@@ -50,6 +49,7 @@ public class RoomFactory {
 
 		// start queueManager
 		room.qeueManager = new QeueManager();
+		room.qeueManager.dispatcherManager = AmbientControlMW.getRfmDispatcher();
 
 		// init CallbackManager
 		CallBackManager callbackManager = new CallBackManager();
@@ -66,7 +66,6 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
-
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
 		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations.values()) {
@@ -81,14 +80,9 @@ public class RoomFactory {
 
 		createEventGenerators(room, room.eventManager);
 
-		//init ClimateManager
-		if(roomConfig.climate!=null){
-			iterate throug the max Components to create instances of the devices first
-			TODO problem. we wait for messages but are not ready. we have to extract an initMethod.
-			room.climateManager=new ClimateManager();
-					room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
+		room.qeueManager.startQeues();
 
-		}
+		System.out.println("RoomFactory initRoom(): initialized ClimateManager");
 
 		return room;
 	}
