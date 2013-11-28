@@ -52,8 +52,10 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
 			PrintStream ps = new PrintStream(socket.getOutputStream());
 			ps.print(header);
-			socket.getOutputStream().write(getByteStreamFromMaxMessage((MaxMessage) message));
-			socket.getOutputStream().flush();
+			if (message instanceof MaxMessage) {
+				socket.getOutputStream().write(getByteStreamFromMaxMessage((MaxMessage) message));
+				socket.getOutputStream().flush();
+			}
 		} catch (Exception e) {
 			System.out.println("MaxDispatcher deliverMessage(): was unable to send data!");
 			reconnect();

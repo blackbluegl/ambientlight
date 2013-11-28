@@ -28,18 +28,18 @@ public class DispatcherManager {
 
 	public void createDispatcher(final RemoteHostConfiguration config, final QeueManager queueManager) {
 
+		final MaxDispatcher dispatcher = new MaxDispatcher();
+		dispatcher.configuration = config;
+		dispatcher.queueManager = queueManager;
+		queueManager.registerOutDispatcher(DispatcherType.MAX, dispatcher);
+
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				if (config instanceof MaxVCubeDeviceConfiguration) {
-					MaxDispatcher dispatcher = new MaxDispatcher();
-					dispatcher.configuration = config;
-					dispatcher.queueManager = queueManager;
 
 					connectDispatcher(dispatcher);
-
-					queueManager.registerOutDispatcher(DispatcherType.MAX, dispatcher);
 
 					if (dispatcher instanceof InDispatcher) {
 						startReceiveMessages(dispatcher, queueManager);
@@ -141,25 +141,10 @@ public class DispatcherManager {
 							qeueManager.putInMessage(inMessage);
 						}
 					} catch (Exception e) {
-						// dispatcher.sendLock.lock();
-						//
-						// System.out.println("DispatcherManager startReceiveMessages(): Connection lost. Reconnecting Dispatcher: "
-						// + dispatcher.getClass().getSimpleName() + " to: " +
-						// dispatcher.configuration.hostName);
-						//
-						// if (dispatcher.reconnect()) {
-						// System.out.println("DispatcherManager startReceiveMessages(): Connection recovered. Dispatcher: "
-						// + dispatcher.getClass().getSimpleName() + " to: " +
-						// dispatcher.configuration.hostName);
-						// dispatcher.sendLock.lock();
-						// } else {
-						System.out
-								.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect. Dispatcher: "
-								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
-						// dispatcher.sendLock.lock();
-						// }
 
-						// dispatcher.sendLock.unlock();
+						System.out
+						.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect. Dispatcher: "
+								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 
 						try {
 							Thread.sleep(10000);

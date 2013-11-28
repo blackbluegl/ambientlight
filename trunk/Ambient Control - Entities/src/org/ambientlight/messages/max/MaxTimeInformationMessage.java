@@ -33,7 +33,17 @@ public class MaxTimeInformationMessage extends MaxMessage {
 	}
 
 
+	public boolean isRequest() {
+		if (payload.length < 11)
+			return true;
+		else
+			return false;
+	}
+
+
 	public void setTime(Date time) {
+		if (isRequest())
+			return;
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(time);
 		payload[10] = (byte) (calendar.get(Calendar.YEAR) - 2000);
@@ -45,6 +55,8 @@ public class MaxTimeInformationMessage extends MaxMessage {
 
 
 	public Date getTime() {
+		if (isRequest())
+			return null;
 		int year = payload[10] + 2000;
 		int day = payload[11];
 		int hour = payload[12];
@@ -59,7 +71,7 @@ public class MaxTimeInformationMessage extends MaxMessage {
 	@Override
 	public String toString() {
 		String parent = super.toString();
-		String result = "\nTime: " + getTime().toString();
+		String result = "\nTime: " + getTime().toString() + "\nisRequest: " + isRequest();
 		return (parent + result);
 	}
 }

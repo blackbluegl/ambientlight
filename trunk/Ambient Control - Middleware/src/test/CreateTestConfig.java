@@ -91,35 +91,35 @@ public class CreateTestConfig {
 		// lk35.configuredLeds.add(ledPoint2);
 
 		ClimateConfiguration climate = new ClimateConfiguration();
-		climate.vCubeAdress = 167874;
-		climate.groupId = 1;
+		climate.vCubeAdress = 1;
+		climate.groupId = 5;
 
 		List<DayEntry> mon = new ArrayList<DayEntry>();
-		DayEntry mon1 = new DayEntry(22, 0, 22.0f);
+		DayEntry mon1 = new DayEntry(24, 0, 22.0f);
 		mon.add(mon1);
 
 		List<DayEntry> tue = new ArrayList<DayEntry>();
-		DayEntry tue1 = new DayEntry(22, 0, 22.0f);
+		DayEntry tue1 = new DayEntry(24, 0, 22.0f);
 		tue.add(tue1);
 
 		List<DayEntry> wed = new ArrayList<DayEntry>();
-		DayEntry wed1 = new DayEntry(22, 0, 22.0f);
+		DayEntry wed1 = new DayEntry(24, 0, 22.0f);
 		wed.add(wed1);
 
 		List<DayEntry> thu = new ArrayList<DayEntry>();
-		DayEntry thu1 = new DayEntry(22, 0, 22.0f);
+		DayEntry thu1 = new DayEntry(24, 0, 22.0f);
 		thu.add(thu1);
 
 		List<DayEntry> fri = new ArrayList<DayEntry>();
-		DayEntry fri1 = new DayEntry(22, 0, 22.0f);
+		DayEntry fri1 = new DayEntry(24, 0, 22.0f);
 		fri.add(fri1);
 
 		List<DayEntry> sat = new ArrayList<DayEntry>();
-		DayEntry sat1 = new DayEntry(22, 0, 22.0f);
+		DayEntry sat1 = new DayEntry(24, 0, 22.0f);
 		sat.add(sat1);
 
 		List<DayEntry> sun = new ArrayList<DayEntry>();
-		DayEntry sun1 = new DayEntry(22, 0, 22.0f);
+		DayEntry sun1 = new DayEntry(24, 0, 22.0f);
 		sun.add(sun1);
 		HashMap<MaxDayInWeek, List<DayEntry>> weekProfile = new HashMap<MaxDayInWeek, List<DayEntry>>();
 		weekProfile.put(MaxDayInWeek.MONDAY, mon);
