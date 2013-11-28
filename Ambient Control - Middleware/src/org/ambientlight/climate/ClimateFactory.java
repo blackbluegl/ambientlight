@@ -57,8 +57,9 @@ public class ClimateFactory {
 					System.out.println("RoomFactory initRoom(): add ShutterContact: " + currentDevice.config.label);
 				}
 			}
+			// room.qeueManager.registerMessageListener(DispatcherType.MAX,
+			// room.climateManager);
 			room.climateManager.init();
-			room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
 			System.out.println("ClimateFactory initClimateManager(): initialized ClimateManager");
 		}
 	}

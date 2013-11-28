@@ -66,6 +66,8 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
+		room.qeueManager.startQeues();
+
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
 		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations.values()) {
@@ -80,7 +82,7 @@ public class RoomFactory {
 
 		createEventGenerators(room, room.eventManager);
 
-		room.qeueManager.startQeues();
+
 
 		System.out.println("RoomFactory initRoom(): initialized ClimateManager");
 

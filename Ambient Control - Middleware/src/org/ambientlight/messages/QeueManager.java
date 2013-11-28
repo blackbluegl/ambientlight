@@ -60,15 +60,16 @@ public class QeueManager {
 			@Override
 			public void run() {
 				while (true) {
-					outLock.lock();
 					try {
+						outLock.lock();
 						hasOutMessages.await();
-						if (!handleOutMessages()) {
+						boolean allHandled = handleOutMessages();
+						outLock.unlock();
+						if (!allHandled) {
 							retryHandleOutMessages();
 						}
 					} catch (InterruptedException e) {
 					} finally {
-						outLock.unlock();
 					}
 				}
 			}
@@ -154,7 +155,7 @@ public class QeueManager {
 
 	private boolean handleOutMessages() {
 		boolean sendFailureOccured = false;
-		outLock.lock();
+		// outLock.lock();
 		List<MessageEntry> messagesToRemove = new ArrayList<MessageEntry>();
 		for (MessageEntry out : outQueue) {
 			if (out.state == State.AWAITING_RESPONSE || out.state == State.WAITING_FOR_CONDITION) {
@@ -175,7 +176,7 @@ public class QeueManager {
 
 		}
 		outQueue.removeAll(messagesToRemove);
-		outLock.unlock();
+		// outLock.unlock();
 
 		this.startWatchDogForWaitingMessages();
 
@@ -188,8 +189,8 @@ public class QeueManager {
 
 
 	private void handleInMessages() {
-		for (Message inMessage : inQeue) {
-			MessageListener listener = messageListeners.get(inMessage.getDispatcherType());
+		for (final Message inMessage : inQeue) {
+			final MessageListener listener = messageListeners.get(inMessage.getDispatcherType());
 			if (listener == null) {
 				continue;
 			}
@@ -199,13 +200,29 @@ public class QeueManager {
 			if (inMessage instanceof AckResponseMessage) {
 				// there maybe an outMessage waiting for
 				// this message
-				MessageEntry foundRequest = getAwaitingRequestMessageForInMessage(inMessage, listener);
+				final MessageEntry foundRequest = getAwaitingRequestMessageForInMessage(inMessage, listener);
 				if (foundRequest != null) {
 					foundRequest.state = State.RETRIEVED_ANSWER;
-					listener.handleResponseMessages(foundRequest.state, inMessage, foundRequest.message);
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							listener.handleResponseMessages(foundRequest.state, inMessage, foundRequest.message);
+						}
+					}).start();
+				} else {
+					System.out
+							.println("QeueManager handleInMessages: got an AckResponseMessage where no Request is listening to (anymore): "
+									+ inMessage);
 				}
 			} else {
-				listener.handleMessage(inMessage);
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						listener.handleMessage(inMessage);
+					}
+				}).start();
 			}
 		}
 		inQeue.clear();
@@ -213,7 +230,7 @@ public class QeueManager {
 
 
 	private void startWatchDogForWaitingMessages() {
-		outLock.lock();
+		// outLock.lock();
 		for (final MessageEntry current : outQueue) {
 			if (current.state == State.AWAITING_RESPONSE) {
 				new Thread(new Runnable() {
@@ -243,7 +260,7 @@ public class QeueManager {
 				}).start();
 			}
 		}
-		outLock.unlock();
+		// outLock.unlock();
 	}
 
 
@@ -257,7 +274,9 @@ public class QeueManager {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				outLock.lock();
 				hasOutMessages.signal();
+				outLock.unlock();
 			}
 		}).start();
 	}

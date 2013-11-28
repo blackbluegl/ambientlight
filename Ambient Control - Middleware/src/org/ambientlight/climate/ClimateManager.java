@@ -106,7 +106,7 @@ public class ClimateManager implements MessageListener {
 		}
 		AmbientControlMW.getRoom().qeueManager.putOutMessages(correlators);
 
-		sendTimeInfoToComponents();
+		// sendTimeInfoToComponents();
 
 		setMode(config.setTemp, config.mode, config.temporaryUntilDate);
 	}
@@ -121,14 +121,18 @@ public class ClimateManager implements MessageListener {
 	@Override
 	public void handleMessage(Message message) {
 		if (message instanceof MaxThermostatStateMessage) {
+			System.out.println("ClimateManager - handleMessage(): handle " + message);
 			handleThermostatState((MaxThermostatStateMessage) message);
 		} else if (message instanceof MaxSetTemperatureMessage) {
+			System.out.println("ClimateManager - handleMessage(): handle " + message);
 			handleSetTemperature((MaxSetTemperatureMessage) message);
 		} else if (message instanceof MaxShutterContactStateMessage) {
+			System.out.println("ClimateManager - handleMessage(): handle " + message);
 			handleShutterState((MaxShutterContactStateMessage) message);
 		} else if (message instanceof MaxPairPingMessage) {
+			System.out.println("ClimateManager - handleMessage(): handle " + message);
 			handlePairPing((MaxPairPingMessage) message);
-		} else if (message instanceof MaxMessage == false) {
+		} else {
 			System.out.println("ClimateManager handleMessage(): do not handle: " + message);
 			return;
 		}
@@ -165,7 +169,7 @@ public class ClimateManager implements MessageListener {
 	private void handlePairPing(MaxPairPingMessage message) {
 
 		// known device wants to re-pair with some other device
-		if (message.getToAdress().equals(config.vCubeAdress) == false) {
+		if (message.getToAdress().equals(config.vCubeAdress) == false && message.isReconnecting()) {
 			System.out.println("ClimateManager handleMessage(): Device wants to refresh pairing with some other device: "
 					+ message);
 		}
@@ -228,6 +232,13 @@ public class ClimateManager implements MessageListener {
 	 * @throws IOException
 	 */
 	private void handleShutterState(MaxShutterContactStateMessage message) {
+		ShutterContact shutterContact = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents()
+				.get(message.getFromAdress());
+		if (shutterContact == null) {
+			System.out.println("ClimateManager handleShutterState(): got request from unknown device: adress="
+					+ message.getFromAdress());
+			return;
+		}
 		RoomConfigurationFactory.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
@@ -640,11 +651,13 @@ public class ClimateManager implements MessageListener {
 			@Override
 			public void run() {
 				try {
+					System.out.println("ClimateManager - startPairing(): Waiting for new Devices");
 					Thread.sleep(WAIT_FOR_NEW_DEVICES * 1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} finally {
 					learnMode = false;
+					System.out.println("ClimateManager - startPairing(): Stopped waiting for new Devices");
 				}
 			}
 		}).start();
