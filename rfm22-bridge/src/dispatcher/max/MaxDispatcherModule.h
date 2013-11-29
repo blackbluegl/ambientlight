@@ -50,7 +50,7 @@ private:
 
 	const uint8_t incommingMessageLength=30;
 
-	bool sendLongPreamble(RF22 *rf22);
+	bool sendLongPreamble(RF22 *rf22, bool longPreamble);
 
 	time_t lastSendTimeStamp;
 

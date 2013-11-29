@@ -48,7 +48,7 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 	//wait for new messages
 	module->switchToRx(rfm22);
 	//at least wait a second for incomming messages
-	usleep(1500000);
+	usleep(1000000);
 	cout << "RFMDispatcher dispatchOutMessage(): dispatched a message.\n";
 }
 

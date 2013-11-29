@@ -176,7 +176,7 @@ void RF22::handleInterrupt() {
 	spiBurstRead(RF22_REG_03_INTERRUPT_STATUS1, _lastInterruptFlags, 2);
 
 	if (_lastInterruptFlags[0] & RF22_IFFERROR) {
-		cout << "RFM22 handleInterrupt(): IFFERROR\n";
+	//	cout << "RFM22 handleInterrupt(): IFFERROR\n";
 		resetFifos(); // Clears the interrupt
 		if (_mode == RF22_MODE_TX) {
 			restartTransmit();
@@ -251,7 +251,7 @@ void RF22::handleInterrupt() {
 		setModeRx(); // Keep trying
 	}
 	if (_lastInterruptFlags[1] & RF22_IPREAVAL) {
-		cout << "RFM22 handleInterrupt(): IPREAVAL\n";
+	//	cout << "RFM22 handleInterrupt(): IPREAVAL\n";
 		_lastRssi = spiRead(RF22_REG_26_RSSI);
 		//	clearRxBuf();
 	}
