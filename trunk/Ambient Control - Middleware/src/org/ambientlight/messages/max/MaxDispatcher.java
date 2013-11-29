@@ -52,6 +52,7 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
 			PrintStream ps = new PrintStream(socket.getOutputStream());
 			ps.print(header);
+			ps.flush();
 			if (message instanceof MaxMessage) {
 				socket.getOutputStream().write(getByteStreamFromMaxMessage((MaxMessage) message));
 				socket.getOutputStream().flush();

@@ -132,10 +132,23 @@ public class ClimateManager implements MessageListener {
 		} else if (message instanceof MaxPairPingMessage) {
 			System.out.println("ClimateManager - handleMessage(): handle " + message);
 			handlePairPing((MaxPairPingMessage) message);
+		} else if (message instanceof MaxTimeInformationMessage) {
+			System.out.println("ClimateManager - handleMessage(): handle " + message);
+			handleGetTimeInfo((MaxTimeInformationMessage) message);
 		} else {
 			System.out.println("ClimateManager handleMessage(): do not handle: " + message);
 			return;
 		}
+	}
+
+
+	/**
+	 * @param message
+	 */
+	private void handleGetTimeInfo(MaxTimeInformationMessage message) {
+		System.out.println("ClimateManager - getTimeInfo: sending time to device: " + message.getFromAdress());
+		MaxTimeInformationMessage time = getTimeInfoForDevice(new Date(), message.getFromAdress());
+		AmbientControlMW.getRoom().qeueManager.putOutMessage(time);
 	}
 
 
@@ -174,16 +187,11 @@ public class ClimateManager implements MessageListener {
 					+ message);
 		}
 		// device wants to repair with us
-		else if (learnMode == false && message.isReconnecting() && message.getToAdress().equals(config.vCubeAdress) == true) {
+		else if (message.isReconnecting() && message.getToAdress().equals(config.vCubeAdress) == true) {
 			// device is known and will be refreshed
 			if (AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress()) != null) {
 				System.out.println("ClimateManager handleMessage(): Device wants to refresh pairing with us: " + message);
 				sendPong(message, false);
-				// device is unknown. we recreate it and set it up
-			} else {
-				System.out.println("ClimateManager handleMessage(): Unknown Device refreshes pairing with us. Recreate it now: "
-						+ message);
-				sendPong(message, true);
 			}
 		}
 		// device wants to pair and we are in learnmode. we create it
@@ -282,7 +290,7 @@ public class ClimateManager implements MessageListener {
 
 
 	public void setFactoryResetDevice(int adress) throws IOException {
-
+		fehler.. response message is remove linkpartner aber wir haben im request garkeine to  gesetzt
 		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(adress);
 		if (device == null) {
 			System.out.println("ClimateManager setFactoryResetDevice(): got request for unknown device: adress=" + adress);
@@ -343,16 +351,27 @@ public class ClimateManager implements MessageListener {
 
 		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
 			if (current instanceof Thermostat) {
-				MaxTimeInformationMessage message = new MaxTimeInformationMessage();
-				message.setSequenceNumber(getNewSequnceNumber());
-				message.setFromAdress(config.vCubeAdress);
-				message.setTime(now);
-				message.setToAdress(((Thermostat) current).config.adress);
+				MaxTimeInformationMessage message = getTimeInfoForDevice(now, current.config.adress);
 
 				messages.add(message);
 			}
 		}
 		AmbientControlMW.getRoom().qeueManager.putOutMessages(messages);
+	}
+
+
+	/**
+	 * @param now
+	 * @param current
+	 * @return
+	 */
+	private MaxTimeInformationMessage getTimeInfoForDevice(Date now, int adress) {
+		MaxTimeInformationMessage message = new MaxTimeInformationMessage();
+		message.setSequenceNumber(getNewSequnceNumber());
+		message.setFromAdress(config.vCubeAdress);
+		message.setTime(now);
+		message.setToAdress(adress);
+		return message;
 	}
 
 
