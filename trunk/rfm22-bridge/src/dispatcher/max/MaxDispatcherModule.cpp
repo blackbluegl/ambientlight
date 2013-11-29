@@ -44,10 +44,12 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
+	bool sendLong=true;
 	if (lastSendTimeStamp + 4 < now) {
-		sendLongPreamble (rf22);
+		sendLong = false;
 		//do count used timeslots for 1% rule
 	}
+	sendLongPreamble(rf22,sendLong);
 
 	//create message
 	unsigned int length = message.payLoad.size() + 3;
@@ -140,7 +142,7 @@ void MaxDispatcherModule::switchToRx(RF22 *rf22) {
 	rf22->setModeRx();
 }
 
-bool MaxDispatcherModule::sendLongPreamble(RF22 *rf22) {
+bool MaxDispatcherModule::sendLongPreamble(RF22 *rf22, bool longPreamble) {
 	// We do not change the complete modem settings. we just adapt the data and preamble to send a 0101 sequence.
 	const uint8_t syncLong[] = { 0x55, 0x55, 0x55, 0x55, };
 	rf22->setSyncWords(syncLong, 0x4);
@@ -151,7 +153,11 @@ bool MaxDispatcherModule::sendLongPreamble(RF22 *rf22) {
 	for (int i = 0; i < fakePreambleLength; i++) {
 		data[i] = 0x55;
 	}
-	for (int i = 0; i < 8; i++) {
+	if (longPreamble == true) {
+		for (int i = 0; i < 8; i++) {
+			rf22->send(data, fakePreambleLength);
+		}
+	}else{
 		rf22->send(data, fakePreambleLength);
 	}
 
