@@ -77,7 +77,7 @@ void* SocketHandler::handleCommands(void* arg) {
 		}
 	} catch (SockedException &e) {
 		cout << "SocketHandler handleCommands(): caught sockedException!\n";
-		handleCloseConnection(myself);
+	//	handleCloseConnection(myself);
 	}
 
 	return 0;
