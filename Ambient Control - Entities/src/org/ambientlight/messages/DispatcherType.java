@@ -20,5 +20,5 @@ package org.ambientlight.messages;
  * 
  */
 public enum DispatcherType {
-	MAX, ELRO
+	MAX, ELRO, SYSTEM
 }

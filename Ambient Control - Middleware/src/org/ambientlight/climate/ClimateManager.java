@@ -290,7 +290,6 @@ public class ClimateManager implements MessageListener {
 
 
 	public void setFactoryResetDevice(int adress) throws IOException {
-		fehler.. response message is remove linkpartner aber wir haben im request garkeine to  gesetzt
 		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(adress);
 		if (device == null) {
 			System.out.println("ClimateManager setFactoryResetDevice(): got request for unknown device: adress=" + adress);
@@ -299,22 +298,13 @@ public class ClimateManager implements MessageListener {
 
 		RoomConfigurationFactory.beginTransaction();
 
-		// send remove
-		MaxFactoryResetMessage resetDevice = new MaxFactoryResetMessage();
-		resetDevice.setFromAdress(config.vCubeAdress);
-		resetDevice.setSequenceNumber(getNewSequnceNumber());
-		resetDevice.setToAdress(adress);
-
-		// Wait until shutterContact comes alive
-		WaitForShutterContactCondition condition = null;
-		if (device.config instanceof ShutterContactConfiguration) {
-			condition = new WaitForShutterContactCondition(device.config.adress);
-		}
-
-		AmbientControlMW.getRoom().qeueManager.putOutMessage(resetDevice, condition);
 
 		// unregister link from other devices
 		for (MaxComponentConfiguration currentConfig : config.devices.values()) {
+
+			if (currentConfig.adress == adress) {
+				continue;
+			}
 
 			MaxRemoveLinkPartnerMessage unlink = new MaxRemoveLinkPartnerMessage();
 			unlink.setLinkPartnerAdress(currentConfig.adress);
@@ -330,6 +320,20 @@ public class ClimateManager implements MessageListener {
 
 			AmbientControlMW.getRoom().qeueManager.putOutMessage(unlink, conditionForCurrent);
 		}
+
+		// send remove
+		MaxFactoryResetMessage resetDevice = new MaxFactoryResetMessage();
+		resetDevice.setFromAdress(config.vCubeAdress);
+		resetDevice.setSequenceNumber(getNewSequnceNumber());
+		resetDevice.setToAdress(adress);
+
+		// Wait until shutterContact comes alive
+		WaitForShutterContactCondition condition = null;
+		if (device instanceof ShutterContact) {
+			condition = new WaitForShutterContactCondition(device.config.adress);
+		}
+
+		AmbientControlMW.getRoom().qeueManager.putOutMessage(resetDevice, condition);
 
 		// remove correlator
 		UnRegisterCorrelatorMessage corelator = new UnRegisterCorrelatorMessage();

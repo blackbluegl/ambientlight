@@ -27,5 +27,5 @@ public interface InDispatcher {
 	public Message receiveMessages() throws IOException;
 
 
-	public Message parseMessage(byte[] input);
+	public Message parseMessage(String dispatcherType, byte[] input);
 }
