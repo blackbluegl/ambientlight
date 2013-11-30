@@ -48,7 +48,7 @@ std::string Enums::enumToString(Enums::DispatcherType dispatchType) {
 		return "UNKNOWN";
 		break;
 	case Enums::SYSTEM:
-		return "SYTEM";
+		return "SYSTEM";
 		break;
 	}
 	return "UNKNOWN";

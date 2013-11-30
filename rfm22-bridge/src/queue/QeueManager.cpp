@@ -88,7 +88,8 @@ void QeueManager::handleInMessages() {
 				}
 			} catch (SockedException &ex) {
 				cout << "QueueManager handleInMessages(): sockedHandler has no valid connection anymore. "
-						<< "Removal should be applied by the corresponding thread\n";
+						<< "Connection will be closed\n";
+				SocketHandler::handleCloseConnection(socketHandler);
 			}
 		}
 		pthread_mutex_unlock(&mutexLockInQueue);
