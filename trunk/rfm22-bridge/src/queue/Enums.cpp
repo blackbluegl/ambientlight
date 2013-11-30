@@ -27,10 +27,10 @@ Enums::MessageCommandType Enums::stringToMessageCommandTypeEnum(std::string comm
 	if ("RFM_SEND_MESSAGE" == command) {
 		return RFM_SEND_MESSAGE;
 	}
-	if("CLOSE_CONNECTION" == command){
+	if ("CLOSE_CONNECTION" == command) {
 		return CLOSE_CONNECTION;
 	}
-	if("PING" == command){
+	if ("PING" == command) {
 		return PING;
 	}
 	return UNKNOWN_COMMAND;
@@ -47,6 +47,9 @@ std::string Enums::enumToString(Enums::DispatcherType dispatchType) {
 	case Enums::UNKNOWN:
 		return "UNKNOWN";
 		break;
+	case Enums::SYSTEM:
+		return "SYTEM";
+		break;
 	}
 	return "UNKNOWN";
 }
@@ -58,8 +61,9 @@ Enums::DispatcherType Enums::stringToEnum(std::string dispatchType) {
 	if ("ELRO" == dispatchType) {
 		return Enums::ELRO;
 	}
+	if("SYSTEM" == dispatchType){
+		return Enums::SYSTEM;
+	}
 	return Enums::UNKNOWN;
 }
-
-
 

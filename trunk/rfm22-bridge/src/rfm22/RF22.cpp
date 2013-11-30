@@ -215,7 +215,7 @@ void RF22::handleInterrupt() {
 		_mode = RF22_MODE_IDLE;
 	}
 	if (_lastInterruptFlags[0] & RF22_IPKVALID) {
-		cout << "RFM22 handleInterrupt(): IPKVALID\n";
+	//	cout << "RFM22 handleInterrupt(): IPKVALID\n";
 		fflush(stdout);
 		uint8_t len = spiRead(RF22_REG_4B_RECEIVED_PACKET_LENGTH);
 
