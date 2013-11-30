@@ -18,6 +18,7 @@ package org.ambientlight.messages;
 import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.messages.max.MaxDispatcher;
+import org.ambientlight.messages.rfm22bridge.PingMessage;
 
 
 /**
@@ -32,6 +33,7 @@ public class DispatcherManager {
 		dispatcher.configuration = config;
 		dispatcher.queueManager = queueManager;
 		queueManager.registerOutDispatcher(DispatcherType.MAX, dispatcher);
+		queueManager.registerOutDispatcher(DispatcherType.SYSTEM, dispatcher);
 
 		new Thread(new Runnable() {
 
@@ -58,27 +60,29 @@ public class DispatcherManager {
 	private void connectDispatcher(MaxDispatcher dispatcher) {
 		try {
 			dispatcher.connect();
+			System.out.println("DispatcherManager connectDispatcher(): Successfully connected Dispatcher: "
+					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 		} catch (Exception e) {
 
 			System.out.println("DispatcherManager connectDispatcher(): could not connect Dispatcher: "
 					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName + ". Retrying.");
-			boolean connected = false;
-			while (connected == false) {
-				try {
-					Thread.sleep(10000);
-					connected = dispatcher.reconnect();
-					if (!connected) {
-						System.out.println("DispatcherManager connectDispatcher(): could not reconnect Dispatcher: "
-								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName
-								+ ". Retrying.");
-					}
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}
+
+			// boolean connected = false;
+			// while (connected == false) {
+			// try {
+			// Thread.sleep(10000);
+			// connected = dispatcher.reconnect();
+			// if (!connected) {
+			// System.out.println("DispatcherManager connectDispatcher(): could not reconnect Dispatcher: "
+			// + dispatcher.getClass().getSimpleName() + " to: " +
+			// dispatcher.configuration.hostName
+			// + ". Retrying.");
+			// }
+			// } catch (InterruptedException e1) {
+			// e1.printStackTrace();
+			// }
+			// }
 		}
-		System.out.println("DispatcherManager connectDispatcher(): Successfully connected Dispatcher: "
-				+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 	}
 
 
@@ -118,7 +122,10 @@ public class DispatcherManager {
 	public boolean dispatchMessage(Dispatcher dispatcher, Message message) {
 		dispatcher.sendLock.lock();
 		try {
-			return dispatcher.deliverMessage(message);
+			boolean delivered = dispatcher.deliverMessage(message);
+			if (message instanceof PingMessage)
+				return true;
+			return delivered;
 		} catch (Exception e) {
 
 		} finally {

@@ -71,7 +71,7 @@ public class MaxTimeInformationMessage extends MaxMessage {
 	@Override
 	public String toString() {
 		String parent = super.toString();
-		String result = "\nTime: " + getTime().toString() + "\nisRequest: " + isRequest();
+		String result = "\nTime: " + String.valueOf(getTime()) + "\nisRequest: " + isRequest();
 		return (parent + result);
 	}
 }

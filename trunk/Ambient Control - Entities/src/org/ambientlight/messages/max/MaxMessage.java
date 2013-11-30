@@ -163,7 +163,7 @@ public class MaxMessage extends Message {
 	@Override
 	public String getValue() {
 		// TODO Auto-generated method stub
-		return String.valueOf(payload.length);
+		return String.valueOf(getPayload().length);
 	}
 
 }
