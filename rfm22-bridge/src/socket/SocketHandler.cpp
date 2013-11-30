@@ -29,6 +29,7 @@ SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int 
 	this->queueManager = queues;
 	this->socketId = socketId;
 	this->correlation->registerSocket(this);
+	this->correlation->registerCorrelation(this, "Socket_" + this->socketId);
 }
 
 SocketHandler::~SocketHandler() {
@@ -43,29 +44,23 @@ void* SocketHandler::handleCommands(void* arg) {
 			std::vector<std::string> commandValues = myself->getValuesOfMessage(myself->readLine(myself->socketId));
 
 			if (commandValues.size() < 1) {
-				if (send(myself->socketId, "NOK\n", 4, MSG_NOSIGNAL) < 0) {
-					SockedException ex;
-					throw ex;
-				}
+				myself->sendResponse("NOK");
 				continue;
 			}
 
 			Enums::MessageCommandType commandType = Enums::stringToMessageCommandTypeEnum(commandValues.at(0));
 
 			if (commandType == Enums::UNKNOWN_COMMAND) {
-				if (send(myself->socketId, "NOK\n", 4, MSG_NOSIGNAL) < 0) {
-					SockedException ex;
-					throw ex;
-				}
+				myself->sendResponse("NOK");
 				continue;
 			}
 
 			if (commandType == Enums::CLOSE_CONNECTION) {
-				handleCloseConnection(myself);
+				myself->handleCloseConnection(myself);
 				return 0;
 			}
 
-			if(commandType == Enums::PING){
+			if (commandType == Enums::PING) {
 				myself->handlePing();
 				continue;
 			}
@@ -96,42 +91,29 @@ void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::
 	outMessage.dispatchTo = dispatcherType;
 	this->queueManager->postOutMessage(outMessage);
 
-	if (send(socketId, "OK\n", 3, 0) < 0) {
-		SockedException ex;
-		throw ex;
-	}
+	this->sendResponse("OK");
 }
 
 void SocketHandler::handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
 	std::string correlation(Enums::enumToString(dispatcherType) + "_" + commandValues.at(2));
 	this->correlation->registerCorrelation(this, correlation);
-	if (send(socketId, "OK\n", 3, 0) < 0) {
-		SockedException ex;
-		throw ex;
-	}
+	this->sendResponse("OK");
 }
 
 void SocketHandler::handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues) {
 	std::string correlation(Enums::enumToString(dispatcherType) + "_" + commandValues.at(2));
 	this->correlation->unRegisterCorrelation(this, correlation);
-	if (send(socketId, "OK\n", 3, 0) < 0) {
-		SockedException ex;
-		throw ex;
-	}
+	this->sendResponse("OK");
 }
 
 void SocketHandler::handlePing() {
-	if (send(socketId, "PONG\n", 5, 0) < 0) {
-		SockedException ex;
-		throw ex;
-	}
+	this->sendResponse("PONG");
 }
 
 void SocketHandler::handleCloseConnection(SocketHandler* socketHandler) {
 	cout << "SocketHandler handleCloseConnection(): closing connection\n";
-	send(socketHandler->socketId, "OK\n", 3, MSG_NOSIGNAL);
-	close(socketHandler->socketId);
 	socketHandler->correlation->unregisterSocket(socketHandler->socketId);
+	close(socketHandler->socketId);
 	delete socketHandler;
 }
 
@@ -141,7 +123,7 @@ std::string SocketHandler::readLine(int socked) {
 	std::string buffer = "";
 	do {
 		if ((rc = read(socked, &c, +1)) == 1) {
-			buffer.append(&c,1);
+			buffer.append(&c, 1);
 			if (c == '\n') {
 				break;
 			}
@@ -205,4 +187,13 @@ std::vector<std::string> SocketHandler::getValuesOfMessage(std::string commandVa
 		prevPos = ++pos;
 	}
 	return results;
+}
+
+void SocketHandler::sendResponse(string response) {
+	InMessage responseMessage;
+	responseMessage.correlation = "Socket_" + this->socketId;
+	responseMessage.dispatchTo = Enums::SYSTEM;
+	for (std::string::iterator it = response.begin(); it != response.end(); ++it)
+		responseMessage.payload.push_back(*it);
+	this->queueManager->postInMessage(responseMessage);
 }

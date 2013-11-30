@@ -64,8 +64,8 @@ void QeueManager::handleInMessages() {
 		while (inEnqueueAt != inReadAt) {
 
 			inReadAt++;
-			if(inReadAt==100){
-				inReadAt=0;
+			if (inReadAt == 100) {
+				inReadAt = 0;
 			}
 
 			InMessage msg = inQeue[inReadAt];
@@ -74,13 +74,21 @@ void QeueManager::handleInMessages() {
 				if (socketHandler != NULL) {
 					socketHandler->handleInMessage(msg);
 				} else {
-					for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
-							it != this->correlation->correlationMapSocketHandler.end(); ++it) {
-						it->second->handleInMessage(msg);
+					if (this->correlation->correlationMapSocketHandler.empty()) {
+						cout << "QueueManager handleInMessages(): got a message but no clients are connected. "
+								<< "This message is lost!\n";
+					} else {
+						for (std::map<int, SocketHandler*>::iterator it = this->correlation->correlationMapSocketHandler.begin();
+								it != this->correlation->correlationMapSocketHandler.end(); ++it) {
+							it->second->handleInMessage(msg);
+						}
+						cout << "QueueManager handleInMessages(): got no correlation for message. "
+								<< " This message will be broadcasted\n";
 					}
 				}
 			} catch (SockedException &ex) {
-				cout << "QueueManager handleInMessages(): sockedHandler has no valid connection anymore. removal should be applied by the corresponding thread";
+				cout << "QueueManager handleInMessages(): sockedHandler has no valid connection anymore. "
+						<< "Removal should be applied by the corresponding thread\n";
 			}
 		}
 		pthread_mutex_unlock(&mutexLockInQueue);

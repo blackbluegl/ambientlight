@@ -18,7 +18,7 @@ public:
 	virtual ~Enums();
 
 	enum DispatcherType {
-		MAX, ELRO, UNKNOWN
+		MAX, ELRO, SYSTEM, UNKNOWN
 	};
 
 	enum MessageCommandType {

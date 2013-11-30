@@ -40,7 +40,7 @@ private:
 	void handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
 	void handlePing();
 	std::vector<std::string> getValuesOfMessage(std::string commandValues);
-
+	void sendResponse(std::string response);
 };
 
 #endif /* SOCKETHANDLER_H_ */
