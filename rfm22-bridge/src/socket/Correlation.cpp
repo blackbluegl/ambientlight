@@ -6,6 +6,8 @@
  */
 
 #include "Correlation.h"
+#include <iostream>
+#include <sstream>
 
 Correlation::Correlation() {
 }
@@ -15,7 +17,7 @@ Correlation::~Correlation() {
 
 SocketHandler* Correlation::getSocketForID(string correlatorId) {
 
-	if(correlationCorrelator.find(correlatorId)==correlationCorrelator.end()){
+	if (correlationCorrelator.find(correlatorId) == correlationCorrelator.end()) {
 		return NULL;
 	}
 	int socketId = correlationCorrelator.find(correlatorId)->second;
@@ -35,9 +37,18 @@ void Correlation::unRegisterCorrelation(SocketHandler *socketHandler, string cor
 	correlationCorrelator.erase(correlatorId);
 }
 
-void Correlation::unregisterSocket(int sockedId) {
+bool Correlation::unregisterSocket(int sockedId) {
 
-	correlationMapSocketHandler.erase(sockedId);
+	std::map<int, SocketHandler*>::iterator it;
+
+	it = correlationMapSocketHandler.find(sockedId);
+	if(it == correlationMapSocketHandler.end()){
+		cout <<"Correlation unregister: socket is not registered: "<<sockedId<<"\n";
+		return false;
+	}
+	cout << "Correlation unregister: unregistering: "<<sockedId<<"\n";
+
+	correlationMapSocketHandler.erase(it);
 
 	vector<string> eraseEntries;
 
@@ -50,12 +61,12 @@ void Correlation::unregisterSocket(int sockedId) {
 	for (unsigned int i = 0; i < eraseEntries.size(); i++) {
 		correlationCorrelator.erase(eraseEntries.at(i));
 	}
-
+	return true;
 }
 
 void Correlation::registerSocket(SocketHandler *socketHandler) {
 
-	correlationMapSocketHandler.insert(pair<int, SocketHandler*>(socketHandler->socketId,socketHandler));
+	correlationMapSocketHandler.insert(pair<int, SocketHandler*>(socketHandler->socketId, socketHandler));
 
 }
 

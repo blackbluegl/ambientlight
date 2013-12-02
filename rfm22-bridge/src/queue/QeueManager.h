@@ -42,11 +42,8 @@ private:
 
 	static void* handleOutMessagesWrap(void* arg);
 	static void* handleInMessagesWrap(void* arg);
-	static void* informInQueueFilledWrap(void* arg);
 	void handleOutMessages();
 	void handleInMessages();
-	void informInQueueFilled();
-
 };
 
 #endif /* QEUEMANAGER_H_ */

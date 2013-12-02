@@ -35,12 +35,17 @@ void QeueManager::handleOutMessages() {
 	while (true) {
 		pthread_mutex_lock(&mutexLockOutQueue);
 		pthread_cond_wait(&conditionOutQueueFilled, &mutexLockOutQueue);
+		pthread_mutex_unlock(&mutexLockOutQueue);
 		while (outQeue.size() > 0) {
+			pthread_mutex_lock(&mutexLockOutQueue);
 			OutMessage outMessage = outQeue.at(0);
 			outQeue.erase(outQeue.begin());
+			int count = outQeue.size();
+			cout << "QeueManager handleOutMessages(): Send a Message " << count << " Messages left.\n";
 			dispatcher->dispatchOutMessage(outMessage);
+			pthread_mutex_unlock(&mutexLockOutQueue);
 		}
-		pthread_mutex_unlock(&mutexLockOutQueue);
+
 	}
 }
 
@@ -88,8 +93,8 @@ void QeueManager::handleInMessages() {
 				}
 			} catch (SockedException &ex) {
 				cout << "QueueManager handleInMessages(): sockedHandler has no valid connection anymore. "
-						<< "Connection will be closed\n";
-				SocketHandler::handleCloseConnection(socketHandler);
+						<< "Connection should be closed\n";
+				//	SocketHandler::handleCloseConnection(socketHandler,correlation);
 			}
 		}
 		pthread_mutex_unlock(&mutexLockInQueue);
@@ -101,18 +106,9 @@ void QeueManager::postInMessage(InMessage message) {
 	if (inEnqueueAt == 100) {
 		inEnqueueAt = 0;
 	}
+
 	inQeue[inEnqueueAt] = message;
-	//create a thread that informs the outQueue to send new Data
-	pthread_t informThread;
-	pthread_create(&informThread, NULL, QeueManager::informInQueueFilledWrap, this);
-}
 
-void* QeueManager::informInQueueFilledWrap(void* arg) {
-	((QeueManager*) arg)->informInQueueFilled();
-	return 0;
-}
-
-void QeueManager::informInQueueFilled() {
 	pthread_mutex_lock(&mutexLockInQueue);
 	pthread_cond_signal(&conditionInQueueFilled);
 	pthread_mutex_unlock(&mutexLockInQueue);

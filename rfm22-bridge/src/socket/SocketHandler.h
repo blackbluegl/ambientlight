@@ -26,7 +26,7 @@ public:
 	static void* handleCommands(void* arg);
 
 	void handleInMessage(InMessage message);
-	static void handleCloseConnection(SocketHandler* socketHandler);
+	static void handleCloseConnection(SocketHandler* socketHandler, Correlation* correlation);
 
 private:
 	Correlation *correlation;
@@ -34,11 +34,14 @@ private:
 	std::string readLine(int socked);
 	std::vector<uint8_t> readBytes(int socked, unsigned int length);
 
+	pthread_mutex_t mutexLockCloseSocket;
+
 
 
 	void handleRFMMessage(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
 	void handleRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
 	void handleUnRegisterCorrelation(Enums::DispatcherType dispatcherType, std::vector<std::string> commandValues);
+	void handleTest(Enums::DispatcherType dispatcherType);
 	void handlePing();
 	std::vector<std::string> getValuesOfMessage(std::string commandValues);
 	void sendResponse(std::string response);
