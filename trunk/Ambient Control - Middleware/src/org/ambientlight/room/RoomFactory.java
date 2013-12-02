@@ -50,6 +50,7 @@ public class RoomFactory {
 		// start queueManager
 		room.qeueManager = new QeueManager();
 		room.qeueManager.dispatcherManager = AmbientControlMW.getRfmDispatcher();
+		room.qeueManager.startQeues();
 
 		// init CallbackManager
 		CallBackManager callbackManager = new CallBackManager();
@@ -66,7 +67,7 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
-		room.qeueManager.startQeues();
+
 
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();

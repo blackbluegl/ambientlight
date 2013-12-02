@@ -28,6 +28,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class QeueManager {
 
+	private boolean retryOngoin = false;
+
 	public enum State {
 		PENDING, SENDING, SENT, WAITING_FOR_CONDITION, AWAITING_RESPONSE, SEND_ERROR, TIMED_OUT, RETRIEVED_ANSWER;
 	}
@@ -69,7 +71,9 @@ public class QeueManager {
 							retryHandleOutMessages();
 						}
 					} catch (InterruptedException e) {
+						e.printStackTrace();
 					} finally {
+
 					}
 				}
 			}
@@ -176,7 +180,6 @@ public class QeueManager {
 
 		}
 		outQueue.removeAll(messagesToRemove);
-		// outLock.unlock();
 
 		this.startWatchDogForWaitingMessages();
 
@@ -212,8 +215,8 @@ public class QeueManager {
 					}).start();
 				} else {
 					System.out
-							.println("QeueManager handleInMessages: got an AckResponseMessage where no Request is listening to (anymore): "
-									+ inMessage);
+					.println("QeueManager handleInMessages: got an AckResponseMessage where no Request is listening to (anymore): "
+							+ inMessage);
 				}
 			} else {
 				new Thread(new Runnable() {
@@ -265,16 +268,21 @@ public class QeueManager {
 
 
 	private void retryHandleOutMessages() {
+		if (retryOngoin == true)
+			return;
+		System.out.println("QeueuManager - retryHandleOutMessages(): some Messages could not be sent. Retrying!");
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
 					Thread.sleep(10000);
+					System.out.println("QeueuManager - retryHandleOutMessages(): Retrying to send waiting OutMessages");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				outLock.lock();
+				retryOngoin = false;
 				hasOutMessages.signal();
 				outLock.unlock();
 			}
@@ -289,14 +297,17 @@ public class QeueManager {
 	 */
 	private MessageEntry getAwaitingRequestMessageForInMessage(Message inMessage, MessageListener listener) {
 		outLock.lock();
-		for (MessageEntry entry : outQueue) {
-			if (entry.state == State.AWAITING_RESPONSE
-					&& ((AckRequestMessage) entry.message).getCorrelation().equals(
-							((AckResponseMessage) inMessage).getCorrelator()) == true)
-				return entry;
+		MessageEntry entry = null;
+		for (MessageEntry current : outQueue) {
+			if (current.state == State.AWAITING_RESPONSE
+					&& ((AckRequestMessage) current.message).getCorrelation().equals(
+							((AckResponseMessage) inMessage).getCorrelator()) == true) {
+			}
+			entry = current;
+			break;
 		}
 		outLock.unlock();
-		return null;
+		return entry;
 	}
 
 
