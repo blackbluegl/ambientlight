@@ -16,10 +16,11 @@
 package org.ambientlight.messages.max;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.messages.Dispatcher;
 import org.ambientlight.messages.InDispatcher;
 import org.ambientlight.messages.Message;
@@ -32,6 +33,8 @@ import org.ambientlight.messages.rfm22bridge.PingMessage;
  */
 public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
+	ReentrantLock sendLock = new ReentrantLock();
+
 	private boolean pongReceived = false;
 
 
@@ -43,7 +46,7 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	 * .messages.Message)
 	 */
 	@Override
-	public boolean deliverMessage(Message message) {
+	public synchronized boolean deliverMessage(Message message) {
 		try {
 
 			String header = message.getCommand() + "|" + message.getDispatcherType() + "|";
@@ -61,7 +64,6 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 			}
 		} catch (Exception e) {
 			System.out.println("MaxDispatcher deliverMessage(): was unable to send data!");
-			// reconnect();
 			return false;
 		}
 		return true;
@@ -70,21 +72,18 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
 	@Override
 	public Message receiveMessages() throws IOException {
-
-		String line = readLine();
+		InputStream in = socket.getInputStream();
+		String line = readLine(in);
 
 		String[] command = line.split("\\|");
 
 		if (command.length != 2)
 			return null;
 
-		if ("MAX".equals(command[0]) || "SYSTEM".equals(command[0])) {
-			int length = Integer.parseInt(command[1]);
-			byte[] messageBytes = new byte[length];
-			socket.getInputStream().read(messageBytes, 0, length);
-			return parseMessage(command[0], messageBytes);
-		}
-		return null;
+		int length = Integer.parseInt(command[1]);
+		byte[] messageBytes = new byte[length];
+		in.read(messageBytes, 0, length);
+		return parseMessage(command[0], messageBytes);
 	}
 
 
@@ -181,11 +180,12 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	 */
 	@Override
 	public boolean isConnected() {
+
 		pongReceived = false;
 		try {
 			PingMessage ping = new PingMessage();
 
-			AmbientControlMW.getRoom().qeueManager.putOutMessage(ping);
+			deliverMessage(ping);
 
 			Thread.sleep(3000);
 			if (pongReceived)
@@ -202,12 +202,12 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	}
 
 
-	private String readLine() throws IOException {
+	private String readLine(InputStream inputStream) throws IOException {
 		ArrayList<Character> result = new ArrayList<Character>();
 
 		boolean finished = false;
 		while (!finished) {
-			int charAt = socket.getInputStream().read();
+			int charAt = inputStream.read();
 			if (charAt == -1) {
 				finished = true;
 			} else if ('\n' == (char) charAt) {

@@ -25,6 +25,7 @@ import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.max.MaxMessageType;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
+import org.ambientlight.messages.rfm22bridge.TestMessage;
 
 
 /**
@@ -58,7 +59,15 @@ public class MessageQueueTest {
 
 		ArrayList<Message> out = new ArrayList<Message>();
 		out.add(tempMsg);
-		Thread.sleep(1500);
+		// Thread.sleep(1500);
 		// manager.putOutMessages(out);
+
+		for (int i = 0; i < 10000; i++) {
+			TestMessage test = new TestMessage();
+			manager.putOutMessage(test);
+			// Thread.sleep(1);
+			// System.out.println(i);
+		}
+		System.out.println("finished");
 	}
 }
