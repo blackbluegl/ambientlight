@@ -27,7 +27,7 @@ public:
 	void registerCorrelation(SocketHandler *socketHandler, string correlatorId);
 	void unRegisterCorrelation(SocketHandler *socketHandler, string correlatorId);
 	void registerSocket(SocketHandler *socketHandler);
-	void unregisterSocket(int sockedId);
+	bool unregisterSocket(int sockedId);
 
 
 private:

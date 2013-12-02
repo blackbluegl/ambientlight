@@ -33,6 +33,9 @@ Enums::MessageCommandType Enums::stringToMessageCommandTypeEnum(std::string comm
 	if ("PING" == command) {
 		return PING;
 	}
+	if ("TEST" == command) {
+		return TEST;
+	}
 	return UNKNOWN_COMMAND;
 }
 
@@ -61,7 +64,7 @@ Enums::DispatcherType Enums::stringToEnum(std::string dispatchType) {
 	if ("ELRO" == dispatchType) {
 		return Enums::ELRO;
 	}
-	if("SYSTEM" == dispatchType){
+	if ("SYSTEM" == dispatchType) {
 		return Enums::SYSTEM;
 	}
 	return Enums::UNKNOWN;

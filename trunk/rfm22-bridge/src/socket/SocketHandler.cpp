@@ -24,6 +24,8 @@
 #include <sstream>
 #include "SockedException.h"
 
+pthread_mutex_t mutexLockCloseConnection = PTHREAD_MUTEX_INITIALIZER;
+
 SocketHandler::SocketHandler(Correlation *correlation, QeueManager *queues, int socketId) {
 	this->correlation = correlation;
 	this->queueManager = queues;
@@ -44,7 +46,8 @@ void* SocketHandler::handleCommands(void* arg) {
 			std::vector<std::string> commandValues = myself->getValuesOfMessage(myself->readLine(myself->socketId));
 
 			if (commandValues.size() < 1) {
-				myself->sendResponse("NOK");
+				//myself->sendResponse("NOK");
+				SocketHandler::handleCloseConnection(myself, myself->correlation);
 				continue;
 			}
 
@@ -56,7 +59,7 @@ void* SocketHandler::handleCommands(void* arg) {
 			}
 
 			if (commandType == Enums::CLOSE_CONNECTION) {
-				myself->handleCloseConnection(myself);
+				myself->handleCloseConnection(myself, myself->correlation);
 				return 0;
 			}
 
@@ -73,11 +76,13 @@ void* SocketHandler::handleCommands(void* arg) {
 				myself->handleRegisterCorrelation(dispatcherType, commandValues);
 			} else if (commandType == Enums::UNREGISTER_CORRELATION) {
 				myself->handleUnRegisterCorrelation(dispatcherType, commandValues);
+			} else if (commandType == Enums::TEST) {
+				myself->handleTest(dispatcherType);
 			}
 		}
 	} catch (SockedException &e) {
 		cout << "SocketHandler handleCommands(): caught sockedException!\n";
-	//	handleCloseConnection(myself);
+		handleCloseConnection(myself, myself->correlation);
 	}
 
 	return 0;
@@ -110,11 +115,23 @@ void SocketHandler::handlePing() {
 	this->sendResponse("PONG");
 }
 
-void SocketHandler::handleCloseConnection(SocketHandler* socketHandler) {
+void SocketHandler::handleCloseConnection(SocketHandler* socketHandler, Correlation* correlation) {
+	pthread_mutex_lock(&mutexLockCloseConnection);
+
+	if (!socketHandler || socketHandler == NULL) {
+		cout << "SocketHandler handleCloseConnection(): socketHandler is null! Maybe it is already closed?\n";
+		return;
+	}
+
 	cout << "SocketHandler handleCloseConnection(): closing connection\n";
-	socketHandler->correlation->unregisterSocket(socketHandler->socketId);
+	if (correlation->unregisterSocket(socketHandler->socketId) == false) {
+		pthread_mutex_unlock(&mutexLockCloseConnection);
+		return;
+	}
 	close(socketHandler->socketId);
 	delete socketHandler;
+	cout << "SocketHandler handleCloseConnection(): closed\n";
+	pthread_mutex_unlock(&mutexLockCloseConnection);
 }
 
 std::string SocketHandler::readLine(int socked) {
@@ -187,6 +204,16 @@ std::vector<std::string> SocketHandler::getValuesOfMessage(std::string commandVa
 		prevPos = ++pos;
 	}
 	return results;
+}
+
+void SocketHandler::handleTest(Enums::DispatcherType dispatcherType) {
+	InMessage responseMessage;
+	responseMessage.correlation = "Socket_" + this->socketId;
+	responseMessage.dispatchTo = dispatcherType;
+	std::string response = "TEST";
+	for (std::string::iterator it = response.begin(); it != response.end(); ++it)
+		responseMessage.payload.push_back(*it);
+	this->queueManager->postInMessage(responseMessage);
 }
 
 void SocketHandler::sendResponse(string response) {
