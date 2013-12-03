@@ -15,14 +15,50 @@
 
 package org.ambientlight.messages.max;
 
+import org.ambientlight.messages.AckRequestMessage;
+
+
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxFactoryResetMessage extends MaxMessage {
+public class MaxFactoryResetMessage extends MaxMessage implements AckRequestMessage {
 
 	public MaxFactoryResetMessage() {
 		payload = new byte[10];
 		setMessageType(MaxMessageType.RESET);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 5;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		return 5;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		return String.valueOf(getToAdress());
 	}
 }
