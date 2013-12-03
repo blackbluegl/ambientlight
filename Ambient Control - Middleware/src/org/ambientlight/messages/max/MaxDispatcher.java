@@ -185,14 +185,21 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 		try {
 			PingMessage ping = new PingMessage();
 
+
 			deliverMessage(ping);
 
 			Thread.sleep(3000);
-			if (pongReceived)
+			System.out.println("ping");
+			if (pongReceived) {
+				System.out.println("pong");
 				return true;
+			}
+
 		} catch (Exception e) {
+			System.out.println("pong ex");
 			return false;
 		}
+		System.out.println("no pong");
 		return false;
 	}
 

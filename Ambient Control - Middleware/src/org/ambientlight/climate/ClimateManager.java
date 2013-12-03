@@ -212,10 +212,16 @@ public class ClimateManager implements MessageListener {
 	 */
 	@Override
 	public void handleResponseMessages(State state, Message response, Message request) {
+		if (response != null) {
+			System.out.println("ClimateManager - handleResponseMessage: called with response: " + response);
+		}
+		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(((MaxMessage) request).getToAdress());
+		if (device == null) {
+			System.out.println("ClimateManager - handleResonseMessages: Device is unknown.");
+			return;
+		}
 
 		RoomConfigurationFactory.beginTransaction();
-
-		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(((MaxMessage) request).getToAdress());
 
 		if (state == State.TIMED_OUT) {
 
@@ -307,7 +313,8 @@ public class ClimateManager implements MessageListener {
 			}
 
 			MaxRemoveLinkPartnerMessage unlink = new MaxRemoveLinkPartnerMessage();
-			unlink.setLinkPartnerAdress(currentConfig.adress);
+			unlink.setToAdress(currentConfig.adress);
+			unlink.setLinkPartnerAdress(adress);
 			unlink.setLinkPartnerDeviceType(device.config.getDeviceType());
 			unlink.setSequenceNumber(getNewSequnceNumber());
 			unlink.setFromAdress(config.vCubeAdress);
