@@ -28,7 +28,7 @@ public:
 
 	void startQeues();
 
-	void postOutMessage(OutMessage message);
+	void postOutMessage(OutMessage message,bool beginning);
 	void postInMessage(InMessage message);
 
 private:
