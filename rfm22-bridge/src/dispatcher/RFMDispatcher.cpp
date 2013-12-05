@@ -21,6 +21,7 @@ RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
 RFMDispatcher::~RFMDispatcher() {
 }
 
+
 void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 	cout << "RFMDispatcher dispatchOutMessage(): dispatching message of type" << Enums::enumToString(message.dispatchTo) << "\n";
 	DispatcherModule* module = dispatchers.at(message.dispatchTo);
@@ -48,7 +49,7 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 	//wait for new messages
 	module->switchToRx(rfm22);
 	//at least wait a second for incomming messages
-	usleep(1000000);
+	usleep(100000);
 	cout << "RFMDispatcher dispatchOutMessage(): dispatched a message.\n";
 }
 

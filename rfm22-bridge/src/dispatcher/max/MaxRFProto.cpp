@@ -162,7 +162,7 @@ MaxRFMessage *MaxRFMessage::parse(const uint8_t *buf, size_t len) {
 	if (m->parse_payload(buf + 10, len - 10))
 		return m;
 	else
-		return NULL;
+		return m;
 }
 
 void MaxRFMessage::updateState() {

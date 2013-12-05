@@ -16,6 +16,7 @@
 #include "MaxRFProto.h"
 #include <iostream>
 #include <sstream>
+#include "../../queue/Enums.h"
 
 MaxDispatcherModule::~MaxDispatcherModule() {
 
@@ -44,12 +45,28 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
-	bool sendLong=true;
-	if (lastSendTimeStamp + 4 < now) {
-		sendLong = false;
-		//do count used timeslots for 1% rule
+	bool sendLong = false;
+	if (lastSendTimeStamp + 3 < now) {
+		sendLong = true;
 	}
-	sendLongPreamble(rf22,sendLong);
+
+	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
+		cout << "MaxDispatcher - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
+		sendLong = false;
+	}
+
+	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
+		cout << "MaxDispatcher - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
+		sendLong = false;
+	}
+
+	if (sendLong == true) {
+		cout << "MaxDispatcher - sendMessage(): sending long preamble\n";
+	} else {
+		cout << "MaxDispatcher - sendMessage(): sending short preamble\n";
+	}
+
+	sendLongPreamble(rf22, sendLong);
 
 	//create message
 	unsigned int length = message.payLoad.size() + 3;
@@ -118,6 +135,25 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 				<< " from " << rfMessage->addr_from << " to " << rfMessage->addr_to << "\r\n";
 	}
 
+//	if (rfMessage->type == MessageType::SHUTTER_CONTACT_STATE) {
+//		//we have to create a response very fast for the shuttercontact
+//		OutMessage response;
+//		response.payLoad.push_back(rfMessage->seqnum);
+//		response.payLoad.push_back(0x0); //flags maybe wrong. have to sniff again
+//		response.payLoad.push_back(0x2); //ack
+//		response.payLoad.push_back(data[7]); //swap from and to
+//		response.payLoad.push_back(data[8]);
+//		response.payLoad.push_back(data[9]);
+//		response.payLoad.push_back(data[4]);
+//		response.payLoad.push_back(data[5]);
+//		response.payLoad.push_back(data[6]);
+//		response.payLoad.push_back(data[10]); //set the same group id
+//		response.payLoad.push_back(0x0); //simple ack
+//		response.dispatchTo = Enums::DispatcherType::MAX;
+//		dispatcher->sendADirectResponse(response);
+//		cout << "MaxDispatcherModule - receiveMessage(): send as soon as possible an ack for: " << rfMessage->addr_from << "\n";
+//	}
+
 	InMessage message;
 	message.dispatchTo = Enums::MAX;
 
@@ -154,10 +190,10 @@ bool MaxDispatcherModule::sendLongPreamble(RF22 *rf22, bool longPreamble) {
 		data[i] = 0x55;
 	}
 	if (longPreamble == true) {
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 10; i++) {
 			rf22->send(data, fakePreambleLength);
 		}
-	}else{
+	} else {
 		rf22->send(data, fakePreambleLength);
 	}
 

@@ -94,7 +94,7 @@ void SocketHandler::handleRFMMessage(Enums::DispatcherType dispatcherType, std::
 	OutMessage outMessage;
 	outMessage.payLoad = readBytes(this->socketId, length);
 	outMessage.dispatchTo = dispatcherType;
-	this->queueManager->postOutMessage(outMessage);
+	this->queueManager->postOutMessage(outMessage, false);
 
 	this->sendResponse("OK");
 }

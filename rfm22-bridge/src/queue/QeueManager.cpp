@@ -49,9 +49,13 @@ void QeueManager::handleOutMessages() {
 	}
 }
 
-void QeueManager::postOutMessage(OutMessage message) {
+void QeueManager::postOutMessage(OutMessage message, bool beginning) {
 	pthread_mutex_lock(&mutexLockOutQueue);
-	outQeue.push_back(message);
+	if (beginning == true) {
+		outQeue.insert(outQeue.begin(),message);
+	} else {
+		outQeue.push_back(message);
+	}
 	pthread_cond_signal(&conditionOutQueueFilled);
 	pthread_mutex_unlock(&mutexLockOutQueue);
 }
