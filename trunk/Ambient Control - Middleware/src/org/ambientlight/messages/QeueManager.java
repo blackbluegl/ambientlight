@@ -36,9 +36,19 @@ public class QeueManager {
 
 	private class MessageEntry {
 
+		int retries = 1;
 		WaitForResponseCondition condition;
 		Message message;
-		State state = State.PENDING;
+		private State state = State.PENDING;
+
+
+		public void setState(State state) {
+
+			if (condition != null) {
+				System.out.println("was changed!");
+			}
+			this.state = state;
+		}
 	}
 
 	public DispatcherManager dispatcherManager;
@@ -114,16 +124,9 @@ public class QeueManager {
 		if (messages == null || messages.size() == 0)
 			return;
 
-		outLock.lock();
-		List<MessageEntry> entries = new ArrayList<QeueManager.MessageEntry>();
 		for (Message current : messages) {
-			MessageEntry entry = new MessageEntry();
-			entry.message = current;
-			entries.add(entry);
+			putOutMessage(current);
 		}
-		outQueue.addAll(entries);
-		hasOutMessages.signal();
-		outLock.unlock();
 	}
 
 
@@ -142,6 +145,10 @@ public class QeueManager {
 		if (waitCondition != null) {
 			entry.state = State.WAITING_FOR_CONDITION;
 		}
+		if (message instanceof AckRequestMessage) {
+			entry.retries = ((AckRequestMessage) message).getRetryCount();
+		}
+
 		outLock.lock();
 		outQueue.add(entry);
 		hasOutMessages.signal();
@@ -172,7 +179,7 @@ public class QeueManager {
 			if (dispatcherManager.dispatchMessage(outDispatchers.get(out.message.getDispatcherType()), out.message)) {
 
 				if (out.message instanceof AckRequestMessage) {
-					out.state = State.WAITING_FOR_RESPONSE;
+					out.setState(State.WAITING_FOR_RESPONSE);
 					this.startWatchDogForWaitingMessage(out);
 				} else {
 					out.state = State.SENT;
@@ -215,7 +222,7 @@ public class QeueManager {
 				final MessageEntry foundRequest = getAwaitingRequestMessageForInMessage(inMessage, listener);
 				// there is a request waiting
 				if (foundRequest != null) {
-					foundRequest.state = State.RETRIEVED_ANSWER;
+					foundRequest.setState(State.RETRIEVED_ANSWER);
 					// decouple listeners action to handle next message
 					new Thread(new Runnable() {
 
@@ -252,59 +259,63 @@ public class QeueManager {
 	}
 
 
-	private void startWatchDogForWaitingMessage(final MessageEntry current) {
-		current.state = State.WAITING_FOR_RESPONSE;
+	private void startWatchDogForWaitingMessage(final MessageEntry entry) {
+
 
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				int retries = 0;
 
-				while (((AckRequestMessage) current.message).getRetryCount() > retries) {
+				if (entry.retries > 0) {
 					// wait
-					retries++;
+					entry.retries--;
 					try {
-						Thread.sleep(((AckRequestMessage) current.message).getTimeOutSec() * 1000);
+						Thread.sleep(((AckRequestMessage) entry.message).getTimeOutSec() * 1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-
-					if (current.state == State.RETRIEVED_ANSWER) {
+					System.out.println("!!!!should have answer!!!");
+					if (entry.state == State.RETRIEVED_ANSWER) {
 						// got an answer - just stop watching.
-						break;
+						System.out.println("had answer");
 					} else {
 						outLock.lock();
 						// sending the message again!
-						System.out
-								.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage got no answer. Retrying. "
-										+ (((AckRequestMessage) current.message).getRetryCount() - retries)
-										+ " retries left for Message: " + current.message);
 
-						boolean delivered = dispatcherManager.dispatchMessage(
-								outDispatchers.get(current.message.getDispatcherType()), current.message);
-						// the dispatcher system was not ready. so this retry
-						// does not count
-						if (delivered == false) {
-							retries--;
+						if (entry.condition != null) {
+							// we have to wait for the next condition to become
+							// true
+							entry.state = State.WAITING_FOR_CONDITION;
+							System.out
+							.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage with condition got no answer. Retrying after next time condition comes true. "
+									+ entry.retries + " retries left for Message: " + entry.message);
+
+						} else {
+							System.out
+							.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage got no answer. Retrying. "
+									+ entry.retries + " retries left for Message: " + entry.message);
+							entry.state = State.PENDING;
+							hasOutMessages.signal();
 						}
 						outLock.unlock();
+						return;
 					}
 				}
 
 				// finished waiting - remove the message from queue
 				outLock.lock();
-				outQueue.remove(current);
+				outQueue.remove(entry);
 				outLock.unlock();
 
 				// if we got no answer we have to inform the waiting client
-				if (current.state == State.WAITING_FOR_RESPONSE) {
+				if (entry.state == State.WAITING_FOR_RESPONSE) {
 					System.out
 					.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage got no answer and timed out. Informing client: "
-							+ current.message);
-					current.state = State.TIMED_OUT;
-					messageListeners.get(current.message.getDispatcherType()).handleResponseMessages(current.state, null,
-							current.message);
+							+ entry.message);
+					entry.state = State.TIMED_OUT;
+					messageListeners.get(entry.message.getDispatcherType()).handleResponseMessages(entry.state, null,
+							entry.message);
 				}
 			}
 		}).start();
@@ -354,9 +365,9 @@ public class QeueManager {
 			if (current.state == State.WAITING_FOR_RESPONSE
 					&& ((AckRequestMessage) current.message).getCorrelation().equals(
 							((AckResponseMessage) inMessage).getCorrelator()) == true) {
+				result = current;
+				break;
 			}
-			result = current;
-			break;
 		}
 		outLock.unlock();
 		return result;
@@ -372,7 +383,7 @@ public class QeueManager {
 		outLock.lock();
 		for (MessageEntry entry : outQueue) {
 			if (entry.state == State.WAITING_FOR_CONDITION && entry.condition.fullfilled(inMessage)) {
-				entry.state = State.PENDING;
+				entry.setState(State.PENDING);
 				hasOutMessages.signal();
 				System.out
 				.println("QeueManager - handleConditionalOutMessageForResponse(): condition fullfilled. Message may be send now: "

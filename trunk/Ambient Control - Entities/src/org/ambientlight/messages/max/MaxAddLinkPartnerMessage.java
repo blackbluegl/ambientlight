@@ -15,12 +15,15 @@
 
 package org.ambientlight.messages.max;
 
+import org.ambientlight.messages.AckRequestMessage;
+
+
 /**
  * 
  * @author Florian Bornkessel
  * 
  */
-public class MaxAddLinkPartnerMessage extends MaxMessage {
+public class MaxAddLinkPartnerMessage extends MaxMessage implements AckRequestMessage {
 
 	public MaxAddLinkPartnerMessage() {
 		payload = new byte[14];
@@ -57,5 +60,40 @@ public class MaxAddLinkPartnerMessage extends MaxMessage {
 		String parent = super.toString();
 		String current = "linkPartner: " + getLinkPartnerAdress() + "\nPartnerType: " + getLinkPartnerType();
 		return parent + "\n" + current;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		// TODO Auto-generated method stub
+		return 5;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		// TODO Auto-generated method stub
+		return String.valueOf(getSequenceNumber());
 	}
 }

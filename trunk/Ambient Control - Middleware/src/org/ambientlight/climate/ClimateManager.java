@@ -111,6 +111,7 @@ public class ClimateManager implements MessageListener {
 		setMode(config.setTemp, config.mode, config.temporaryUntilDate);
 	}
 
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -253,6 +254,14 @@ public class ClimateManager implements MessageListener {
 					+ message.getFromAdress());
 			return;
 		}
+
+		// respond as fast as possible
+		MaxAckMessage ack = new MaxAckMessage();
+		ack.setFromAdress(config.vCubeAdress);
+		ack.setToAdress(message.getFromAdress());
+		ack.setSequenceNumber(message.getSequenceNumber());
+		AmbientControlMW.getRoom().qeueManager.putOutMessage(ack);
+
 		RoomConfigurationFactory.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
@@ -304,6 +313,10 @@ public class ClimateManager implements MessageListener {
 
 		RoomConfigurationFactory.beginTransaction();
 
+		MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
+		wakeUp.setFromAdress(this.config.vCubeAdress);
+		wakeUp.setToAdress(adress);
+		AmbientControlMW.getRoom().qeueManager.putOutMessage(wakeUp);
 
 		// unregister link from other devices
 		for (MaxComponentConfiguration currentConfig : config.devices.values()) {
@@ -508,7 +521,8 @@ public class ClimateManager implements MessageListener {
 				// link devices
 				for (MaxComponentConfiguration currentConfig : this.config.devices.values()) {
 
-					// only pair with shutterContacts or Thermostates
+					// only pair with shutterContacts or thermostates at the
+					// moment
 					if (currentConfig instanceof ShutterContactConfiguration == false
 							&& currentConfig instanceof ThermostatConfiguration == false) {
 						continue;
@@ -525,10 +539,33 @@ public class ClimateManager implements MessageListener {
 						continue;
 					}
 
-					MaxAddLinkPartnerMessage link = new MaxAddLinkPartnerMessage();
-					link.setLinkPartnerAdress(currentConfig.adress);
-					link.setLinkPartnerDeviceType(pairMessage.getDeviceType());
-					AmbientControlMW.getRoom().qeueManager.putOutMessage(link);
+					// set new device as linkpartner to existing
+					// Wait until shutterContact comes alive
+					WaitForShutterContactCondition conditionForCurrent = null;
+					if (currentConfig instanceof ShutterContactConfiguration) {
+						conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress);
+						MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
+						wakeUp.setFromAdress(this.config.vCubeAdress);
+						wakeUp.setToAdress(currentConfig.adress);
+						AmbientControlMW.getRoom().qeueManager.putOutMessage(wakeUp, conditionForCurrent);
+					}
+					MaxAddLinkPartnerMessage linkCurrentToNew = new MaxAddLinkPartnerMessage();
+					linkCurrentToNew.setLinkPartnerAdress(config.adress);
+					linkCurrentToNew.setLinkPartnerDeviceType(pairMessage.getDeviceType());
+					linkCurrentToNew.setFromAdress(this.config.vCubeAdress);
+					linkCurrentToNew.setSequenceNumber(getNewSequnceNumber());
+					linkCurrentToNew.setToAdress(currentConfig.adress);
+					AmbientControlMW.getRoom().qeueManager.putOutMessage(linkCurrentToNew, conditionForCurrent);
+
+					// and register the current to the new one - should be alive
+					// so we need no condition
+					MaxAddLinkPartnerMessage linkNewToCurrent = new MaxAddLinkPartnerMessage();
+					linkNewToCurrent.setLinkPartnerAdress(currentConfig.adress);
+					linkNewToCurrent.setLinkPartnerDeviceType(currentConfig.getDeviceType());
+					linkNewToCurrent.setFromAdress(this.config.vCubeAdress);
+					linkNewToCurrent.setSequenceNumber(getNewSequnceNumber());
+					linkNewToCurrent.setToAdress(config.adress);
+					AmbientControlMW.getRoom().qeueManager.putOutMessage(linkNewToCurrent);
 				}
 			}
 		}
@@ -692,6 +729,7 @@ public class ClimateManager implements MessageListener {
 			}
 		}).start();
 	}
+
 
 	private int getNewSequnceNumber() {
 		outSequenceNumber++;

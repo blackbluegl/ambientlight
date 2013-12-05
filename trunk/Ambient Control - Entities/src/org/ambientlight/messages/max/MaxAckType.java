@@ -24,16 +24,16 @@ import java.util.Map;
  * 
  */
 public enum MaxAckType {
-	ACK_THERMOSTATE(0x01), ACK_SIMPLE(0x00), ACK_INVALID_MESSAGE(0x80);
+	ACK_THERMOSTATE((byte) 0x01), ACK_SIMPLE((byte) 0x00), ACK_INVALID_MESSAGE((byte) 0x80);
 
-	public final int byteValue;
+	public final byte byteValue;
 
 
-	MaxAckType(int byteValue) {
+	MaxAckType(byte byteValue) {
 		this.byteValue = byteValue;
 	}
 
-	private static final Map<Integer, MaxAckType> BY_CODE_MAP = new LinkedHashMap<Integer, MaxAckType>();
+	private static final Map<Byte, MaxAckType> BY_CODE_MAP = new LinkedHashMap<Byte, MaxAckType>();
 
 	static {
 		for (MaxAckType rae : MaxAckType.values()) {
@@ -42,7 +42,7 @@ public enum MaxAckType {
 	}
 
 
-	public static MaxAckType forCode(int code) {
+	public static MaxAckType forCode(Byte code) {
 		return BY_CODE_MAP.get(code);
 	}
 }

@@ -53,6 +53,10 @@ public class MessageDump implements MessageListener {
 	@Override
 	public void handleResponseMessages(State state, Message response, Message request) {
 		// TODO Auto-generated method stub
+		if (response == null)
+			return;
+		System.out.println((new Date(System.currentTimeMillis()).toString() + " - new Response Message:\n" + response.toString())
+				+ "\n");
 
 	}
 }
