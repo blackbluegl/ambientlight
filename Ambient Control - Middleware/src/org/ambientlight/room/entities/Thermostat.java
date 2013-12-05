@@ -15,7 +15,6 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
 
 
 /**
@@ -24,13 +23,10 @@ import org.ambientlight.config.room.actors.ThermostatConfiguration;
  */
 public class Thermostat extends MaxComponent implements Sensor {
 
-	public ThermostatConfiguration getConfig() {
-		return (ThermostatConfiguration) config;
-	}
+
 
 	public float temperatur;
 	public boolean isLocked;
-
 
 
 	/*

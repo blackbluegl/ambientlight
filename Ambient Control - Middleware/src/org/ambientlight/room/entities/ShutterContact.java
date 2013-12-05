@@ -15,7 +15,6 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.config.room.actors.MaxComponentConfiguration;
 
 
 /**
@@ -23,8 +22,6 @@ import org.ambientlight.config.room.actors.MaxComponentConfiguration;
  * 
  */
 public class ShutterContact extends MaxComponent {
-
-	public MaxComponentConfiguration config;
 
 	public boolean isOpen = false;
 

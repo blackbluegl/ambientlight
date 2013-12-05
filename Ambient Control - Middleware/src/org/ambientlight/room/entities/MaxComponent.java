@@ -22,7 +22,7 @@ import org.ambientlight.config.room.actors.MaxComponentConfiguration;
  * @author Florian Bornkessel
  * 
  */
-public class MaxComponent {
+public abstract class MaxComponent {
 
 	public MaxComponentConfiguration config;
 

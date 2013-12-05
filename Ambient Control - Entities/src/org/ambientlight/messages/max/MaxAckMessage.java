@@ -46,6 +46,11 @@ public class MaxAckMessage extends MaxMessage implements AckResponseMessage {
 	}
 
 
+	public void setAckType(MaxAckType type) {
+		payload[10] = type.byteValue;
+	}
+
+
 	public MaxThermostateMode getMode() {
 		return MaxThermostateMode.forCode(payload[11] & 0x3);
 	}
@@ -92,15 +97,20 @@ public class MaxAckMessage extends MaxMessage implements AckResponseMessage {
 	@Override
 	public String toString() {
 		String parent = super.toString() + "\n";
-		String myString = "Mode: " + getMode() + "\n";
-		myString += "AckType: " + getAckType() + "\n";
-		myString += "Until: " + getTemporaryUntil() + "\n";
-		myString += "DST: " + getDST() + "\n";
-		myString += "Locked: " + isLocked() + "\n";
-		myString += "BatteryLow: " + hadRfError() + "\n";
-		myString += "RF-Error: " + isBatteryLow() + "\n";
-		myString += "ValvePos: " + getValvePosition() + "\n";
-		myString += "Set Temp: " + getSetTemp() + "\n";
+		String myString = "";
+		try {
+			myString = "Mode: " + getMode() + "\n";
+			myString += "AckType: " + getAckType() + "\n";
+			myString += "Until: " + getTemporaryUntil() + "\n";
+			myString += "DST: " + getDST() + "\n";
+			myString += "Locked: " + isLocked() + "\n";
+			myString += "BatteryLow: " + hadRfError() + "\n";
+			myString += "RF-Error: " + isBatteryLow() + "\n";
+			myString += "ValvePos: " + getValvePosition() + "\n";
+			myString += "Set Temp: " + getSetTemp() + "\n";
+		} catch (Exception e) {
+			myString = "Thermostat may not be initialized propperly";
+		}
 		return parent + myString;
 	}
 
