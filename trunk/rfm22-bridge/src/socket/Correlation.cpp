@@ -42,11 +42,11 @@ bool Correlation::unregisterSocket(int sockedId) {
 	std::map<int, SocketHandler*>::iterator it;
 
 	it = correlationMapSocketHandler.find(sockedId);
-	if(it == correlationMapSocketHandler.end()){
-		cout <<"Correlation unregister: socket is not registered: "<<sockedId<<"\n";
+	if (it == correlationMapSocketHandler.end()) {
+		cout << "Correlation unregister: socket is not registered: " << sockedId << "\n";
 		return false;
 	}
-	cout << "Correlation unregister: unregistering: "<<sockedId<<"\n";
+	cout << "Correlation unregister: unregistering: " << sockedId << "\n";
 
 	correlationMapSocketHandler.erase(it);
 

@@ -28,10 +28,6 @@ public:
 	void unRegisterCorrelation(SocketHandler *socketHandler, string correlatorId);
 	void registerSocket(SocketHandler *socketHandler);
 	bool unregisterSocket(int sockedId);
-
-
-private:
-
 	map<string,int> correlationCorrelator;
 };
 
