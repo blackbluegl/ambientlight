@@ -15,11 +15,14 @@
 
 package org.ambientlight.messages.max;
 
+import org.ambientlight.messages.AckRequestMessage;
+
+
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxWakeUpMessage extends MaxMessage {
+public class MaxWakeUpMessage extends MaxMessage implements AckRequestMessage {
 
 	private static final byte WAKE_UP_CALL = 0x3F;
 
@@ -28,6 +31,39 @@ public class MaxWakeUpMessage extends MaxMessage {
 		payload = new byte[11];
 		setMessageType(MaxMessageType.WAKE_UP);
 		payload[10] = WAKE_UP_CALL;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 2;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.AckRequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		return String.valueOf(getSequenceNumber());
 	}
 
 }
