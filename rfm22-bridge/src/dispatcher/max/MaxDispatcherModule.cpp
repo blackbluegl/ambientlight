@@ -10,13 +10,13 @@
 #include "../../rfm22/RF22.h"
 #include "Crc.h"
 #include "Pn9.h"
-//#include "../../queue/OutMessage.h"
 #include <vector>
 #include "../../queue/InMessage.h"
 #include "MaxRFProto.h"
 #include <iostream>
 #include <sstream>
 #include "../../queue/Enums.h"
+#include <unistd.h>
 
 MaxDispatcherModule::~MaxDispatcherModule() {
 
@@ -35,7 +35,7 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 	/* Detect preamble after 4 nibbles */
 	rf22->spiWrite(RF22_REG_35_PREAMBLE_DETECTION_CONTROL1, (0x4 << 3));
 	/* Send 8 bytes of preamble - but that depends on the message type and will be handled dynamically*/
-	rf22->setPreambleLength(255); // in nibbles
+	rf22->setPreambleLength(8); // in nibbles
 	rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, incommingMessageLength);
 	return true;
 }
@@ -51,19 +51,19 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
-		cout << "MaxDispatcher - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
+		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
-		cout << "MaxDispatcher - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
+		cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
 		sendLong = false;
 	}
 
 	if (sendLong == true) {
-		cout << "MaxDispatcher - sendMessage(): sending long preamble\n";
+		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
 	} else {
-		cout << "MaxDispatcher - sendMessage(): sending short preamble\n";
+		cout << "MaxDispatcherModule - sendMessage(): sending short preamble\n";
 	}
 
 	sendLongPreamble(rf22, sendLong);
@@ -128,31 +128,40 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 	MaxRFMessage *rfMessage = MaxRFMessage::parse(data + 1, len - 3);
 
 	if (rfMessage == NULL) {
-		std::cout << "Packet is invalid" << "\r\n";
+		std::cout << "MaxDispatcherModule - receiveMessage():  Packet is invalid" << "\r\n";
 		return;
 	} else {
-		std::cout << "MaxDispatcherModule receiveMessage(): got MAX! Message: " << rfMessage->type_to_str(rfMessage->type)
+		std::cout << "MaxDispatcherModule - receiveMessage(): got MAX! Message: " << rfMessage->type_to_str(rfMessage->type)
 				<< " from " << rfMessage->addr_from << " to " << rfMessage->addr_to << "\r\n";
 	}
 
-//	if (rfMessage->type == MessageType::SHUTTER_CONTACT_STATE) {
-//		//we have to create a response very fast for the shuttercontact
-//		OutMessage response;
-//		response.payLoad.push_back(rfMessage->seqnum);
-//		response.payLoad.push_back(0x0); //flags maybe wrong. have to sniff again
-//		response.payLoad.push_back(0x2); //ack
-//		response.payLoad.push_back(data[7]); //swap from and to
-//		response.payLoad.push_back(data[8]);
-//		response.payLoad.push_back(data[9]);
-//		response.payLoad.push_back(data[4]);
-//		response.payLoad.push_back(data[5]);
-//		response.payLoad.push_back(data[6]);
-//		response.payLoad.push_back(data[10]); //set the same group id
-//		response.payLoad.push_back(0x0); //simple ack
-//		response.dispatchTo = Enums::DispatcherType::MAX;
-//		dispatcher->sendADirectResponse(response);
-//		cout << "MaxDispatcherModule - receiveMessage(): send as soon as possible an ack for: " << rfMessage->addr_from << "\n";
-//	}
+	if (rfMessage->type == MessageType::SHUTTER_CONTACT_STATE) {
+		//we have to create a response very fast for the shuttercontact we have less than 50ms time
+		stringstream ss;
+		ss <<"MAX_" << rfMessage->addr_from;
+		string correlator = ss.str();
+		//we do this only if we know the device
+
+		if (this->dispatcher->queueManager->correlation->getSocketForID(correlator) !=NULL) {
+
+			OutMessage response;
+			response.payLoad.push_back(rfMessage->seqnum);
+			response.payLoad.push_back(0x0); //flags maybe wrong. have to sniff again
+			response.payLoad.push_back(0x2); //ack
+			response.payLoad.push_back(data[7]); //swap from and to
+			response.payLoad.push_back(data[8]);
+			response.payLoad.push_back(data[9]);
+			response.payLoad.push_back(data[4]);
+			response.payLoad.push_back(data[5]);
+			response.payLoad.push_back(data[6]);
+			response.payLoad.push_back(data[10]); //set the same group id
+			response.payLoad.push_back(0x0); //simple ack
+			response.dispatchTo = Enums::DispatcherType::MAX;
+			dispatcher->sendADirectResponse(response);
+			cout << "MaxDispatcherModule - receiveMessage(): send as soon as possible an ack for: " << rfMessage->addr_from
+					<< "\n";
+		}
+	}
 
 	InMessage message;
 	message.dispatchTo = Enums::MAX;
@@ -179,26 +188,29 @@ void MaxDispatcherModule::switchToRx(RF22 *rf22) {
 }
 
 bool MaxDispatcherModule::sendLongPreamble(RF22 *rf22, bool longPreamble) {
-	// We do not change the complete modem settings. we just adapt the data and preamble to send a 0101 sequence.
-	const uint8_t syncLong[] = { 0x55, 0x55, 0x55, 0x55, };
-	rf22->setSyncWords(syncLong, 0x4);
-
-	uint8_t fakePreambleLength = 50;
-	rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, fakePreambleLength);
-	uint8_t data[fakePreambleLength];
-	for (int i = 0; i < fakePreambleLength; i++) {
-		data[i] = 0x55;
-	}
 	if (longPreamble == true) {
-		for (int i = 0; i < 10; i++) {
+		// We do not change the complete modem settings. we just adapt the data and preamble to send a 0101 sequence.
+		const uint8_t syncLong[] = { 0x55, 0x55, 0x55, 0x55, };
+		rf22->setSyncWords(syncLong, 0x4);
+		//maybe usefull if signal not clean enough rf22->setPreambleLength(255); // in nibbles
+		uint8_t fakePreambleLength = 50;
+		rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, fakePreambleLength);
+		uint8_t data[fakePreambleLength];
+		for (int i = 0; i < fakePreambleLength; i++) {
+			data[i] = 0x55;
+		}
+
+		for (int i = 0; i < 25; i++) {
 			rf22->send(data, fakePreambleLength);
 		}
-	} else {
-		rf22->send(data, fakePreambleLength);
-	}
 
-	//prepare modem and reset sync word
-	rf22->waitPacketSent();
-	rf22->setSyncWords(maxSyncWords, 4);
+		//prepare modem and reset sync word
+		rf22->waitPacketSent();
+		rf22->setSyncWords(maxSyncWords, 4);
+		//maybe usefull if signal not clean enough rf22->setPreambleLength(8); // in nibbles
+
+	} else {
+		return false;
+	}
 	return true;
 }

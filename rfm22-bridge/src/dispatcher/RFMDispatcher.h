@@ -28,7 +28,7 @@ public:
 
 	void dispatchOutMessage(OutMessage message);
 	void dispatchInMessage(InMessage message);
-
+	void sendADirectResponse(OutMessage response);
 	void initRFM22();
 
 private:

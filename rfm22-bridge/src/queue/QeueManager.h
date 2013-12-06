@@ -24,6 +24,7 @@ class Correlation;
 class QeueManager {
 public:
 	QeueManager(Correlation *correlation, RFMDispatcher *dispatcher);
+	Correlation *correlation;
 	virtual ~QeueManager();
 
 	void startQeues();
@@ -32,7 +33,7 @@ public:
 	void postInMessage(InMessage message);
 
 private:
-	Correlation *correlation;
+
 	RFMDispatcher *dispatcher;
 
 	std::vector<OutMessage> outQeue;
