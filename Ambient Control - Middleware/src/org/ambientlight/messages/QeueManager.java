@@ -130,6 +130,16 @@ public class QeueManager {
 	}
 
 
+	public void putOutMessagesWithCondition(List<ConditionalMessage> messages) {
+		if (messages == null || messages.size() == 0)
+			return;
+
+		for (ConditionalMessage current : messages) {
+			putOutMessage(current.message, current.condition);
+		}
+	}
+
+
 	public void putOutMessage(Message message) {
 		putOutMessage(message, null);
 	}
@@ -260,7 +270,6 @@ public class QeueManager {
 
 
 	private void startWatchDogForWaitingMessage(final MessageEntry entry) {
-
 
 		new Thread(new Runnable() {
 

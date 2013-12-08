@@ -29,6 +29,13 @@ public class UnRegisterCorrelatorMessage extends Message {
 	private String correlator;
 
 
+	public UnRegisterCorrelatorMessage(DispatcherType dispatcherType, String correlator) {
+		super();
+		this.dispatcherType = dispatcherType;
+		this.correlator = correlator;
+	}
+
+
 	/*
 	 * (non-Javadoc)
 	 * 

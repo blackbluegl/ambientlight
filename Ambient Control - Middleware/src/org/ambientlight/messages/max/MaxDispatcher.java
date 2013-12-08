@@ -194,14 +194,14 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 				//				System.out.println("pong");
 				return true;
 			// while testing
-			return true;
+			// return true;
 
 		} catch (Exception e) {
 			// System.out.println("pong ex");
 			return false;
 		}
 		// System.out.println("no pong");
-		// return false;
+		return false;
 	}
 
 
