@@ -17,6 +17,7 @@ package test;
 
 import java.util.Date;
 
+import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
 import org.ambientlight.messages.QeueManager.State;
@@ -57,6 +58,33 @@ public class MessageDump implements MessageListener {
 			return;
 		System.out.println((new Date(System.currentTimeMillis()).toString() + " - new Response Message:\n" + response.toString())
 				+ "\n");
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.messages.MessageListener#onConnectionLost(org.ambientlight
+	 * .messages.DispatcherType)
+	 */
+	@Override
+	public void onConnectionLost(DispatcherType dispatcher) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.MessageListener#onConnectionRecovered(org.
+	 * ambientlight.messages.DispatcherType)
+	 */
+	@Override
+	public void onConnectionRecovered(DispatcherType dispatcher) {
+		// TODO Auto-generated method stub
 
 	}
 }
