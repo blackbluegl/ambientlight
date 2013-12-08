@@ -59,6 +59,6 @@ public class MaxFactoryResetMessage extends MaxMessage implements AckRequestMess
 	 */
 	@Override
 	public String getCorrelation() {
-		return String.valueOf(getToAdress());
+		return String.valueOf(getSequenceNumber());
 	}
 }

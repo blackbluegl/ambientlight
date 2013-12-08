@@ -21,8 +21,14 @@ package org.ambientlight.messages;
  */
 public interface MessageListener {
 
-	public void handleMessage(Message message);
+	public void onMessage(Message message);
 
 
-	public void handleResponseMessages(QeueManager.State state, Message response, Message request);
+	public void onAckResponseMessage(QeueManager.State state, Message response, Message request);
+
+
+	public void onConnectionLost(DispatcherType dispatcher);
+
+
+	public void onConnectionRecovered(DispatcherType dispatcher);
 }
