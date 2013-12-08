@@ -97,6 +97,7 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 }
 
 void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
+	lastSendTimeStamp = time(NULL);
 	uint8_t data[incommingMessageLength];
 	uint8_t incommingLength = incommingMessageLength;
 
