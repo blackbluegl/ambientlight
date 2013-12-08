@@ -39,6 +39,8 @@ public abstract class Dispatcher {
 	public abstract boolean isConnected();
 
 
+	public abstract DispatcherType getDispatcherType();
+
 	public abstract boolean deliverMessage(Message message);
 
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.messages.Dispatcher;
+import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.InDispatcher;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.rfm22bridge.PingMessage;
@@ -231,6 +232,17 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 		}
 
 		return resultString;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.Dispatcher#getDispatcherType()
+	 */
+	@Override
+	public DispatcherType getDispatcherType() {
+		return DispatcherType.MAX;
 	}
 
 }

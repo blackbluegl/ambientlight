@@ -34,7 +34,7 @@ public class DispatcherManager {
 		queueManager.registerOutDispatcher(DispatcherType.SYSTEM, dispatcher);
 
 		connectDispatcher(dispatcher);
-		startHeartBeatCheck(dispatcher);
+		startHeartBeatCheck(dispatcher, queueManager);
 
 		new Thread(new Runnable() {
 
@@ -63,7 +63,7 @@ public class DispatcherManager {
 	}
 
 
-	private void startHeartBeatCheck(final Dispatcher dispatcher) {
+	private void startHeartBeatCheck(final Dispatcher dispatcher, final QeueManager queueManager) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -74,9 +74,11 @@ public class DispatcherManager {
 							System.out
 							.println("DispatcherManager startHeartBeatCheck(): Connection lost. Reconnecting Dispatcher: "
 									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
-
+							queueManager.dispatcherLostConnection(dispatcher.getDispatcherType());
 							dispatcher.closeConnection();
 							dispatcher.connect();
+							queueManager.dispatcherRecoveredConnection(dispatcher.getDispatcherType());
+							queueManager.resendFailedMessages();
 							System.out.println("DispatcherManager startHeartBeatCheck(): Connection recovered for Dispatcher: "
 									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 						}

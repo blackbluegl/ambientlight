@@ -176,7 +176,6 @@ public class QeueManager {
 
 	private boolean handleOutMessages() {
 		boolean sendFailureOccured = false;
-		// outLock.lock();
 		List<MessageEntry> removeAfterSent = new ArrayList<MessageEntry>();
 		for (MessageEntry out : outQueue) {
 
@@ -214,6 +213,7 @@ public class QeueManager {
 	private void handleInMessages() {
 		for (final Message inMessage : inQeue) {
 			final MessageListener listener = messageListeners.get(inMessage.getDispatcherType());
+
 			if (listener == null) {
 				System.out.println("QueueManager - handleInMessages(): got no listener for MessageDispatcherType: "
 						+ inMessage.getDispatcherType());
@@ -238,7 +238,13 @@ public class QeueManager {
 
 						@Override
 						public void run() {
-							listener.handleResponseMessages(foundRequest.state, inMessage, foundRequest.message);
+							try {
+								listener.onAckResponseMessage(foundRequest.state, inMessage, foundRequest.message);
+							} catch (Exception e) {
+								System.out.println("QeueManager handleInMessages: error trying to "
+										+ "call client.onAckResponseMessage(): " + inMessage);
+								e.printStackTrace();
+							}
 						}
 					}).start();
 					messageHandled = true;
@@ -246,9 +252,8 @@ public class QeueManager {
 				// maybe it timed out or ther was never a request for this
 				// message. Log and handle it the
 				else {
-					System.out
-					.println("QeueManager handleInMessages: got an AckResponseMessage where no correlation could be found for: "
-							+ inMessage);
+					System.out.println("QeueManager handleInMessages: got an AckResponseMessage"
+							+ " where no correlation could be found for: " + inMessage);
 					messageHandled = false;
 				}
 			}
@@ -260,11 +265,18 @@ public class QeueManager {
 
 					@Override
 					public void run() {
-						listener.handleMessage(inMessage);
+						try {
+							listener.onMessage(inMessage);
+						} catch (Exception e) {
+							System.out.println("QeueManager handleInMessages: error trying to call client.onMessage(): "
+									+ inMessage);
+							e.printStackTrace();
+						}
 					}
 				}).start();
 			}
 		}
+
 		inQeue.clear();
 	}
 
@@ -276,14 +288,16 @@ public class QeueManager {
 			@Override
 			public void run() {
 
+				// wait for responses
+				try {
+					Thread.sleep(((AckRequestMessage) entry.message).getTimeOutSec() * 1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
 				if (entry.retries > 0) {
-					// wait
 					entry.retries--;
-					try {
-						Thread.sleep(((AckRequestMessage) entry.message).getTimeOutSec() * 1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+
 					System.out.println("!!!!should have answer!!!");
 					if (entry.state == State.RETRIEVED_ANSWER) {
 						// got an answer - just stop watching.
@@ -299,32 +313,40 @@ public class QeueManager {
 							System.out
 							.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage with condition got no answer. Retrying after next time condition comes true. "
 									+ entry.retries + " retries left for Message: " + entry.message);
-
 						} else {
+							// entries without condition will directly be resend
+							entry.state = State.PENDING;
 							System.out
 							.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage got no answer. Retrying. "
 									+ entry.retries + " retries left for Message: " + entry.message);
-							entry.state = State.PENDING;
 							hasOutMessages.signal();
 						}
+
+						// message was not send. stop here and wait for next
+						// trial.
 						outLock.unlock();
 						return;
 					}
 				}
 
-				// finished waiting - remove the message from queue
+				// finished waiting - with or without sucess
 				outLock.lock();
 				outQueue.remove(entry);
 				outLock.unlock();
 
 				// if we got no answer we have to inform the waiting client
 				if (entry.state == State.WAITING_FOR_RESPONSE) {
-					System.out
-					.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage got no answer and timed out. Informing client: "
-							+ entry.message);
+					System.out.println("QeueManager - WhatchDogForWaitingMessages(): requestMessage got"
+							+ " no answer and timed out. Informing client: " + entry.message);
 					entry.state = State.TIMED_OUT;
-					messageListeners.get(entry.message.getDispatcherType()).handleResponseMessages(entry.state, null,
-							entry.message);
+					try {
+						messageListeners.get(entry.message.getDispatcherType()).onAckResponseMessage(entry.state, null,
+								entry.message);
+					} catch (Exception e) {
+						System.out.println("QeueManager - WhatchDogForWaitingMessages(): got Exception"
+								+ " while trying to call clientonAckResponseMessage()");
+						e.printStackTrace();
+					}
 				}
 			}
 		}).start();
@@ -393,11 +415,49 @@ public class QeueManager {
 		for (MessageEntry entry : outQueue) {
 			if (entry.state == State.WAITING_FOR_CONDITION && entry.condition.fullfilled(inMessage)) {
 				entry.setState(State.PENDING);
+				System.out.println("QeueManager - handleConditionalOutMessageForResponse(): "
+						+ "condition fullfilled. Message may be send now: " + entry.toString());
 				hasOutMessages.signal();
-				System.out
-				.println("QeueManager - handleConditionalOutMessageForResponse(): condition fullfilled. Message may be send now: "
-						+ entry.toString());
 			}
+		}
+		outLock.unlock();
+	}
+
+
+	/**
+	 * @param dispatcherType
+	 */
+	public void dispatcherLostConnection(DispatcherType dispatcherType) {
+		MessageListener messageListener = messageListeners.get(dispatcherType);
+		if (messageListener != null) {
+			messageListener.onConnectionLost(dispatcherType);
+		}
+	}
+
+
+	/**
+	 * @param dispatcherType
+	 */
+	public void dispatcherRecoveredConnection(DispatcherType dispatcherType) {
+		MessageListener messageListener = messageListeners.get(dispatcherType);
+		if (messageListener != null) {
+			messageListener.onConnectionRecovered(dispatcherType);
+		}
+	}
+
+
+	/**
+	 * 
+	 */
+	public void resendFailedMessages() {
+		outLock.lock();
+		if (outQueue.isEmpty() == false) {
+			for (MessageEntry entry : outQueue) {
+				if (entry.state == State.SEND_ERROR) {
+					entry.state = State.PENDING;
+				}
+			}
+			hasOutMessages.signal();
 		}
 		outLock.unlock();
 	}

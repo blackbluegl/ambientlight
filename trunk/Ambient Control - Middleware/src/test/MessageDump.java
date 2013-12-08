@@ -36,7 +36,7 @@ public class MessageDump implements MessageListener {
 	 * .messages.Message)
 	 */
 	@Override
-	public void handleMessage(Message message) {
+	public void onMessage(Message message) {
 
 		System.out.println((new Date(System.currentTimeMillis()).toString() + " - new Message:\n" + message.toString()) + "\n");
 	}
@@ -51,7 +51,7 @@ public class MessageDump implements MessageListener {
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
-	public void handleResponseMessages(State state, Message response, Message request) {
+	public void onAckResponseMessage(State state, Message response, Message request) {
 		// TODO Auto-generated method stub
 		if (response == null)
 			return;

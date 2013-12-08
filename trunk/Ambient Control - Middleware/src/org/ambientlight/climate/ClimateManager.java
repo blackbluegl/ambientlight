@@ -102,15 +102,22 @@ public class ClimateManager implements MessageListener {
 		threePm.set(Calendar.MINUTE, 5);
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 
-		List<Message> correlators = new ArrayList<Message>();
-		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
-			correlators.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
-		}
-		AmbientControlMW.getRoom().qeueManager.putOutMessages(correlators);
-
-		// sendTimeInfoToComponents();
+		sendRegisterCorrelators();
 
 		setMode(config.setTemp, config.mode, config.temporaryUntilDate);
+	}
+
+
+	/**
+	 * 
+	 */
+	private void sendRegisterCorrelators() {
+		List<Message> correlators = new ArrayList<Message>();
+		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
+			correlators
+			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
+		}
+		AmbientControlMW.getRoom().qeueManager.putOutMessages(correlators);
 	}
 
 
@@ -122,7 +129,7 @@ public class ClimateManager implements MessageListener {
 	 * .messages.Message)
 	 */
 	@Override
-	public void handleMessage(Message message) {
+	public void onMessage(Message message) {
 		if (message instanceof MaxThermostatStateMessage) {
 			System.out.println("ClimateManager - handleMessage(): handle " + message);
 			handleThermostatState((MaxThermostatStateMessage) message);
@@ -217,7 +224,7 @@ public class ClimateManager implements MessageListener {
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
-	public void handleResponseMessages(State state, Message response, Message request) {
+	public void onAckResponseMessage(State state, Message response, Message request) {
 		if (response != null) {
 			System.out.println("ClimateManager - handleResponseMessage: called with response: " + response);
 		}
@@ -796,5 +803,33 @@ public class ClimateManager implements MessageListener {
 		}
 
 		return outSequenceNumber;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.messages.MessageListener#onConnectionLost(org.ambientlight
+	 * .messages.DispatcherType)
+	 */
+	@Override
+	public void onConnectionLost(DispatcherType dispatcher) {
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.MessageListener#onConnectionRecovered(org.
+	 * ambientlight.messages.DispatcherType)
+	 */
+	@Override
+	public void onConnectionRecovered(DispatcherType dispatcher) {
+		System.out.println("ClimateManager - onConnectionRecovered(): connection recovered. Sending correlators again");
+		if (dispatcher == DispatcherType.MAX) {
+			this.sendRegisterCorrelators();
+		}
 	}
 }
