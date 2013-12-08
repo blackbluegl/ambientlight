@@ -444,21 +444,4 @@ public class QeueManager {
 			messageListener.onConnectionRecovered(dispatcherType);
 		}
 	}
-
-
-	/**
-	 * 
-	 */
-	public void resendFailedMessages() {
-		outLock.lock();
-		if (outQueue.isEmpty() == false) {
-			for (MessageEntry entry : outQueue) {
-				if (entry.state == State.SEND_ERROR) {
-					entry.state = State.PENDING;
-				}
-			}
-			hasOutMessages.signal();
-		}
-		outLock.unlock();
-	}
 }

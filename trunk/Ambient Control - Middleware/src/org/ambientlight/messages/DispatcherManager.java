@@ -78,7 +78,6 @@ public class DispatcherManager {
 							dispatcher.closeConnection();
 							dispatcher.connect();
 							queueManager.dispatcherRecoveredConnection(dispatcher.getDispatcherType());
-							queueManager.resendFailedMessages();
 							System.out.println("DispatcherManager startHeartBeatCheck(): Connection recovered for Dispatcher: "
 									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 						}
