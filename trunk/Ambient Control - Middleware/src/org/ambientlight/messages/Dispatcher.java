@@ -34,34 +34,32 @@ public abstract class Dispatcher {
 	public RemoteHostConfiguration configuration;
 	public QeueManager queueManager;
 	protected Socket socket;
+	private boolean isConnected = false;
 
 
-	public abstract boolean isConnected();
+	public boolean isConnected() {
+		return isConnected;
+	}
+
+
+	public abstract boolean checkConnection();
 
 
 	public abstract DispatcherType getDispatcherType();
+
 
 	public abstract boolean deliverMessage(Message message);
 
 
 	public void connect() throws UnknownHostException, IOException {
 		socket = new Socket(this.configuration.hostName, this.configuration.port);
-	}
-
-
-	public boolean reconnect() {
-		try {
-			closeConnection();
-			socket = new Socket(this.configuration.hostName, this.configuration.port);
-		} catch (Exception e) {
-			return false;
-		}
-		return true;
+		this.isConnected = true;
 	}
 
 
 	void closeConnection() {
 		try {
+			this.isConnected = false;
 			socket.close();
 		} catch (Exception e) {
 			System.out.println("Dispatcher closeConnection(): error while closing connection: ");

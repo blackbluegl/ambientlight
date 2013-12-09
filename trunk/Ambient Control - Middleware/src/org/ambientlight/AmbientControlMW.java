@@ -5,12 +5,10 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 import java.util.Timer;
 
-import org.ambientlight.climate.ClimateFactory;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.actors.ActorConfiguration;
 import org.ambientlight.config.room.actors.LightObjectConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.rendering.RenderControl;
 import org.ambientlight.rendering.Renderer;
@@ -38,8 +36,6 @@ public class AmbientControlMW {
 	static RoomFactory roomFactory;
 
 	static ProcessFactory processFactory;
-
-	static DispatcherManager rfmDispatcher;
 
 	public static final int FREQUENCY = 25;
 
@@ -79,16 +75,12 @@ public class AmbientControlMW {
 	private static void initComponents(RoomConfiguration roomConfiguration) throws InterruptedException, UnknownHostException,
 	IOException {
 
-		rfmDispatcher = new DispatcherManager();
 
 		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
 
 		roomFactory = new RoomFactory(deviceFactory, processFactory);
 
-		room = roomFactory.initRoom(roomConfiguration);
-
-		ClimateFactory climateFactory = new ClimateFactory();
-		climateFactory.initClimateManager();
+		roomFactory.initRoom(roomConfiguration);
 
 		processFactory = new ProcessFactory(room);
 		processFactory.initProcesses();
@@ -160,11 +152,6 @@ public class AmbientControlMW {
 
 	public static void setRoom(Room room) {
 		AmbientControlMW.room = room;
-	}
-
-
-	public static DispatcherManager getRfmDispatcher() {
-		return AmbientControlMW.rfmDispatcher;
 	}
 
 

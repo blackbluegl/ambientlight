@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
@@ -33,7 +32,7 @@ public class DeviceDriverFactory {
 
 		if (dc instanceof MaxVCubeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init MaxVCube device");
-			AmbientControlMW.getRfmDispatcher().createDispatcher((MaxVCubeDeviceConfiguration) dc, room.qeueManager);
+			room.qeueManager.dispatcherManager.createDispatcher((MaxVCubeDeviceConfiguration) dc, room.qeueManager);
 		}
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {

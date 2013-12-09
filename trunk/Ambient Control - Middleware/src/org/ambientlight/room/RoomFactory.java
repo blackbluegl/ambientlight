@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
+import org.ambientlight.climate.ClimateFactory;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.process.events.AlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -20,6 +21,7 @@ import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfigur
 import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.process.eventmanager.EventManager;
@@ -43,14 +45,21 @@ public class RoomFactory {
 
 
 	public Room initRoom(RoomConfiguration roomConfig) throws UnknownHostException, IOException {
-		Room room = new Room();
-
+		AmbientControlMW.setRoom(new Room());
+		Room room = AmbientControlMW.getRoom();
 		room.config = roomConfig;
+
+		// start DispatcherManager
+		DispatcherManager dispatcherManager = new DispatcherManager();
 
 		// start queueManager
 		room.qeueManager = new QeueManager();
-		room.qeueManager.dispatcherManager = AmbientControlMW.getRfmDispatcher();
+		room.qeueManager.dispatcherManager = dispatcherManager;
 		room.qeueManager.startQeues();
+
+		// start climate Manager
+		ClimateFactory climateFactory = new ClimateFactory();
+		climateFactory.initClimateManager(room, roomConfig, room.qeueManager);
 
 		// init CallbackManager
 		CallBackManager callbackManager = new CallBackManager();
@@ -67,8 +76,6 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
-
-
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
 		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations.values()) {
@@ -82,8 +89,6 @@ public class RoomFactory {
 		room.eventManager = new EventManager();
 
 		createEventGenerators(room, room.eventManager);
-
-
 
 		System.out.println("RoomFactory initRoom(): initialized ClimateManager");
 

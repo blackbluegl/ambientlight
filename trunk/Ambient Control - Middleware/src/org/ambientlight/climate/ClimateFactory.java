@@ -17,11 +17,12 @@ package org.ambientlight.climate;
 
 import java.util.HashMap;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
 import org.ambientlight.config.room.actors.ShutterContactConfiguration;
 import org.ambientlight.config.room.actors.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.messages.QeueManager;
 import org.ambientlight.room.Room;
 import org.ambientlight.room.entities.MaxComponent;
 import org.ambientlight.room.entities.ShutterContact;
@@ -34,13 +35,14 @@ import org.ambientlight.room.entities.Thermostat;
  */
 public class ClimateFactory {
 
-	public void initClimateManager() {
-		Room room = AmbientControlMW.getRoom();
+	public void initClimateManager(Room room, RoomConfiguration roomConfig, QeueManager queueManager) {
+
 		// init ClimateManager
-		if (room.config.climate != null) {
+		if (roomConfig.climate != null) {
 			room.setMaxComponents(new HashMap<Integer, MaxComponent>());
 			room.climateManager = new ClimateManager();
 			room.climateManager.config = room.config.climate;
+			room.climateManager.queueManager = queueManager;
 			room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
 
 			for (MaxComponentConfiguration component : room.config.climate.devices.values()) {
@@ -57,9 +59,7 @@ public class ClimateFactory {
 					System.out.println("RoomFactory initRoom(): add ShutterContact: " + currentDevice.config.label);
 				}
 			}
-			// room.qeueManager.registerMessageListener(DispatcherType.MAX,
-			// room.climateManager);
-			room.climateManager.init();
+
 			System.out.println("ClimateFactory initClimateManager(): initialized ClimateManager");
 		}
 	}

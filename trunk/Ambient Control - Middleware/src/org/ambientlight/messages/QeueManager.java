@@ -53,7 +53,6 @@ public class QeueManager {
 
 	public DispatcherManager dispatcherManager;
 
-	HashMap<DispatcherType, Dispatcher> outDispatchers = new HashMap<DispatcherType, Dispatcher>();
 	HashMap<DispatcherType, MessageListener> messageListeners = new HashMap<DispatcherType, MessageListener>();
 
 	ArrayList<MessageEntry> outQueue = new ArrayList<MessageEntry>();
@@ -107,11 +106,6 @@ public class QeueManager {
 			}
 
 		}).start();
-	}
-
-
-	public void registerOutDispatcher(DispatcherType dispatcherType, Dispatcher dispatcher) {
-		outDispatchers.put(dispatcherType, dispatcher);
 	}
 
 
@@ -185,7 +179,7 @@ public class QeueManager {
 			}
 
 			out.state = State.SENDING;
-			if (dispatcherManager.dispatchMessage(outDispatchers.get(out.message.getDispatcherType()), out.message)) {
+			if (dispatcherManager.dispatchMessage(out.message)) {
 
 				if (out.message instanceof AckRequestMessage) {
 					out.setState(State.WAITING_FOR_RESPONSE);
@@ -427,10 +421,10 @@ public class QeueManager {
 	/**
 	 * @param dispatcherType
 	 */
-	public void dispatcherLostConnection(DispatcherType dispatcherType) {
+	public void onDisconnectDispatcher(DispatcherType dispatcherType) {
 		MessageListener messageListener = messageListeners.get(dispatcherType);
 		if (messageListener != null) {
-			messageListener.onConnectionLost(dispatcherType);
+			messageListener.onDisconnectDispatcher(dispatcherType);
 		}
 	}
 
@@ -438,10 +432,10 @@ public class QeueManager {
 	/**
 	 * @param dispatcherType
 	 */
-	public void dispatcherRecoveredConnection(DispatcherType dispatcherType) {
+	public void onConnectDispatcher(DispatcherType dispatcherType) {
 		MessageListener messageListener = messageListeners.get(dispatcherType);
 		if (messageListener != null) {
-			messageListener.onConnectionRecovered(dispatcherType);
+			messageListener.onConnectDispatcher(dispatcherType);
 		}
 	}
 }

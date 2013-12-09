@@ -35,6 +35,7 @@ import org.ambientlight.messages.ConditionalMessage;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
+import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.QeueManager.State;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.DeviceType;
@@ -74,6 +75,8 @@ import org.ambientlight.room.entities.Thermostat;
  */
 public class ClimateManager implements MessageListener {
 
+	public QeueManager queueManager;
+
 	TimerTask syncTimeTask = new TimerTask() {
 
 		@Override
@@ -91,20 +94,15 @@ public class ClimateManager implements MessageListener {
 
 
 	public ClimateManager() {
-
-	}
-
-
-	public void init() {
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
 		threePm.set(Calendar.MINUTE, 5);
+		if (threePm.getTimeInMillis() < new Date().getTime()) {
+			threePm.add(Calendar.DAY_OF_MONTH, 1);
+		}
+
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
-
-		sendRegisterCorrelators();
-
-		setMode(config.setTemp, config.mode, config.temporaryUntilDate);
 	}
 
 
@@ -117,7 +115,7 @@ public class ClimateManager implements MessageListener {
 			correlators
 			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
 		}
-		AmbientControlMW.getRoom().qeueManager.putOutMessages(correlators);
+		queueManager.putOutMessages(correlators);
 	}
 
 
@@ -160,7 +158,7 @@ public class ClimateManager implements MessageListener {
 			return;
 		System.out.println("ClimateManager - getTimeInfo: sending time to device: " + message.getFromAdress());
 		MaxTimeInformationMessage time = getTimeInfoForDevice(new Date(), message.getFromAdress());
-		AmbientControlMW.getRoom().qeueManager.putOutMessage(time);
+		queueManager.putOutMessage(time);
 
 	}
 
@@ -563,7 +561,7 @@ public class ClimateManager implements MessageListener {
 				outMessages.add(new ConditionalMessage(null, linkNewToCurrent));
 			}
 
-			AmbientControlMW.getRoom().qeueManager.putOutMessagesWithCondition(outMessages);
+			queueManager.putOutMessagesWithCondition(outMessages);
 			RoomConfigurationFactory.commitTransaction();
 			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 		}
@@ -658,7 +656,7 @@ public class ClimateManager implements MessageListener {
 			}
 		}
 
-		AmbientControlMW.getRoom().qeueManager.putOutMessages(messages);
+		queueManager.putOutMessages(messages);
 
 		RoomConfigurationFactory.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
@@ -685,7 +683,7 @@ public class ClimateManager implements MessageListener {
 			}
 		}
 
-		AmbientControlMW.getRoom().qeueManager.putOutMessages(messages);
+		queueManager.putOutMessages(messages);
 
 		if (config.mode == MaxThermostateMode.AUTO) {
 			Calendar now = GregorianCalendar.getInstance();
@@ -814,7 +812,7 @@ public class ClimateManager implements MessageListener {
 	 * .messages.DispatcherType)
 	 */
 	@Override
-	public void onConnectionLost(DispatcherType dispatcher) {
+	public void onDisconnectDispatcher(DispatcherType dispatcher) {
 
 	}
 
@@ -826,10 +824,14 @@ public class ClimateManager implements MessageListener {
 	 * ambientlight.messages.DispatcherType)
 	 */
 	@Override
-	public void onConnectionRecovered(DispatcherType dispatcher) {
-		System.out.println("ClimateManager - onConnectionRecovered(): connection recovered. Sending correlators again");
+	public void onConnectDispatcher(DispatcherType dispatcher) {
+		System.out.println("ClimateManager - onConnectDispatcher(): got connection. Syncing MAX devices.");
 		if (dispatcher == DispatcherType.MAX) {
 			this.sendRegisterCorrelators();
+
+			this.sendTimeInfoToComponents();
+
+			this.setMode(config.setTemp, config.mode, config.temporaryUntilDate);
 		}
 	}
 }

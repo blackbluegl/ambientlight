@@ -61,7 +61,6 @@ public class MessageDump implements MessageListener {
 
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -70,7 +69,7 @@ public class MessageDump implements MessageListener {
 	 * .messages.DispatcherType)
 	 */
 	@Override
-	public void onConnectionLost(DispatcherType dispatcher) {
+	public void onDisconnectDispatcher(DispatcherType dispatcher) {
 		// TODO Auto-generated method stub
 
 	}
@@ -83,7 +82,7 @@ public class MessageDump implements MessageListener {
 	 * ambientlight.messages.DispatcherType)
 	 */
 	@Override
-	public void onConnectionRecovered(DispatcherType dispatcher) {
+	public void onConnectDispatcher(DispatcherType dispatcher) {
 		// TODO Auto-generated method stub
 
 	}

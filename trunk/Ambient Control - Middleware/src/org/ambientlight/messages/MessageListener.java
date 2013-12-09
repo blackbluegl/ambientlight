@@ -27,8 +27,8 @@ public interface MessageListener {
 	public void onAckResponseMessage(QeueManager.State state, Message response, Message request);
 
 
-	public void onConnectionLost(DispatcherType dispatcher);
+	public void onDisconnectDispatcher(DispatcherType dispatcher);
 
 
-	public void onConnectionRecovered(DispatcherType dispatcher);
+	public void onConnectDispatcher(DispatcherType dispatcher);
 }

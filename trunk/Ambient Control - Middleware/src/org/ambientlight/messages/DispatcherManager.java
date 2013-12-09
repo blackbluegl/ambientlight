@@ -15,6 +15,8 @@
 
 package org.ambientlight.messages;
 
+import java.util.HashMap;
+
 import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.messages.max.MaxDispatcher;
 
@@ -25,16 +27,18 @@ import org.ambientlight.messages.max.MaxDispatcher;
  */
 public class DispatcherManager {
 
+	HashMap<DispatcherType, Dispatcher> outDispatchers = new HashMap<DispatcherType, Dispatcher>();
+
+
 	public void createDispatcher(final RemoteHostConfiguration config, final QeueManager queueManager) {
 
 		final MaxDispatcher dispatcher = new MaxDispatcher();
 		dispatcher.configuration = config;
 		dispatcher.queueManager = queueManager;
-		queueManager.registerOutDispatcher(DispatcherType.MAX, dispatcher);
-		queueManager.registerOutDispatcher(DispatcherType.SYSTEM, dispatcher);
+		outDispatchers.put(DispatcherType.MAX, dispatcher);
+		outDispatchers.put(DispatcherType.SYSTEM, dispatcher);
 
 		connectDispatcher(dispatcher);
-		startHeartBeatCheck(dispatcher, queueManager);
 
 		new Thread(new Runnable() {
 
@@ -45,6 +49,9 @@ public class DispatcherManager {
 				}
 			}
 		}).start();
+
+		queueManager.onConnectDispatcher(DispatcherType.MAX);
+		startHeartBeatCheck(dispatcher, queueManager);
 	}
 
 
@@ -70,14 +77,14 @@ public class DispatcherManager {
 			public void run() {
 				while (true) {
 					try {
-						if (dispatcher.isConnected() == false) {
+						if (dispatcher.checkConnection() == false) {
 							System.out
 							.println("DispatcherManager startHeartBeatCheck(): Connection lost. Reconnecting Dispatcher: "
 									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
-							queueManager.dispatcherLostConnection(dispatcher.getDispatcherType());
+							queueManager.onDisconnectDispatcher(dispatcher.getDispatcherType());
 							dispatcher.closeConnection();
 							dispatcher.connect();
-							queueManager.dispatcherRecoveredConnection(dispatcher.getDispatcherType());
+							queueManager.onConnectDispatcher(dispatcher.getDispatcherType());
 							System.out.println("DispatcherManager startHeartBeatCheck(): Connection recovered for Dispatcher: "
 									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 						}
@@ -99,7 +106,8 @@ public class DispatcherManager {
 	}
 
 
-	public synchronized boolean dispatchMessage(Dispatcher dispatcher, Message message) {
+	public synchronized boolean dispatchMessage(Message message) {
+		Dispatcher dispatcher = this.outDispatchers.get(message.getDispatcherType());
 		return dispatcher.deliverMessage(message);
 	}
 
