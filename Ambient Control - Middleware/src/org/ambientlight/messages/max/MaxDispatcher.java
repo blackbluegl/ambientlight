@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.messages.Dispatcher;
 import org.ambientlight.messages.DispatcherType;
@@ -34,7 +33,7 @@ import org.ambientlight.messages.rfm22bridge.PingMessage;
  */
 public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
-	ReentrantLock sendLock = new ReentrantLock();
+	// ReentrantLock sendLock = new ReentrantLock();
 
 	private boolean pongReceived = false;
 
@@ -180,19 +179,18 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	 * @see org.ambientlight.messages.OutDispatcher#isConnected()
 	 */
 	@Override
-	public boolean isConnected() {
+	public boolean checkConnection() {
 
 		pongReceived = false;
 		try {
 			PingMessage ping = new PingMessage();
-
 
 			deliverMessage(ping);
 
 			Thread.sleep(10000);
 			// System.out.println("ping");
 			if (pongReceived)
-				//				System.out.println("pong");
+				// System.out.println("pong");
 				return true;
 			// while testing
 			// return true;
@@ -244,5 +242,4 @@ public class MaxDispatcher extends Dispatcher implements InDispatcher {
 	public DispatcherType getDispatcherType() {
 		return DispatcherType.MAX;
 	}
-
 }
