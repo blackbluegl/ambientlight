@@ -54,7 +54,7 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//in this case we do answer and do not have to wait any longer
-		waitForResponseInMs=15;
+		waitForResponseInMs = 0;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
@@ -139,6 +139,7 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 				<< " from " << rfMessage->addr_from << " to " << rfMessage->addr_to << "\r\n";
 	}
 
+	//the latest version seems to be fast enough to send acks from the client. but this has to be tested for slower clients.
 	if (rfMessage->type == MessageType::SHUTTER_CONTACT_STATE) {
 		//we have to create a response very fast for the shuttercontact we have less than 50ms time
 		stringstream ss;
@@ -176,7 +177,7 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 	std::stringstream toStream;
 	toStream << rfMessage->addr_to;
 
-	message.correlation = "MAX_" + fromStream.str()+"_"+toStream.str();
+	message.correlation = "MAX_" + fromStream.str() + "_" + toStream.str();
 	for (uint8_t i = 1; i < len - 2; i++) {
 		message.payload.push_back(data[i]);
 	}
