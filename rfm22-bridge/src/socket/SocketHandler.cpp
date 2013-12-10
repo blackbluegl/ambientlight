@@ -152,7 +152,7 @@ std::string SocketHandler::readLine(int socked) {
 		SockedException ex;
 		throw ex;
 	}
-	cout << "SocketHandler readLine(): " << buffer << "\n";
+	//cout << "SocketHandler readLine(): " << buffer << "\n";
 	return buffer;
 }
 
