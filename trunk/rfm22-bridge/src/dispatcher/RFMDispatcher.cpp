@@ -21,8 +21,8 @@ RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
 RFMDispatcher::~RFMDispatcher() {
 }
 
-void RFMDispatcher::sendADirectResponse(OutMessage response){
-	queueManager->postOutMessage(response,true);
+void RFMDispatcher::sendADirectResponse(OutMessage response) {
+	queueManager->postOutMessage(response, true);
 }
 
 void RFMDispatcher::dispatchOutMessage(OutMessage message) {
@@ -30,14 +30,15 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 	DispatcherModule* module = dispatchers.at(message.dispatchTo);
 
 	if (lastDispatcher != message.dispatchTo) {
-		//dispatchermodule is different. reinit sending module
+		cout << "dispatchermodule is different. reinit sending module\n";
 		module->init(rfm22);
 		lastDispatcher = message.dispatchTo;
 	}
 
 	module->switchToTX(rfm22);
-	module->sendMessage(rfm22, message);
+	int timeToWaitAfterRequest = module->sendMessage(rfm22, message); //set to a wait before send!
 
+	waitBeforeSend = true;
 	//now set module to rx
 	if (lastDispatcher != defaultDispatcher) {
 		//change back to default dispatchermodule
@@ -51,12 +52,22 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 
 	//wait for new messages
 	module->switchToRx(rfm22);
-	//at least wait a second for incomming messages
-	usleep(100000);
+
+	//wait after send
+	int periodsToSleep = timeToWaitAfterRequest / 5;
+	for (int i = 0; i < periodsToSleep; i++) {
+		usleep(5000);
+		//cout << "after: have to wait before send\n";
+		if (waitBeforeSend == false) {
+			break;
+		}
+	}
 }
 
 void RFMDispatcher::dispatchInMessage(InMessage message) {
 	queueManager->postInMessage(message);
+	//if waitBeforeSend was true the outQueue maybe waiting for an answer before sending. now we have got the answer and may send data.
+	waitBeforeSend = false;
 }
 
 void RFMDispatcher::initRFM22() {

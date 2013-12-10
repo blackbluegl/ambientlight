@@ -21,7 +21,7 @@ public:
 	virtual ~DispatcherModule();
 
 	virtual bool init(RF22 *rf22);
-	virtual void sendMessage(RF22 *rf22, OutMessage message);
+	virtual int sendMessage(RF22 *rf22, OutMessage message);
 	virtual void receiveMessage(RF22 *rf22);
 	virtual void switchToTX(RF22 *rf22);
 	virtual void switchToRx(RF22 *rf22);

@@ -17,9 +17,10 @@ DispatcherModule::~DispatcherModule() {
 bool DispatcherModule::init(RF22 *rf22) {
 	return true;
 }
-void DispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
-
+int DispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
+	return 0;
 }
+
 void DispatcherModule::receiveMessage(RF22 *rf22) {
 
 }

@@ -40,8 +40,8 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 	return true;
 }
 
-void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
-
+int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
+	int waitForResponseInMs = 100;
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
@@ -53,6 +53,8 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
+		//in this case we do answer and do not have to wait any longer
+		waitForResponseInMs=15;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
@@ -94,10 +96,11 @@ void MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	rf22->waitPacketSent();
 
 	lastSendTimeStamp = time(NULL);
+	return waitForResponseInMs;
 }
 
 void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
-	lastSendTimeStamp = time(NULL);
+
 	uint8_t data[incommingMessageLength];
 	uint8_t incommingLength = incommingMessageLength;
 
@@ -139,11 +142,11 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 	if (rfMessage->type == MessageType::SHUTTER_CONTACT_STATE) {
 		//we have to create a response very fast for the shuttercontact we have less than 50ms time
 		stringstream ss;
-		ss <<"MAX_" << rfMessage->addr_from;
+		ss << "MAX_" << rfMessage->addr_from << "_" << rfMessage->addr_to;
 		string correlator = ss.str();
 		//we do this only if we know the device
 
-		if (this->dispatcher->queueManager->correlation->getSocketForID(correlator) !=NULL) {
+		if (this->dispatcher->queueManager->correlation->getSocketForID(correlator) != NULL) {
 
 			OutMessage response;
 			response.payLoad.push_back(rfMessage->seqnum);
@@ -170,7 +173,10 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 	std::stringstream fromStream;
 	fromStream << rfMessage->addr_from;
 
-	message.correlation = "MAX_" + fromStream.str();
+	std::stringstream toStream;
+	toStream << rfMessage->addr_to;
+
+	message.correlation = "MAX_" + fromStream.str()+"_"+toStream.str();
 	for (uint8_t i = 1; i < len - 2; i++) {
 		message.payload.push_back(data[i]);
 	}
