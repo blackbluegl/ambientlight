@@ -11,6 +11,7 @@
 #include <math.h>
 #include <errno.h>
 #include <iostream>
+#include <unistd.h>
 
 // Interrupt vectors for the 2 Arduino interrupt pins
 // Each interrupt can be handled by a different instance of RF22, allowing you to have
@@ -544,8 +545,10 @@ bool RF22::waitAvailableTimeout(uint16_t timeout) {
 }
 
 void RF22::waitPacketSent() {
-	while (_mode == RF22_MODE_TX)
-		; // Wait for any previous transmit to finish
+// Wait for any previous transmit to finish
+	while (_mode == RF22_MODE_TX){
+		usleep(500);
+	}
 }
 
 // Diagnostic help
