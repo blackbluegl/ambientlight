@@ -22,7 +22,7 @@ public:
 	virtual ~MaxDispatcherModule();
 
 	bool init(RF22 *rf22);
-	void sendMessage(RF22 *rf22, OutMessage message);
+	int sendMessage(RF22 *rf22, OutMessage message);
 	void receiveMessage(RF22 *rf22);
 	void switchToTX(RF22 *rf22);
 	void switchToRx(RF22 *rf22);

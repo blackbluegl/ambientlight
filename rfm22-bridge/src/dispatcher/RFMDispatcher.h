@@ -26,6 +26,8 @@ public:
 	QeueManager *queueManager;
 	virtual ~RFMDispatcher();
 
+	bool waitBeforeSend = false;
+
 	void dispatchOutMessage(OutMessage message);
 	void dispatchInMessage(InMessage message);
 	void sendADirectResponse(OutMessage response);
