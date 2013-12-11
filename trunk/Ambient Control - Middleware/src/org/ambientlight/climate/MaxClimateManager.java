@@ -73,7 +73,7 @@ import org.ambientlight.room.entities.Thermostat;
  * @author Florian Bornkessel
  * 
  */
-public class ClimateManager implements MessageListener {
+public class MaxClimateManager implements MessageListener {
 
 	public QeueManager queueManager;
 
@@ -93,7 +93,7 @@ public class ClimateManager implements MessageListener {
 	public static int WAIT_FOR_NEW_DEVICES = 90;
 
 
-	public ClimateManager() {
+	public MaxClimateManager() {
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
@@ -259,11 +259,19 @@ public class ClimateManager implements MessageListener {
 	private void handleShutterState(MaxShutterContactStateMessage message) {
 		ShutterContact shutterContact = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents()
 				.get(message.getFromAdress());
-		if (shutterContact == null) {
+		if (shutterContact == null || message.getToAdress() != this.config.vCubeAdress) {
 			System.out.println("ClimateManager handleShutterState(): got request from unknown device: adress="
 					+ message.getFromAdress());
 			return;
 		}
+
+		// MaxAckMessage ack = new MaxAckMessage();
+		// ack.setFromAdress(this.config.vCubeAdress);
+		// ack.setToAdress(message.getFromAdress());
+		// ack.setSequenceNumber(getNewSequnceNumber());
+		// ack.setAckType(MaxAckType.ACK_SIMPLE);
+		// this.queueManager.putOutMessage(ack);
+
 		RoomConfigurationFactory.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
@@ -320,7 +328,7 @@ public class ClimateManager implements MessageListener {
 		// Wait until shutterContact comes alive
 		WaitForShutterContactCondition condition = null;
 		if (device instanceof ShutterContact) {
-			condition = new WaitForShutterContactCondition(device.config.adress);
+			condition = new WaitForShutterContactCondition(device.config.adress, this.config.vCubeAdress);
 			// MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
 			// wakeUp.setFromAdress(this.config.vCubeAdress);
 			// wakeUp.setToAdress(adress);
@@ -349,7 +357,7 @@ public class ClimateManager implements MessageListener {
 			// Wait until shutterContact comes alive if it is one
 			WaitForShutterContactCondition conditionForCurrent = null;
 			if (currentConfig instanceof ShutterContactConfiguration) {
-				conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress);
+				conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress, adress);
 			}
 
 			MaxRemoveLinkPartnerMessage unlink = getUnlinkMessageForDevice(currentConfig.adress, device.config.adress,
@@ -546,7 +554,7 @@ public class ClimateManager implements MessageListener {
 				// again
 				WaitForShutterContactCondition conditionForCurrent = null;
 				if (currentConfig instanceof ShutterContactConfiguration) {
-					conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress);
+					conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress, this.config.vCubeAdress);
 				}
 
 				// link new device to current

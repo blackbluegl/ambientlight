@@ -70,7 +70,7 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements AckRequestMe
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 10;
+		return 2;
 	}
 
 
@@ -82,7 +82,7 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements AckRequestMe
 	@Override
 	public int getRetryCount() {
 		// TODO Auto-generated method stub
-		return 5;
+		return 10;
 	}
 
 

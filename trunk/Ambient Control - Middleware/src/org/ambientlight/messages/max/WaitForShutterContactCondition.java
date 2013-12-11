@@ -26,12 +26,14 @@ import org.ambientlight.messages.WaitForResponseCondition;
 public class WaitForShutterContactCondition extends WaitForResponseCondition {
 
 	private Integer shutterAdress = 0;
+	private Integer toAdress = 0;
 
 	Message responseMessage;
 
 
-	public WaitForShutterContactCondition(int shutterAdress) {
+	public WaitForShutterContactCondition(int shutterAdress, int toAdress) {
 		this.shutterAdress = shutterAdress;
+		this.toAdress = toAdress;
 	}
 
 
@@ -43,7 +45,8 @@ public class WaitForShutterContactCondition extends WaitForResponseCondition {
 	@Override
 	public boolean fullfilled(Message compare) {
 		if (compare instanceof MaxShutterContactStateMessage
-				&& ((MaxShutterContactStateMessage) compare).getFromAdress().equals(shutterAdress))
+				&& ((MaxShutterContactStateMessage) compare).getFromAdress().equals(shutterAdress)
+				&& ((MaxShutterContactStateMessage) compare).getToAdress().equals(toAdress))
 			return true;
 		return false;
 	}

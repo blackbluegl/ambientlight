@@ -40,7 +40,7 @@ public class ClimateFactory {
 		// init ClimateManager
 		if (roomConfig.climate != null) {
 			room.setMaxComponents(new HashMap<Integer, MaxComponent>());
-			room.climateManager = new ClimateManager();
+			room.climateManager = new MaxClimateManager();
 			room.climateManager.config = room.config.climate;
 			room.climateManager.queueManager = queueManager;
 			room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
