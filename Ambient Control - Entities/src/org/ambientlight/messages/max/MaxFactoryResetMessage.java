@@ -48,7 +48,7 @@ public class MaxFactoryResetMessage extends MaxMessage implements AckRequestMess
 	 */
 	@Override
 	public int getRetryCount() {
-		return 5;
+		return 10;
 	}
 
 

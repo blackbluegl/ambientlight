@@ -70,8 +70,7 @@ public class MaxRemoveLinkPartnerMessage extends MaxMessage implements AckReques
 	 */
 	@Override
 	public int getTimeOutSec() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 2;
 	}
 
 
@@ -82,8 +81,7 @@ public class MaxRemoveLinkPartnerMessage extends MaxMessage implements AckReques
 	 */
 	@Override
 	public int getRetryCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 10;
 	}
 
 
