@@ -52,7 +52,7 @@ private:
 
 	bool sendLongPreamble(RF22 *rf22, bool longPreamble);
 
-	time_t lastSendTimeStamp;
+	time_t lastMessageOnAir;
 
 };
 

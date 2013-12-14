@@ -12,6 +12,8 @@
 #include "../queue/Enums.h"
 #include <unistd.h>
 
+
+
 RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
 	this->rfm22 = rfm22;
 	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule*>(Enums::MAX, new MaxDispatcherModule(this)));
