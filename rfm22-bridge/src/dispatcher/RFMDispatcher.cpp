@@ -12,11 +12,14 @@
 #include "../queue/Enums.h"
 #include <unistd.h>
 
-
-
 RFMDispatcher::RFMDispatcher(RF22 *rfm22) {
 	this->rfm22 = rfm22;
-	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule*>(Enums::MAX, new MaxDispatcherModule(this)));
+
+	MaxDispatcherModule* maxDispatcher = new MaxDispatcherModule(this);
+	pthread_t sendAckThread;
+	int result = pthread_create(&sendAckThread, NULL, MaxDispatcherModule::startSendAckWrap, maxDispatcher);
+
+	dispatchers.insert(pair<Enums::DispatcherType, DispatcherModule*>(Enums::MAX, maxDispatcher));
 	lastDispatcher = defaultDispatcher;
 }
 
@@ -41,7 +44,7 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 	int timeToWaitAfterRequest = module->sendMessage(rfm22, message); //set to a wait before send!
 
 	waitBeforeSend = true;
-	//now set module to rx
+//now set module to rx
 	if (lastDispatcher != defaultDispatcher) {
 		//change back to default dispatchermodule
 		module = dispatchers.at(defaultDispatcher);
@@ -52,10 +55,10 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 				<< Enums::enumToString(defaultDispatcher) << "\n";
 	}
 
-	//wait for new messages
+//wait for new messages
 	module->switchToRx(rfm22);
 
-	//wait after send
+//wait after send
 	int periodsToSleep = timeToWaitAfterRequest / 5;
 	for (int i = 0; i < periodsToSleep; i++) {
 		usleep(5000);
@@ -68,7 +71,7 @@ void RFMDispatcher::dispatchOutMessage(OutMessage message) {
 
 void RFMDispatcher::dispatchInMessage(InMessage message) {
 	queueManager->postInMessage(message);
-	//if waitBeforeSend was true the outQueue maybe waiting for an answer before sending. now we have got the answer and may send data.
+//if waitBeforeSend was true the outQueue maybe waiting for an answer before sending. now we have got the answer and may send data.
 	waitBeforeSend = false;
 }
 

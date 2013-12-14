@@ -18,18 +18,11 @@
 #include "../../queue/Enums.h"
 #include <unistd.h>
 
-
-pthread_mutex_t mutexLockAckSend = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t conditionSendAck = PTHREAD_COND_INITIALIZER;
-
-
 MaxDispatcherModule::~MaxDispatcherModule() {
-
 }
 
-
 void* MaxDispatcherModule::startSendAckWrap(void* arg) {
-	((QeueManager*) arg)->handleAckSend();
+	((MaxDispatcherModule*) arg)->handleAckSend();
 	return 0;
 }
 
@@ -37,12 +30,14 @@ void MaxDispatcherModule::handleAckSend() {
 	while (true) {
 		pthread_mutex_lock(&mutexLockAckSend);
 		pthread_cond_wait(&conditionSendAck, &mutexLockAckSend);
-		pthread_mutex_unlock(&conditionSendAck);
+		pthread_mutex_unlock(&mutexLockAckSend);
 
+		//receiving and sending on raspberry pi takes 10ms. we add 25ms to match the original timing
+		usleep(10000);
+		dispatcher->sendADirectResponse(this->asyncMessageToSend);
+		cout << "MaxDispatcherModule - handleAckSend(): sent directly a message.\n";
 	}
 }
-
-
 
 bool MaxDispatcherModule::init(RF22 *rf22) {
 	rf22->setModemRegisters(&maxModemConfig);
@@ -76,18 +71,13 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
-		waitForResponseInMs = 0;
+		waitForResponseInMs = 5;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
 		sendLong = false;
 	}
-//
-//	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0xF1) {
-//		cout << "MaxDispatcherModule - sendMessage(): sending an \"WAKEUP\" and therefore a LONG preamble\n";
-//		sendLong = false;
-//	}
 
 	if (sendLong == true) {
 		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
@@ -177,26 +167,24 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 		//we do this only if we know the device
 
 		if (this->dispatcher->queueManager->correlation->getSocketForID(correlator) != NULL) {
+			this->asyncMessageToSend.payLoad.clear();
+			this->asyncMessageToSend.payLoad.push_back(rfMessage->seqnum);
+			this->asyncMessageToSend.payLoad.push_back(0x0); //flags maybe wrong. have to sniff again
+			this->asyncMessageToSend.payLoad.push_back(0x2); //ack
+			this->asyncMessageToSend.payLoad.push_back(data[7]); //swap from and to
+			this->asyncMessageToSend.payLoad.push_back(data[8]);
+			this->asyncMessageToSend.payLoad.push_back(data[9]);
+			this->asyncMessageToSend.payLoad.push_back(data[4]);
+			this->asyncMessageToSend.payLoad.push_back(data[5]);
+			this->asyncMessageToSend.payLoad.push_back(data[6]);
+			this->asyncMessageToSend.payLoad.push_back(data[10]); //set the same group id
+			this->asyncMessageToSend.payLoad.push_back(0x0); //simple ack
+			this->asyncMessageToSend.dispatchTo = Enums::DispatcherType::MAX;
 
-			OutMessage response;
-			response.payLoad.push_back(rfMessage->seqnum);
-			response.payLoad.push_back(0x0); //flags maybe wrong. have to sniff again
-			response.payLoad.push_back(0x2); //ack
-			response.payLoad.push_back(data[7]); //swap from and to
-			response.payLoad.push_back(data[8]);
-			response.payLoad.push_back(data[9]);
-			response.payLoad.push_back(data[4]);
-			response.payLoad.push_back(data[5]);
-			response.payLoad.push_back(data[6]);
-			response.payLoad.push_back(data[10]); //set the same group id
-			response.payLoad.push_back(0x0); //simple ack
-			response.dispatchTo = Enums::DispatcherType::MAX;
-
-			//receiving and sending just takes 10ms. we add 20ms to match the original timing
-			usleep(20000);
-			dispatcher->sendADirectResponse(response);
-			cout << "MaxDispatcherModule - receiveMessage(): send as soon as possible an ack for: " << rfMessage->addr_from
-					<< "\n";
+			//send message
+			pthread_mutex_lock(&mutexLockAckSend);
+			pthread_cond_signal(&conditionSendAck);
+			pthread_mutex_unlock(&mutexLockAckSend);
 		}
 	}
 
