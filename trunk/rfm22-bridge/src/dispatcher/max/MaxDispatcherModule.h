@@ -16,9 +16,13 @@ class OutMessage;
 
 class MaxDispatcherModule: public DispatcherModule {
 public:
+	pthread_mutex_t mutexLockAckSend = PTHREAD_MUTEX_INITIALIZER;
+	pthread_cond_t conditionSendAck = PTHREAD_COND_INITIALIZER;
+
 	MaxDispatcherModule(RFMDispatcher *rfmDispatcher) :
-			DispatcherModule(rfmDispatcher) {
-	};
+				DispatcherModule(rfmDispatcher) {
+		};
+
 	virtual ~MaxDispatcherModule();
 
 	bool init(RF22 *rf22);
@@ -26,6 +30,7 @@ public:
 	void receiveMessage(RF22 *rf22);
 	void switchToTX(RF22 *rf22);
 	void switchToRx(RF22 *rf22);
+	static void* startSendAckWrap(void* arg);
 
 private:
 	const RF22::ModemConfig maxModemConfig = { 0x01, //F Filter Coefficient Sets. Defaults are for Rb = 40 kbps and Fd = 20 kHz so Bw = 80 kHz - resetvalue
@@ -46,13 +51,16 @@ private:
 			0x1e, //frequence derivation 18750
 			};
 
+	void handleAckSend();
+
 	const uint8_t maxSyncWords[4] = { 0xc6, 0x26, 0xc6, 0x26 };
 
-	const uint8_t incommingMessageLength=30;
+	const uint8_t incommingMessageLength = 30;
 
 	bool sendLongPreamble(RF22 *rf22, bool longPreamble);
 
 	time_t lastMessageOnAir;
+	OutMessage asyncMessageToSend;
 
 };
 

@@ -19,7 +19,6 @@ class DispatcherModule {
 public:
 	DispatcherModule(RFMDispatcher *rfmDispatcher);
 	virtual ~DispatcherModule();
-
 	virtual bool init(RF22 *rf22);
 	virtual int sendMessage(RF22 *rf22, OutMessage message);
 	virtual void receiveMessage(RF22 *rf22);
