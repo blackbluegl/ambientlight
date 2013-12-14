@@ -18,9 +18,31 @@
 #include "../../queue/Enums.h"
 #include <unistd.h>
 
+
+pthread_mutex_t mutexLockAckSend = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t conditionSendAck = PTHREAD_COND_INITIALIZER;
+
+
 MaxDispatcherModule::~MaxDispatcherModule() {
 
 }
+
+
+void* MaxDispatcherModule::startSendAckWrap(void* arg) {
+	((QeueManager*) arg)->handleAckSend();
+	return 0;
+}
+
+void MaxDispatcherModule::handleAckSend() {
+	while (true) {
+		pthread_mutex_lock(&mutexLockAckSend);
+		pthread_cond_wait(&conditionSendAck, &mutexLockAckSend);
+		pthread_mutex_unlock(&conditionSendAck);
+
+	}
+}
+
+
 
 bool MaxDispatcherModule::init(RF22 *rf22) {
 	rf22->setModemRegisters(&maxModemConfig);
@@ -35,25 +57,25 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 	/* Detect preamble after 4 nibbles */
 	rf22->spiWrite(RF22_REG_35_PREAMBLE_DETECTION_CONTROL1, (0x4 << 3));
 	/* Send 8 bytes of preamble - but that depends on the message type and will be handled dynamically*/
-	rf22->setPreambleLength(8); // in nibbles
+	rf22->setPreambleLength(6); // in nibbles - was 6
 	rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, incommingMessageLength);
 	return true;
 }
 
 int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
-	int waitForResponseInMs = 100;
+	int waitForResponseInMs = 150; //was 100 and worked good
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
 	bool sendLong = false;
-	if (lastSendTimeStamp + 3 < now) {
+	if (lastMessageOnAir + 1 < now) { //was 1 and worked good
 		sendLong = true;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
-		//in this case we do answer and do not have to wait any longer
+		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
 		waitForResponseInMs = 0;
 	}
 
@@ -61,6 +83,11 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
 		sendLong = false;
 	}
+//
+//	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0xF1) {
+//		cout << "MaxDispatcherModule - sendMessage(): sending an \"WAKEUP\" and therefore a LONG preamble\n";
+//		sendLong = false;
+//	}
 
 	if (sendLong == true) {
 		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
@@ -95,7 +122,7 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	rf22->send(sendData, length);
 	rf22->waitPacketSent();
 
-	lastSendTimeStamp = time(NULL);
+	lastMessageOnAir = time(NULL);
 	return waitForResponseInMs;
 }
 
@@ -107,6 +134,8 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 	if (rf22->recv(data, &incommingLength) == false) {
 		return;
 	}
+
+	lastMessageOnAir = time(NULL);
 
 	// Enable reception right away again, so we won't miss the next message while processing this one.
 	rf22->setModeRx();
@@ -162,6 +191,9 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 			response.payLoad.push_back(data[10]); //set the same group id
 			response.payLoad.push_back(0x0); //simple ack
 			response.dispatchTo = Enums::DispatcherType::MAX;
+
+			//receiving and sending just takes 10ms. we add 20ms to match the original timing
+			usleep(20000);
 			dispatcher->sendADirectResponse(response);
 			cout << "MaxDispatcherModule - receiveMessage(): send as soon as possible an ack for: " << rfMessage->addr_from
 					<< "\n";
