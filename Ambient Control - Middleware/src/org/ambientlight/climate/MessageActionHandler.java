@@ -13,13 +13,23 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities;
+package org.ambientlight.climate;
+
+import org.ambientlight.messages.Message;
+import org.ambientlight.messages.QeueManager;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class ShutterContact extends MaxComponent {
+public interface MessageActionHandler {
 
-	public boolean isOpen = false;
+	public boolean onMessage(Message message);
+
+
+	public boolean onAckResponseMessage(QeueManager.State state, Message response, Message request);
+
+
+	public boolean isFinished();
+
 }

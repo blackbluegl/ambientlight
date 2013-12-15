@@ -37,7 +37,7 @@ public class MaxFactoryResetMessage extends MaxMessage implements AckRequestMess
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 5;
+		return 2;
 	}
 
 

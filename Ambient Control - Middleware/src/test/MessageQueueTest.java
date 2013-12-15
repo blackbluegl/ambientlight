@@ -145,16 +145,17 @@ public class MessageQueueTest {
 		List<Message> outMessages = new ArrayList<Message>();
 		// outMessages.add(temp);
 		// outMessages.add(pairPong);
-		// outMessages.add(wakeUp);
+		outMessages.add(wakeUp);
 		// outMessages.add(link);
 		// outMessages.add(link2);
 
 		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(529299, 1);
 		// manager.putOutMessage(wakeUp, condition);
 		// manager.putOutMessage(wakeUp2, condition);
-		manager.putOutMessage(link2, condition);
+		// manager.putOutMessage(link2, condition);
 		// manager.putOutMessage(link3, condition);
 		// manager.putOutMessage(link4, condition);
+		manager.putOutMessages(outMessages);
 		System.out.println("finished");
 	}
 }
