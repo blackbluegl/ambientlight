@@ -33,7 +33,7 @@ void MaxDispatcherModule::handleAckSend() {
 		pthread_mutex_unlock(&mutexLockAckSend);
 
 		//receiving and sending on raspberry pi takes 10ms. we add 25ms to match the original timing
-		usleep(20000);
+		usleep(25000);
 		dispatcher->sendADirectResponse(this->asyncMessageToSend);
 
 	//	cout << "MaxDispatcherModule - handleAckSend(): sent directly a message.\n";
@@ -59,7 +59,7 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 }
 
 int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
-	int waitForResponseInMs = 150; //was 100 and worked good
+	int waitForResponseInMs = 100; //was 100 and worked good
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
@@ -72,7 +72,7 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	//	cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
-		waitForResponseInMs = 30;
+		waitForResponseInMs = 15;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
