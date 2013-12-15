@@ -72,7 +72,7 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	//	cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
-		waitForResponseInMs = 15;
+		waitForResponseInMs = 20;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {

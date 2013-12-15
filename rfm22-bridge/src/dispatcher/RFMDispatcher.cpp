@@ -31,7 +31,7 @@ void RFMDispatcher::sendADirectResponse(OutMessage response) {
 }
 
 void RFMDispatcher::dispatchOutMessage(OutMessage message) {
-	cout << "RFMDispatcher dispatchOutMessage(): dispatching message of type" << Enums::enumToString(message.dispatchTo) << "\n";
+//	cout << "RFMDispatcher dispatchOutMessage(): dispatching message of type" << Enums::enumToString(message.dispatchTo) << "\n";
 	DispatcherModule* module = dispatchers.at(message.dispatchTo);
 
 	if (lastDispatcher != message.dispatchTo) {
