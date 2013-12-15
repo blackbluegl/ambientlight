@@ -33,9 +33,10 @@ void MaxDispatcherModule::handleAckSend() {
 		pthread_mutex_unlock(&mutexLockAckSend);
 
 		//receiving and sending on raspberry pi takes 10ms. we add 25ms to match the original timing
-		usleep(10000);
+		usleep(20000);
 		dispatcher->sendADirectResponse(this->asyncMessageToSend);
-		cout << "MaxDispatcherModule - handleAckSend(): sent directly a message.\n";
+
+	//	cout << "MaxDispatcherModule - handleAckSend(): sent directly a message.\n";
 	}
 }
 
@@ -52,7 +53,7 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 	/* Detect preamble after 4 nibbles */
 	rf22->spiWrite(RF22_REG_35_PREAMBLE_DETECTION_CONTROL1, (0x4 << 3));
 	/* Send 8 bytes of preamble - but that depends on the message type and will be handled dynamically*/
-	rf22->setPreambleLength(6); // in nibbles - was 6
+	rf22->setPreambleLength(16); // in nibbles - was 6
 	rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, incommingMessageLength);
 	return true;
 }
@@ -68,22 +69,22 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
-		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
+	//	cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
-		waitForResponseInMs = 5;
+		waitForResponseInMs = 30;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
-		cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
+	//	cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
 		sendLong = false;
 	}
 
-	if (sendLong == true) {
-		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
-	} else {
-		cout << "MaxDispatcherModule - sendMessage(): sending short preamble\n";
-	}
+//	if (sendLong == true) {
+//		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
+//	} else {
+//		cout << "MaxDispatcherModule - sendMessage(): sending short preamble\n";
+//	}
 
 	sendLongPreamble(rf22, sendLong);
 

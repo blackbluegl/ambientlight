@@ -12,6 +12,7 @@
 #include "../socket/SockedException.h"
 #include <iostream>
 
+
 pthread_mutex_t mutexLockOutQueue = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t conditionOutQueueFilled = PTHREAD_COND_INITIALIZER;
 
@@ -41,7 +42,7 @@ void QeueManager::handleOutMessages() {
 			OutMessage outMessage = outQeue.at(0);
 			outQeue.erase(outQeue.begin());
 			int count = outQeue.size();
-			cout << "QeueManager handleOutMessages(): Send a Message " << count << " Messages left.\n";
+		//	cout << "QeueManager handleOutMessages(): Send a Message " << count << " Messages left.\n";
 			dispatcher->dispatchOutMessage(outMessage);
 			pthread_mutex_unlock(&mutexLockOutQueue);
 		}
