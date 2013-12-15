@@ -41,7 +41,7 @@ public class MaxWakeUpMessage extends MaxMessage implements AckRequestMessage {
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 2;
+		return 5;
 	}
 
 

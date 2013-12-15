@@ -20,49 +20,30 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.ClimateConfiguration;
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ShutterContactConfiguration;
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
-import org.ambientlight.messages.ConditionalMessage;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.QeueManager.State;
 import org.ambientlight.messages.max.DayEntry;
-import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAckMessage;
 import org.ambientlight.messages.max.MaxAckType;
-import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
-import org.ambientlight.messages.max.MaxConfigValveMessage;
-import org.ambientlight.messages.max.MaxConfigValveMessage.DecalcEntry;
-import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
-import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.messages.max.MaxDayInWeek;
-import org.ambientlight.messages.max.MaxFactoryResetMessage;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
-import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
-import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
-import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxShutterContactStateMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
-import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
-import org.ambientlight.messages.max.MaxWakeUpMessage;
-import org.ambientlight.messages.max.WaitForShutterContactCondition;
-import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.entities.MaxComponent;
 import org.ambientlight.room.entities.ShutterContact;
@@ -87,7 +68,7 @@ public class MaxClimateManager implements MessageListener {
 
 	public ClimateConfiguration config;
 
-	private int outSequenceNumber = 0;
+	private List<MessageActionHandler> actionHandlers = new ArrayList<MessageActionHandler>();
 
 	boolean learnMode = false;
 	public static int WAIT_FOR_NEW_DEVICES = 90;
@@ -157,7 +138,7 @@ public class MaxClimateManager implements MessageListener {
 		if (!message.isRequest() || AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress()) == null)
 			return;
 		System.out.println("ClimateManager - getTimeInfo: sending time to device: " + message.getFromAdress());
-		MaxTimeInformationMessage time = getTimeInfoForDevice(new Date(), message.getFromAdress());
+		MaxTimeInformationMessage time = MaxMessageCreator.getTimeInfoForDevice(new Date(), message.getFromAdress());
 		queueManager.putOutMessage(time);
 
 	}
@@ -265,13 +246,6 @@ public class MaxClimateManager implements MessageListener {
 			return;
 		}
 
-		// MaxAckMessage ack = new MaxAckMessage();
-		// ack.setFromAdress(this.config.vCubeAdress);
-		// ack.setToAdress(message.getFromAdress());
-		// ack.setSequenceNumber(getNewSequnceNumber());
-		// ack.setAckType(MaxAckType.ACK_SIMPLE);
-		// this.queueManager.putOutMessage(ack);
-
 		RoomConfigurationFactory.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
@@ -323,84 +297,16 @@ public class MaxClimateManager implements MessageListener {
 			return;
 		}
 
-		RoomConfigurationFactory.beginTransaction();
+		if (device instanceof Thermostat) {
+			RemoveThermostatHandler remove = new RemoveThermostatHandler((Thermostat) device);
+			this.actionHandlers.add(remove);
+		}
 
-		// Wait until shutterContact comes alive
-		WaitForShutterContactCondition condition = null;
 		if (device instanceof ShutterContact) {
-			condition = new WaitForShutterContactCondition(device.config.adress, this.config.vCubeAdress);
-			// MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
-			// wakeUp.setFromAdress(this.config.vCubeAdress);
-			// wakeUp.setToAdress(adress);
-			// wakeUp.setSequenceNumber(getNewSequnceNumber());
-			// AmbientControlMW.getRoom().qeueManager.putOutMessage(wakeUp,
-			// condition);
+			RemoveShutterContactHandler remove = new RemoveShutterContactHandler((ShutterContact) device);
+			this.actionHandlers.add(remove);
 		}
 
-		// remove correlator
-		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, adress,
-				this.config.vCubeAdress);
-		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
-
-		// send remove
-		MaxFactoryResetMessage resetDevice = getFactoryResetMessageForDevice(device.config.adress);
-		AmbientControlMW.getRoom().qeueManager.putOutMessage(resetDevice, condition);
-
-		// unregister link from other devices
-		for (MaxComponentConfiguration currentConfig : config.devices.values()) {
-
-			// we skip the device because it will be deleted anyway
-			if (currentConfig.adress == adress) {
-				continue;
-			}
-
-			// Wait until shutterContact comes alive if it is one
-			WaitForShutterContactCondition conditionForCurrent = null;
-			if (currentConfig instanceof ShutterContactConfiguration) {
-				conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress, adress);
-			}
-
-			MaxRemoveLinkPartnerMessage unlink = getUnlinkMessageForDevice(currentConfig.adress, device.config.adress,
-					device.config.getDeviceType());
-			AmbientControlMW.getRoom().qeueManager.putOutMessage(unlink, conditionForCurrent);
-		}
-
-		// Remove from modell
-		AmbientControlMW.getRoom().getMaxComponents().remove(adress);
-		this.config.devices.remove(adress);
-
-		RoomConfigurationFactory.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
-	}
-
-
-	/**
-	 * @param adress
-	 * @return
-	 */
-	private MaxFactoryResetMessage getFactoryResetMessageForDevice(int adress) {
-		MaxFactoryResetMessage resetDevice = new MaxFactoryResetMessage();
-		resetDevice.setFromAdress(config.vCubeAdress);
-		resetDevice.setToAdress(adress);
-		resetDevice.setSequenceNumber(getNewSequnceNumber());
-		return resetDevice;
-	}
-
-
-	/**
-	 * @param device
-	 * @param currentConfig
-	 * @return
-	 */
-	private MaxRemoveLinkPartnerMessage getUnlinkMessageForDevice(int adress, int linkPartnerAdress,
-			DeviceType linkPartnerDeviceType) {
-		MaxRemoveLinkPartnerMessage unlink = new MaxRemoveLinkPartnerMessage();
-		unlink.setFromAdress(config.vCubeAdress);
-		unlink.setToAdress(adress);
-		unlink.setSequenceNumber(getNewSequnceNumber());
-		unlink.setLinkPartnerAdress(linkPartnerAdress);
-		unlink.setLinkPartnerDeviceType(linkPartnerDeviceType);
-		return unlink;
 	}
 
 
@@ -410,8 +316,7 @@ public class MaxClimateManager implements MessageListener {
 
 		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
 			if (current instanceof Thermostat) {
-				MaxTimeInformationMessage message = getTimeInfoForDevice(now, current.config.adress);
-
+				MaxTimeInformationMessage message = MaxMessageCreator.getTimeInfoForDevice(now, current.config.adress);
 				messages.add(message);
 			}
 		}
@@ -419,233 +324,6 @@ public class MaxClimateManager implements MessageListener {
 	}
 
 
-	/**
-	 * @param now
-	 * @param current
-	 * @return
-	 */
-	private MaxTimeInformationMessage getTimeInfoForDevice(Date now, int adress) {
-		MaxTimeInformationMessage message = new MaxTimeInformationMessage();
-		message.setSequenceNumber(getNewSequnceNumber());
-		message.setFromAdress(config.vCubeAdress);
-		message.setToAdress(adress);
-		message.setTime(now);
-		return message;
-	}
-
-
-	/**
-	 * @param pairMessage
-	 * @param newDevice
-	 */
-	private void sendPong(MaxPairPingMessage pairMessage, boolean newDevice) {
-
-		// check for known deviceTypes
-		if (pairMessage.getDeviceType() == null && pairMessage.getDeviceType() != DeviceType.HEATING_THERMOSTAT
-				&& pairMessage.getDeviceType() != DeviceType.HEATING_THERMOSTAT_PLUS
-				&& pairMessage.getDeviceType() != DeviceType.SHUTTER_CONTACT) {
-			System.out.println("ClimateManager - sendPong(): We do not support this device");
-			return;
-		}
-
-		// Send pair pong
-		MaxPairPongMessage pairPong = new MaxPairPongMessage();
-		pairPong.setFromAdress(config.vCubeAdress);
-		pairPong.setToAdress(pairMessage.getFromAdress());
-
-		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
-		AmbientControlMW.getRoom().qeueManager.putOutMessage(pairPong);
-
-		if (newDevice) {
-			// keep device waiting for messages
-			MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
-			wakeUp.setFromAdress(this.config.vCubeAdress);
-			wakeUp.setSequenceNumber(getNewSequnceNumber());
-			wakeUp.setToAdress(pairMessage.getFromAdress());
-			AmbientControlMW.getRoom().qeueManager.putOutMessage(wakeUp);
-
-			// add and setup new device
-			RoomConfigurationFactory.beginTransaction();
-			List<ConditionalMessage> outMessages = new ArrayList<ConditionalMessage>();
-
-			// register the device at the rfmbridge - it will ack some requests
-			// directly because the way over network is to long. eg.
-			// shuttercontact messages.
-			outMessages.add(new ConditionalMessage(null, new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage
-					.getFromAdress(), this.config.vCubeAdress)));
-
-			// these values will be filled
-			MaxComponentConfiguration config = null;
-			MaxComponent device = null;
-
-			// setup and create device and config specific for each devicetype
-			if (pairMessage.getDeviceType() == DeviceType.HEATING_THERMOSTAT
-					|| pairMessage.getDeviceType() == DeviceType.HEATING_THERMOSTAT_PLUS) {
-				device = new Thermostat();
-				config = new ThermostatConfiguration();
-				device.config = config;
-
-				// it is the sensor value we can read. but we need something to
-				// start withString.valueOf(
-				((Thermostat) device).temperatur = this.config.setTemp;
-
-				((ThermostatConfiguration) config).offset = this.config.DEFAULT_OFFSET;
-				config.label = "Thermostat";
-
-				// Setup Time;
-				outMessages.add(new ConditionalMessage(null, getTimeInfoForDevice(new Date(), pairMessage.getFromAdress())));
-
-				// Setup valve
-				outMessages.add(new ConditionalMessage(null, getConfigValveForDevice(pairMessage.getFromAdress())));
-
-				// Set Temperatures
-				outMessages.add(new ConditionalMessage(null, getConfigureTemperatures(pairMessage.getFromAdress())));
-
-				// Setup temperatur
-				outMessages.add(new ConditionalMessage(null, getSetTempForDevice(pairMessage.getFromAdress())));
-
-				// Set group
-				outMessages.add(new ConditionalMessage(null, getSetGroupIdForDevice(pairMessage.getFromAdress())));
-
-				// Setup weekly Profile
-				List<Message> weekProfile = getWeekProfileForDevice(pairMessage.getFromAdress(), this.config.currentWeekProfile);
-				for (Message dayProfile : weekProfile) {
-					outMessages.add(new ConditionalMessage(null, dayProfile));
-				}
-
-			} else if (pairMessage.getDeviceType() == DeviceType.SHUTTER_CONTACT) {
-				device = new ShutterContact();
-				config = new ShutterContactConfiguration();
-				device.config = config;
-				((ShutterContact) device).isOpen = false;
-				config.label = "Fensterkontakt";
-			}
-
-			// set common values to the configuration
-			config.adress = pairMessage.getFromAdress();
-			config.batteryLow = false;
-			config.firmware = pairMessage.getFirmware();
-			config.invalidArgument = false;
-			config.lastUpdate = new Date();
-			config.rfError = false;
-			config.serial = pairMessage.getSerial();
-			config.timedOut = false;
-
-			// add device to ambientcontrol
-			device.config = config;
-			AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
-			AmbientControlMW.getRoom().config.climate.devices.put(config.adress, config);
-
-			// link devices
-			for (MaxComponentConfiguration currentConfig : this.config.devices.values()) {
-
-				// do not link with ourself
-				if (currentConfig.adress == pairMessage.getFromAdress()) {
-					continue;
-				}
-
-				// never link shutter contacts with each other
-				if (currentConfig instanceof ShutterContactConfiguration
-						&& pairMessage.getDeviceType() == DeviceType.SHUTTER_CONTACT) {
-					continue;
-				}
-
-				// if current device is a shuttercontact - wait until its online
-				// again
-				WaitForShutterContactCondition conditionForCurrent = null;
-				if (currentConfig instanceof ShutterContactConfiguration) {
-					conditionForCurrent = new WaitForShutterContactCondition(currentConfig.adress, this.config.vCubeAdress);
-				}
-
-				// link new device to current
-				MaxAddLinkPartnerMessage linkCurrentToNew = getLinkMessage(currentConfig.adress, pairMessage.getFromAdress(),
-						pairMessage.getDeviceType());
-				outMessages.add(new ConditionalMessage(conditionForCurrent, linkCurrentToNew));
-
-				// link the current to the new device - the device was woken up
-				// no condition is needed
-				MaxAddLinkPartnerMessage linkNewToCurrent = getLinkMessage(pairMessage.getFromAdress(), currentConfig.adress,
-						currentConfig.getDeviceType());
-				outMessages.add(new ConditionalMessage(null, linkNewToCurrent));
-			}
-
-			queueManager.putOutMessagesWithCondition(outMessages);
-			RoomConfigurationFactory.commitTransaction();
-			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
-		}
-	}
-
-
-	/**
-	 * @param pairMessage
-	 * @param config
-	 * @param currentConfig
-	 * @return
-	 */
-	private MaxAddLinkPartnerMessage getLinkMessage(int adress, int linkPartnerAdress, DeviceType linkPartnerTDeviceType) {
-		MaxAddLinkPartnerMessage linkCurrentToNew = new MaxAddLinkPartnerMessage();
-		linkCurrentToNew.setSequenceNumber(getNewSequnceNumber());
-		linkCurrentToNew.setFromAdress(this.config.vCubeAdress);
-		linkCurrentToNew.setToAdress(adress);
-		linkCurrentToNew.setLinkPartnerAdress(linkPartnerAdress);
-		linkCurrentToNew.setLinkPartnerDeviceType(linkPartnerTDeviceType);
-		return linkCurrentToNew;
-	}
-
-
-	/**
-	 * @param pairMessage
-	 * @return
-	 */
-	private MaxSetGroupIdMessage getSetGroupIdForDevice(int adress) {
-		MaxSetGroupIdMessage group = new MaxSetGroupIdMessage();
-		group.setSequenceNumber(getNewSequnceNumber());
-		group.setFromAdress(this.config.vCubeAdress);
-		group.setToAdress(adress);
-		group.setGroupId(this.config.groupId);
-		return group;
-	}
-
-
-	/**
-	 * @param pairMessage
-	 * @return
-	 */
-	private MaxConfigureTemperaturesMessage getConfigureTemperatures(int adress) {
-		MaxConfigureTemperaturesMessage temps = new MaxConfigureTemperaturesMessage();
-		temps.setSequenceNumber(getNewSequnceNumber());
-		temps.setFromAdress(this.config.vCubeAdress);
-		temps.setToAdress(adress);
-		temps.setComfortTemp(this.config.comfortTemperatur);
-		temps.setEcoTemp(this.config.ecoTemperatur);
-		temps.setMaxTemp(this.config.maxTemp);
-		temps.setMinTemp(this.config.minTemp);
-		temps.setOffsetTemp(this.config.DEFAULT_OFFSET);
-		temps.setWindowOpenTemp(this.config.windowOpenTemperatur);
-		temps.setWindowOpenTime(this.config.windowOpenTimeMins);
-		return temps;
-	}
-
-
-	/**
-	 * @param pairMessage
-	 * @return
-	 */
-	private MaxConfigValveMessage getConfigValveForDevice(int adress) {
-		MaxConfigValveMessage valve = new MaxConfigValveMessage();
-		valve.setSequenceNumber(getNewSequnceNumber());
-		valve.setFromAdress(this.config.vCubeAdress);
-		valve.setToAdress(adress);
-		valve.setBoostDuration(this.config.boostDurationMins);
-		valve.setBoostValvePosition(this.config.boostValvePositionPercent);
-		DecalcEntry decalc = valve.new DecalcEntry();
-		decalc.day = this.config.decalcDay;
-		decalc.hour = this.config.decalcHour;
-		valve.setDecalc(decalc);
-		valve.setMaxValvePosition(this.config.DEFAULT_MAX_VALVE_POSITION);
-		valve.setValveOffset(this.config.DEFAULT_VALVE_OFFSET_PERCENT);
-		return valve;
-	}
 
 
 	public void setCurrentProfile(String profile) {
@@ -660,7 +338,7 @@ public class MaxClimateManager implements MessageListener {
 
 		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
 			if (current instanceof Thermostat) {
-				messages.addAll(getWeekProfileForDevice(current.config.adress, profile));
+				messages.addAll(MaxMessageCreator.getWeekProfileForDevice(current.config.adress, profile));
 			}
 		}
 
@@ -686,7 +364,7 @@ public class MaxClimateManager implements MessageListener {
 
 		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
 			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = getSetTempForDevice(current.config.adress);
+				MaxSetTemperatureMessage outMessage = MaxMessageCreator.getSetTempForDevice(current.config.adress);
 				messages.add(outMessage);
 			}
 		}
@@ -721,67 +399,6 @@ public class MaxClimateManager implements MessageListener {
 	}
 
 
-	/**
-	 * @param current
-	 * @return
-	 */
-	private MaxSetTemperatureMessage getSetTempForDevice(int adress) {
-		MaxSetTemperatureMessage outMessage = new MaxSetTemperatureMessage();
-		outMessage.setFromAdress(config.vCubeAdress);
-		outMessage.setTemp(config.setTemp);
-		outMessage.setTemporaryUntil(config.temporaryUntilDate);
-		outMessage.setMode(config.mode);
-		outMessage.setSequenceNumber(getNewSequnceNumber());
-		outMessage.setToAdress(adress);
-		return outMessage;
-	}
-
-
-	/**
-	 * @param fromAdress
-	 * @param weekProfile
-	 */
-	private List<Message> getWeekProfileForDevice(Integer deviceAdress, String weekProfile) {
-		List<Message> messages = new ArrayList<Message>();
-		HashMap<MaxDayInWeek, List<DayEntry>> profiles = config.weekProfiles.get(weekProfile);
-		for (Entry<MaxDayInWeek, List<DayEntry>> currentDayProfile : profiles.entrySet()) {
-			int entryCountPartOne = currentDayProfile.getValue().size();
-			boolean twoParts = false;
-
-			if (entryCountPartOne > 7) {
-				twoParts = true;
-				entryCountPartOne = 7;
-			}
-
-			MaxConfigureWeekProgrammMessage week = new MaxConfigureWeekProgrammMessage();
-			for (int i = 0; i < entryCountPartOne; i++) {
-				week.addEntry(currentDayProfile.getValue().get(i));
-			}
-			week.setDay(currentDayProfile.getKey());
-			week.setFromAdress(config.vCubeAdress);
-			week.setSecondPart(false);
-			week.setSequenceNumber(getNewSequnceNumber());
-			week.setToAdress(deviceAdress);
-			messages.add(week);
-
-			if (twoParts) {
-				MaxConfigureWeekProgrammMessage week2 = new MaxConfigureWeekProgrammMessage();
-				for (int i = 7; i < currentDayProfile.getValue().size(); i++) {
-					week2.addEntry(currentDayProfile.getValue().get(i));
-				}
-				week2.setDay(currentDayProfile.getKey());
-				week2.setFromAdress(config.vCubeAdress);
-				week2.setSecondPart(true);
-				week2.setSecondPart(true);
-				week2.setSequenceNumber(getNewSequnceNumber());
-				week2.setToAdress(deviceAdress);
-				messages.add(week2);
-			}
-		}
-		return messages;
-	}
-
-
 	public void startPairingMode() {
 		this.learnMode = true;
 		new Thread(new Runnable() {
@@ -799,16 +416,6 @@ public class MaxClimateManager implements MessageListener {
 				}
 			}
 		}).start();
-	}
-
-
-	private int getNewSequnceNumber() {
-		outSequenceNumber++;
-		if (outSequenceNumber > 255) {
-			outSequenceNumber = 0;
-		}
-
-		return outSequenceNumber;
 	}
 
 
