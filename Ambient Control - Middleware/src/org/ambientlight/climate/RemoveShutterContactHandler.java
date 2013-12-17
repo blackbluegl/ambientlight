@@ -15,18 +15,12 @@
 
 package org.ambientlight.climate;
 
-import java.util.ArrayList;
-
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ShutterContactConfiguration;
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
 import org.ambientlight.messages.max.MaxFactoryResetMessage;
 import org.ambientlight.messages.max.MaxMessage;
-import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.max.WaitForShutterContactCondition;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
@@ -52,22 +46,6 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 	public RemoveShutterContactHandler(ShutterContact device) {
 		this.device = device;
-		ShutterContactConfiguration config = (ShutterContactConfiguration) device.config;
-
-		ArrayList<Integer> removedLinks = new ArrayList<Integer>();
-
-		// unlink thermostates
-		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climate.devices.values()) {
-
-			if (currentConfig instanceof ThermostatConfiguration == false) {
-				continue;
-			}
-
-			MaxRemoveLinkPartnerMessage unlink = MaxMessageCreator.getUnlinkMessageForDevice(currentConfig.adress,
-					config.proxyAdress, device.config.getDeviceType());
-			AmbientControlMW.getRoom().qeueManager.putOutMessage(unlink);
-			removedLinks.add(currentConfig.adress);
-		}
 
 		// Wait until shutterContact comes alive and remove it
 		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.config.adress,

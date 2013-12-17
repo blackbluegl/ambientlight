@@ -21,11 +21,11 @@ import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ShutterContactConfiguration;
 import org.ambientlight.config.room.actors.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
+import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
@@ -107,7 +107,12 @@ public class AddThermostateHandler implements MessageActionHandler {
 			outMessages.add(dayProfile);
 		}
 
-		// link devices
+		// link to proxyShutterContact
+		MaxAddLinkPartnerMessage linkToShutterContact = MaxMessageCreator.getLinkMessage(config.adress,
+				AmbientControlMW.getRoom().config.climate.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
+		outMessages.add(linkToShutterContact);
+
+		// link devices to other thermostates
 		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climate.devices.values()) {
 
 			// do not link with ourself
@@ -124,13 +129,6 @@ public class AddThermostateHandler implements MessageActionHandler {
 				// link new device to current
 				MaxAddLinkPartnerMessage linkNewToCurrent = MaxMessageCreator.getLinkMessage(pairMessage.getFromAdress(),
 						currentConfig.adress, currentConfig.getDeviceType());
-				outMessages.add(linkNewToCurrent);
-			}
-
-			if (currentConfig instanceof ShutterContactConfiguration) {
-				// link new device to current
-				MaxAddLinkPartnerMessage linkNewToCurrent = MaxMessageCreator.getLinkMessage(pairMessage.getFromAdress(),
-						((ShutterContactConfiguration) currentConfig).proxyAdress, currentConfig.getDeviceType());
 				outMessages.add(linkNewToCurrent);
 			}
 		}
