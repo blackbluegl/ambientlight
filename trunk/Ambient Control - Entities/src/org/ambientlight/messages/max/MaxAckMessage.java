@@ -18,14 +18,14 @@ package org.ambientlight.messages.max;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.ambientlight.messages.AckResponseMessage;
+import org.ambientlight.messages.ResponseMessage;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxAckMessage extends MaxMessage implements AckResponseMessage {
+public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 
 	public MaxAckMessage() {
 		payload = new byte[17];

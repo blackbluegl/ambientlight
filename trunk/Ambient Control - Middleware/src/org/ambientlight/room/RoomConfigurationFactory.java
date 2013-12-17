@@ -62,7 +62,7 @@ public class RoomConfigurationFactory {
 	}
 
 
-	public static void revertTransaction(RoomConfiguration roomConfig) {
+	public static void cancelTransaction() {
 		saveLock.unlock();
 	}
 

@@ -99,7 +99,7 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
-	public boolean onAckResponseMessage(State state, Message response, Message request) {
+	public boolean onResponse(State state, Message response, Message request) {
 		// there should occour no timeout
 		return false;
 	}
