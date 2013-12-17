@@ -15,14 +15,14 @@
 
 package org.ambientlight.messages.max;
 
-import org.ambientlight.messages.AckRequestMessage;
+import org.ambientlight.messages.RequestMessage;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxWakeUpMessage extends MaxMessage implements AckRequestMessage {
+public class MaxWakeUpMessage extends MaxMessage implements RequestMessage {
 
 	private static final byte WAKE_UP_CALL = 0x3F;
 

@@ -52,7 +52,7 @@ public class MessageDump implements MessageListener {
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
-	public void onAckResponseMessage(State state, Message response, Message request) {
+	public void onResponse(State state, Message response, Message request) {
 		// TODO Auto-generated method stub
 		if (response == null)
 			return;

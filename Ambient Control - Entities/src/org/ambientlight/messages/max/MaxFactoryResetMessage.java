@@ -15,14 +15,14 @@
 
 package org.ambientlight.messages.max;
 
-import org.ambientlight.messages.AckRequestMessage;
+import org.ambientlight.messages.RequestMessage;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxFactoryResetMessage extends MaxMessage implements AckRequestMessage {
+public class MaxFactoryResetMessage extends MaxMessage implements RequestMessage {
 
 	public MaxFactoryResetMessage() {
 		payload = new byte[10];

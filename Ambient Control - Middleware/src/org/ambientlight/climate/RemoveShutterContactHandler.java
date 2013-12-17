@@ -109,7 +109,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 	@Override
 	public boolean onMessage(Message message) {
 		// we are not interested in messages without a context
-		if (message instanceof MaxMessage && ((MaxMessage) message).getSequenceNumber() == this.sequenceNumberForDeletedDevice) {
+		if (((MaxMessage) message).getSequenceNumber() == this.sequenceNumberForDeletedDevice) {
 			System.out.println("RemoveShutterHandler onMessage(): The shutterContact responded now."
 					+ " Please reset the contact manually.");
 		}
@@ -125,8 +125,8 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
-	public boolean onAckResponseMessage(State state, Message response, Message request) {
-		if (actionState == ActionState.REMOVE_FROM_MODELL && request instanceof MaxMessage
+	public boolean onResponse(State state, Message response, Message request) {
+		if (actionState == ActionState.REMOVE_FROM_MODELL
 				&& ((MaxMessage) request).getSequenceNumber() == this.sequenceNumberForDeletedDevice) {
 
 			if (state == State.TIMED_OUT) {

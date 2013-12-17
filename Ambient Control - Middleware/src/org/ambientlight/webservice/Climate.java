@@ -56,7 +56,7 @@ public class Climate {
 	public Response startPairing() {
 		MaxClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
-		manager.startPairingMode();
+		manager.setPairingMode();
 
 		return Response.status(200).build();
 	}

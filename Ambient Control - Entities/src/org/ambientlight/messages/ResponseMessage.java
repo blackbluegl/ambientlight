@@ -20,11 +20,7 @@ package org.ambientlight.messages;
  * @author Florian Bornkessel
  *
  */
-public interface AckRequestMessage {
+public interface ResponseMessage {
 
-	public int getTimeOutSec();
-
-	public int getRetryCount();
-
-	public String getCorrelation();
+	public String getCorrelator();
 }

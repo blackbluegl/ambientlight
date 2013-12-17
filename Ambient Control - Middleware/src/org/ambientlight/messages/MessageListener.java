@@ -24,7 +24,7 @@ public interface MessageListener {
 	public void onMessage(Message message);
 
 
-	public void onAckResponseMessage(QeueManager.State state, Message response, Message request);
+	public void onResponse(QeueManager.State state, Message response, Message request);
 
 
 	public void onDisconnectDispatcher(DispatcherType dispatcher);

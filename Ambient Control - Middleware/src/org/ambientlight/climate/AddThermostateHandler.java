@@ -23,19 +23,14 @@ import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
 import org.ambientlight.config.room.actors.ShutterContactConfiguration;
 import org.ambientlight.config.room.actors.ThermostatConfiguration;
-import org.ambientlight.messages.ConditionalMessage;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
-import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
-import org.ambientlight.messages.max.WaitForShutterContactCondition;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.MaxComponent;
-import org.ambientlight.room.entities.ShutterContact;
 import org.ambientlight.room.entities.Thermostat;
 
 
@@ -48,15 +43,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 	boolean finished = false;
 
 
-	public AddThermostateHandler(MaxPairPingMessage pairMessage, boolean newDevice) {
-
-		// check for known deviceTypes
-		if (pairMessage.getDeviceType() == null && pairMessage.getDeviceType() != DeviceType.HEATING_THERMOSTAT
-				&& pairMessage.getDeviceType() != DeviceType.HEATING_THERMOSTAT_PLUS
-				&& pairMessage.getDeviceType() != DeviceType.SHUTTER_CONTACT) {
-			System.out.println("ClimateManager - sendPong(): We do not support this device");
-			return;
-		}
+	public AddThermostateHandler(MaxPairPingMessage pairMessage) {
 
 		// Send pair pong
 		MaxPairPongMessage pairPong = new MaxPairPongMessage();
@@ -66,120 +53,93 @@ public class AddThermostateHandler implements MessageActionHandler {
 		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(pairPong);
 
-		if (newDevice) {
+		// add and setup new device
+		RoomConfigurationFactory.beginTransaction();
+		List<Message> outMessages = new ArrayList<Message>();
 
-			// add and setup new device
-			RoomConfigurationFactory.beginTransaction();
-			List<ConditionalMessage> outMessages = new ArrayList<ConditionalMessage>();
+		// register the device at the rfmbridge - for direct routing
+		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), AmbientControlMW
+				.getRoom().config.climate.vCubeAdress));
 
-			// register the device at the rfmbridge - it will ack some requests
-			// directly because the way over network is to long. eg.
-			// shuttercontact messages.
-			outMessages.add(new ConditionalMessage(null, new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage
-					.getFromAdress(), AmbientControlMW.getRoom().config.climate.vCubeAdress)));
+		// create device in ambientcontrol
+		ThermostatConfiguration config = new ThermostatConfiguration();
+		Thermostat device = new Thermostat();
+		device.config = config;
 
-			// these values will be filled
-			MaxComponentConfiguration config = null;
-			MaxComponent device = null;
+		// it is the sensor value we can read. but we need something to
+		// start
+		device.temperatur = AmbientControlMW.getRoom().config.climate.setTemp;
 
-			// setup and create device and config specific for each devicetype
-			if (pairMessage.getDeviceType() == DeviceType.HEATING_THERMOSTAT
-					|| pairMessage.getDeviceType() == DeviceType.HEATING_THERMOSTAT_PLUS) {
-				device = new Thermostat();
-				config = new ThermostatConfiguration();
-				device.config = config;
+		config.offset = AmbientControlMW.getRoom().config.climate.DEFAULT_OFFSET;
+		config.label = "Thermostat";
+		config.adress = pairMessage.getFromAdress();
+		config.batteryLow = false;
+		config.firmware = pairMessage.getFirmware();
+		config.invalidArgument = false;
+		config.lastUpdate = new Date();
+		config.rfError = false;
+		config.serial = pairMessage.getSerial();
+		config.timedOut = false;
 
-				// it is the sensor value we can read. but we need something to
-				// start withString.valueOf(
-				((Thermostat) device).temperatur = AmbientControlMW.getRoom().config.climate.setTemp;
+		// add device to ambientcontrol
+		AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
+		AmbientControlMW.getRoom().config.climate.devices.put(config.adress, config);
 
-				((ThermostatConfiguration) config).offset = AmbientControlMW.getRoom().config.climate.DEFAULT_OFFSET;
-				config.label = "Thermostat";
+		// setup Time;
+		outMessages.add(MaxMessageCreator.getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
 
-				// Setup Time;
-				outMessages.add(new ConditionalMessage(null, MaxMessageCreator.getTimeInfoForDevice(new Date(),
-						pairMessage.getFromAdress())));
+		// setup valve
+		outMessages.add(MaxMessageCreator.getConfigValveForDevice(pairMessage.getFromAdress()));
 
-				// Setup valve
-				outMessages.add(new ConditionalMessage(null, MaxMessageCreator.getConfigValveForDevice(pairMessage
-						.getFromAdress())));
+		// set Temperatures
+		outMessages.add(MaxMessageCreator.getConfigureTemperatures(pairMessage.getFromAdress()));
 
-				// Set Temperatures
-				outMessages.add(new ConditionalMessage(null, MaxMessageCreator.getConfigureTemperatures(pairMessage
-						.getFromAdress())));
+		// setup temperatur
+		outMessages.add(MaxMessageCreator.getSetTempForDevice(pairMessage.getFromAdress()));
 
-				// Setup temperatur
-				outMessages.add(new ConditionalMessage(null, MaxMessageCreator.getSetTempForDevice(pairMessage.getFromAdress())));
+		// set group
+		outMessages.add(MaxMessageCreator.getSetGroupIdForDevice(pairMessage.getFromAdress()));
 
-				// Set group
-				outMessages.add(new ConditionalMessage(null,
-						MaxMessageCreator.getSetGroupIdForDevice(pairMessage.getFromAdress())));
+		// setup weekly Profile
+		List<Message> weekProfile = MaxMessageCreator.getWeekProfileForDevice(pairMessage.getFromAdress(),
+				AmbientControlMW.getRoom().config.climate.currentWeekProfile);
+		for (Message dayProfile : weekProfile) {
+			outMessages.add(dayProfile);
+		}
 
-				// Setup weekly Profile
-				List<Message> weekProfile = MaxMessageCreator.getWeekProfileForDevice(pairMessage.getFromAdress(),
-						AmbientControlMW.getRoom().config.climate.currentWeekProfile);
-				for (Message dayProfile : weekProfile) {
-					outMessages.add(new ConditionalMessage(null, dayProfile));
-				}
+		// link devices
+		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climate.devices.values()) {
 
-			} else if (pairMessage.getDeviceType() == DeviceType.SHUTTER_CONTACT) {
-				device = new ShutterContact();
-				config = new ShutterContactConfiguration();
-				device.config = config;
-				((ShutterContact) device).isOpen = false;
-				config.label = "Fensterkontakt";
-				((ShutterContactConfiguration) config).proxyAdress = config.adress + 1;
+			// do not link with ourself
+			if (currentConfig.adress == pairMessage.getFromAdress()) {
+				continue;
 			}
 
-			// set common values to the configuration
-			config.adress = pairMessage.getFromAdress();
-			config.batteryLow = false;
-			config.firmware = pairMessage.getFirmware();
-			config.invalidArgument = false;
-			config.lastUpdate = new Date();
-			config.rfError = false;
-			config.serial = pairMessage.getSerial();
-			config.timedOut = false;
-
-			// add device to ambientcontrol
-			device.config = config;
-			AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
-			AmbientControlMW.getRoom().config.climate.devices.put(config.adress, config);
-
-			DeviceType newDeviceType = device.config.getDeviceType();
-			int newAdress = device.config.adress;
-			if (device instanceof ShutterContact) {
-				newAdress = ((ShutterContactConfiguration) device.config).proxyAdress;
-			}
-
-			// link devices
-			for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climate.devices.values()) {
-
-				// do not link with ourself and only with thermostates
-				if (currentConfig.adress == pairMessage.getFromAdress()
-						&& currentConfig instanceof ThermostatConfiguration == false) {
-					continue;
-				}
-
-				// link new device to current
+			if (currentConfig instanceof ThermostatConfiguration) {
+				// link current to new
 				MaxAddLinkPartnerMessage linkCurrentToNew = MaxMessageCreator.getLinkMessage(currentConfig.adress,
 						pairMessage.getFromAdress(), pairMessage.getDeviceType());
-				outMessages.add(new ConditionalMessage(conditionForCurrent, linkCurrentToNew));
+				outMessages.add(linkCurrentToNew);
 
-				// link the current to the new device - the device is pairing
-				// and woken up
-				// no condition is needed
+				// link new device to current
 				MaxAddLinkPartnerMessage linkNewToCurrent = MaxMessageCreator.getLinkMessage(pairMessage.getFromAdress(),
 						currentConfig.adress, currentConfig.getDeviceType());
-				outMessages.add(new ConditionalMessage(null, linkNewToCurrent));
+				outMessages.add(linkNewToCurrent);
 			}
 
-			AmbientControlMW.getRoom().qeueManager.putOutMessagesWithCondition(outMessages);
-			RoomConfigurationFactory.commitTransaction();
-			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
-
-			finished = true;
+			if (currentConfig instanceof ShutterContactConfiguration) {
+				// link new device to current
+				MaxAddLinkPartnerMessage linkNewToCurrent = MaxMessageCreator.getLinkMessage(pairMessage.getFromAdress(),
+						((ShutterContactConfiguration) currentConfig).proxyAdress, currentConfig.getDeviceType());
+				outMessages.add(linkNewToCurrent);
+			}
 		}
+
+		AmbientControlMW.getRoom().qeueManager.putOutMessages(outMessages);
+		RoomConfigurationFactory.commitTransaction();
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
+		finished = true;
 	}
 
 
@@ -192,7 +152,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 	 */
 	@Override
 	public boolean onMessage(Message message) {
-		// TODO Auto-generated method stub
+		// we do not manage any incomming messages for this action
 		return false;
 	}
 
@@ -206,8 +166,9 @@ public class AddThermostateHandler implements MessageActionHandler {
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
-	public boolean onAckResponseMessage(State state, Message response, Message request) {
-		// TODO Auto-generated method stub
+	public boolean onResponse(State state, Message response, Message request) {
+		// normally the thermostates react within the retry amount of the
+		// requests.
 		return false;
 	}
 

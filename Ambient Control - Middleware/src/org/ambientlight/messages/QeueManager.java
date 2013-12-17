@@ -149,8 +149,8 @@ public class QeueManager {
 		if (waitCondition != null) {
 			entry.state = State.WAITING_FOR_CONDITION;
 		}
-		if (message instanceof AckRequestMessage) {
-			entry.retries = ((AckRequestMessage) message).getRetryCount();
+		if (message instanceof RequestMessage) {
+			entry.retries = ((RequestMessage) message).getRetryCount();
 		}
 
 		outLock.lock();
@@ -181,7 +181,7 @@ public class QeueManager {
 			out.state = State.SENDING;
 			if (dispatcherManager.dispatchMessage(out.message)) {
 
-				if (out.message instanceof AckRequestMessage) {
+				if (out.message instanceof RequestMessage) {
 					out.setState(State.WAITING_FOR_RESPONSE);
 					this.startWatchDogForWaitingMessage(out);
 				} else {
@@ -221,7 +221,7 @@ public class QeueManager {
 			// there maybe an outMessage waiting for
 			// this response
 			boolean messageHandled = false;
-			if (inMessage instanceof AckResponseMessage) {
+			if (inMessage instanceof ResponseMessage) {
 
 				final MessageEntry foundRequest = getAwaitingRequestMessageForInMessage(inMessage, listener);
 				// there is a request waiting
@@ -233,7 +233,7 @@ public class QeueManager {
 						@Override
 						public void run() {
 							try {
-								listener.onAckResponseMessage(foundRequest.state, inMessage, foundRequest.message);
+								listener.onResponse(foundRequest.state, inMessage, foundRequest.message);
 							} catch (Exception e) {
 								System.out.println("QeueManager handleInMessages: error trying to "
 										+ "call client.onAckResponseMessage(): " + inMessage);
@@ -284,7 +284,7 @@ public class QeueManager {
 
 				// wait for responses
 				try {
-					Thread.sleep(((AckRequestMessage) entry.message).getTimeOutSec() * 1000);
+					Thread.sleep(((RequestMessage) entry.message).getTimeOutSec() * 1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -334,7 +334,7 @@ public class QeueManager {
 							+ " no answer and timed out. Informing client: " + entry.message);
 					entry.state = State.TIMED_OUT;
 					try {
-						messageListeners.get(entry.message.getDispatcherType()).onAckResponseMessage(entry.state, null,
+						messageListeners.get(entry.message.getDispatcherType()).onResponse(entry.state, null,
 								entry.message);
 					} catch (Exception e) {
 						System.out.println("QeueManager - WhatchDogForWaitingMessages(): got Exception"
@@ -388,8 +388,8 @@ public class QeueManager {
 		MessageEntry result = null;
 		for (MessageEntry current : outQueue) {
 			if (current.state == State.WAITING_FOR_RESPONSE
-					&& ((AckRequestMessage) current.message).getCorrelation().equals(
-							((AckResponseMessage) inMessage).getCorrelator()) == true) {
+					&& ((RequestMessage) current.message).getCorrelation().equals(
+							((ResponseMessage) inMessage).getCorrelator()) == true) {
 				result = current;
 				break;
 			}

@@ -27,7 +27,7 @@ public interface MessageActionHandler {
 	public boolean onMessage(Message message);
 
 
-	public boolean onAckResponseMessage(QeueManager.State state, Message response, Message request);
+	public boolean onResponse(QeueManager.State state, Message response, Message request);
 
 
 	public boolean isFinished();

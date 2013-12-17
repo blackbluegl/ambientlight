@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,6 +39,7 @@ import org.ambientlight.messages.max.MaxAckType;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
+import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxShutterContactStateMessage;
@@ -56,25 +58,27 @@ import org.ambientlight.room.entities.Thermostat;
  */
 public class MaxClimateManager implements MessageListener {
 
+	public static int WAIT_FOR_NEW_DEVICES = 90;
+
 	public QeueManager queueManager;
-
-	TimerTask syncTimeTask = new TimerTask() {
-
-		@Override
-		public void run() {
-			sendTimeInfoToComponents();
-		}
-	};
 
 	public ClimateConfiguration config;
 
 	private List<MessageActionHandler> actionHandlers = new ArrayList<MessageActionHandler>();
 
+	TimerTask syncTimeTask = new TimerTask() {
+
+		@Override
+		public void run() {
+			sendTimeInfoToThermostates();
+		}
+	};
+
 	boolean learnMode = false;
-	public static int WAIT_FOR_NEW_DEVICES = 90;
 
 
 	public MaxClimateManager() {
+		// set time to thermostates at 3:00 every day
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
@@ -82,21 +86,98 @@ public class MaxClimateManager implements MessageListener {
 		if (threePm.getTimeInMillis() < new Date().getTime()) {
 			threePm.add(Calendar.DAY_OF_MONTH, 1);
 		}
-
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 	}
 
 
-	/**
+	/*
+	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * org.ambientlight.messages.MessageListener#onConnectionLost(org.ambientlight
+	 * .messages.DispatcherType)
 	 */
-	private void sendRegisterCorrelators() {
-		List<Message> correlators = new ArrayList<Message>();
-		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
-			correlators
-			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
+	@Override
+	public void onDisconnectDispatcher(DispatcherType dispatcher) {
+
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.MessageListener#onConnectionRecovered(org.
+	 * ambientlight.messages.DispatcherType)
+	 */
+	@Override
+	public void onConnectDispatcher(DispatcherType dispatcher) {
+		System.out.println("ClimateManager - onConnectDispatcher(): got connection. Syncing MAX devices.");
+		if (dispatcher == DispatcherType.MAX) {
+
+			this.sendRegisterCorrelators();
+
+			this.sendTimeInfoToThermostates();
+
+			this.setMode(config.setTemp, config.mode, config.temporaryUntilDate);
 		}
-		queueManager.putOutMessages(correlators);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.messages.MessageListener#handleResponseMessages(org.
+	 * ambientlight.messages.QeueManager.State,
+	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
+	 */
+	@Override
+	public void onResponse(State state, Message response, Message request) {
+		try {
+			if (response != null) {
+				System.out.println("ClimateManager - onResponse: called with response: " + response);
+			}
+
+			MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(((MaxMessage) request).getToAdress());
+			if (device == null) {
+				System.out.println("ClimateManager - onResponse: Device is unknown.");
+				return;
+			}
+
+			// try to handle the message via an actionhandler
+			for (MessageActionHandler current : actionHandlers) {
+				if (current.onResponse(state, response, request)) {
+					System.out.println("ClimateManager - onResponse: message handled by actionhandler.");
+					return;
+				}
+			}
+
+			// common handling of unhandled responses
+			RoomConfigurationFactory.beginTransaction();
+
+			if (state == State.TIMED_OUT) {
+				device.config.timedOut = true;
+				System.out.println("Climate Manager - onResponse(): Error! Timeout for Device: " + device.config.label);
+
+			} else if (state == State.RETRIEVED_ANSWER && response instanceof MaxAckMessage
+					&& ((MaxAckMessage) response).getAckType() == MaxAckType.ACK_INVALID_MESSAGE) {
+				device.config.invalidArgument = true;
+				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.config.label
+						+ " reported invalid Arguments!");
+			} else {
+				System.out.println("Climate Manager - onResponse(): could not handle message");
+			}
+
+			RoomConfigurationFactory.commitTransaction();
+
+		} catch (Exception e) {
+			System.out.println("ClimateManager - onResponse: caught exception: ");
+			e.printStackTrace();
+			RoomConfigurationFactory.cancelTransaction();
+		} finally {
+			clearFinishedActionHandlers();
+			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		}
 	}
 
 
@@ -109,24 +190,42 @@ public class MaxClimateManager implements MessageListener {
 	 */
 	@Override
 	public void onMessage(Message message) {
-		if (message instanceof MaxThermostatStateMessage) {
-			System.out.println("ClimateManager - handleMessage(): handle " + message);
-			handleThermostatState((MaxThermostatStateMessage) message);
-		} else if (message instanceof MaxSetTemperatureMessage) {
-			System.out.println("ClimateManager - handleMessage(): handle " + message);
-			handleSetTemperature((MaxSetTemperatureMessage) message);
-		} else if (message instanceof MaxShutterContactStateMessage) {
-			System.out.println("ClimateManager - handleMessage(): handle " + message);
-			handleShutterState((MaxShutterContactStateMessage) message);
-		} else if (message instanceof MaxPairPingMessage) {
-			System.out.println("ClimateManager - handleMessage(): handle " + message);
-			handlePairPing((MaxPairPingMessage) message);
-		} else if (message instanceof MaxTimeInformationMessage) {
-			System.out.println("ClimateManager - handleMessage(): handle " + message);
-			handleGetTimeInfo((MaxTimeInformationMessage) message);
-		} else {
-			System.out.println("ClimateManager handleMessage(): do not handle: " + message);
-			return;
+
+		try {
+
+			// try to handle the message via an actionhandler
+			for (MessageActionHandler current : actionHandlers) {
+				if (current.onMessage(message)) {
+					System.out.println("ClimateManager - onMessage: message handled by actionhandler.");
+					return;
+				}
+			}
+
+			// handle by ourself
+			if (message instanceof MaxThermostatStateMessage) {
+				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				handleThermostatState((MaxThermostatStateMessage) message);
+			} else if (message instanceof MaxSetTemperatureMessage) {
+				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				handleSetTemperature((MaxSetTemperatureMessage) message);
+			} else if (message instanceof MaxShutterContactStateMessage) {
+				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				handleShutterState((MaxShutterContactStateMessage) message);
+			} else if (message instanceof MaxPairPingMessage) {
+				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				handlePairPing((MaxPairPingMessage) message);
+			} else if (message instanceof MaxTimeInformationMessage) {
+				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				handleGetTimeInfo((MaxTimeInformationMessage) message);
+			} else {
+				System.out.println("ClimateManager handleMessage(): could not handle: " + message);
+			}
+
+		} catch (Exception e) {
+			System.out.println("ClimateManager - onMessage: caught exception: ");
+			e.printStackTrace();
+		} finally {
+			clearFinishedActionHandlers();
 		}
 	}
 
@@ -174,62 +273,51 @@ public class MaxClimateManager implements MessageListener {
 	private void handlePairPing(MaxPairPingMessage message) {
 
 		// known device wants to re-pair with some other device
+		// todo check if thermostates want to refresh to shuttercontacts - we
+		// have to handle this
 		if (message.getToAdress().equals(config.vCubeAdress) == false && message.isReconnecting()) {
-			System.out.println("ClimateManager handleMessage(): Device wants to refresh pairing with some other device: "
+			System.out.println("ClimateManager handlePairPing(): Device wants to refresh pairing with some other device: "
 					+ message);
 		}
-		// device wants to repair with us
+
+		// device wants to re-pair with vcube
 		else if (message.isReconnecting() && message.getToAdress().equals(config.vCubeAdress) == true) {
+
 			// device is known and will be refreshed
 			if (AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress()) != null) {
-				System.out.println("ClimateManager handleMessage(): Device wants to refresh pairing with us: " + message);
-				sendPong(message, false);
+				System.out.println("ClimateManager handlePairPing(): re-pairing device: " + message);
+
+				MaxPairPongMessage pairPong = new MaxPairPongMessage();
+				pairPong.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+				pairPong.setToAdress(message.getFromAdress());
+				pairPong.setSequenceNumber(message.getSequenceNumber());
+				AmbientControlMW.getRoom().qeueManager.putOutMessage(pairPong);
+			}
+			// device is unknown
+			else {
+				System.out.println("ClimateManager handlePairPing(): Unknown Device wants to refresh pairing"
+						+ " with us, but is unknwon. Ignoring: " + message);
 			}
 		}
-		// device wants to pair and we are in learnmode. we create it
-		// and set it up
+
+		// create and add device in learnmode
 		else if (learnMode && message.isReconnecting() == false) {
-			sendPong(message, true);
+			switch (message.getDeviceType()) {
+			case HEATING_THERMOSTAT:
+				registerActionHandler(new AddThermostateHandler(message));
+				break;
+			case HEATING_THERMOSTAT_PLUS:
+				registerActionHandler(new AddThermostateHandler(message));
+				break;
+			case SHUTTER_CONTACT:
+				registerActionHandler(new AddShutterContactHandler(message));
+				break;
+			default:
+				System.out.println("ClimateManager handlePairPing(): The devicetype is not supported yet: "
+						+ message.getDeviceType());
+				break;
+			}
 		}
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#handleResponseMessages(org.
-	 * ambientlight.messages.QeueManager.State,
-	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
-	 */
-	@Override
-	public void onAckResponseMessage(State state, Message response, Message request) {
-		if (response != null) {
-			System.out.println("ClimateManager - handleResponseMessage: called with response: " + response);
-		}
-		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(((MaxMessage) request).getToAdress());
-		if (device == null) {
-			System.out.println("ClimateManager - handleResonseMessages: Device is unknown.");
-			return;
-		}
-
-		RoomConfigurationFactory.beginTransaction();
-
-		if (state == State.TIMED_OUT) {
-
-			device.config.timedOut = true;
-			System.out.println("Climate Manager - handleResponseMessage(): Error! Timeout for Device: " + device.config.label);
-
-		} else if (state == State.RETRIEVED_ANSWER && response instanceof MaxAckMessage
-				&& ((MaxAckMessage) response).getAckType() == MaxAckType.ACK_INVALID_MESSAGE) {
-
-			device.config.invalidArgument = true;
-			System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.config.label
-					+ " reported invalid Arguments!");
-		}
-
-		RoomConfigurationFactory.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 
 
@@ -310,22 +398,6 @@ public class MaxClimateManager implements MessageListener {
 	}
 
 
-	private void sendTimeInfoToComponents() {
-		Date now = new Date();
-		List<Message> messages = new ArrayList<Message>();
-
-		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
-			if (current instanceof Thermostat) {
-				MaxTimeInformationMessage message = MaxMessageCreator.getTimeInfoForDevice(now, current.config.adress);
-				messages.add(message);
-			}
-		}
-		AmbientControlMW.getRoom().qeueManager.putOutMessages(messages);
-	}
-
-
-
-
 	public void setCurrentProfile(String profile) {
 		RoomConfigurationFactory.beginTransaction();
 
@@ -399,7 +471,7 @@ public class MaxClimateManager implements MessageListener {
 	}
 
 
-	public void startPairingMode() {
+	public void setPairingMode() {
 		this.learnMode = true;
 		new Thread(new Runnable() {
 
@@ -419,34 +491,44 @@ public class MaxClimateManager implements MessageListener {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#onConnectionLost(org.ambientlight
-	 * .messages.DispatcherType)
-	 */
-	@Override
-	public void onDisconnectDispatcher(DispatcherType dispatcher) {
-
+	private void sendRegisterCorrelators() {
+		List<Message> correlators = new ArrayList<Message>();
+		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
+			correlators
+			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
+		}
+		queueManager.putOutMessages(correlators);
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.messages.MessageListener#onConnectionRecovered(org.
-	 * ambientlight.messages.DispatcherType)
-	 */
-	@Override
-	public void onConnectDispatcher(DispatcherType dispatcher) {
-		System.out.println("ClimateManager - onConnectDispatcher(): got connection. Syncing MAX devices.");
-		if (dispatcher == DispatcherType.MAX) {
-			this.sendRegisterCorrelators();
+	private void sendTimeInfoToThermostates() {
+		Date now = new Date();
+		List<Message> messages = new ArrayList<Message>();
 
-			this.sendTimeInfoToComponents();
+		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
+			if (current instanceof Thermostat) {
+				MaxTimeInformationMessage message = MaxMessageCreator.getTimeInfoForDevice(now, current.config.adress);
+				messages.add(message);
+			}
+		}
+		AmbientControlMW.getRoom().qeueManager.putOutMessages(messages);
+	}
 
-			this.setMode(config.setTemp, config.mode, config.temporaryUntilDate);
+
+	private void registerActionHandler(MessageActionHandler actionHandler) {
+		if (actionHandler.isFinished())
+			return;
+		this.actionHandlers.add(actionHandler);
+	}
+
+
+	private void clearFinishedActionHandlers() {
+		Iterator<MessageActionHandler> iterator = this.actionHandlers.iterator();
+		while (iterator.hasNext()) {
+			MessageActionHandler current = iterator.next();
+			if (current.isFinished()) {
+				iterator.remove();
+			}
 		}
 	}
 }

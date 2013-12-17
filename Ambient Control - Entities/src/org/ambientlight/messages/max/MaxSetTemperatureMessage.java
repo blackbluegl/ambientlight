@@ -18,14 +18,14 @@ package org.ambientlight.messages.max;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.ambientlight.messages.AckRequestMessage;
+import org.ambientlight.messages.RequestMessage;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxSetTemperatureMessage extends MaxMessage implements AckRequestMessage {
+public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessage {
 
 	public MaxSetTemperatureMessage() {
 		payload = new byte[14];

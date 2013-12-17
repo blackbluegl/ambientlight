@@ -15,7 +15,7 @@
 
 package org.ambientlight.messages.max;
 
-import org.ambientlight.messages.AckRequestMessage;
+import org.ambientlight.messages.RequestMessage;
 
 
 /**
@@ -23,7 +23,7 @@ import org.ambientlight.messages.AckRequestMessage;
  * @author Florian Bornkessel
  * 
  */
-public class MaxRemoveLinkPartnerMessage extends MaxMessage implements AckRequestMessage {
+public class MaxRemoveLinkPartnerMessage extends MaxMessage implements RequestMessage {
 
 	public MaxRemoveLinkPartnerMessage() {
 		payload = new byte[14];
