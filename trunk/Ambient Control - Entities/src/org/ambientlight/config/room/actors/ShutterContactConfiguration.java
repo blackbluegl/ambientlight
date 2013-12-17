@@ -36,6 +36,4 @@ public class ShutterContactConfiguration extends MaxComponentConfiguration {
 		return DeviceType.SHUTTER_CONTACT;
 	}
 
-	public int proxyAdress = 100;
-
 }

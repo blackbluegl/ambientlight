@@ -26,6 +26,7 @@ import org.ambientlight.config.room.actors.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
+import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
@@ -70,7 +71,6 @@ public class AddShutterContactHandler implements MessageActionHandler {
 		device.isOpen = false;
 
 		config.label = "Fensterkontakt";
-		config.proxyAdress = config.adress + 1;
 		config.adress = pairMessage.getFromAdress();
 		config.batteryLow = false;
 		config.firmware = pairMessage.getFirmware();
@@ -91,9 +91,9 @@ public class AddShutterContactHandler implements MessageActionHandler {
 				continue;
 			}
 
-			// link current device to the proxy adress of the thermostate
+			// link current device to the proxy adress of the shutter
 			MaxAddLinkPartnerMessage linkCurrentToNew = MaxMessageCreator.getLinkMessage(currentConfig.adress,
-					config.proxyAdress, pairMessage.getDeviceType());
+					AmbientControlMW.getRoom().config.climate.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 			outMessages.add(linkCurrentToNew);
 		}
 

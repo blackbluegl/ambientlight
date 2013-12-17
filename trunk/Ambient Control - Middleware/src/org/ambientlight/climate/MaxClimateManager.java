@@ -28,6 +28,7 @@ import java.util.TimerTask;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.ClimateConfiguration;
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
+import org.ambientlight.config.room.actors.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
@@ -165,7 +166,7 @@ public class MaxClimateManager implements MessageListener {
 				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.config.label
 						+ " reported invalid Arguments!");
 			} else {
-				System.out.println("Climate Manager - onResponse(): could not handle message");
+				System.out.println("Climate Manager - onResponse(): did not handle message");
 			}
 
 			RoomConfigurationFactory.commitTransaction();
@@ -344,6 +345,20 @@ public class MaxClimateManager implements MessageListener {
 
 		RoomConfigurationFactory.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
+		// inform thermostates
+		for (MaxComponentConfiguration current : this.config.devices.values()) {
+			if (current instanceof ThermostatConfiguration == false) {
+				continue;
+			}
+			MaxShutterContactStateMessage sendMessage = new MaxShutterContactStateMessage();
+			sendMessage.setFromAdress(this.config.proxyShutterContactAdress);
+			sendMessage.setFlags(0x6);
+			sendMessage.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
+			sendMessage.setToAdress(current.adress);
+			sendMessage.setOpen(message.isOpen());
+			queueManager.putOutMessage(sendMessage);
+		}
 	}
 
 
