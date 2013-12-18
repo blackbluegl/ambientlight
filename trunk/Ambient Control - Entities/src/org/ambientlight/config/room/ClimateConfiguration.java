@@ -34,9 +34,9 @@ import org.ambientlight.messages.max.MaxThermostateMode;
  */
 public class ClimateConfiguration {
 
-	public final float DEFAULT_OFFSET = MaxConfigureTemperaturesMessage.DEFAULT_OFFSET;
-	public final int DEFAULT_MAX_VALVE_POSITION = MaxConfigValveMessage.DEFAULT_MAX_VALVE_POSITION;
-	public final int DEFAULT_VALVE_OFFSET_PERCENT = 0;
+	public static final float DEFAULT_OFFSET = MaxConfigureTemperaturesMessage.DEFAULT_OFFSET;
+	public static final int DEFAULT_MAX_VALVE_POSITION = MaxConfigValveMessage.DEFAULT_MAX_VALVE_POSITION;
+	public static final int DEFAULT_VALVE_OFFSET_PERCENT = 0;
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public float setTemp = 22.0f;
@@ -54,7 +54,7 @@ public class ClimateConfiguration {
 	public float minTemp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
 	public float windowOpenTemperatur = 12.0f;
 	public int windowOpenTimeMins = 15;
-	public int boostDurationMins = 60;
+	public int boostDurationMins = 5;
 	public int boostValvePositionPercent = 100;
 	public int decalcHour = 12;
 	public MaxDayInWeek decalcDay = MaxDayInWeek.SATURDAY;
