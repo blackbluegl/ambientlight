@@ -59,10 +59,10 @@ public class MaxTimeInformationMessage extends MaxMessage {
 			return null;
 		int year = payload[10] + 2000;
 		int day = payload[11];
-		int hour = payload[12];
+		int hour = payload[12] & 0x1F;
 		int minute = payload[13] & 0x3F;
 		int second = payload[14] & 0x3F;
-		int month = (((payload[13] & 0xF0) >> 4) | ((payload[14] & 0xC0) >> 6)) - 1;
+		int month = (((payload[13] & 0xC0) >> 4) | ((payload[14]) >> 6)) - 1;
 		GregorianCalendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
 		return calendar.getTime();
 	}
