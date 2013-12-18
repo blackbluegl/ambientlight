@@ -292,10 +292,8 @@ public class QeueManager {
 				if (entry.retries > 0) {
 					entry.retries--;
 
-					System.out.println("!!!!should have answer!!!");
 					if (entry.state == State.RETRIEVED_ANSWER) {
 						// got an answer - just stop watching.
-						System.out.println("had answer");
 					} else {
 						outLock.lock();
 						// sending the message again!
