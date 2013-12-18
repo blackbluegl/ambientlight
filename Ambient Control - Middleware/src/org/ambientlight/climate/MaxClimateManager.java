@@ -542,6 +542,8 @@ public class MaxClimateManager implements MessageListener {
 		while (iterator.hasNext()) {
 			MessageActionHandler current = iterator.next();
 			if (current.isFinished()) {
+				System.out.println("Climatemanager - clearFinishedActionhandlers: removed Actionhandler: "
+						+ current.getClass().getSimpleName());
 				iterator.remove();
 			}
 		}
