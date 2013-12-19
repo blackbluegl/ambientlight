@@ -140,7 +140,7 @@ public class MaxMessage extends Message {
 	public String toString() {
 		return "MaxMessage: " + getMessageType() + " - SeqNr: " + getSequenceNumber() + " from: " + getFromAdress() + " to: "
 				+ getToAdress() + " with groupId: " + getGroupNumber() + " Flags: 0x" + Integer.toHexString(getFlags())
-				+ "\nPayload: " + MaxUtil.getHexString(payload);
+				+ "\nPayload: " + MaxUtil.getHexString(getPayload());
 	}
 
 
