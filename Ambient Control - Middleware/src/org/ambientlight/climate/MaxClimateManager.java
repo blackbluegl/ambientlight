@@ -517,6 +517,7 @@ public class MaxClimateManager implements MessageListener {
 
 
 	private void sendTimeInfoToThermostates() {
+
 		Date now = new Date();
 		List<Message> messages = new ArrayList<Message>();
 

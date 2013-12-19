@@ -52,6 +52,8 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 
 
 	public MaxThermostateMode getMode() {
+		if (payload.length < 12)
+			return null;
 		return MaxThermostateMode.forCode(payload[11] & 0x3);
 	}
 
@@ -98,9 +100,10 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 	public String toString() {
 		String parent = super.toString() + "\n";
 		String myString = "";
-		try {
+		myString += "AckType: " + getAckType() + "\n";
+
+		if (payload.length < 12) {
 			myString = "Mode: " + getMode() + "\n";
-			myString += "AckType: " + getAckType() + "\n";
 			myString += "Until: " + getTemporaryUntil() + "\n";
 			myString += "DST: " + getDST() + "\n";
 			myString += "Locked: " + isLocked() + "\n";
@@ -108,8 +111,6 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 			myString += "RF-Error: " + isBatteryLow() + "\n";
 			myString += "ValvePos: " + getValvePosition() + "\n";
 			myString += "Set Temp: " + getSetTemp() + "\n";
-		} catch (Exception e) {
-			myString = "Thermostat may not be initialized propperly";
 		}
 		return parent + myString;
 	}

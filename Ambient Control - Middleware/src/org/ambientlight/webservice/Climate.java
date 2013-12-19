@@ -80,11 +80,11 @@ public class Climate {
 	}
 
 
-	@POST
-	@Path("/currentWeekProfile")
+	@GET
+	@Path("/currentWeekProfile/{currentProfile}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setCurrentWeekProfile(String profile) {
+	public Response setCurrentWeekProfile(@PathParam("currentProfile") String profile) {
 		MaxClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		try {
