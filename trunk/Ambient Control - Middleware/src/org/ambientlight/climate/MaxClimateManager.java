@@ -348,20 +348,9 @@ public class MaxClimateManager implements MessageListener {
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
 		// inform thermostates
-		for (MaxComponentConfiguration current : this.config.devices.values()) {
-			if (current instanceof ThermostatConfiguration == false) {
-				continue;
-			}
-			MaxShutterContactStateMessage sendMessage = new MaxShutterContactStateMessage();
-			sendMessage.setFromAdress(this.config.proxyShutterContactAdress);
-			sendMessage.setFlags(0x6);
-			sendMessage.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
-			sendMessage.setToAdress(current.adress);
-			sendMessage.setOpen(message.isOpen());
-			queueManager.putOutMessage(sendMessage);
-		}
+		boolean open = isAWindowOpen();
+		sendWindowStateToThermostates(open);
 	}
-
 
 	/**
 	 * @param message
@@ -417,7 +406,6 @@ public class MaxClimateManager implements MessageListener {
 	public void setCurrentProfile(String profile) {
 		RoomConfigurationFactory.beginTransaction();
 
-
 		if (config.weekProfiles.containsKey(profile) == false || config.weekProfiles.get(profile).isEmpty())
 			throw new IllegalArgumentException("the selected weekProfile does not exist or is empty and unusable!");
 
@@ -438,7 +426,6 @@ public class MaxClimateManager implements MessageListener {
 		}
 
 		queueManager.putOutMessages(messages);
-
 
 		RoomConfigurationFactory.commitTransaction();
 
@@ -518,6 +505,21 @@ public class MaxClimateManager implements MessageListener {
 	}
 
 
+	protected void sendWindowStateToThermostates(boolean open) {
+		for (MaxComponentConfiguration current : this.config.devices.values()) {
+			if (current instanceof ThermostatConfiguration == false) {
+				continue;
+			}
+			MaxShutterContactStateMessage sendMessage = new MaxShutterContactStateMessage();
+			sendMessage.setFromAdress(this.config.proxyShutterContactAdress);
+			sendMessage.setFlags(0x6);
+			sendMessage.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
+			sendMessage.setToAdress(current.adress);
+			sendMessage.setOpen(open);
+			queueManager.putOutMessage(sendMessage);
+		}
+	}
+
 	private void sendRegisterCorrelators() {
 		List<Message> correlators = new ArrayList<Message>();
 		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
@@ -561,4 +563,14 @@ public class MaxClimateManager implements MessageListener {
 			}
 		}
 	}
+
+
+	protected boolean isAWindowOpen() {
+		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
+			if (current instanceof ShutterContact && ((ShutterContact) current).isOpen)
+				return true;
+		}
+		return false;
+	}
+
 }

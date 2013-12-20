@@ -84,21 +84,21 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 	}
 
 	public int getValvePosition() {
-		if (payload.length < 12)
+		if (payload.length < 13)
 			return 0;
 		return payload[12] & 0xff;
 	}
 
 
 	public float getSetTemp() {
-		if (payload.length < 12)
+		if (payload.length < 14)
 			return 0.0f;
 		return (payload[13] & 0xff) / 2;
 	}
 
 
 	public Date getTemporaryUntil() {
-		if (this.getMode() != MaxThermostateMode.TEMPORARY)
+		if (this.getMode() != MaxThermostateMode.TEMPORARY || this.payload.length < 15)
 			return null;
 		byte[] time = new byte[] { payload[14], payload[15], payload[16] };
 		return MaxUtil.parseUntilTime(time);

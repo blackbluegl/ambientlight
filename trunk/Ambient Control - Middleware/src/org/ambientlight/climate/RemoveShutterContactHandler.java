@@ -45,7 +45,18 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 
 	public RemoveShutterContactHandler(ShutterContact device) {
+		RoomConfigurationFactory.beginTransaction();
+
 		this.device = device;
+
+		// check if removal of shuttercontact changes the open window state of
+		// the thermostates
+		boolean isAWindowOpen = AmbientControlMW.getRoom().climateManager.isAWindowOpen();
+		this.device.isOpen = false;
+		boolean isAWindowNowOpen = AmbientControlMW.getRoom().climateManager.isAWindowOpen();
+		if (isAWindowOpen != isAWindowNowOpen) {
+			AmbientControlMW.getRoom().climateManager.sendWindowStateToThermostates(isAWindowNowOpen);
+		}
 
 		// Wait until shutterContact comes alive and remove it
 		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.config.adress,
@@ -55,6 +66,12 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(resetDevice, condition);
 
 		actionState = ActionState.REMOVE_FROM_MODELL;
+
+		RoomConfigurationFactory.commitTransaction();
+
+		if (isAWindowOpen != isAWindowNowOpen) {
+			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		}
 	}
 
 
@@ -91,6 +108,12 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 			System.out.println("RemoveShutterHandler onMessage(): The shutterContact responded now."
 					+ " Please reset the contact manually.");
 		}
+
+		// catch all window shutter messages until it was reset - the climate
+		// manager shall not handle any message during removal
+		if (((MaxMessage) message).getFromAdress().equals(this.device.config.adress) && this.actionState != ActionState.FINISHED)
+			return true;
+
 		return false;
 	}
 

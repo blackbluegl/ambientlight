@@ -41,7 +41,6 @@ public class ClimateConfiguration {
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public float setTemp = 22.0f;
 	public Date temporaryUntilDate;
-	public boolean windowOpen = false;
 	public String currentWeekProfile = "default";
 
 	public int vCubeAdress = 1;
