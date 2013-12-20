@@ -53,13 +53,13 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 	/* Detect preamble after 4 nibbles */
 	rf22->spiWrite(RF22_REG_35_PREAMBLE_DETECTION_CONTROL1, (0x4 << 3));
 	/* Send 8 bytes of preamble - but that depends on the message type and will be handled dynamically*/
-	rf22->setPreambleLength(16); // in nibbles - was 6
+	rf22->setPreambleLength(8); // in nibbles - was 6
 	rf22->spiWrite(RF22_REG_3E_PACKET_LENGTH, incommingMessageLength);
 	return true;
 }
 
 int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
-	int waitForResponseInMs = 100; //was 100 and worked good
+	int waitForResponseInMs = 150; //was 100 and worked good
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
@@ -229,7 +229,7 @@ bool MaxDispatcherModule::sendLongPreamble(RF22 *rf22, bool longPreamble) {
 			data[i] = 0x55;
 		}
 
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 24; i++) {
 			rf22->send(data, fakePreambleLength);
 		}
 
