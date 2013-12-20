@@ -49,8 +49,10 @@ public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessa
 
 
 	public void setTemp(float temp) {
-		if (getMode() == MaxThermostateMode.AUTO)
+		if (getMode() == MaxThermostateMode.AUTO) {
+			setTempWithoutChecks(temp);
 			return;
+		}
 
 		if (temp > MaxConfigureTemperaturesMessage.MAX_TEMPERATURE) {
 			temp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
