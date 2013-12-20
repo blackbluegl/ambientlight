@@ -35,6 +35,7 @@ import org.ambientlight.messages.max.MaxFactoryResetMessage;
 import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 
 
@@ -54,11 +55,17 @@ public class MaxMessageCreator {
 	public static MaxSetTemperatureMessage getSetTempForDevice(int adress) {
 		MaxSetTemperatureMessage outMessage = new MaxSetTemperatureMessage();
 		outMessage.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
-		outMessage.setTemp(AmbientControlMW.getRoom().config.climate.setTemp);
+		if (AmbientControlMW.getRoom().config.climate.mode != MaxThermostateMode.AUTO) {
+			outMessage.setTemp(AmbientControlMW.getRoom().config.climate.setTemp);
+		} else {
+			outMessage.setTemp(0.0f);
+		}
 		outMessage.setTemporaryUntil(AmbientControlMW.getRoom().config.climate.temporaryUntilDate);
 		outMessage.setMode(AmbientControlMW.getRoom().config.climate.mode);
 		outMessage.setSequenceNumber(getNewSequnceNumber());
 		outMessage.setToAdress(adress);
+		outMessage.setGroupNumber(AmbientControlMW.getRoom().config.climate.groupId);
+		outMessage.setFlags(0x04);
 		return outMessage;
 	}
 

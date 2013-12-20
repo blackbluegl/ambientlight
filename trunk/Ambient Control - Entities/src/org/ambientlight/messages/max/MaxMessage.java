@@ -132,6 +132,10 @@ public class MaxMessage extends Message {
 	}
 
 
+	public void setGroupNumber(int groupId) {
+		payload[9] = (byte) groupId;
+	}
+
 	// public void setGroupNumber(int groupNumber) {
 	// payload[9] = (byte) groupNumber;
 	// }

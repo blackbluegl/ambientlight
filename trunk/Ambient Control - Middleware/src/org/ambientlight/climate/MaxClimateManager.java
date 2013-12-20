@@ -47,6 +47,7 @@ import org.ambientlight.messages.max.MaxShutterContactStateMessage;
 import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.messages.max.MaxWakeUpMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.entities.MaxComponent;
 import org.ambientlight.room.entities.ShutterContact;
@@ -416,6 +417,7 @@ public class MaxClimateManager implements MessageListener {
 	public void setCurrentProfile(String profile) {
 		RoomConfigurationFactory.beginTransaction();
 
+
 		if (config.weekProfiles.containsKey(profile) == false || config.weekProfiles.get(profile).isEmpty())
 			throw new IllegalArgumentException("the selected weekProfile does not exist or is empty and unusable!");
 
@@ -425,13 +427,23 @@ public class MaxClimateManager implements MessageListener {
 
 		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
 			if (current instanceof Thermostat) {
+				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
+				wakeup.setFromAdress(config.vCubeAdress);
+				wakeup.setToAdress(current.config.adress);
+				wakeup.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
+				messages.add(wakeup);
+
 				messages.addAll(MaxMessageCreator.getWeekProfileForDevice(current.config.adress, profile));
 			}
 		}
 
 		queueManager.putOutMessages(messages);
 
+
 		RoomConfigurationFactory.commitTransaction();
+
+		// this.setMode(0.0f, MaxThermostateMode.AUTO, null);
+
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
 	}

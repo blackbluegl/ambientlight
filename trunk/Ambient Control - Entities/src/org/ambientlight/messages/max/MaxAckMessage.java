@@ -59,11 +59,15 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 
 
 	public boolean getDST() {
+		if (payload.length < 12)
+			return false;
 		return (payload[11] >> 2 & 0x1) > 0 ? true : false;
 	}
 
 
 	public boolean isLocked() {
+		if (payload.length < 12)
+			return false;
 		return (payload[11] >> 5 & 0x1) > 0 ? true : false;
 	}
 
@@ -74,16 +78,21 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 
 
 	public boolean isBatteryLow() {
+		if (payload.length < 12)
+			return false;
 		return (payload[11] >> 7) > 0 ? true : false;
 	}
 
-
 	public int getValvePosition() {
+		if (payload.length < 12)
+			return 0;
 		return payload[12] & 0xff;
 	}
 
 
 	public float getSetTemp() {
+		if (payload.length < 12)
+			return 0.0f;
 		return (payload[13] & 0xff) / 2;
 	}
 
@@ -102,7 +111,7 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 		String myString = "";
 		myString += "AckType: " + getAckType() + "\n";
 
-		if (payload.length < 12) {
+		if (payload.length > 11) {
 			myString = "Mode: " + getMode() + "\n";
 			myString += "Until: " + getTemporaryUntil() + "\n";
 			myString += "DST: " + getDST() + "\n";
