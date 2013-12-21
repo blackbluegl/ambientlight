@@ -80,6 +80,7 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements RequestMessa
 	 * @see org.ambientlight.messages.AckRequestMessage#getRetryCount()
 	 */
 	@Override
+
 	public int getRetryCount() {
 		// TODO Auto-generated method stub
 		return 10;

@@ -20,12 +20,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.ambientlight.messages.RequestMessage;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxConfigureWeekProgrammMessage extends MaxMessage {
+public class MaxConfigureWeekProgrammMessage extends MaxMessage implements RequestMessage {
 
 
 
@@ -152,6 +154,42 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 		String parent = super.toString();
 		String result = "Day: " + getDay() + "\nSecondPart: " + this.isSecondPart() + "\nEntries: " + entries;
 		return parent + "\n" + result;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.RequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		// TODO Auto-generated method stub
+		return 2;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.RequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		// TODO Auto-generated method stub
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.messages.RequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		// TODO Auto-generated method stub
+		return String.valueOf(getSequenceNumber());
 	}
 
 }
