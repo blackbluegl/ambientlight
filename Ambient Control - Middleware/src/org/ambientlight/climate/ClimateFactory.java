@@ -15,7 +15,10 @@
 
 package org.ambientlight.climate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.actors.MaxComponentConfiguration;
@@ -23,6 +26,8 @@ import org.ambientlight.config.room.actors.ShutterContactConfiguration;
 import org.ambientlight.config.room.actors.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.QeueManager;
+import org.ambientlight.messages.max.DayEntry;
+import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.Room;
 import org.ambientlight.room.entities.MaxComponent;
 import org.ambientlight.room.entities.ShutterContact;
@@ -39,6 +44,22 @@ public class ClimateFactory {
 
 		// init ClimateManager
 		if (roomConfig.climate != null) {
+
+			List<String> invalidWeekProfiles = new ArrayList<String>();
+			for (Entry<String, HashMap<MaxDayInWeek, List<DayEntry>>> currentWeekProfileEntrySet : room.config.climate.weekProfiles
+					.entrySet()) {
+				System.out.println("ClimateFactory initClimateManager(): parsing weekprofile: "
+						+ currentWeekProfileEntrySet.getKey());
+				boolean validProfile = this.parseWeekProfile(currentWeekProfileEntrySet.getValue());
+				if (validProfile == false) {
+					System.out.println(currentWeekProfileEntrySet.getKey() + " is invalid an will be skipped");
+					invalidWeekProfiles.add(currentWeekProfileEntrySet.getKey());
+				}
+			}
+			for (String currentWeekProfileToRemove : invalidWeekProfiles) {
+				room.config.climate.weekProfiles.remove(currentWeekProfileToRemove);
+			}
+
 			room.setMaxComponents(new HashMap<Integer, MaxComponent>());
 			room.climateManager = new MaxClimateManager();
 			room.climateManager.config = room.config.climate;
@@ -62,5 +83,33 @@ public class ClimateFactory {
 
 			System.out.println("ClimateFactory initClimateManager(): initialized ClimateManager");
 		}
+	}
+
+
+	public boolean parseWeekProfile(HashMap<MaxDayInWeek, List<DayEntry>> currentWeekProfile) {
+		for (Entry<MaxDayInWeek, List<DayEntry>> currentDayEntry : currentWeekProfile.entrySet()) {
+
+			if (currentDayEntry.getValue().size() > 13) {
+				System.out.println("ClimateFactory - parseWeekProfile(): " + currentDayEntry.getKey()
+						+ " has more than 13 entries");
+
+				return false;
+			}
+
+			boolean validTerminationEntryFoun = false;
+			for (DayEntry currentEntry : currentDayEntry.getValue()) {
+				if (currentEntry.getHour() == 24 && currentEntry.getMin() == 0) {
+					validTerminationEntryFoun = true;
+					break;
+				}
+			}
+			if (validTerminationEntryFoun == false) {
+				System.out
+				.println("ClimateFactory - parseWeekProfile(): " + currentDayEntry.getKey() + " has no Entry wit 24:00");
+				return false;
+			}
+
+		}
+		return true;
 	}
 }

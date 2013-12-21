@@ -18,7 +18,6 @@ package org.ambientlight.messages.max;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
@@ -33,7 +32,7 @@ public class MaxUtil {
 			return null;
 
 		int year = 2000 + (untilTime[1] & 0x3f);
-		int month = ((untilTime[0] & 0xE0) >> 4) | (untilTime[1] & 0xFF >> 7);
+		int month = ((untilTime[0] & 0xE0) >> 4) | (untilTime[1] & 0xFF >> 7) - 1;
 		int day = untilTime[0] & 0x1f;
 		int timeInMinutes = (untilTime[2] & 0x3f) * 30;
 		int hours = (int) TimeUnit.MINUTES.toHours(timeInMinutes);
@@ -47,7 +46,7 @@ public class MaxUtil {
 
 	public static byte[] getUntilTime(Date until) {
 		byte[] result = new byte[3];
-		GregorianCalendar untilCalendar = new GregorianCalendar(Locale.GERMANY);
+		Calendar untilCalendar = GregorianCalendar.getInstance();
 		untilCalendar.setTime(until);
 
 		int day = untilCalendar.get(Calendar.DAY_OF_MONTH);

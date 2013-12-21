@@ -17,6 +17,7 @@ package org.ambientlight.messages.max;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -58,6 +59,9 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 	public byte[] getPayload() {
 		// sync entries in payload
 		if (this.entries.size() > 0) {
+
+			Collections.sort(this.entries);
+
 			List<DayEntry> result = new ArrayList<DayEntry>(this.entries);
 			// repeat the last entry until all slots are filled (defined by
 			// Protocol)
@@ -121,7 +125,13 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 
 
 	public DayEntry getEntry(int position) {
+		Collections.sort(this.entries);
 		return entries.get(position);
+	}
+
+
+	public int getEntrySize() {
+		return entries.size();
 	}
 
 
@@ -135,9 +145,10 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage {
 		payload[10] = (byte) (day.byteValue | payload[10]);
 	}
 
-
 	@Override
 	public String toString() {
+		Collections.sort(this.entries);
+
 		String parent = super.toString();
 		String result = "Day: " + getDay() + "\nSecondPart: " + this.isSecondPart() + "\nEntries: " + entries;
 		return parent + "\n" + result;

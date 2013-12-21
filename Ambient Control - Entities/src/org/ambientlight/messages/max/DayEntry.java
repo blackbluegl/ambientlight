@@ -18,7 +18,7 @@ package org.ambientlight.messages.max;
 import java.util.concurrent.TimeUnit;
 
 
-public class DayEntry {
+public class DayEntry implements Comparable<DayEntry> {
 
 	private int hour;
 	private int min;
@@ -105,6 +105,29 @@ public class DayEntry {
 		if (Float.floatToIntBits(temp) != Float.floatToIntBits(other.temp))
 			return false;
 		return true;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(DayEntry compareTo) {
+		final int BEFORE = -1;
+		final int EQUAL = 0;
+		final int AFTER = 1;
+
+		int thisMinutes = this.hour * 60 + this.min;
+		int compareMinutes = compareTo.hour * 60 + compareTo.min;
+
+		if (thisMinutes < compareMinutes)
+			return BEFORE;
+		else if (thisMinutes > compareMinutes)
+			return AFTER;
+
+		return EQUAL;
 	}
 
 }
