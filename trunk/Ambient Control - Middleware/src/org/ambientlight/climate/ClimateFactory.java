@@ -71,13 +71,14 @@ public class ClimateFactory {
 					Thermostat currentDevice = new Thermostat();
 					currentDevice.config = component;
 					room.getMaxComponents().put(currentDevice.config.adress, currentDevice);
-					System.out.println("RoomFactory initRoom(): add Thermostat: " + currentDevice.config.label);
+					System.out.println("ClimateFactory initClimateManager(): added Thermostat: " + currentDevice.config.label);
 				}
 				if (component instanceof ShutterContactConfiguration) {
 					ShutterContact currentDevice = new ShutterContact();
 					currentDevice.config = component;
 					room.getMaxComponents().put(currentDevice.config.adress, currentDevice);
-					System.out.println("RoomFactory initRoom(): add ShutterContact: " + currentDevice.config.label);
+					System.out
+							.println("ClimateFactory initClimateManager(): added ShutterContact: " + currentDevice.config.label);
 				}
 			}
 

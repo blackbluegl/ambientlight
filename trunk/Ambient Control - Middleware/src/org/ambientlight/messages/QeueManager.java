@@ -243,11 +243,12 @@ public class QeueManager {
 					}).start();
 					messageHandled = true;
 				}
-				// maybe it timed out or ther was never a request for this
+				// maybe it timed out or there was never a request for this
 				// message. Log and handle it the
 				else {
-					System.out.println("QeueManager handleInMessages: got an AckResponseMessage"
-							+ " where no correlation could be found for: " + inMessage);
+					// System.out.println("QeueManager handleInMessages: got an AckResponseMessage"
+					// + " where no correlation could be found for: " +
+					// inMessage);
 					messageHandled = false;
 				}
 			}
