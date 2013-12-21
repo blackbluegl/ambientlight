@@ -21,7 +21,7 @@ package org.ambientlight.messages.max;
  */
 public class MaxConfigureTemperaturesMessage extends MaxMessage {
 
-	public final static float MAX_TEMPERATURE = 31.5f;
+	public final static float MAX_TEMPERATURE = 30.5f;
 	public final static float MIN_TEMPERATURE = 4.5f;
 	public final static float MIN_OFFSET = -3.5f;
 	public final static float MAX_OFFSET = 3.5f;

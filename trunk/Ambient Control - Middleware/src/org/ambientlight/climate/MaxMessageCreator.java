@@ -73,6 +73,7 @@ public class MaxMessageCreator {
 	/**
 	 * @param fromAdress
 	 * @param weekProfile
+	 * @throws MessageMalFormedException
 	 */
 	public static List<Message> getWeekProfileForDevice(Integer deviceAdress, String weekProfile) {
 		List<Message> messages = new ArrayList<Message>();
@@ -86,15 +87,18 @@ public class MaxMessageCreator {
 				entryCountPartOne = 7;
 			}
 
+
 			MaxConfigureWeekProgrammMessage week = new MaxConfigureWeekProgrammMessage();
 			for (int i = 0; i < entryCountPartOne; i++) {
 				week.addEntry(currentDayProfile.getValue().get(i));
 			}
+
 			week.setDay(currentDayProfile.getKey());
 			week.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
 			week.setSecondPart(false);
 			week.setSequenceNumber(getNewSequnceNumber());
 			week.setToAdress(deviceAdress);
+
 			messages.add(week);
 
 			if (twoParts) {
@@ -102,6 +106,8 @@ public class MaxMessageCreator {
 				for (int i = 7; i < currentDayProfile.getValue().size(); i++) {
 					week2.addEntry(currentDayProfile.getValue().get(i));
 				}
+
+
 				week2.setDay(currentDayProfile.getKey());
 				week2.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
 				week2.setSecondPart(true);
@@ -110,6 +116,9 @@ public class MaxMessageCreator {
 				week2.setToAdress(deviceAdress);
 				messages.add(week2);
 			}
+
+
+
 		}
 		return messages;
 	}

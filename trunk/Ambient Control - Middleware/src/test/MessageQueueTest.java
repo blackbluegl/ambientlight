@@ -15,6 +15,9 @@
 
 package test;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.DispatcherType;
@@ -125,7 +128,11 @@ public class MessageQueueTest {
 		temp.setFromAdress(1);
 		temp.setToAdress(537069);
 		temp.setMode(MaxThermostateMode.MANUAL);
-		temp.setTemp(19.0f);
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MINUTE, 30);
+		temp.setTemp(22.0f);
+		temp.setTemporaryUntil(cal.getTime());
+		System.out.println(temp);
 		manager.putOutMessage(temp);
 		// manager.putOutMessage(temp);
 		// manager.putOutMessage(pairPong);
