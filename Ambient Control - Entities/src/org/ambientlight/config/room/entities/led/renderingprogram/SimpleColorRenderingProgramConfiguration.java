@@ -1,4 +1,4 @@
-package org.ambientlight.config.scenery.actor.renderingprogram;
+package org.ambientlight.config.room.entities.led.renderingprogram;
 
 import org.ambientlight.annotations.ClassDescription;
 import org.ambientlight.annotations.FieldType;

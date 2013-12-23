@@ -1,4 +1,4 @@
-package org.ambientlight.config.scenery;
+package org.ambientlight.config.room.entities.scenery;
 
 public class UserSceneryConfiguration extends AbstractSceneryConfiguration {
 
