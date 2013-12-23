@@ -8,9 +8,9 @@ import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.config.features.actor.Renderable;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.scenery.actor.ActorConductConfiguration;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
@@ -23,5 +23,5 @@ public class ConfigurationChangeHandlerConfiguration extends AbstractActionHandl
 	@AlternativeValues(values = {
 			@Value(displayName = "Farbe auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration"),
 			@Value(displayName = "Tron auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration") })
-	public Map<String, ActorConductConfiguration> actorConfiguration = new HashMap<String, ActorConductConfiguration>();
+	public Map<String, Renderable> renderConfig = new HashMap<String, Renderable>();
 }
