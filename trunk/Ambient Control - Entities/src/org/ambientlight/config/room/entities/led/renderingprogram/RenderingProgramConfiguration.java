@@ -1,6 +1,4 @@
-package org.ambientlight.config.scenery.actor;
-
-import java.io.Serializable;
+package org.ambientlight.config.room.entities.led.renderingprogram;
 
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.Value;
@@ -12,7 +10,12 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 		@Value(displayName = "Tron", value = "org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration"),
 		@Value(displayName = "Sonnenuntergang", value = "org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration") })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public abstract class ActorConductConfiguration implements Serializable {
 
+public abstract class RenderingProgramConfiguration {
+
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
+
 }
