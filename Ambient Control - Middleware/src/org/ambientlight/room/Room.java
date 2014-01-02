@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.climate.MaxClimateManager;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
@@ -15,14 +14,15 @@ import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.drivers.SwtichDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
+import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.entities.Process;
-import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.EventSensor;
 import org.ambientlight.room.entities.LightObject;
-import org.ambientlight.room.entities.MaxComponent;
-import org.ambientlight.room.entities.Sensor;
+import org.ambientlight.room.entities.climate.ClimateManager;
+import org.ambientlight.room.entities.climate.devices.MaxComponent;
+import org.ambientlight.room.entities.switches.SwitchManager;
 
 
 /**
@@ -32,7 +32,9 @@ import org.ambientlight.room.entities.Sensor;
  */
 public class Room {
 
-	public MaxClimateManager climateManager;
+	public ClimateManager climateManager;
+
+	public SwitchManager schwitchManager;
 
 	public QeueManager qeueManager;
 
@@ -55,7 +57,6 @@ public class Room {
 
 	public List<Process> processes;
 
-	public Map<String, Sensor> sensors;
 
 	public BufferedImage getRoomBitMap() {
 		return roomBitMap;

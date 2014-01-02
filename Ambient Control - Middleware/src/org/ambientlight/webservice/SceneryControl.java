@@ -13,14 +13,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.ISwitchableRoomItem;
+import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
-import org.ambientlight.config.room.actors.SwitchObjectConfiguration;
-import org.ambientlight.config.room.eventgenerator.EventGeneratorConfiguration;
-import org.ambientlight.config.scenery.actor.ActorConductConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.config.scenery.actor.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.led.ActorConductConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.led.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
+import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.entities.LightObject;
 
@@ -117,8 +117,8 @@ public class SceneryControl {
 	@GET
 	@Path("/config/userRoomItems")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, ISwitchableRoomItem> getUserRoomItems() {
-		return AmbientControlMW.getRoom().config.getUserRoomItems();
+	public Map<String, Switchable> getUserRoomItems() {
+		return AmbientControlMW.getRoom().config.getSwitchableActors();
 	}
 
 
@@ -131,7 +131,7 @@ public class SceneryControl {
 		System.out.println("SceneryControlWS:  setting power state for " + itemName + " to " + powerState);
 
 		try {
-			ISwitchableRoomItem config = this.getRoomConfiguration().getUserRoomItems().get(itemName);
+			Switchable config = this.getRoomConfiguration().getSwitchableActors().get(itemName);
 
 			if (config instanceof LightObjectConfiguration) {
 				// update renderer
@@ -142,9 +142,9 @@ public class SceneryControl {
 				AmbientControlMW
 				.getRoom()
 				.getSwitchingDevice()
-				.writeData(((SwitchObjectConfiguration) config).deviceType,
-						((SwitchObjectConfiguration) config).houseCode,
-						((SwitchObjectConfiguration) config).switchingUnitCode, powerState);
+				.writeData(((RemoteSwitchConfiguration) config).deviceType,
+						((RemoteSwitchConfiguration) config).houseCode,
+						((RemoteSwitchConfiguration) config).switchingUnitCode, powerState);
 			}
 
 			// update model

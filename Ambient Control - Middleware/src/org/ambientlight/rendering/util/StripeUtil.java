@@ -3,7 +3,7 @@ package org.ambientlight.rendering.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
 import org.ambientlight.room.StripePart;
 
 

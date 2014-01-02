@@ -23,12 +23,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.process.events.Event;
-import org.ambientlight.config.process.events.SceneryEntryEvent;
-import org.ambientlight.config.process.events.SwitchEvent;
+import org.ambientlight.config.events.BroadcastEvent;
+import org.ambientlight.config.events.SceneryEntryEvent;
+import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.SceneryEventGenerator;
-import org.ambientlight.room.entities.SwitchEventGenerator;
+import org.ambientlight.room.entities.switches.SwitchManager;
 
 
 /**
@@ -42,14 +42,14 @@ public class EventReceiver {
 	@Path("/event")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response handleEvent(Event event) {
-		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(event.sourceName));
+	public Response handleEvent(BroadcastEvent event) {
+		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(event.sourceId));
 		if (event instanceof SceneryEntryEvent) {
 			((SceneryEventGenerator) eventGen).sceneryEntryEventOccured((SceneryEntryEvent) event);
 		}
 
 		if (event instanceof SwitchEvent) {
-			((SwitchEventGenerator) eventGen).switchEventOccured((SwitchEvent) event);
+			((SwitchManager) eventGen).switchEventOccured((SwitchEvent) event);
 		}
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();

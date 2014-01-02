@@ -3,10 +3,10 @@ package org.ambientlight.rendering;
 import java.awt.Color;
 import java.util.List;
 
-import org.ambientlight.config.scenery.actor.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.rendering.effects.RenderingEffect;
 import org.ambientlight.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.rendering.effects.transitions.FadeInTransition;

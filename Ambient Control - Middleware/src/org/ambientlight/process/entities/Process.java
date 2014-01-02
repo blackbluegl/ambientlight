@@ -3,11 +3,11 @@ package org.ambientlight.process.entities;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ambientlight.config.events.BroadcastEvent;
 import org.ambientlight.config.process.EventProcessConfiguration;
-import org.ambientlight.config.process.events.Event;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.process.eventmanager.EventManager;
-import org.ambientlight.process.eventmanager.IEventListener;
+import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.eventmanager.IEventListener;
 
 
 public class Process implements IEventListener {
@@ -20,7 +20,7 @@ public class Process implements IEventListener {
 
 	public void start() {
 		// wait until event happens
-		for (Event event : config.eventTriggerConfigurations) {
+		for (BroadcastEvent event : config.eventTriggerConfigurations) {
 			eventManager.register(this, event);
 		}
 	}
@@ -28,14 +28,14 @@ public class Process implements IEventListener {
 
 	public void suspend() {
 		// wait until event happens
-		for (Event event : config.eventTriggerConfigurations) {
+		for (BroadcastEvent event : config.eventTriggerConfigurations) {
 			eventManager.unregister(this, event);
 		}
 	}
 
 
 	@Override
-	public void handleEvent(Event event) {
+	public void handleEvent(BroadcastEvent event) {
 		token = new Token();
 		token.nextNodeId = getFirstNode();
 

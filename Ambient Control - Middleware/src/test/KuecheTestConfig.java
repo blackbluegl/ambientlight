@@ -7,10 +7,11 @@ import java.util.List;
 
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
+import org.ambientlight.config.events.SceneryEntryEvent;
+import org.ambientlight.config.events.SwitchEvent;
+import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
-import org.ambientlight.config.process.events.SceneryEntryEvent;
-import org.ambientlight.config.process.events.SwitchEvent;
 import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
@@ -19,13 +20,12 @@ import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfig
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
-import org.ambientlight.config.room.ISwitchableRoomItem;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
-import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
-import org.ambientlight.config.scenery.UserSceneryConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.room.RoomConfigurationFactory;
 
@@ -67,11 +67,11 @@ public class KuecheTestConfig {
 		lo.actorConductConfiguration = this.createSimpleColor();
 		rc.actorConfigurations.put(lo.getName(), lo);
 
-		SwitchEventGeneratorConfiguration triggerMainSwitch = new SwitchEventGeneratorConfiguration();
+		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
 		triggerMainSwitch.name = "Lichtschalter";
 		rc.eventGeneratorConfigurations.put("Lichtschalter", triggerMainSwitch);
 
-		SceneryEventGeneratorConfiguration sceneryEventGenerator = new SceneryEventGeneratorConfiguration();
+		SceneryManagerConfiguration sceneryEventGenerator = new SceneryManagerConfiguration();
 		sceneryEventGenerator.name = "RoomSceneryEventGenerator";
 		rc.eventGeneratorConfigurations.put("RoomSceneryEventGenerator", sceneryEventGenerator);
 
@@ -90,11 +90,11 @@ public class KuecheTestConfig {
 		roomSwitchProcess.id = "Licht schalten";
 		rc.processes.add(roomSwitchProcess);
 		SwitchEvent triggerConfOn = new SwitchEvent();
-		triggerConfOn.sourceName = triggerMainSwitch.name;
+		triggerConfOn.sourceId = triggerMainSwitch.name;
 		triggerConfOn.powerState = true;
 
 		SwitchEvent triggerConfOff = new SwitchEvent();
-		triggerConfOff.sourceName = triggerMainSwitch.name;
+		triggerConfOff.sourceId = triggerMainSwitch.name;
 		triggerConfOff.powerState = false;
 
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOn);
@@ -142,7 +142,7 @@ public class KuecheTestConfig {
 
 		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
 		changeConfigFor.add(lo);
-		ArrayList<ISwitchableRoomItem> turnLightOnFor = new ArrayList<ISwitchableRoomItem>();
+		ArrayList<Switchable> turnLightOnFor = new ArrayList<Switchable>();
 		turnLightOnFor.add(lo);
 
 		createUserScenario(rc, userScenario, changeConfigFor, turnLightOnFor);
@@ -152,7 +152,7 @@ public class KuecheTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
-			List<LightObjectConfiguration> lo, List<ISwitchableRoomItem> itemsToPutOn) {
+			List<LightObjectConfiguration> lo, List<Switchable> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -162,7 +162,7 @@ public class KuecheTestConfig {
 
 		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent();
 		triggerSceneryChange.sceneryName = "Kochen";
-		triggerSceneryChange.sourceName = "RoomSceneryEventGenerator";
+		triggerSceneryChange.sourceId = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
@@ -176,7 +176,7 @@ public class KuecheTestConfig {
 		switchNode.id = 1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		for (ISwitchableRoomItem current : itemsToPutOn) {
+		for (Switchable current : itemsToPutOn) {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;

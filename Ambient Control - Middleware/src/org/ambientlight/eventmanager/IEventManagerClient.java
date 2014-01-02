@@ -13,9 +13,9 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.eventmanager;
+package org.ambientlight.eventmanager;
 
-import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.events.BroadcastEvent;
 
 
 
@@ -27,5 +27,5 @@ import org.ambientlight.config.process.events.Event;
 public interface IEventManagerClient {
 
 
-	void onEvent(Event event);
+	void onEvent(BroadcastEvent event);
 }

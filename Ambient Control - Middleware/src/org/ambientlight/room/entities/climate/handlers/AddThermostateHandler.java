@@ -13,15 +13,15 @@
    limitations under the License.
  */
 
-package org.ambientlight.climate;
+package org.ambientlight.room.entities.climate.handlers;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
+import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -31,7 +31,8 @@ import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.Thermostat;
+import org.ambientlight.room.entities.climate.devices.Thermostat;
+import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
 /**
@@ -47,7 +48,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// Send pair pong
 		MaxPairPongMessage pairPong = new MaxPairPongMessage();
-		pairPong.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		pairPong.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		pairPong.setToAdress(pairMessage.getFromAdress());
 
 		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
@@ -59,7 +60,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// register the device at the rfmbridge - for direct routing
 		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), AmbientControlMW
-				.getRoom().config.climate.vCubeAdress));
+				.getRoom().config.climateManager.vCubeAdress));
 
 		// create device in ambientcontrol
 		ThermostatConfiguration config = new ThermostatConfiguration();
@@ -68,9 +69,9 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// it is the sensor value we can read. but we need something to
 		// start
-		device.temperatur = AmbientControlMW.getRoom().config.climate.setTemp;
+		device.temperatur = AmbientControlMW.getRoom().config.climateManager.setTemp;
 
-		config.offset = AmbientControlMW.getRoom().config.climate.DEFAULT_OFFSET;
+		config.offset = AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET;
 		config.label = "Thermostat";
 		config.adress = pairMessage.getFromAdress();
 		config.batteryLow = false;
@@ -83,7 +84,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// add device to ambientcontrol
 		AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
-		AmbientControlMW.getRoom().config.climate.devices.put(config.adress, config);
+		AmbientControlMW.getRoom().config.climateManager.devices.put(config.adress, config);
 
 		// setup Time;
 		outMessages.add(MaxMessageCreator.getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
@@ -102,18 +103,18 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// setup weekly Profile
 		List<Message> weekProfile = MaxMessageCreator.getWeekProfileForDevice(pairMessage.getFromAdress(),
-				AmbientControlMW.getRoom().config.climate.currentWeekProfile);
+				AmbientControlMW.getRoom().config.climateManager.currentWeekProfile);
 		for (Message dayProfile : weekProfile) {
 			outMessages.add(dayProfile);
 		}
 
 		// link to proxyShutterContact
 		MaxAddLinkPartnerMessage linkToShutterContact = MaxMessageCreator.getLinkMessage(config.adress,
-				AmbientControlMW.getRoom().config.climate.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
+				AmbientControlMW.getRoom().config.climateManager.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 		outMessages.add(linkToShutterContact);
 
 		// link devices to other thermostates
-		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climate.devices.values()) {
+		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climateManager.devices.values()) {
 
 			// do not link with ourself
 			if (currentConfig.adress == pairMessage.getFromAdress()) {

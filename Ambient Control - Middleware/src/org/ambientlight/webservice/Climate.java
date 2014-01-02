@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.climate.MaxClimateManager;
+import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.ws.container.TemperaturMode;
 
 
@@ -41,7 +41,7 @@ public class Climate {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setTemperatur(TemperaturMode mode) {
-		MaxClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		manager.setMode(mode.temp, mode.mode, mode.until);
 
@@ -54,7 +54,7 @@ public class Climate {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response startPairing() {
-		MaxClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		manager.setPairingMode();
 
@@ -67,7 +67,7 @@ public class Climate {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response unregister(@PathParam("id") int adress) {
-		MaxClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		try {
 			manager.setFactoryResetDevice(adress);
@@ -85,7 +85,7 @@ public class Climate {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setCurrentWeekProfile(@PathParam("currentProfile") String profile) {
-		MaxClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		try {
 			manager.setCurrentProfile(profile);

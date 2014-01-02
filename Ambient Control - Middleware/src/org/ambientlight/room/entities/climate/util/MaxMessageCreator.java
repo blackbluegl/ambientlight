@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.climate;
+package org.ambientlight.room.entities.climate.util;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,17 +54,17 @@ public class MaxMessageCreator {
 	 */
 	public static MaxSetTemperatureMessage getSetTempForDevice(int adress) {
 		MaxSetTemperatureMessage outMessage = new MaxSetTemperatureMessage();
-		outMessage.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
-		if (AmbientControlMW.getRoom().config.climate.mode != MaxThermostateMode.AUTO) {
-			outMessage.setTemp(AmbientControlMW.getRoom().config.climate.setTemp);
+		outMessage.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
+		if (AmbientControlMW.getRoom().config.climateManager.mode != MaxThermostateMode.AUTO) {
+			outMessage.setTemp(AmbientControlMW.getRoom().config.climateManager.setTemp);
 		} else {
 			outMessage.setTemp(0.0f);
 		}
-		outMessage.setTemporaryUntil(AmbientControlMW.getRoom().config.climate.temporaryUntilDate);
-		outMessage.setMode(AmbientControlMW.getRoom().config.climate.mode);
+		outMessage.setTemporaryUntil(AmbientControlMW.getRoom().config.climateManager.temporaryUntilDate);
+		outMessage.setMode(AmbientControlMW.getRoom().config.climateManager.mode);
 		outMessage.setSequenceNumber(getNewSequnceNumber());
 		outMessage.setToAdress(adress);
-		outMessage.setGroupNumber(AmbientControlMW.getRoom().config.climate.groupId);
+		outMessage.setGroupNumber(AmbientControlMW.getRoom().config.climateManager.groupId);
 		outMessage.setFlags(0x04);
 		return outMessage;
 	}
@@ -77,7 +77,7 @@ public class MaxMessageCreator {
 	 */
 	public static List<Message> getWeekProfileForDevice(Integer deviceAdress, String weekProfile) {
 		List<Message> messages = new ArrayList<Message>();
-		HashMap<MaxDayInWeek, List<DayEntry>> profiles = AmbientControlMW.getRoom().config.climate.weekProfiles.get(weekProfile);
+		HashMap<MaxDayInWeek, List<DayEntry>> profiles = AmbientControlMW.getRoom().config.climateManager.weekProfiles.get(weekProfile);
 		for (Entry<MaxDayInWeek, List<DayEntry>> currentDayProfile : profiles.entrySet()) {
 			int entryCountPartOne = currentDayProfile.getValue().size();
 			boolean twoParts = false;
@@ -94,7 +94,7 @@ public class MaxMessageCreator {
 			}
 
 			week.setDay(currentDayProfile.getKey());
-			week.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+			week.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 			week.setSecondPart(false);
 			week.setSequenceNumber(getNewSequnceNumber());
 			week.setToAdress(deviceAdress);
@@ -109,7 +109,7 @@ public class MaxMessageCreator {
 
 
 				week2.setDay(currentDayProfile.getKey());
-				week2.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+				week2.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 				week2.setSecondPart(true);
 				week2.setSecondPart(true);
 				week2.setSequenceNumber(getNewSequnceNumber());
@@ -130,7 +130,7 @@ public class MaxMessageCreator {
 	 */
 	public static MaxFactoryResetMessage getFactoryResetMessageForDevice(int adress) {
 		MaxFactoryResetMessage resetDevice = new MaxFactoryResetMessage();
-		resetDevice.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		resetDevice.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		resetDevice.setToAdress(adress);
 		resetDevice.setSequenceNumber(getNewSequnceNumber());
 		return resetDevice;
@@ -145,7 +145,7 @@ public class MaxMessageCreator {
 	public static MaxRemoveLinkPartnerMessage getUnlinkMessageForDevice(int adress, int linkPartnerAdress,
 			DeviceType linkPartnerDeviceType) {
 		MaxRemoveLinkPartnerMessage unlink = new MaxRemoveLinkPartnerMessage();
-		unlink.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		unlink.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		unlink.setToAdress(adress);
 		unlink.setSequenceNumber(getNewSequnceNumber());
 		unlink.setLinkPartnerAdress(linkPartnerAdress);
@@ -162,7 +162,7 @@ public class MaxMessageCreator {
 	public static MaxTimeInformationMessage getTimeInfoForDevice(Date now, int adress) {
 		MaxTimeInformationMessage message = new MaxTimeInformationMessage();
 		message.setSequenceNumber(getNewSequnceNumber());
-		message.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		message.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		message.setToAdress(adress);
 		message.setTime(now);
 		return message;
@@ -178,7 +178,7 @@ public class MaxMessageCreator {
 	public static MaxAddLinkPartnerMessage getLinkMessage(int adress, int linkPartnerAdress, DeviceType linkPartnerTDeviceType) {
 		MaxAddLinkPartnerMessage linkCurrentToNew = new MaxAddLinkPartnerMessage();
 		linkCurrentToNew.setSequenceNumber(getNewSequnceNumber());
-		linkCurrentToNew.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		linkCurrentToNew.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		linkCurrentToNew.setToAdress(adress);
 		linkCurrentToNew.setLinkPartnerAdress(linkPartnerAdress);
 		linkCurrentToNew.setLinkPartnerDeviceType(linkPartnerTDeviceType);
@@ -193,9 +193,9 @@ public class MaxMessageCreator {
 	public static MaxSetGroupIdMessage getSetGroupIdForDevice(int adress) {
 		MaxSetGroupIdMessage group = new MaxSetGroupIdMessage();
 		group.setSequenceNumber(getNewSequnceNumber());
-		group.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		group.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		group.setToAdress(adress);
-		group.setGroupId(AmbientControlMW.getRoom().config.climate.groupId);
+		group.setGroupId(AmbientControlMW.getRoom().config.climateManager.groupId);
 		return group;
 	}
 
@@ -207,15 +207,15 @@ public class MaxMessageCreator {
 	public static MaxConfigureTemperaturesMessage getConfigureTemperatures(int adress) {
 		MaxConfigureTemperaturesMessage temps = new MaxConfigureTemperaturesMessage();
 		temps.setSequenceNumber(getNewSequnceNumber());
-		temps.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		temps.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		temps.setToAdress(adress);
-		temps.setComfortTemp(AmbientControlMW.getRoom().config.climate.comfortTemperatur);
-		temps.setEcoTemp(AmbientControlMW.getRoom().config.climate.ecoTemperatur);
-		temps.setMaxTemp(AmbientControlMW.getRoom().config.climate.maxTemp);
-		temps.setMinTemp(AmbientControlMW.getRoom().config.climate.minTemp);
-		temps.setOffsetTemp(AmbientControlMW.getRoom().config.climate.DEFAULT_OFFSET);
-		temps.setWindowOpenTemp(AmbientControlMW.getRoom().config.climate.windowOpenTemperatur);
-		temps.setWindowOpenTime(AmbientControlMW.getRoom().config.climate.windowOpenTimeMins);
+		temps.setComfortTemp(AmbientControlMW.getRoom().config.climateManager.comfortTemperatur);
+		temps.setEcoTemp(AmbientControlMW.getRoom().config.climateManager.ecoTemperatur);
+		temps.setMaxTemp(AmbientControlMW.getRoom().config.climateManager.maxTemp);
+		temps.setMinTemp(AmbientControlMW.getRoom().config.climateManager.minTemp);
+		temps.setOffsetTemp(AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET);
+		temps.setWindowOpenTemp(AmbientControlMW.getRoom().config.climateManager.windowOpenTemperatur);
+		temps.setWindowOpenTime(AmbientControlMW.getRoom().config.climateManager.windowOpenTimeMins);
 		return temps;
 	}
 
@@ -227,16 +227,16 @@ public class MaxMessageCreator {
 	public static MaxConfigValveMessage getConfigValveForDevice(int adress) {
 		MaxConfigValveMessage valve = new MaxConfigValveMessage();
 		valve.setSequenceNumber(getNewSequnceNumber());
-		valve.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		valve.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		valve.setToAdress(adress);
-		valve.setBoostDuration(AmbientControlMW.getRoom().config.climate.boostDurationMins);
-		valve.setBoostValvePosition(AmbientControlMW.getRoom().config.climate.boostValvePositionPercent);
+		valve.setBoostDuration(AmbientControlMW.getRoom().config.climateManager.boostDurationMins);
+		valve.setBoostValvePosition(AmbientControlMW.getRoom().config.climateManager.boostValvePositionPercent);
 		DecalcEntry decalc = valve.new DecalcEntry();
-		decalc.day = AmbientControlMW.getRoom().config.climate.decalcDay;
-		decalc.hour = AmbientControlMW.getRoom().config.climate.decalcHour;
+		decalc.day = AmbientControlMW.getRoom().config.climateManager.decalcDay;
+		decalc.hour = AmbientControlMW.getRoom().config.climateManager.decalcHour;
 		valve.setDecalc(decalc);
-		valve.setMaxValvePosition(AmbientControlMW.getRoom().config.climate.DEFAULT_MAX_VALVE_POSITION);
-		valve.setValveOffset(AmbientControlMW.getRoom().config.climate.DEFAULT_VALVE_OFFSET_PERCENT);
+		valve.setMaxValvePosition(AmbientControlMW.getRoom().config.climateManager.DEFAULT_MAX_VALVE_POSITION);
+		valve.setValveOffset(AmbientControlMW.getRoom().config.climateManager.DEFAULT_VALVE_OFFSET_PERCENT);
 		return valve;
 	}
 

@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.climate;
+package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager;

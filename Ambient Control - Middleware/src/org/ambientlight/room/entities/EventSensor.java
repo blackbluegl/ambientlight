@@ -15,7 +15,7 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.events.BroadcastEvent;
 
 
 /**
@@ -24,5 +24,5 @@ import org.ambientlight.config.process.events.Event;
  */
 public interface EventSensor {
 
-	public Event getValue();
+	public BroadcastEvent getValue();
 }

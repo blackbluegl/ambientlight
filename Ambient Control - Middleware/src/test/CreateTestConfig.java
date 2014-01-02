@@ -13,10 +13,11 @@ import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
+import org.ambientlight.config.events.SceneryEntryEvent;
+import org.ambientlight.config.events.SwitchEvent;
+import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
-import org.ambientlight.config.process.events.SceneryEntryEvent;
-import org.ambientlight.config.process.events.SwitchEvent;
 import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
@@ -25,17 +26,16 @@ import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfig
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
-import org.ambientlight.config.room.ClimateConfiguration;
-import org.ambientlight.config.room.ISwitchableRoomItem;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
-import org.ambientlight.config.room.actors.SwitchObjectConfiguration;
-import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
-import org.ambientlight.config.scenery.UserSceneryConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.scenery.actor.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.led.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.led.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
@@ -90,7 +90,7 @@ public class CreateTestConfig {
 		// ledPoint2.port = 2;
 		// lk35.configuredLeds.add(ledPoint2);
 
-		ClimateConfiguration climate = new ClimateConfiguration();
+		ClimateManagerConfiguration climate = new ClimateManagerConfiguration();
 		climate.vCubeAdress = 1;
 		climate.groupId = 5;
 
@@ -135,7 +135,7 @@ public class CreateTestConfig {
 		climate.weekProfiles = weekProfiles;
 		climate.currentWeekProfile = "default";
 
-		rc.climate = climate;
+		rc.climateManager = climate;
 
 		MaxVCubeDeviceConfiguration rfmConfig = new MaxVCubeDeviceConfiguration();
 
@@ -174,7 +174,7 @@ public class CreateTestConfig {
 
 		dc.configuredStripes.add(sc);
 
-		SwitchObjectConfiguration sw1 = new SwitchObjectConfiguration();
+		RemoteSwitchConfiguration sw1 = new RemoteSwitchConfiguration();
 		sw1.deviceType = "ELRO";
 		sw1.houseCode = 15;
 		sw1.switchingUnitCode = 3;
@@ -204,11 +204,11 @@ public class CreateTestConfig {
 		background.actorConductConfiguration = sunset;
 		rc.actorConfigurations.put(background.getName(), background);
 
-		SwitchEventGeneratorConfiguration triggerMainSwitch = new SwitchEventGeneratorConfiguration();
+		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
 		triggerMainSwitch.name = "RoomSwitch";
 		rc.eventGeneratorConfigurations.put("RoomSwitch", triggerMainSwitch);
 
-		SceneryEventGeneratorConfiguration sceneryEventGenerator = new SceneryEventGeneratorConfiguration();
+		SceneryManagerConfiguration sceneryEventGenerator = new SceneryManagerConfiguration();
 		sceneryEventGenerator.name = "RoomSceneryEventGenerator";
 		rc.eventGeneratorConfigurations.put("RoomSceneryEventGenerator", sceneryEventGenerator);
 
@@ -231,11 +231,11 @@ public class CreateTestConfig {
 		roomSwitchProcess.id = "roomSwitch";
 		rc.processes.add(roomSwitchProcess);
 		SwitchEvent triggerConfOn = new SwitchEvent();
-		triggerConfOn.sourceName = triggerMainSwitch.name;
+		triggerConfOn.sourceId = triggerMainSwitch.name;
 		triggerConfOn.powerState = true;
 
 		SwitchEvent triggerConfOff = new SwitchEvent();
-		triggerConfOff.sourceName = triggerMainSwitch.name;
+		triggerConfOff.sourceId = triggerMainSwitch.name;
 		triggerConfOff.powerState = false;
 
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOn);
@@ -284,7 +284,7 @@ public class CreateTestConfig {
 		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
 		changeConfigFor.add(background);
 		changeConfigFor.add(lo);
-		ArrayList<ISwitchableRoomItem> turnLightOnFor = new ArrayList<ISwitchableRoomItem>();
+		ArrayList<Switchable> turnLightOnFor = new ArrayList<Switchable>();
 		turnLightOnFor.add(background);
 		turnLightOnFor.add(sw1);
 		turnLightOnFor.add(triggerMainSwitch);
@@ -296,7 +296,7 @@ public class CreateTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
-			List<LightObjectConfiguration> lo, List<ISwitchableRoomItem> itemsToPutOn) {
+			List<LightObjectConfiguration> lo, List<Switchable> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -306,7 +306,7 @@ public class CreateTestConfig {
 
 		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent();
 		triggerSceneryChange.sceneryName = "scenario1";
-		triggerSceneryChange.sourceName = "RoomSceneryEventGenerator";
+		triggerSceneryChange.sourceId = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
@@ -320,7 +320,7 @@ public class CreateTestConfig {
 		switchNode.id = 1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		for (ISwitchableRoomItem current : itemsToPutOn) {
+		for (Switchable current : itemsToPutOn) {
 			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;

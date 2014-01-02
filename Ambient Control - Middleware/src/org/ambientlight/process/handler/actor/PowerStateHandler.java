@@ -1,11 +1,11 @@
 package org.ambientlight.process.handler.actor;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.room.ISwitchableRoomItem;
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
-import org.ambientlight.config.room.actors.SwitchObjectConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.room.entities.LightObject;
@@ -19,7 +19,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 		// if simple mode handle all actors the same way
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
-			for (ISwitchableRoomItem actorConfig : AmbientControlMW.getRoom().config.getUserRoomItems().values()) {
+			for (Switchable actorConfig : AmbientControlMW.getRoom().config.getSwitchableActors().values()) {
 				switchPowerState(actorConfig.getName(), powerState, actorConfig);
 			}
 			return;
@@ -27,7 +27,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 
 		for (String currentActorName : getConfig().powerStateConfiguration.keySet()) {
 			boolean powerState = getConfig().powerStateConfiguration.get(currentActorName);
-			ISwitchableRoomItem actorConfig = AmbientControlMW.getRoom().config.getUserRoomItems().get(currentActorName);
+			Switchable actorConfig = AmbientControlMW.getRoom().config.getSwitchableActors().get(currentActorName);
 			switchPowerState(currentActorName, powerState, actorConfig);
 		}
 	}
@@ -36,16 +36,16 @@ public class PowerStateHandler extends AbstractActionHandler {
 	/**
 	 * @param currentActorName
 	 */
-	public void switchPowerState(String currentActorName, boolean powerState, ISwitchableRoomItem actorConfig) {
+	public void switchPowerState(String currentActorName, boolean powerState, Switchable actorConfig) {
 		try {
-			if (actorConfig instanceof SwitchObjectConfiguration) {
+			if (actorConfig instanceof RemoteSwitchConfiguration) {
 				// update switch device
 				AmbientControlMW
 				.getRoom()
 				.getSwitchingDevice()
-				.writeData(((SwitchObjectConfiguration) actorConfig).deviceType,
-						((SwitchObjectConfiguration) actorConfig).houseCode,
-						((SwitchObjectConfiguration) actorConfig).switchingUnitCode, powerState);
+				.writeData(((RemoteSwitchConfiguration) actorConfig).deviceType,
+						((RemoteSwitchConfiguration) actorConfig).houseCode,
+						((RemoteSwitchConfiguration) actorConfig).switchingUnitCode, powerState);
 
 			} else if (actorConfig instanceof LightObjectConfiguration) {
 				// update renderer for light objects and update model

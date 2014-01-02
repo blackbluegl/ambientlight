@@ -15,9 +15,9 @@
 
 package org.ambientlight.process.handler.event;
 
-import org.ambientlight.config.process.events.AlarmEvent;
-import org.ambientlight.config.process.events.SceneryEntryEvent;
-import org.ambientlight.config.process.events.SwitchEvent;
+import org.ambientlight.config.events.DailyAlarmEvent;
+import org.ambientlight.config.events.SceneryEntryEvent;
+import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
@@ -44,7 +44,7 @@ public class EventToBooleanHandler extends AbstractActionHandler {
 				token.data = event.powerState ? 1.0 : 0.0;
 				token.valueType = DataTypeValidation.BOOLEAN;
 			}
-			if (token.data instanceof AlarmEvent || token.data instanceof SceneryEntryEvent) {
+			if (token.data instanceof DailyAlarmEvent || token.data instanceof SceneryEntryEvent) {
 				token.data = 1.0;
 				token.valueType = DataTypeValidation.BOOLEAN;
 			}

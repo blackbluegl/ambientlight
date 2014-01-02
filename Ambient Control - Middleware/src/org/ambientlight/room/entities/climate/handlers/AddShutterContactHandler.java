@@ -13,16 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.climate;
+package org.ambientlight.room.entities.climate.handlers;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ShutterContactConfiguration;
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
+import org.ambientlight.config.room.entities.climate.ShutterContactConfiguration;
+import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -32,7 +32,8 @@ import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.ShutterContact;
+import org.ambientlight.room.entities.climate.devices.ShutterContact;
+import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
 /**
@@ -48,7 +49,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 
 		// Send pair pong
 		MaxPairPongMessage pairPong = new MaxPairPongMessage();
-		pairPong.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+		pairPong.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		pairPong.setToAdress(pairMessage.getFromAdress());
 
 		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
@@ -61,7 +62,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 		// register the device at the rfmbridge - it will ack some requests
 		// directly because the way over network is to long.
 		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), AmbientControlMW
-				.getRoom().config.climate.vCubeAdress));
+				.getRoom().config.climateManager.vCubeAdress));
 
 		// create device
 		ShutterContactConfiguration config = new ShutterContactConfiguration();
@@ -81,10 +82,10 @@ public class AddShutterContactHandler implements MessageActionHandler {
 		config.timedOut = false;
 
 		AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
-		AmbientControlMW.getRoom().config.climate.devices.put(config.adress, config);
+		AmbientControlMW.getRoom().config.climateManager.devices.put(config.adress, config);
 
 		// link devices
-		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climate.devices.values()) {
+		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climateManager.devices.values()) {
 
 			// do link only with thermostates
 			if (currentConfig instanceof ThermostatConfiguration == false) {
@@ -93,7 +94,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 
 			// link current device to the proxy adress of the shutter
 			MaxAddLinkPartnerMessage linkCurrentToNew = MaxMessageCreator.getLinkMessage(currentConfig.adress,
-					AmbientControlMW.getRoom().config.climate.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
+					AmbientControlMW.getRoom().config.climateManager.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 			outMessages.add(linkCurrentToNew);
 		}
 

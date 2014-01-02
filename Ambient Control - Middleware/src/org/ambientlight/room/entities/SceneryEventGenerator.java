@@ -15,10 +15,10 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.config.process.events.Event;
-import org.ambientlight.config.process.events.SceneryEntryEvent;
-import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.config.scenery.UserSceneryConfiguration;
+import org.ambientlight.config.events.BroadcastEvent;
+import org.ambientlight.config.events.SceneryEntryEvent;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
 
 
 /**
@@ -33,7 +33,7 @@ public class SceneryEventGenerator extends EventGenerator implements EventSensor
 
 		UserSceneryConfiguration currentScenery = new UserSceneryConfiguration();
 		currentScenery.id = event.sceneryName;
-		((SceneryEventGeneratorConfiguration) this.config).currentScenery = currentScenery;
+		((SceneryManagerConfiguration) this.config).currentScenery = currentScenery;
 
 		eventManager.onEvent(event);
 	}
@@ -45,10 +45,10 @@ public class SceneryEventGenerator extends EventGenerator implements EventSensor
 	 * @see org.ambientlight.room.entities.Sensor#getValue()
 	 */
 	@Override
-	public Event getValue() {
+	public BroadcastEvent getValue() {
 		SceneryEntryEvent event = new SceneryEntryEvent();
-		event.sceneryName = ((SceneryEventGeneratorConfiguration) this.config).currentScenery.id;
-		event.sourceName = ((SceneryEventGeneratorConfiguration) this.config).name;
+		event.sceneryName = ((SceneryManagerConfiguration) this.config).currentScenery.id;
+		event.sourceId = ((SceneryManagerConfiguration) this.config).name;
 		return event;
 	}
 }

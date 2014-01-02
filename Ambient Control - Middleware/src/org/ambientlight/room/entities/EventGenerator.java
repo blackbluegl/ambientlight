@@ -15,8 +15,8 @@
 
 package org.ambientlight.room.entities;
 
-import org.ambientlight.config.room.eventgenerator.EventGeneratorConfiguration;
-import org.ambientlight.process.eventmanager.IEventManagerClient;
+import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
+import org.ambientlight.eventmanager.IEventManagerClient;
 
 
 /**
