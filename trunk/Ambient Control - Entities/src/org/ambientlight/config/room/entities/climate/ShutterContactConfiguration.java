@@ -20,9 +20,12 @@ import org.ambientlight.messages.max.DeviceType;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class ShutterContactConfiguration extends MaxComponentConfiguration {
+
+	public boolean isOpen = false;
+
 
 	/*
 	 * (non-Javadoc)
