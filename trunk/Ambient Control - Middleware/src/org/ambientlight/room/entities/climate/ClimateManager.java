@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.climate;
+package org.ambientlight.room.entities.climate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +26,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.ClimateConfiguration;
-import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
+import org.ambientlight.config.room.entities.climate.ShutterContactConfiguration;
+import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
@@ -49,22 +50,28 @@ import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 import org.ambientlight.messages.max.MaxWakeUpMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.MaxComponent;
-import org.ambientlight.room.entities.ShutterContact;
-import org.ambientlight.room.entities.Thermostat;
+import org.ambientlight.room.entities.climate.devices.MaxComponent;
+import org.ambientlight.room.entities.climate.devices.ShutterContact;
+import org.ambientlight.room.entities.climate.devices.Thermostat;
+import org.ambientlight.room.entities.climate.handlers.AddShutterContactHandler;
+import org.ambientlight.room.entities.climate.handlers.AddThermostateHandler;
+import org.ambientlight.room.entities.climate.handlers.MessageActionHandler;
+import org.ambientlight.room.entities.climate.handlers.RemoveShutterContactHandler;
+import org.ambientlight.room.entities.climate.handlers.RemoveThermostatHandler;
+import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxClimateManager implements MessageListener {
+public class ClimateManager implements MessageListener {
 
 	public static int WAIT_FOR_NEW_DEVICES = 90;
 
 	public QeueManager queueManager;
 
-	public ClimateConfiguration config;
+	public ClimateManagerConfiguration config;
 
 	private List<MessageActionHandler> actionHandlers = new ArrayList<MessageActionHandler>();
 
@@ -79,7 +86,7 @@ public class MaxClimateManager implements MessageListener {
 	boolean learnMode = false;
 
 
-	public MaxClimateManager() {
+	public ClimateManager() {
 		// set time to thermostates at 3:00 every day
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
@@ -248,6 +255,7 @@ public class MaxClimateManager implements MessageListener {
 	/**
 	 * @param message
 	 * @throws IOException
+	 *             public Map<String, Sensor> sensors;
 	 */
 	private void handleSetTemperature(MaxSetTemperatureMessage message) {
 		Thermostat thermostat = (Thermostat) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
@@ -290,7 +298,7 @@ public class MaxClimateManager implements MessageListener {
 				System.out.println("ClimateManager handlePairPing(): re-pairing device: " + message);
 
 				MaxPairPongMessage pairPong = new MaxPairPongMessage();
-				pairPong.setFromAdress(AmbientControlMW.getRoom().config.climate.vCubeAdress);
+				pairPong.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 				pairPong.setToAdress(message.getFromAdress());
 				pairPong.setSequenceNumber(message.getSequenceNumber());
 				AmbientControlMW.getRoom().qeueManager.putOutMessage(pairPong);
@@ -340,7 +348,7 @@ public class MaxClimateManager implements MessageListener {
 
 		ShutterContact shutter = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
 		shutter.config.batteryLow = message.isBatteryLow();
-		shutter.isOpen = message.isOpen();
+		((ShutterContactConfiguration) shutter.config).isOpen = message.isOpen();
 		shutter.config.rfError = message.hadRfError();
 		shutter.config.lastUpdate = new Date(System.currentTimeMillis());
 
@@ -351,6 +359,7 @@ public class MaxClimateManager implements MessageListener {
 		boolean open = isAWindowOpen();
 		sendWindowStateToThermostates(open);
 	}
+
 
 	/**
 	 * @param message
@@ -520,6 +529,7 @@ public class MaxClimateManager implements MessageListener {
 		}
 	}
 
+
 	private void sendRegisterCorrelators() {
 		List<Message> correlators = new ArrayList<Message>();
 		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
@@ -567,7 +577,7 @@ public class MaxClimateManager implements MessageListener {
 
 	protected boolean isAWindowOpen() {
 		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
-			if (current instanceof ShutterContact && ((ShutterContact) current).isOpen)
+			if (current instanceof ShutterContact && ((ShutterContactConfiguration) (current.config)).isOpen)
 				return true;
 		}
 		return false;

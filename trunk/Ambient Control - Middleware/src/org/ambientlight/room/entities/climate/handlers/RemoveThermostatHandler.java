@@ -13,11 +13,11 @@
    limitations under the License.
  */
 
-package org.ambientlight.climate;
+package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.actors.MaxComponentConfiguration;
-import org.ambientlight.config.room.actors.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
+import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -26,7 +26,8 @@ import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.Thermostat;
+import org.ambientlight.room.entities.climate.devices.Thermostat;
+import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
 /**
@@ -63,7 +64,7 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 
 		// remove correlator - rfm bridge does route its messages to all clients
 		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, config.adress,
-				AmbientControlMW.getRoom().config.climate.vCubeAdress);
+				AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell

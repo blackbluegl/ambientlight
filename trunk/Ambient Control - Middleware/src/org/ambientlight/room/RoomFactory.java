@@ -9,27 +9,27 @@ import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.climate.ClimateFactory;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
-import org.ambientlight.config.process.events.AlarmEvent;
+import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.actors.ActorConfiguration;
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
-import org.ambientlight.config.room.eventgenerator.AlarmEventGeneratorConfiguration;
-import org.ambientlight.config.room.eventgenerator.EventGeneratorConfiguration;
-import org.ambientlight.config.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.config.room.eventgenerator.SwitchEventGeneratorConfiguration;
+import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
+import org.ambientlight.config.room.entities.led.ActorConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessFactory;
-import org.ambientlight.process.eventmanager.EventManager;
 import org.ambientlight.room.entities.AlarmGenerator;
 import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.SceneryEventGenerator;
-import org.ambientlight.room.entities.SwitchEventGenerator;
+import org.ambientlight.room.entities.climate.ClimateFactory;
+import org.ambientlight.room.entities.switches.SwitchManager;
 
 
 public class RoomFactory {
@@ -106,15 +106,15 @@ public class RoomFactory {
 
 		for (EventGeneratorConfiguration currentConfig : room.config.eventGeneratorConfigurations.values()) {
 			EventGenerator generator = null;
-			if (currentConfig instanceof AlarmEventGeneratorConfiguration) {
+			if (currentConfig instanceof AlarmManagerConfiguration) {
 				generator = new AlarmGenerator();
-				AlarmEventGeneratorConfiguration alarmConfig = (AlarmEventGeneratorConfiguration) currentConfig;
-				((AlarmGenerator) generator).createAlarm(new AlarmEvent(alarmConfig.hour, alarmConfig.min, alarmConfig.name));
+				AlarmManagerConfiguration alarmConfig = (AlarmManagerConfiguration) currentConfig;
+				((AlarmGenerator) generator).createAlarm(new DailyAlarmEvent(alarmConfig.hour, alarmConfig.min, alarmConfig.name));
 			}
-			if (currentConfig instanceof SwitchEventGeneratorConfiguration) {
-				generator = new SwitchEventGenerator();
+			if (currentConfig instanceof SwitchManagerConfiguration) {
+				generator = new SwitchManager();
 			}
-			if (currentConfig instanceof SceneryEventGeneratorConfiguration) {
+			if (currentConfig instanceof SceneryManagerConfiguration) {
 				generator = new SceneryEventGenerator();
 			}
 			generator.config = currentConfig;

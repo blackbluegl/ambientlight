@@ -1,4 +1,4 @@
-package org.ambientlight.process.eventmanager;
+package org.ambientlight.eventmanager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.process.events.AlarmEvent;
-import org.ambientlight.config.process.events.Event;
+import org.ambientlight.config.events.BroadcastEvent;
+import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.room.entities.AlarmGenerator;
 
 
 public class EventManager implements IEventManager, IEventManagerClient {
 
-	Map<Event, List<IEventListener>> eventMap = new HashMap<Event, List<IEventListener>>();
+	Map<BroadcastEvent, List<IEventListener>> eventMap = new HashMap<BroadcastEvent, List<IEventListener>>();
 
 
 	/*
@@ -25,12 +25,12 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 * org.ambientlight.process.trigger.EventTriggerConfiguration)
 	 */
 	@Override
-	public void register(final IEventListener eventListener, final Event triggerConfig) {
+	public void register(final IEventListener eventListener, final BroadcastEvent triggerConfig) {
 		System.out.println("EventManager: registering event: " + triggerConfig.toString());
-		if (triggerConfig instanceof AlarmEvent) {
-			AlarmEvent alarmConfig = (AlarmEvent) triggerConfig;
-			((AlarmGenerator) AmbientControlMW.getRoom().eventGenerators.get(alarmConfig.sourceName))
-			.createAlarm((AlarmEvent) triggerConfig);
+		if (triggerConfig instanceof DailyAlarmEvent) {
+			DailyAlarmEvent alarmConfig = (DailyAlarmEvent) triggerConfig;
+			((AlarmGenerator) AmbientControlMW.getRoom().eventGenerators.get(alarmConfig.sourceId))
+			.createAlarm((DailyAlarmEvent) triggerConfig);
 		}
 
 		List<IEventListener> eventListenerList = eventMap.get(triggerConfig);
@@ -46,7 +46,7 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 * @param process
 	 * @param event
 	 */
-	public void unregister(IEventListener process, Event event) {
+	public void unregister(IEventListener process, BroadcastEvent event) {
 		this.eventMap.get(event).remove(process);
 		if (this.eventMap.get(event).isEmpty()) {
 			this.eventMap.remove(event);
@@ -63,7 +63,7 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	 * .process.trigger.EventTriggerConfiguration, java.lang.String)
 	 */
 	@Override
-	public void onEvent(Event event) {
+	public void onEvent(BroadcastEvent event) {
 
 		List<IEventListener> eventListeners = this.eventMap.get(event);
 		if (eventListeners != null) {

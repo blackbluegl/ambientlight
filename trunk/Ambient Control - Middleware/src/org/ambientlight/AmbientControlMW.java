@@ -6,8 +6,8 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.actors.ActorConfiguration;
-import org.ambientlight.config.room.actors.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.led.ActorConfiguration;
+import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.rendering.RenderControl;

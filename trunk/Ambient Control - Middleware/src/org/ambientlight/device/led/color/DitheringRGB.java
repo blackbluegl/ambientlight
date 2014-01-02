@@ -28,7 +28,6 @@ import org.ambientlight.config.device.led.ColorConfiguration;
  */
 public class DitheringRGB {
 
-
 	public List<Color> getDitheredRGB(List<Color64Bit> input) {
 		if (input == null)
 			return new ArrayList<Color>();
@@ -38,7 +37,7 @@ public class DitheringRGB {
 
 	private List<Color> ditherAndDownSample(List<Color64Bit> input) {
 
-		if(input ==null||input.isEmpty())
+		if (input == null || input.isEmpty())
 			return new ArrayList<Color>();
 
 		List<Color> result = new ArrayList<Color>();
@@ -48,10 +47,10 @@ public class DitheringRGB {
 		if (fillCount > 0) {
 			fillCount = 6 - fillCount;
 		}
-		ColorConfiguration config =new ColorConfiguration();
-		config.gammaRed=input.get(0).gammaRed;
-		config.gammaGreen=input.get(0).gammaGreen;
-		config.gammaBlue=input.get(0).gammaBlue;
+		ColorConfiguration config = new ColorConfiguration();
+		config.gammaRed = input.get(0).gammaRed;
+		config.gammaGreen = input.get(0).gammaGreen;
+		config.gammaBlue = input.get(0).gammaBlue;
 		config.levelRed = input.get(0).levelRed;
 		config.levelGreen = input.get(0).levelGreen;
 		config.levelBlue = input.get(0).levelBlue;
@@ -123,7 +122,13 @@ public class DitheringRGB {
 
 	private void addError(List<Integer> result, int[] patternErrorDifuse1) {
 		for (int i = 0; i < result.size(); i++) {
-			result.set(i, result.get(i) + patternErrorDifuse1[i]);
+			int resultWithError = result.get(i) + patternErrorDifuse1[i];
+			if (resultWithError < 0) {
+				resultWithError = 0;
+			} else if (resultWithError > 255) {
+				resultWithError = 255;
+			}
+			result.set(i, resultWithError);
 		}
 	}
 }

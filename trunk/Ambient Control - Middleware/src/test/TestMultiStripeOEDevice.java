@@ -13,16 +13,16 @@ import org.ambientlight.device.led.Stripe;
 
 public class TestMultiStripeOEDevice {
 
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		MultistripeOverEthernetClientDeviceDriver device = new MultistripeOverEthernetClientDeviceDriver();
 		MultiStripeOverEthernetClientDeviceConfiguration config = new MultiStripeOverEthernetClientDeviceConfiguration();
 		config.hostName = "ambi-schlafen";
 		// config.hostName = "localhost";
-		config.port = 30000;
+		config.port = 2002;
 		device.setConfiguration(config);
 
 		float value = 1.0f;
-		float gamma = 1.0f;
+		float gamma = 2.20f;
 		ColorConfiguration cConfig = new ColorConfiguration();
 		cConfig.gammaRed = gamma;
 		cConfig.gammaGreen = gamma;
@@ -33,44 +33,40 @@ public class TestMultiStripeOEDevice {
 
 		StripeConfiguration sc = new StripeConfiguration();
 		sc.colorConfiguration = cConfig;
-		sc.pixelAmount = 162;
+		sc.pixelAmount = 52 * 3;
 		sc.port = 0;
-		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
 
 		Stripe myStripe = new Stripe(sc);
 		device.attachStripe(myStripe);
 
 		device.connect();
-		for (int z = 0; z < 10000; z++) {
-			for (int i = 0; i < 25500; i++) {
 
-				int color = i / 100;
+		while (true) {
+			for (int i = 1; i < 256; i++) {
+				int color = i;
+				Color c2 = new Color((int) (color * 1.0f), (int) (color * 0.65f), (int) (color * 0.2f));
 
-				Color c2 = new Color(color, color, color);
-				boolean darker = false;
 				for (int g = 0; g < sc.pixelAmount; g++) {
-
-					Color c1 = new Color(color + 1, color + 1, color + 01);
-					if (darker) {
-						myStripe.setPixel(g, c1.getRGB());
-						darker = false;
-					} else {
-						myStripe.setPixel(g, c2.getRGB());
-						darker = true;
-					}
-
+					myStripe.setPixel(g, c2.getRGB());
 				}
 				device.writeData();
-				System.out.println("sent data");
+				System.out.println(i);
+				Thread.sleep(40);
 			}
-			try {
-				Thread.currentThread().sleep(39);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+			for (int i = 0; i < sc.pixelAmount; i++) {
+				Color black = Color.BLACK;
+				Color white = Color.WHITE;
+				for (int y = 0; y < sc.pixelAmount; y++) {
+					myStripe.setPixel(i, y == i ? white.getRGB() : black.getRGB());
+				}
+				device.writeData();
+				System.out.println(i);
+				Thread.sleep(40);
 			}
 		}
-		device.closeConnection();
 
+		// device.closeConnection();
 	}
 }
