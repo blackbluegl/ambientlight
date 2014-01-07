@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
-import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponent;
+import org.ambientlight.config.room.entities.climate.Thermostat;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -31,7 +31,6 @@ import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.climate.devices.Thermostat;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -63,28 +62,25 @@ public class AddThermostateHandler implements MessageActionHandler {
 				.getRoom().config.climateManager.vCubeAdress));
 
 		// create device in ambientcontrol
-		ThermostatConfiguration config = new ThermostatConfiguration();
 		Thermostat device = new Thermostat();
-		device.config = config;
 
 		// it is the sensor value we can read. but we need something to
 		// start
-		device.temperatur = AmbientControlMW.getRoom().config.climateManager.setTemp;
+		device.setTemperature(AmbientControlMW.getRoom().config.climateManager.setTemp);
 
-		config.offset = AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET;
-		config.label = "Thermostat";
-		config.adress = pairMessage.getFromAdress();
-		config.batteryLow = false;
-		config.firmware = pairMessage.getFirmware();
-		config.invalidArgument = false;
-		config.lastUpdate = new Date();
-		config.rfError = false;
-		config.serial = pairMessage.getSerial();
-		config.timedOut = false;
+		device.offset = AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET;
+		device.label = "Thermostat";
+		device.adress = pairMessage.getFromAdress();
+		device.batteryLow = false;
+		device.firmware = pairMessage.getFirmware();
+		device.invalidArgument = false;
+		device.lastUpdate = new Date();
+		device.rfError = false;
+		device.serial = pairMessage.getSerial();
+		device.timedOut = false;
 
 		// add device to ambientcontrol
-		AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
-		AmbientControlMW.getRoom().config.climateManager.devices.put(config.adress, config);
+		AmbientControlMW.getRoom().config.climateManager.devices.put(device.adress, device);
 
 		// setup Time;
 		outMessages.add(MaxMessageCreator.getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
@@ -109,19 +105,19 @@ public class AddThermostateHandler implements MessageActionHandler {
 		}
 
 		// link to proxyShutterContact
-		MaxAddLinkPartnerMessage linkToShutterContact = MaxMessageCreator.getLinkMessage(config.adress,
+		MaxAddLinkPartnerMessage linkToShutterContact = MaxMessageCreator.getLinkMessage(device.adress,
 				AmbientControlMW.getRoom().config.climateManager.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 		outMessages.add(linkToShutterContact);
 
 		// link devices to other thermostates
-		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climateManager.devices.values()) {
+		for (MaxComponent currentConfig : AmbientControlMW.getRoom().config.climateManager.devices.values()) {
 
 			// do not link with ourself
 			if (currentConfig.adress == pairMessage.getFromAdress()) {
 				continue;
 			}
 
-			if (currentConfig instanceof ThermostatConfiguration) {
+			if (currentConfig instanceof Thermostat) {
 				// link current to new
 				MaxAddLinkPartnerMessage linkCurrentToNew = MaxMessageCreator.getLinkMessage(currentConfig.adress,
 						pairMessage.getFromAdress(), pairMessage.getDeviceType());

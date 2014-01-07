@@ -27,9 +27,9 @@ import java.util.TimerTask;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
-import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
-import org.ambientlight.config.room.entities.climate.ShutterContactConfiguration;
-import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponent;
+import org.ambientlight.config.room.entities.climate.ShutterContact;
+import org.ambientlight.config.room.entities.climate.Thermostat;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
@@ -50,9 +50,6 @@ import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 import org.ambientlight.messages.max.MaxWakeUpMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.climate.devices.MaxComponent;
-import org.ambientlight.room.entities.climate.devices.ShutterContact;
-import org.ambientlight.room.entities.climate.devices.Thermostat;
 import org.ambientlight.room.entities.climate.handlers.AddShutterContactHandler;
 import org.ambientlight.room.entities.climate.handlers.AddThermostateHandler;
 import org.ambientlight.room.entities.climate.handlers.MessageActionHandler;
@@ -147,7 +144,8 @@ public class ClimateManager implements MessageListener {
 				System.out.println("ClimateManager - onResponse: called with response: " + response);
 			}
 
-			MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(((MaxMessage) request).getToAdress());
+			MaxComponent device = config.devices.get(((MaxMessage) request).getToAdress());
+
 			if (device == null) {
 				System.out.println("ClimateManager - onResponse: Device is unknown.");
 				return;
@@ -165,13 +163,13 @@ public class ClimateManager implements MessageListener {
 			RoomConfigurationFactory.beginTransaction();
 
 			if (state == State.TIMED_OUT) {
-				device.config.timedOut = true;
-				System.out.println("Climate Manager - onResponse(): Error! Timeout for Device: " + device.config.label);
+				device.timedOut = true;
+				System.out.println("Climate Manager - onResponse(): Error! Timeout for Device: " + device.label);
 
 			} else if (state == State.RETRIEVED_ANSWER && response instanceof MaxAckMessage
 					&& ((MaxAckMessage) response).getAckType() == MaxAckType.ACK_INVALID_MESSAGE) {
-				device.config.invalidArgument = true;
-				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.config.label
+				device.invalidArgument = true;
+				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.label
 						+ " reported invalid Arguments!");
 			} else {
 				System.out.println("Climate Manager - onResponse(): did not handle message");
@@ -243,7 +241,7 @@ public class ClimateManager implements MessageListener {
 	 * @param message
 	 */
 	private void handleGetTimeInfo(MaxTimeInformationMessage message) {
-		if (!message.isRequest() || AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress()) == null)
+		if (!message.isRequest() || config.devices.get(message.getFromAdress()) == null)
 			return;
 		System.out.println("ClimateManager - getTimeInfo: sending time to device: " + message.getFromAdress());
 		MaxTimeInformationMessage time = MaxMessageCreator.getTimeInfoForDevice(new Date(), message.getFromAdress());
@@ -258,7 +256,7 @@ public class ClimateManager implements MessageListener {
 	 *             public Map<String, Sensor> sensors;
 	 */
 	private void handleSetTemperature(MaxSetTemperatureMessage message) {
-		Thermostat thermostat = (Thermostat) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
+		Thermostat thermostat = (Thermostat) config.devices.get(message.getFromAdress());
 		if (thermostat == null) {
 			System.out.println("ClimateManager handleSetTemperature(): got request from unknown device: adress="
 					+ message.getFromAdress());
@@ -294,7 +292,7 @@ public class ClimateManager implements MessageListener {
 		else if (message.isReconnecting() && message.getToAdress().equals(config.vCubeAdress) == true) {
 
 			// device is known and will be refreshed
-			if (AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress()) != null) {
+			if (config.devices.get(message.getFromAdress()) != null) {
 				System.out.println("ClimateManager handlePairPing(): re-pairing device: " + message);
 
 				MaxPairPongMessage pairPong = new MaxPairPongMessage();
@@ -336,8 +334,7 @@ public class ClimateManager implements MessageListener {
 	 * @throws IOException
 	 */
 	private void handleShutterState(MaxShutterContactStateMessage message) {
-		ShutterContact shutterContact = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents()
-				.get(message.getFromAdress());
+		ShutterContact shutterContact = (ShutterContact) config.devices.get(message.getFromAdress());
 		if (shutterContact == null || message.getToAdress() != this.config.vCubeAdress) {
 			System.out.println("ClimateManager handleShutterState(): got request from unknown device: adress="
 					+ message.getFromAdress());
@@ -346,11 +343,11 @@ public class ClimateManager implements MessageListener {
 
 		RoomConfigurationFactory.beginTransaction();
 
-		ShutterContact shutter = (ShutterContact) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
-		shutter.config.batteryLow = message.isBatteryLow();
-		((ShutterContactConfiguration) shutter.config).isOpen = message.isOpen();
-		shutter.config.rfError = message.hadRfError();
-		shutter.config.lastUpdate = new Date(System.currentTimeMillis());
+		ShutterContact shutter = (ShutterContact) config.devices.get(message.getFromAdress());
+		shutter.batteryLow = message.isBatteryLow();
+		shutter.isOpen = message.isOpen();
+		shutter.rfError = message.hadRfError();
+		shutter.lastUpdate = new Date(System.currentTimeMillis());
 
 		RoomConfigurationFactory.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
@@ -367,7 +364,7 @@ public class ClimateManager implements MessageListener {
 	 */
 	private void handleThermostatState(MaxThermostatStateMessage message) {
 
-		Thermostat thermostat = (Thermostat) AmbientControlMW.getRoom().getMaxComponents().get(message.getFromAdress());
+		Thermostat thermostat = (Thermostat) config.devices.get(message.getFromAdress());
 		if (thermostat == null) {
 			System.out.println("ClimateManager handleThermostatState(): got request from unknown device: adress="
 					+ message.getFromAdress());
@@ -376,11 +373,11 @@ public class ClimateManager implements MessageListener {
 
 		RoomConfigurationFactory.beginTransaction();
 
-		thermostat.config.batteryLow = message.isBatteryLow();
+		thermostat.batteryLow = message.isBatteryLow();
 		thermostat.isLocked = message.isLocked();
-		thermostat.config.lastUpdate = new Date(System.currentTimeMillis());
+		thermostat.lastUpdate = new Date(System.currentTimeMillis());
 
-		thermostat.temperatur = message.getActualTemp();
+		thermostat.setTemperature(message.getActualTemp());
 
 		config.mode = message.getMode();
 		config.temporaryUntilDate = message.getTemporaryUntil();
@@ -393,7 +390,7 @@ public class ClimateManager implements MessageListener {
 
 	public void setFactoryResetDevice(int adress) throws IOException {
 
-		MaxComponent device = AmbientControlMW.getRoom().getMaxComponents().get(adress);
+		MaxComponent device = config.devices.get(adress);
 		if (device == null) {
 			System.out.println("ClimateManager setFactoryResetDevice(): got request for unknown device: adress=" + adress);
 			return;
@@ -422,15 +419,15 @@ public class ClimateManager implements MessageListener {
 
 		List<Message> messages = new ArrayList<Message>();
 
-		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
+		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
 				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
 				wakeup.setFromAdress(config.vCubeAdress);
-				wakeup.setToAdress(current.config.adress);
+				wakeup.setToAdress(current.adress);
 				wakeup.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
 				messages.add(wakeup);
 
-				messages.addAll(MaxMessageCreator.getWeekProfileForDevice(current.config.adress, profile));
+				messages.addAll(MaxMessageCreator.getWeekProfileForDevice(current.adress, profile));
 			}
 		}
 
@@ -457,9 +454,9 @@ public class ClimateManager implements MessageListener {
 
 		List<Message> messages = new ArrayList<Message>();
 
-		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
+		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = MaxMessageCreator.getSetTempForDevice(current.config.adress);
+				MaxSetTemperatureMessage outMessage = MaxMessageCreator.getSetTempForDevice(current.adress);
 				messages.add(outMessage);
 			}
 		}
@@ -514,9 +511,9 @@ public class ClimateManager implements MessageListener {
 	}
 
 
-	protected void sendWindowStateToThermostates(boolean open) {
-		for (MaxComponentConfiguration current : this.config.devices.values()) {
-			if (current instanceof ThermostatConfiguration == false) {
+	public void sendWindowStateToThermostates(boolean open) {
+		for (MaxComponent current : this.config.devices.values()) {
+			if (current instanceof Thermostat == false) {
 				continue;
 			}
 			MaxShutterContactStateMessage sendMessage = new MaxShutterContactStateMessage();
@@ -532,7 +529,7 @@ public class ClimateManager implements MessageListener {
 
 	private void sendRegisterCorrelators() {
 		List<Message> correlators = new ArrayList<Message>();
-		for (MaxComponentConfiguration currentDeviceConfig : config.devices.values()) {
+		for (MaxComponent currentDeviceConfig : config.devices.values()) {
 			correlators
 			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
 		}
@@ -545,9 +542,9 @@ public class ClimateManager implements MessageListener {
 		Date now = new Date();
 		List<Message> messages = new ArrayList<Message>();
 
-		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
+		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxTimeInformationMessage message = MaxMessageCreator.getTimeInfoForDevice(now, current.config.adress);
+				MaxTimeInformationMessage message = MaxMessageCreator.getTimeInfoForDevice(now, current.adress);
 				messages.add(message);
 			}
 		}
@@ -575,9 +572,9 @@ public class ClimateManager implements MessageListener {
 	}
 
 
-	protected boolean isAWindowOpen() {
-		for (MaxComponent current : AmbientControlMW.getRoom().getMaxComponents().values()) {
-			if (current instanceof ShutterContact && ((ShutterContactConfiguration) (current.config)).isOpen)
+	public boolean isAWindowOpen() {
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof ShutterContact && ((ShutterContact) (current)).isOpen)
 				return true;
 		}
 		return false;

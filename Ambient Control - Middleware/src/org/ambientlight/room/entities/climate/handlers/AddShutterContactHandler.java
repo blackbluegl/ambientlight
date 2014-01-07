@@ -20,9 +20,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
-import org.ambientlight.config.room.entities.climate.ShutterContactConfiguration;
-import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponent;
+import org.ambientlight.config.room.entities.climate.ShutterContact;
+import org.ambientlight.config.room.entities.climate.Thermostat;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -32,7 +32,6 @@ import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.climate.devices.ShutterContact;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -65,30 +64,26 @@ public class AddShutterContactHandler implements MessageActionHandler {
 				.getRoom().config.climateManager.vCubeAdress));
 
 		// create device
-		ShutterContactConfiguration config = new ShutterContactConfiguration();
 		ShutterContact device = new ShutterContact();
-		device.config = config;
 
 		device.isOpen = false;
+		device.label = "Fensterkontakt";
+		device.adress = pairMessage.getFromAdress();
+		device.batteryLow = false;
+		device.firmware = pairMessage.getFirmware();
+		device.invalidArgument = false;
+		device.lastUpdate = new Date();
+		device.rfError = false;
+		device.serial = pairMessage.getSerial();
+		device.timedOut = false;
 
-		config.label = "Fensterkontakt";
-		config.adress = pairMessage.getFromAdress();
-		config.batteryLow = false;
-		config.firmware = pairMessage.getFirmware();
-		config.invalidArgument = false;
-		config.lastUpdate = new Date();
-		config.rfError = false;
-		config.serial = pairMessage.getSerial();
-		config.timedOut = false;
-
-		AmbientControlMW.getRoom().getMaxComponents().put(config.adress, device);
-		AmbientControlMW.getRoom().config.climateManager.devices.put(config.adress, config);
+		AmbientControlMW.getRoom().config.climateManager.devices.put(device.adress, device);
 
 		// link devices
-		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().config.climateManager.devices.values()) {
+		for (MaxComponent currentConfig : AmbientControlMW.getRoom().config.climateManager.devices.values()) {
 
 			// do link only with thermostates
-			if (currentConfig instanceof ThermostatConfiguration == false) {
+			if (currentConfig instanceof Thermostat == false) {
 				continue;
 			}
 

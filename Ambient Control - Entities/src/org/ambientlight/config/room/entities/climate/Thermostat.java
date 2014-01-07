@@ -25,9 +25,10 @@ import org.ambientlight.messages.max.DeviceType;
  * @author Florian Bornkessel
  */
 
-public class ThermostatConfiguration extends MaxComponentConfiguration implements TemperatureSensor {
+public class Thermostat extends MaxComponent implements TemperatureSensor {
 
 	public float offset;
+	public boolean isLocked;
 	private float temperature;
 
 

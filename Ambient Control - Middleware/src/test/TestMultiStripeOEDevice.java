@@ -16,7 +16,7 @@ public class TestMultiStripeOEDevice {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		MultistripeOverEthernetClientDeviceDriver device = new MultistripeOverEthernetClientDeviceDriver();
 		MultiStripeOverEthernetClientDeviceConfiguration config = new MultiStripeOverEthernetClientDeviceConfiguration();
-		config.hostName = "ambi-schlafen";
+		config.hostName = "led-bridge-schlafen";
 		// config.hostName = "localhost";
 		config.port = 2002;
 		device.setConfiguration(config);
@@ -34,8 +34,8 @@ public class TestMultiStripeOEDevice {
 		StripeConfiguration sc = new StripeConfiguration();
 		sc.colorConfiguration = cConfig;
 		sc.pixelAmount = 52 * 3;
-		sc.port = 0;
-		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
+		sc.port = 1;
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
 
 		Stripe myStripe = new Stripe(sc);
 		device.attachStripe(myStripe);

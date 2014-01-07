@@ -16,8 +16,8 @@
 package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
-import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
+import org.ambientlight.config.room.entities.climate.MaxComponent;
+import org.ambientlight.config.room.entities.climate.Thermostat;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -26,7 +26,6 @@ import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.climate.devices.Thermostat;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -41,35 +40,33 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 
 	public RemoveThermostatHandler(Thermostat device) {
 
-		ThermostatConfiguration config = (ThermostatConfiguration) device.config;
 
 		RoomConfigurationFactory.beginTransaction();
 
 		// unregister link from other thermostates
-		for (MaxComponentConfiguration currentConfig : AmbientControlMW.getRoom().climateManager.config.devices.values()) {
+		for (MaxComponent currentDevice : AmbientControlMW.getRoom().climateManager.config.devices.values()) {
 
 			// only other thermostates
-			if (currentConfig.adress == config.adress || currentConfig instanceof ThermostatConfiguration == false) {
+			if (currentDevice.adress == device.adress || currentDevice instanceof Thermostat == false) {
 				continue;
 			}
 
-			MaxRemoveLinkPartnerMessage unlink = MaxMessageCreator.getUnlinkMessageForDevice(currentConfig.adress, config.adress,
-					config.getDeviceType());
+			MaxRemoveLinkPartnerMessage unlink = MaxMessageCreator.getUnlinkMessageForDevice(currentDevice.adress, device.adress,
+					device.getDeviceType());
 			AmbientControlMW.getRoom().qeueManager.putOutMessage(unlink);
 		}
 
 		// send remove
-		MaxFactoryResetMessage resetDevice = MaxMessageCreator.getFactoryResetMessageForDevice(device.config.adress);
+		MaxFactoryResetMessage resetDevice = MaxMessageCreator.getFactoryResetMessageForDevice(device.adress);
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(resetDevice);
 
 		// remove correlator - rfm bridge does route its messages to all clients
-		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, config.adress,
+		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, device.adress,
 				AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
-		AmbientControlMW.getRoom().getMaxComponents().remove(config.adress);
-		AmbientControlMW.getRoom().climateManager.config.devices.remove(config.adress);
+		AmbientControlMW.getRoom().climateManager.config.devices.remove(device.adress);
 
 		RoomConfigurationFactory.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();

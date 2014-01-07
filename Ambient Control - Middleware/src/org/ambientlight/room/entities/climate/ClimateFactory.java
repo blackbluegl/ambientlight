@@ -21,17 +21,12 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.climate.MaxComponentConfiguration;
-import org.ambientlight.config.room.entities.climate.ShutterContactConfiguration;
-import org.ambientlight.config.room.entities.climate.ThermostatConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.Room;
-import org.ambientlight.room.entities.climate.devices.MaxComponent;
-import org.ambientlight.room.entities.climate.devices.ShutterContact;
-import org.ambientlight.room.entities.climate.devices.Thermostat;
+
 
 
 /**
@@ -60,27 +55,10 @@ public class ClimateFactory {
 				room.config.climateManager.weekProfiles.remove(currentWeekProfileToRemove);
 			}
 
-			room.setMaxComponents(new HashMap<Integer, MaxComponent>());
 			room.climateManager = new ClimateManager();
 			room.climateManager.config = room.config.climateManager;
 			room.climateManager.queueManager = queueManager;
 			room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
-
-			for (MaxComponentConfiguration component : room.config.climateManager.devices.values()) {
-				if (component instanceof ThermostatConfiguration) {
-					Thermostat currentDevice = new Thermostat();
-					currentDevice.config = (ThermostatConfiguration) component;
-					room.getMaxComponents().put(currentDevice.config.adress, currentDevice);
-					System.out.println("ClimateFactory initClimateManager(): added Thermostat: " + currentDevice.config.label);
-				}
-				if (component instanceof ShutterContactConfiguration) {
-					ShutterContact currentDevice = new ShutterContact();
-					currentDevice.config = (ShutterContactConfiguration) component;
-					room.getMaxComponents().put(currentDevice.config.adress, currentDevice);
-					System.out
-					.println("ClimateFactory initClimateManager(): added ShutterContact: " + currentDevice.config.label);
-				}
-			}
 
 			System.out.println("ClimateFactory initClimateManager(): initialized ClimateManager");
 		}
