@@ -16,6 +16,7 @@
 package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.room.entities.climate.ShutterContact;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -25,7 +26,6 @@ import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.max.WaitForShutterContactCondition;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.climate.devices.ShutterContact;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -60,9 +60,9 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		}
 
 		// Wait until shutterContact comes alive and remove it
-		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.config.adress,
+		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.adress,
 				AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
-		MaxFactoryResetMessage resetDevice = MaxMessageCreator.getFactoryResetMessageForDevice(device.config.adress);
+		MaxFactoryResetMessage resetDevice = MaxMessageCreator.getFactoryResetMessageForDevice(device.adress);
 		this.sequenceNumberForDeletedDevice = resetDevice.getSequenceNumber();
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(resetDevice, condition);
 
@@ -80,13 +80,13 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		// remove correlator
 		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
-				device.config.adress, AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
+ device.adress,
+				AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
 		RoomConfigurationFactory.beginTransaction();
-		AmbientControlMW.getRoom().getMaxComponents().remove(device.config.adress);
-		AmbientControlMW.getRoom().config.climateManager.devices.remove(device.config.adress);
+		AmbientControlMW.getRoom().config.climateManager.devices.remove(device.adress);
 		RoomConfigurationFactory.commitTransaction();
 
 		this.actionState = ActionState.FINISHED;
@@ -112,7 +112,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		// catch all window shutter messages until it was reset - the climate
 		// manager shall not handle any message during removal
-		if (((MaxMessage) message).getFromAdress().equals(this.device.config.adress) && this.actionState != ActionState.FINISHED)
+		if (((MaxMessage) message).getFromAdress().equals(this.device.adress) && this.actionState != ActionState.FINISHED)
 			return true;
 
 		return false;

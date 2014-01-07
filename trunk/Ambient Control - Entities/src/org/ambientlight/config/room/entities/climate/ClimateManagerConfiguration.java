@@ -58,5 +58,5 @@ public class ClimateManagerConfiguration {
 	public MaxDayInWeek decalcDay = MaxDayInWeek.SATURDAY;
 
 	public Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
-	public Map<Integer, MaxComponentConfiguration> devices = new HashMap<Integer, MaxComponentConfiguration>();
+	public Map<Integer, MaxComponent> devices = new HashMap<Integer, MaxComponent>();
 }

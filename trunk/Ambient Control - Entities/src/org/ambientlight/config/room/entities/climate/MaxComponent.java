@@ -15,28 +15,27 @@
 
 package org.ambientlight.config.room.entities.climate;
 
+import java.util.Date;
+
 import org.ambientlight.messages.max.DeviceType;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class ShutterContactConfiguration extends MaxComponentConfiguration {
+public abstract class MaxComponent {
 
-	public boolean isOpen = false;
+	public abstract DeviceType getDeviceType();
 
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType
-	 * ()
-	 */
-	@Override
-	public DeviceType getDeviceType() {
-		return DeviceType.SHUTTER_CONTACT;
-	}
+	public String label;
+	public int adress;
+	public String firmware;
+	public String serial;
+	public Date lastUpdate;
+	public boolean rfError = false;
+	public boolean timedOut = false;
+	public boolean invalidArgument = false;
+	public boolean batteryLow = false;
 
 }
