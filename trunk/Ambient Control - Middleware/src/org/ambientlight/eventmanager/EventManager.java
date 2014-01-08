@@ -8,7 +8,7 @@ import java.util.Map;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.events.BroadcastEvent;
 import org.ambientlight.config.events.DailyAlarmEvent;
-import org.ambientlight.room.entities.AlarmGenerator;
+import org.ambientlight.room.entities.alarm.AlarmManager;
 
 
 public class EventManager {
@@ -21,7 +21,7 @@ public class EventManager {
 		System.out.println("EventManager: registering event: " + triggerConfig.toString());
 		if (triggerConfig instanceof DailyAlarmEvent) {
 			DailyAlarmEvent alarmConfig = (DailyAlarmEvent) triggerConfig;
-			((AlarmGenerator) AmbientControlMW.getRoom().eventGenerators.get(alarmConfig.sourceId))
+			((AlarmManager) AmbientControlMW.getRoom().eventGenerators.get(alarmConfig.sourceId))
 			.createAlarm((DailyAlarmEvent) triggerConfig);
 		}
 

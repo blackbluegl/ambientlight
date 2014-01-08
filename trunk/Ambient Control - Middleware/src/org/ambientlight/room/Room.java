@@ -3,7 +3,6 @@ package org.ambientlight.room;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -17,7 +16,6 @@ import org.ambientlight.device.led.Stripe;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.entities.Process;
-import org.ambientlight.room.entities.EventGenerator;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.switches.SwitchManager;
@@ -39,9 +37,6 @@ public class Room {
 	public CallBackManager callBackMananger;
 
 	public EventManager eventManager;
-
-
-	public Map<String, EventGenerator> eventGenerators;
 
 	private List<DeviceDriver> devices;
 

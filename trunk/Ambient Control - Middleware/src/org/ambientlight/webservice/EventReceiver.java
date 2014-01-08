@@ -27,7 +27,7 @@ import org.ambientlight.config.events.BroadcastEvent;
 import org.ambientlight.config.events.SceneryEntryEvent;
 import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.room.entities.EventGenerator;
-import org.ambientlight.room.entities.SceneryEventGenerator;
+import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
@@ -45,7 +45,7 @@ public class EventReceiver {
 	public Response handleEvent(BroadcastEvent event) {
 		EventGenerator eventGen = (AmbientControlMW.getRoom().eventGenerators.get(event.sourceId));
 		if (event instanceof SceneryEntryEvent) {
-			((SceneryEventGenerator) eventGen).sceneryEntryEventOccured((SceneryEntryEvent) event);
+			((SceneryManager) eventGen).setCurrentScenery((SceneryEntryEvent) event);
 		}
 
 		if (event instanceof SwitchEvent) {

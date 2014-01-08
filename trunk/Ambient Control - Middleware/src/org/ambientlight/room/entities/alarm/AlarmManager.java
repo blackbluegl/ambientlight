@@ -13,30 +13,44 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities;
+package org.ambientlight.room.entities.alarm;
 
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.config.events.DailyAlarmEvent;
+import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
+import org.ambientlight.config.room.entities.alarm.DailyAlarm;
+import org.ambientlight.eventmanager.EventManager;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class AlarmGenerator extends EventGenerator {
+public class AlarmManager {
+
+	public AlarmManagerConfiguration config;
+
+	public EventManager eventManager;
+
 
 	/**
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	public void createAlarm(final DailyAlarmEvent triggerConfig) {
+	public void createAlarm(final DailyAlarm alarm) {
+
+		transaction einfügen
+
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
+
+				DailyAlarmEvent alarmEvent = new DailyAlarmEvent(alarm.hour, alarm.minute, sourceName)
+
 				eventManager.onEvent(triggerConfig);
 			}
 		};
