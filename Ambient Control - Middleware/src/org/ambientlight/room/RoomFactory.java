@@ -13,8 +13,8 @@ import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.lightobject.ActorConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
@@ -26,9 +26,9 @@ import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessFactory;
 import org.ambientlight.room.entities.AlarmGenerator;
 import org.ambientlight.room.entities.EventGenerator;
-import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.SceneryEventGenerator;
 import org.ambientlight.room.entities.climate.ClimateFactory;
+import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
@@ -78,7 +78,7 @@ public class RoomFactory {
 
 		// initialize the lightObjects
 		List<LightObject> lightObjects = new ArrayList<LightObject>();
-		for (ActorConfiguration currentItemConfiguration : roomConfig.actorConfigurations.values()) {
+		for (ActorConfiguration currentItemConfiguration : roomConfig.lightObjectConfigurations.values()) {
 			if (currentItemConfiguration instanceof LightObjectConfiguration) {
 				lightObjects.add(this.initializeLightObject((LightObjectConfiguration) currentItemConfiguration,
 						room.getAllStripePartsInRoom()));

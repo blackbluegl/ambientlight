@@ -28,11 +28,11 @@ import org.ambientlight.config.process.handler.expression.DecisionHandlerConfigu
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.led.switching.SwitchingConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
@@ -174,13 +174,13 @@ public class CreateTestConfig {
 
 		dc.configuredStripes.add(sc);
 
-		RemoteSwitchConfiguration sw1 = new RemoteSwitchConfiguration();
+		RemoteSwitch sw1 = new RemoteSwitch();
 		sw1.deviceType = "ELRO";
 		sw1.houseCode = 15;
 		sw1.switchingUnitCode = 3;
 		sw1.setName("kleine Stehlampe");
 		sw1.actorConductConfiguration = new SwitchingConfiguration();
-		rc.actorConfigurations.put(sw1.getName(), sw1);
+		rc.lightObjectConfigurations.put(sw1.getName(), sw1);
 
 		LightObjectConfiguration lo = new LightObjectConfiguration();
 		lo.setName("Schrank");
@@ -190,7 +190,7 @@ public class CreateTestConfig {
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.actorConductConfiguration = this.createSimpleColor();
-		rc.actorConfigurations.put(lo.getName(), lo);
+		rc.lightObjectConfigurations.put(lo.getName(), lo);
 
 		LightObjectConfiguration background = new LightObjectConfiguration();
 		background.setPowerState(true);
@@ -202,7 +202,7 @@ public class CreateTestConfig {
 		background.yOffsetInRoom = 0;
 		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
 		background.actorConductConfiguration = sunset;
-		rc.actorConfigurations.put(background.getName(), background);
+		rc.lightObjectConfigurations.put(background.getName(), background);
 
 		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
 		triggerMainSwitch.name = "RoomSwitch";

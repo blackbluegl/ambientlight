@@ -33,9 +33,9 @@ public class TestMultiStripeOEDevice {
 
 		StripeConfiguration sc = new StripeConfiguration();
 		sc.colorConfiguration = cConfig;
-		sc.pixelAmount = 52 * 3;
+		sc.pixelAmount = 22;
 		sc.port = 1;
-		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
 
 		Stripe myStripe = new Stripe(sc);
 		device.attachStripe(myStripe);
@@ -45,7 +45,7 @@ public class TestMultiStripeOEDevice {
 		while (true) {
 			for (int i = 1; i < 256; i++) {
 				int color = i;
-				Color c2 = new Color((int) (color * 1.0f), (int) (color * 0.65f), (int) (color * 0.2f));
+				Color c2 = new Color((int) (color * 1.0f), (int) (color * 1.0f), (int) (color * 1.0f));
 
 				for (int g = 0; g < sc.pixelAmount; g++) {
 					myStripe.setPixel(g, c2.getRGB());
@@ -55,16 +55,16 @@ public class TestMultiStripeOEDevice {
 				Thread.sleep(40);
 			}
 
-			for (int i = 0; i < sc.pixelAmount; i++) {
-				Color black = Color.BLACK;
-				Color white = Color.WHITE;
-				for (int y = 0; y < sc.pixelAmount; y++) {
-					myStripe.setPixel(i, y == i ? white.getRGB() : black.getRGB());
-				}
-				device.writeData();
-				System.out.println(i);
-				Thread.sleep(40);
-			}
+			// for (int i = 0; i < sc.pixelAmount; i++) {
+			// Color black = Color.BLACK;
+			// Color white = Color.WHITE;
+			// for (int y = 0; y < sc.pixelAmount; y++) {
+			// myStripe.setPixel(i, y == i ? white.getRGB() : black.getRGB());
+			// }
+			// device.writeData();
+			// System.out.println(i);
+			// Thread.sleep(40);
+			// }
 		}
 
 		// device.closeConnection();

@@ -18,10 +18,8 @@ import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.entities.Process;
 import org.ambientlight.room.entities.EventGenerator;
-import org.ambientlight.room.entities.EventSensor;
-import org.ambientlight.room.entities.LightObject;
 import org.ambientlight.room.entities.climate.ClimateManager;
-import org.ambientlight.room.entities.climate.devices.MaxComponent;
+import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
@@ -48,8 +46,6 @@ public class Room {
 	private List<DeviceDriver> devices;
 
 	private List<LightObject> lightObjects;
-
-	private Map<Integer, MaxComponent> maxComponents;
 
 	private BufferedImage roomBitMap;
 
@@ -144,21 +140,5 @@ public class Room {
 		}
 
 		return result;
-	}
-
-
-	public EventSensor getEventSensorById(String name) {
-		EventGenerator possibleGenerator = this.eventGenerators.get(name);
-		return (possibleGenerator instanceof EventSensor ? (EventSensor) possibleGenerator : null);
-	}
-
-
-	public Map<Integer, MaxComponent> getMaxComponents() {
-		return maxComponents;
-	}
-
-
-	public void setMaxComponents(Map<Integer, MaxComponent> maxComponents) {
-		this.maxComponents = maxComponents;
 	}
 }
