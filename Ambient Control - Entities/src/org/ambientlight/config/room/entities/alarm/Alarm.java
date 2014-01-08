@@ -22,7 +22,7 @@ import org.ambientlight.config.features.actor.Switchable;
  * @author Florian Bornkessel
  * 
  */
-public abstract class AlarmConfiguration implements Switchable {
+public abstract class Alarm implements Switchable {
 
 	private String id;
 	private boolean active;
@@ -59,7 +59,6 @@ public abstract class AlarmConfiguration implements Switchable {
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return this.id;
 	}
 
@@ -71,7 +70,6 @@ public abstract class AlarmConfiguration implements Switchable {
 	 */
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
 		this.id = name;
 	}
 }

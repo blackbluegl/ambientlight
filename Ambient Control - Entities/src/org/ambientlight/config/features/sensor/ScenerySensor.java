@@ -13,16 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.alarm;
+package org.ambientlight.config.features.sensor;
+
+import org.ambientlight.config.room.entities.scenery.Scenery;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class DailyAlarmConfiguration extends AlarmConfiguration {
+public interface ScenerySensor extends Sensor {
 
-	public String id;
-	public int hour;
-	public int minute;
-
+	public Scenery getCurrentScenery();
 }

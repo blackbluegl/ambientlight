@@ -28,7 +28,7 @@ public class SceneryManagerConfiguration {
 
 	private static final long serialVersionUID = 1L;
 
-	public AbstractSceneryConfiguration currentScenery;
-	public Map<String, AbstractSceneryConfiguration> sceneries = new HashMap<String, AbstractSceneryConfiguration>();
+	public Scenery currentScenery;
+	public Map<String, Scenery> sceneries = new HashMap<String, Scenery>();
 
 }

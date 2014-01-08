@@ -34,7 +34,7 @@ import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSet
 import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
+import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.messages.max.DayEntry;
@@ -216,11 +216,11 @@ public class CreateTestConfig {
 		rc.width = 400;
 		rc.roomName = "testRoom";
 
-		UserSceneryConfiguration userScenario = new UserSceneryConfiguration();
+		Scenery userScenario = new Scenery();
 		userScenario.id = "scenario1";
 		sceneryEventGenerator.sceneries.add(userScenario);
 
-		UserSceneryConfiguration userScenario2 = new UserSceneryConfiguration();
+		Scenery userScenario2 = new Scenery();
 		userScenario2.id = "scenario2";
 		sceneryEventGenerator.sceneries.add(userScenario2);
 
@@ -295,7 +295,7 @@ public class CreateTestConfig {
 	}
 
 
-	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
+	private void createUserScenario(RoomConfiguration rc, Scenery userScenario,
 			List<LightObjectConfiguration> lo, List<Switchable> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();

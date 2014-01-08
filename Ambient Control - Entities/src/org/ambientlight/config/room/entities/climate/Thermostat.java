@@ -81,19 +81,7 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	 * @see org.ambientlight.config.features.Entity#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getSensorName() {
 		return this.label;
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
-	 */
-	@Override
-	public void setName(String name) {
-		this.label = name;
-	}
-
 }

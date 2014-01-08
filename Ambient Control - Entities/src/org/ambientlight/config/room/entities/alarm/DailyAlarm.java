@@ -13,17 +13,15 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities;
-
-import org.ambientlight.eventmanager.EventManager;
-
+package org.ambientlight.config.room.entities.alarm;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class EventGenerator {
+public class DailyAlarm extends Alarm {
 
-	public EventManager eventManager;
+	public int hour;
+	public int minute;
 
 }

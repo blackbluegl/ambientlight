@@ -15,16 +15,13 @@
 
 package org.ambientlight.config.features.sensor;
 
-import java.util.Date;
-
-import org.ambientlight.config.features.Entity;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface Sensor extends Entity {
+public interface Sensor {
 
-	public Date getMessureDate();
+	public String getSensorName();
 }

@@ -24,11 +24,11 @@ import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessFactory;
-import org.ambientlight.room.entities.AlarmGenerator;
 import org.ambientlight.room.entities.EventGenerator;
-import org.ambientlight.room.entities.SceneryEventGenerator;
+import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateFactory;
 import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
@@ -107,15 +107,15 @@ public class RoomFactory {
 		for (EventGeneratorConfiguration currentConfig : room.config.eventGeneratorConfigurations.values()) {
 			EventGenerator generator = null;
 			if (currentConfig instanceof AlarmManagerConfiguration) {
-				generator = new AlarmGenerator();
+				generator = new AlarmManager();
 				AlarmManagerConfiguration alarmConfig = (AlarmManagerConfiguration) currentConfig;
-				((AlarmGenerator) generator).createAlarm(new DailyAlarmEvent(alarmConfig.hour, alarmConfig.min, alarmConfig.name));
+				((AlarmManager) generator).createAlarm(new DailyAlarmEvent(alarmConfig.hour, alarmConfig.min, alarmConfig.name));
 			}
 			if (currentConfig instanceof SwitchManagerConfiguration) {
 				generator = new SwitchManager();
 			}
 			if (currentConfig instanceof SceneryManagerConfiguration) {
-				generator = new SceneryEventGenerator();
+				generator = new SceneryManager();
 			}
 			generator.config = currentConfig;
 			generator.eventManager = eventManager;

@@ -24,7 +24,7 @@ import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
+import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.room.RoomConfigurationFactory;
@@ -79,7 +79,7 @@ public class KuecheTestConfig {
 		rc.width = 40;
 		rc.roomName = "Kochen";
 
-		UserSceneryConfiguration userScenario = new UserSceneryConfiguration();
+		Scenery userScenario = new Scenery();
 		userScenario.id = "Kochen";
 		sceneryEventGenerator.sceneries.add(userScenario);
 
@@ -151,7 +151,7 @@ public class KuecheTestConfig {
 	}
 
 
-	private void createUserScenario(RoomConfiguration rc, UserSceneryConfiguration userScenario,
+	private void createUserScenario(RoomConfiguration rc, Scenery userScenario,
 			List<LightObjectConfiguration> lo, List<Switchable> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();

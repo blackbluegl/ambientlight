@@ -15,6 +15,9 @@
 
 package org.ambientlight.config.features.sensor;
 
+import java.util.Date;
+
+
 /**
  * @author Florian Bornkessel
  * 
@@ -22,4 +25,7 @@ package org.ambientlight.config.features.sensor;
 public interface TemperatureSensor extends Sensor {
 
 	public float getTemperature();
+
+
+	public Date getMessureDate();
 }
