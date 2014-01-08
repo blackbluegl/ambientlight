@@ -4,11 +4,11 @@ import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.process.entities.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.room.entities.LightObject;
+import org.ambientlight.room.entities.lightobject.LightObject;
 
 
 public class PowerStateHandler extends AbstractActionHandler {
@@ -38,14 +38,14 @@ public class PowerStateHandler extends AbstractActionHandler {
 	 */
 	public void switchPowerState(String currentActorName, boolean powerState, Switchable actorConfig) {
 		try {
-			if (actorConfig instanceof RemoteSwitchConfiguration) {
+			if (actorConfig instanceof RemoteSwitch) {
 				// update switch device
 				AmbientControlMW
 				.getRoom()
 				.getSwitchingDevice()
-				.writeData(((RemoteSwitchConfiguration) actorConfig).deviceType,
-						((RemoteSwitchConfiguration) actorConfig).houseCode,
-						((RemoteSwitchConfiguration) actorConfig).switchingUnitCode, powerState);
+				.writeData(((RemoteSwitch) actorConfig).deviceType,
+						((RemoteSwitch) actorConfig).houseCode,
+						((RemoteSwitch) actorConfig).switchingUnitCode, powerState);
 
 			} else if (actorConfig instanceof LightObjectConfiguration) {
 				// update renderer for light objects and update model

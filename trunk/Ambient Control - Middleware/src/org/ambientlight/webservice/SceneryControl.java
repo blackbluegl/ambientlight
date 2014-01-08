@@ -15,14 +15,14 @@ import javax.ws.rs.core.Response;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConductConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.config.room.entities.led.switching.SwitchingConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
+import org.ambientlight.config.room.entities.lightobject.ActorConductConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
-import org.ambientlight.room.entities.LightObject;
+import org.ambientlight.room.entities.lightobject.LightObject;
 
 
 //TODO should be better named: entitiy Control
@@ -45,7 +45,7 @@ public class SceneryControl {
 
 		System.out.println("SceneryControlWS:  setting config for " + itemName + " to " + itemConfiguration.getClass().getName());
 
-		if (AmbientControlMW.getRoom().config.actorConfigurations.containsKey(itemName) == false) {
+		if (AmbientControlMW.getRoom().config.lightObjectConfigurations.containsKey(itemName) == false) {
 			System.out.println("SceneryControlWS: item does not exist or is no actor: " + itemName);
 			return Response.status(500).build();
 		}
@@ -68,7 +68,7 @@ public class SceneryControl {
 		}
 
 		// update running model
-		AmbientControlMW.getRoom().config.actorConfigurations.get(itemName).actorConductConfiguration = itemConfiguration;
+		AmbientControlMW.getRoom().config.lightObjectConfigurations.get(itemName).actorConductConfiguration = itemConfiguration;
 
 		// persist model
 		// RoomConfiguration persistetConfig;
@@ -142,9 +142,9 @@ public class SceneryControl {
 				AmbientControlMW
 				.getRoom()
 				.getSwitchingDevice()
-				.writeData(((RemoteSwitchConfiguration) config).deviceType,
-						((RemoteSwitchConfiguration) config).houseCode,
-						((RemoteSwitchConfiguration) config).switchingUnitCode, powerState);
+				.writeData(((RemoteSwitch) config).deviceType,
+						((RemoteSwitch) config).houseCode,
+						((RemoteSwitch) config).switchingUnitCode, powerState);
 			}
 
 			// update model

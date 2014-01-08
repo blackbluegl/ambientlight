@@ -11,20 +11,12 @@ import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.room.entities.AlarmGenerator;
 
 
-public class EventManager implements IEventManager, IEventManagerClient {
+public class EventManager {
 
 	Map<BroadcastEvent, List<IEventListener>> eventMap = new HashMap<BroadcastEvent, List<IEventListener>>();
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.process.events.IEventManager#register(org.ambientlight
-	 * .process.events.IEventListener,
-	 * org.ambientlight.process.trigger.EventTriggerConfiguration)
-	 */
-	@Override
+
 	public void register(final IEventListener eventListener, final BroadcastEvent triggerConfig) {
 		System.out.println("EventManager: registering event: " + triggerConfig.toString());
 		if (triggerConfig instanceof DailyAlarmEvent) {
@@ -55,14 +47,7 @@ public class EventManager implements IEventManager, IEventManagerClient {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.process.events.IEventManagerClient#onEvent(org.ambientlight
-	 * .process.trigger.EventTriggerConfiguration, java.lang.String)
-	 */
-	@Override
+
 	public void onEvent(BroadcastEvent event) {
 
 		List<IEventListener> eventListeners = this.eventMap.get(event);

@@ -21,8 +21,8 @@ import org.ambientlight.config.process.handler.event.FireEventHandlerConfigurati
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.UserSceneryConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
@@ -65,7 +65,7 @@ public class KuecheTestConfig {
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.actorConductConfiguration = this.createSimpleColor();
-		rc.actorConfigurations.put(lo.getName(), lo);
+		rc.lightObjectConfigurations.put(lo.getName(), lo);
 
 		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
 		triggerMainSwitch.name = "Lichtschalter";

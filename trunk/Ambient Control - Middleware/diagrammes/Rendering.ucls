@@ -39,9 +39,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="5" language="java" name="org.ambientlight.rendering.util.ImageUtil" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/util/ImageUtil.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+  <class id="5" language="java" name="org.ambientlight.room.entities.lightobject.util.ImageUtil" 
+    project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/util/ImageUtil.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1168" y="119"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -49,10 +50,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="6" language="java" name="org.ambientlight.rendering.util.StripePixelMapping" 
+  <class id="6" language="java" name="org.ambientlight.room.entities.lightobject.util.StripePixelMapping" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/util/StripePixelMapping.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/util/StripePixelMapping.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="3165" y="468"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -60,9 +61,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="7" language="java" name="org.ambientlight.rendering.util.StripeUtil" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/util/StripeUtil.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+  <class id="7" language="java" name="org.ambientlight.room.entities.lightobject.util.StripeUtil" 
+    project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/util/StripeUtil.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="133" width="360" x="41" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -70,10 +72,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="8" language="java" name="org.ambientlight.rendering.programms.Tron.CrossWay" 
+  <class id="8" language="java" name="org.ambientlight.room.entities.lightobject.programms.Tron.CrossWay" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Tron.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="3010" y="1596"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -81,9 +83,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="org.ambientlight.rendering.programms.Tron" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+  <class id="9" language="java" name="org.ambientlight.room.entities.lightobject.programms.Tron" 
+    project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Tron.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="2822" y="910"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -91,10 +94,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="org.ambientlight.rendering.programms.SimpleColor" 
+  <class id="10" language="java" name="org.ambientlight.room.entities.lightobject.programms.SimpleColor" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/SimpleColor.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/SimpleColor.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1985" y="716"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -102,10 +105,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="11" language="java" name="org.ambientlight.rendering.programms.RenderingProgramm" 
+  <class id="11" language="java" name="org.ambientlight.room.entities.lightobject.programms.RenderingProgramm" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/RenderingProgramm.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/RenderingProgramm.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="169" width="256" x="2194" y="390"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -113,10 +116,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="org.ambientlight.rendering.programms.Tron.Token.Velocity" 
+  <class id="12" language="java" name="org.ambientlight.room.entities.lightobject.programms.Tron.Token.Velocity" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Tron.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="3309" y="1606"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -124,10 +127,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="13" language="java" name="org.ambientlight.rendering.programms.Tron.Token" 
+  <class id="13" language="java" name="org.ambientlight.room.entities.lightobject.programms.Tron.Token" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Tron.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="3156" y="1329"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -135,10 +138,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="14" language="java" name="org.ambientlight.rendering.programms.Tron.PixelColorMapping" 
+  <class id="14" language="java" name="org.ambientlight.room.entities.lightobject.programms.Tron.PixelColorMapping" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Tron.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="2458" y="1608"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -146,10 +149,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="15" language="java" name="org.ambientlight.rendering.programms.Sunset" 
+  <class id="15" language="java" name="org.ambientlight.room.entities.lightobject.programms.Sunset" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Sunset.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Sunset.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="2330" y="959"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -157,10 +160,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="16" language="java" name="org.ambientlight.rendering.programms.Tron.Lane" 
+  <class id="16" language="java" name="org.ambientlight.room.entities.lightobject.programms.Tron.Lane" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/programms/Tron.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/programms/Tron.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="2709" y="1589"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -168,9 +171,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="17" language="java" name="org.ambientlight.rendering.effects.transitions.FadeOutTransition" 
+  <interface id="17" language="java" 
+    name="org.ambientlight.room.entities.lightobject.effects.transitions.FadeOutTransition" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/FadeOutTransition.java" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/transitions/FadeOutTransition.java" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1584" y="853"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
@@ -179,9 +183,9 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="18" language="java" name="org.ambientlight.rendering.effects.transitions.Transition" 
+  <interface id="18" language="java" name="org.ambientlight.room.entities.lightobject.effects.transitions.Transition" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/Transition.java" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/transitions/Transition.java" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1434" y="687"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
@@ -190,9 +194,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="19" language="java" name="org.ambientlight.rendering.effects.transitions.SimpleFadeOutTransitionImpl" 
+  <class id="19" language="java" 
+    name="org.ambientlight.room.entities.lightobject.effects.transitions.SimpleFadeOutTransitionImpl" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/SimpleFadeOutTransitionImpl.java" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/transitions/SimpleFadeOutTransitionImpl.java" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1585" y="1067"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
@@ -201,9 +206,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="20" language="java" name="org.ambientlight.rendering.effects.transitions.SimpleFadeInTransitionImpl" 
+  <class id="20" language="java" 
+    name="org.ambientlight.room.entities.lightobject.effects.transitions.SimpleFadeInTransitionImpl" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/SimpleFadeInTransitionImpl.java" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/transitions/SimpleFadeInTransitionImpl.java" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1282" y="1059"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
@@ -212,9 +218,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="21" language="java" name="org.ambientlight.rendering.effects.transitions.FadeInTransition" 
+  <interface id="21" language="java" 
+    name="org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/transitions/FadeInTransition.java" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/transitions/FadeInTransition.java" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1281" y="853"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
@@ -223,9 +230,9 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="22" language="java" name="org.ambientlight.rendering.effects.RenderingEffectFactory" 
+  <class id="22" language="java" name="org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/RenderingEffectFactory.java" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/RenderingEffectFactory.java" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1250" y="-169"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
@@ -234,10 +241,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="23" language="java" name="org.ambientlight.rendering.effects.RenderingEffect" 
+  <interface id="23" language="java" name="org.ambientlight.room.entities.lightobject.effects.RenderingEffect" 
     project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/effects/RenderingEffect.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/effects/RenderingEffect.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="1604" y="474"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -245,9 +252,10 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="24" language="java" name="org.ambientlight.rendering.RenderControl" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/RenderControl.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+  <class id="24" language="java" name="org.ambientlight.room.entities.lightobject.RenderControl" 
+    project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/RenderControl.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="720" y="120"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -255,8 +263,9 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="25" language="java" name="org.ambientlight.rendering.Renderer" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/rendering/Renderer.java" binary="false" 
+  <class id="25" language="java" name="org.ambientlight.room.entities.lightobject.Renderer" 
+    project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/entities/lightobject/Renderer.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="313" width="356" x="2770" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 

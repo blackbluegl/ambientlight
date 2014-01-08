@@ -6,16 +6,14 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.ProcessFactory;
-import org.ambientlight.rendering.RenderControl;
-import org.ambientlight.rendering.Renderer;
-import org.ambientlight.rendering.effects.RenderingEffectFactory;
 import org.ambientlight.room.Room;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.RoomFactory;
+import org.ambientlight.room.entities.lightobject.LightObjectManager;
+import org.ambientlight.room.entities.lightobject.Renderer;
+import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 
 
 public class AmbientControlMW {
@@ -27,7 +25,7 @@ public class AmbientControlMW {
 		return roomConfigFileName;
 	}
 
-	static RenderControl renderControl;
+	static LightObjectManager renderControl;
 
 	static Renderer renderer;
 
@@ -53,7 +51,7 @@ public class AmbientControlMW {
 		initComponents(roomConfiguration);
 
 		// start rendering but only if there is something to render
-		if (doAnyLightObjectsExist(roomConfiguration)) {
+		if (roomConfiguration.lightObjectConfigurations.isEmpty() == false) {
 			Timer timer = new Timer();
 			timer.schedule(new RenderingTask(), 0, 1000 / FREQUENCY);
 		} else {
@@ -75,7 +73,6 @@ public class AmbientControlMW {
 	private static void initComponents(RoomConfiguration roomConfiguration) throws InterruptedException, UnknownHostException,
 	IOException {
 
-
 		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
 
 		roomFactory = new RoomFactory(deviceFactory, processFactory);
@@ -86,7 +83,7 @@ public class AmbientControlMW {
 		processFactory.initProcesses();
 
 		renderer = new Renderer(room);
-		renderControl = new RenderControl(new RenderingEffectFactory(room));
+		renderControl = new LightObjectManager(new RenderingEffectFactory(room));
 	}
 
 
@@ -125,16 +122,6 @@ public class AmbientControlMW {
 	}
 
 
-	private static boolean doAnyLightObjectsExist(RoomConfiguration rc) {
-		for (String currentActor : rc.actorConfigurations.keySet()) {
-			ActorConfiguration current = rc.actorConfigurations.get(currentActor);
-			if (current instanceof LightObjectConfiguration)
-				return true;
-		}
-		return false;
-	}
-
-
 	public static RoomFactory getRoomFactory() {
 		return roomFactory;
 	}
@@ -165,12 +152,12 @@ public class AmbientControlMW {
 	}
 
 
-	public static RenderControl getRenderProgrammFactory() {
+	public static LightObjectManager getRenderProgrammFactory() {
 		return renderControl;
 	}
 
 
-	public static void setRenderProgrammFactory(RenderControl renderProgrammFactory) {
+	public static void setRenderProgrammFactory(LightObjectManager renderProgrammFactory) {
 		AmbientControlMW.renderControl = renderProgrammFactory;
 	}
 

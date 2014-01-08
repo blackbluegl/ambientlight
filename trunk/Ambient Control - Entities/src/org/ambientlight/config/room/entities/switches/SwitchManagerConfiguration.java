@@ -10,5 +10,5 @@ public class SwitchManagerConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public Map<String, SwitchConfiguration> switches = new HashMap<String, SwitchConfiguration>();
+	public Map<String, Switch> switches = new HashMap<String, Switch>();
 }

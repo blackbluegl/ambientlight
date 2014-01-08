@@ -17,7 +17,7 @@ package org.ambientlight.room.entities.switches;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.room.entities.switches.SwitchConfiguration;
+import org.ambientlight.config.room.entities.switches.Switch;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 
@@ -39,7 +39,7 @@ public class SwitchManager {
 
 		RoomConfigurationFactory.beginTransaction();
 
-		SwitchConfiguration switchConfig = config.switches.get(id);
+		Switch switchConfig = config.switches.get(id);
 		switchConfig.powerState = powerState;
 
 		RoomConfigurationFactory.commitTransaction();

@@ -16,7 +16,7 @@
 package org.ambientlight.config.features.actor;
 
 import org.ambientlight.config.features.Entity;
-import org.ambientlight.config.room.entities.led.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 
 
 /**

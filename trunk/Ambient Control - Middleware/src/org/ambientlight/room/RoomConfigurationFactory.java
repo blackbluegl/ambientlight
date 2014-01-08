@@ -13,12 +13,11 @@ import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfigurat
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConfiguration;
-import org.ambientlight.config.room.entities.led.LightObjectConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.TronRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -104,9 +103,7 @@ public class RoomConfigurationFactory {
 		xstream.processAnnotations(RoomConfiguration.class);
 		xstream.processAnnotations(StripePartConfiguration.class);
 		xstream.processAnnotations(LightObjectConfiguration.class);
-		xstream.processAnnotations(RemoteSwitchConfiguration.class);
-		xstream.processAnnotations(ActorConfiguration.class);
-		xstream.processAnnotations(ActorConfiguration.class);
+		xstream.processAnnotations(RemoteSwitch.class);
 		xstream.processAnnotations(StripeConfiguration.class);
 		xstream.processAnnotations(DeviceConfiguration.class);
 		xstream.processAnnotations(SwitchDeviceOverEthernetConfiguration.class);
