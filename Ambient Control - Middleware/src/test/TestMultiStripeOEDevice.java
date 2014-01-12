@@ -16,7 +16,7 @@ public class TestMultiStripeOEDevice {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		MultistripeOverEthernetClientDeviceDriver device = new MultistripeOverEthernetClientDeviceDriver();
 		MultiStripeOverEthernetClientDeviceConfiguration config = new MultiStripeOverEthernetClientDeviceConfiguration();
-		config.hostName = "led-bridge-schlafen";
+		config.hostName = "led-bridge-wohnen";
 		// config.hostName = "localhost";
 		config.port = 2002;
 		device.setConfiguration(config);
@@ -33,7 +33,7 @@ public class TestMultiStripeOEDevice {
 
 		StripeConfiguration sc = new StripeConfiguration();
 		sc.colorConfiguration = cConfig;
-		sc.pixelAmount = 22;
+		sc.pixelAmount = 150;
 		sc.port = 1;
 		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
 
@@ -43,9 +43,9 @@ public class TestMultiStripeOEDevice {
 		device.connect();
 
 		while (true) {
-			for (int i = 1; i < 256; i++) {
+			for (int i = 1; i < 255; i++) {
 				int color = i;
-				Color c2 = new Color((int) (color * 1.0f), (int) (color * 1.0f), (int) (color * 1.0f));
+				Color c2 = new Color((int) (color * 1.0f), (int) (color * 0.9f), (int) (color * 0.6f));
 
 				for (int g = 0; g < sc.pixelAmount; g++) {
 					myStripe.setPixel(g, c2.getRGB());
@@ -54,7 +54,7 @@ public class TestMultiStripeOEDevice {
 				System.out.println(i);
 				Thread.sleep(40);
 			}
-
+			break;
 			// for (int i = 0; i < sc.pixelAmount; i++) {
 			// Color black = Color.BLACK;
 			// Color white = Color.WHITE;

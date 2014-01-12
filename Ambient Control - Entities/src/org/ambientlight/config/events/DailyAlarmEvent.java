@@ -11,10 +11,10 @@ public class DailyAlarmEvent extends BroadcastEvent {
 	public int minute;
 
 
-	public DailyAlarmEvent(int hour, int minute, String sourceName) {
+	public DailyAlarmEvent(String sourceId, int hour, int minute) {
+		super(sourceId);
 		this.hour = hour;
 		this.minute = minute;
-		super.sourceId = sourceName;
 	}
 
 

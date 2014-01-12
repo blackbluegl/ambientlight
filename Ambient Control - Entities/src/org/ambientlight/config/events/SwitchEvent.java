@@ -15,6 +15,13 @@ public class SwitchEvent extends BroadcastEvent {
 	public SwitchType type;
 
 
+	public SwitchEvent(String sourceId, boolean powerState, SwitchType type) {
+		super(sourceId);
+		this.powerState = powerState;
+		this.type = type;
+	}
+
+
 	@Override
 	public String toString() {
 		String value = "Schalter(" + type + "): " + sourceId + " im Zustand: ";

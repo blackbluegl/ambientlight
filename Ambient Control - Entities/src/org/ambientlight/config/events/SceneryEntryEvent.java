@@ -8,6 +8,12 @@ import org.ambientlight.annotations.ValueBindingPath;
 
 public class SceneryEntryEvent extends BroadcastEvent {
 
+
+	public SceneryEntryEvent(String sourceId, String sceneryName) {
+		super(sourceId);
+		this.sceneryName = sceneryName;
+	}
+
 	/**
 	 * 
 	 */

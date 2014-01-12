@@ -19,10 +19,12 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.DailyAlarm;
 import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.room.RoomConfigurationFactory;
 
 
 /**
@@ -40,30 +42,35 @@ public class AlarmManager {
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	public void createAlarm(final DailyAlarm alarm) {
+	public void createAlarm(final String name, final DailyAlarm alarm) {
 
-		transaction einfügen
+		RoomConfigurationFactory.beginTransaction();
+
+		this.config.alarms.put(name, alarm);
 
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
 
-				DailyAlarmEvent alarmEvent = new DailyAlarmEvent(alarm.hour, alarm.minute, sourceName)
-
-				eventManager.onEvent(triggerConfig);
+				DailyAlarmEvent alarmEvent = new DailyAlarmEvent(name, alarm.hour, alarm.minute);
+				eventManager.onEvent(alarmEvent);
 			}
 		};
 
 		Calendar now = Calendar.getInstance();
-		Calendar alarm = Calendar.getInstance();
-		alarm.set(Calendar.HOUR_OF_DAY, triggerConfig.hour);
-		alarm.set(Calendar.MINUTE, triggerConfig.minute);
-		if (alarm.before(now)) {
-			alarm.add(Calendar.DAY_OF_MONTH, 1);
+		Calendar alarmCalendar = Calendar.getInstance();
+		alarmCalendar.set(Calendar.HOUR_OF_DAY, alarm.hour);
+		alarmCalendar.set(Calendar.MINUTE, alarm.minute);
+		if (alarmCalendar.before(now)) {
+			alarmCalendar.add(Calendar.DAY_OF_MONTH, 1);
 		}
 
 		Timer timer = new Timer();
-		timer.schedule(task, alarm.getTime());
+		timer.schedule(task, alarmCalendar.getTime());
+
+		RoomConfigurationFactory.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 }
