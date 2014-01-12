@@ -18,7 +18,7 @@ public class ConfigurationChangeHandler extends AbstractActionHandler {
 
 			if (config instanceof RenderingProgramConfiguration) {
 				LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(currentActorName);
-				AmbientControlMW.getRenderProgrammFactory().updateRenderingConfigurationForLightObject(
+				AmbientControlMW.getRenderProgrammFactory().setRenderingConfigurationForLightObject(
 						AmbientControlMW.getRenderer(), (RenderingProgramConfiguration) config, lightObject);
 			}
 		}

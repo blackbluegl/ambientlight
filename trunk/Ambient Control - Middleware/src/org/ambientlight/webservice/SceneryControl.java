@@ -35,6 +35,7 @@ public class SceneryControl {
 		return "Version:0.15.0";
 	}
 
+	todo nicht vergessen logig in lightobjectmanager zu packen!
 
 	@PUT
 	@Path("/config/room/items/{itemName}/program")

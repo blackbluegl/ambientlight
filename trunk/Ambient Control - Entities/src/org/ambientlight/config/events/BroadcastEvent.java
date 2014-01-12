@@ -21,6 +21,11 @@ public abstract class BroadcastEvent implements Serializable {
 	public String sourceId;
 
 
+	public BroadcastEvent(String sourceId) {
+		this.sourceId = sourceId;
+	}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

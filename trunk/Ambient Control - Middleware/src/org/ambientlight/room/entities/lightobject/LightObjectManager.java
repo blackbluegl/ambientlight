@@ -2,10 +2,12 @@ package org.ambientlight.room.entities.lightobject;
 
 import java.awt.Color;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition;
@@ -25,10 +27,11 @@ public class LightObjectManager {
 	}
 
 
-	public void addLightObjectToRender(Renderer renderer, LightObject lightObject, FadeInTransition transition) {
+	private void addLightObjectToRender(Renderer renderer, LightObject lightObject, FadeInTransition transition) {
 
 		if (lightObject.configuration.getPowerState() == false)
 			return;
+
 
 		RenderingProgramm renderProgram = null;
 
@@ -64,17 +67,7 @@ public class LightObjectManager {
 	}
 
 
-	//
-	// public void addAllLightObjectsInRoomToRenderer(Renderer renderer,
-	// List<LightObject> lightObjects) {
-	// for (LightObject current : lightObjects) {
-	// this.addLightObjectToRender(renderer, current,
-	// effectFactory.getFadeInEffect(current));
-	// }
-	// }
-
-
-	public void updatePowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
+	public void setPowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
 
 		if (lightObject.configuration.getPowerState() == powerState) {
 			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getName()
@@ -82,7 +75,10 @@ public class LightObjectManager {
 			return;
 		}
 
+		RoomConfigurationFactory.beginTransaction();
 		lightObject.configuration.setPowerState(powerState);
+		RoomConfigurationFactory.commitTransaction();
+
 		if (powerState == false) {
 
 			// set fadeout effect
@@ -97,10 +93,19 @@ public class LightObjectManager {
 	}
 
 
-	public void updateRenderingConfigurationForLightObject(Renderer renderer, RenderingProgramConfiguration newConfig,
+	public void setRenderingConfigurationForLightObject(Renderer renderer, RenderingProgramConfiguration newConfig,
 			LightObject lightObject) {
-		renderer.removeRenderTaskForLightObject(lightObject);
+
+		RoomConfigurationFactory.beginTransaction();
+
 		lightObject.configuration.setRenderProgram(newConfig);
+
+		RoomConfigurationFactory.commitTransaction();
+		renderer.removeRenderTaskForLightObject(lightObject);
+
 		this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 	}
 }

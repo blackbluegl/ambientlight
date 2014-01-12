@@ -50,7 +50,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 			} else if (actorConfig instanceof LightObjectConfiguration) {
 				// update renderer for light objects and update model
 				LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(currentActorName);
-				AmbientControlMW.getRenderProgrammFactory().updatePowerStateForLightObject(AmbientControlMW.getRenderer(),
+				AmbientControlMW.getRenderProgrammFactory().setPowerStateForLightObject(AmbientControlMW.getRenderer(),
 						lightObject, powerState);
 			}
 

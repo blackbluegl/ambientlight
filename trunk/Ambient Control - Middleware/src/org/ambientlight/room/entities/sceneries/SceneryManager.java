@@ -15,11 +15,13 @@
 
 package org.ambientlight.room.entities.sceneries;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.events.SceneryEntryEvent;
 import org.ambientlight.config.features.sensor.ScenerySensor;
 import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.room.RoomConfigurationFactory;
 
 
 /**
@@ -29,7 +31,7 @@ import org.ambientlight.eventmanager.EventManager;
  */
 public class SceneryManager implements ScenerySensor {
 
-	public static final String SENSOR_NAME = "SceneryManager";
+	public static final String SOURCE_NAME = "SceneryManager";
 
 	public SceneryManagerConfiguration config;
 
@@ -37,14 +39,23 @@ public class SceneryManager implements ScenerySensor {
 
 
 	public void setCurrentScenery(String scenery) {
-		todo Scenery als eingabe - umwandlung in event und ausgabe
-		todo transactoins einfügen
-		Scenery currentScenery = new Scenery();
-		currentScenery.id = event.sceneryName;
-		this.config.currentScenery = currentScenery;
 
-		eventManager.onEvent(event);
+		if (config.sceneries.containsKey(scenery) == false)
+			throw new IllegalArgumentException("Scenery does not exist!");
+
+		RoomConfigurationFactory.beginTransaction();
+
+		SceneryEntryEvent currentSceneryEntry = new SceneryEntryEvent(SOURCE_NAME, scenery);
+
+		this.config.currentScenery = config.sceneries.get(scenery);
+
+		eventManager.onEvent(currentSceneryEntry);
+
+		RoomConfigurationFactory.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
+
 
 
 	/*
@@ -66,7 +77,7 @@ public class SceneryManager implements ScenerySensor {
 	 */
 	@Override
 	public String getSensorName() {
-		return SENSOR_NAME;
+		return SOURCE_NAME;
 	}
 
 }

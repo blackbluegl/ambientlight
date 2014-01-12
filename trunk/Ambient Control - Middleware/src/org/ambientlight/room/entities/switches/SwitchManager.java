@@ -44,10 +44,7 @@ public class SwitchManager {
 
 		RoomConfigurationFactory.commitTransaction();
 
-		SwitchEvent switchEvent = new SwitchEvent();
-		switchEvent.sourceId = switchConfig.id;
-		switchEvent.powerState = switchConfig.powerState;
-		switchEvent.type = switchConfig.type;
+		SwitchEvent switchEvent = new SwitchEvent(switchConfig.id, powerState, switchConfig.type);
 
 		AmbientControlMW.getRoom().eventManager.onEvent(switchEvent);
 	}
