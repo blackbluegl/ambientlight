@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
 
-public interface SwtichDeviceDriver extends DeviceDriver {
+public interface RemoteSwtichDeviceDriver extends DeviceDriver {
 	
 	public void setConfiguration(SwitchDeviceOverEthernetConfiguration configuration);
 	public void writeData(String type, int housecode,int switchingUnit,boolean state) throws IOException;

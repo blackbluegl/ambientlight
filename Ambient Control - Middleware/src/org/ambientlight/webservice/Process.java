@@ -31,7 +31,7 @@ import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
@@ -96,7 +96,7 @@ public class Process {
 		if (result.resultIsValid() == false)
 			return result;
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 		Integer positionToReplace = null;
 		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(process.id)) {
@@ -112,7 +112,7 @@ public class Process {
 			AmbientControlMW.getRoom().config.processes.add(process);
 		}
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
@@ -125,7 +125,7 @@ public class Process {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object deleteProcess(@PathParam(value = "id") String id) {
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
 			if (currentProcess.id.equals(id)) {
 				stopProcess(id);
@@ -134,7 +134,7 @@ public class Process {
 			}
 		}
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
@@ -156,7 +156,6 @@ public class Process {
 			return Response.status(500).build();
 		}
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
 		return Response.status(200).build();
 	}
@@ -176,7 +175,7 @@ public class Process {
 			return Response.status(500).build();
 		}
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 
 		return Response.status(200).build();
 	}

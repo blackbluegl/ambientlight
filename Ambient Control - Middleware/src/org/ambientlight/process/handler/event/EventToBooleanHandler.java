@@ -19,7 +19,7 @@ import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.events.SceneryEntryEvent;
 import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.process.entities.Token;
+import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 
 

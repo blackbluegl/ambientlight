@@ -22,11 +22,11 @@ import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import com.thoughtworks.xstream.XStream;
 
 
-public class RoomConfigurationFactory {
+public class Persistence {
 
 	private static ReentrantLock saveLock = new ReentrantLock();
 
-	static String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight" + File.separator
+	private static String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight" + File.separator
 			+ "sceneries";
 
 

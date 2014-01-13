@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
-import org.ambientlight.room.StripePart;
+import org.ambientlight.device.led.StripePart;
 
 
 public class StripeUtil {

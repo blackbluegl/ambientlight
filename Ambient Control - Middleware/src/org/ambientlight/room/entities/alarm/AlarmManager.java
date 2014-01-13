@@ -24,7 +24,7 @@ import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.DailyAlarm;
 import org.ambientlight.eventmanager.EventManager;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 
 
 /**
@@ -44,7 +44,7 @@ public class AlarmManager {
 	 */
 	public void createAlarm(final String name, final DailyAlarm alarm) {
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		this.config.alarms.put(name, alarm);
 
@@ -69,7 +69,7 @@ public class AlarmManager {
 		Timer timer = new Timer();
 		timer.schedule(task, alarmCalendar.getTime());
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}

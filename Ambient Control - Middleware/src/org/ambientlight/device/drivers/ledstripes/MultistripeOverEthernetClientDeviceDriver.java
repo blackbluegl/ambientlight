@@ -1,4 +1,4 @@
-package org.ambientlight.device.drivers.multistripeoverethernet;
+package org.ambientlight.device.drivers.ledstripes;
 
 import java.awt.Color;
 import java.io.BufferedReader;

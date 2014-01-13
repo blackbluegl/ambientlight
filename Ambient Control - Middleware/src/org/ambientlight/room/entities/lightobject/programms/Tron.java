@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.device.led.StripePartConfiguration;
-import org.ambientlight.room.StripePart;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.lightobject.util.ImageUtil;
 import org.ambientlight.room.entities.lightobject.util.StripeUtil;

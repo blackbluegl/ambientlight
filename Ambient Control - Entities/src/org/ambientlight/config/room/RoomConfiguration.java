@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.features.actor.Switchable;
-import org.ambientlight.config.process.EventProcessConfiguration;
+import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
@@ -31,10 +31,10 @@ public class RoomConfiguration implements Serializable {
 	public SwitchManagerConfiguration switchesManager;
 	public AlarmManagerConfiguration alarmManager;
 	public SceneryManagerConfiguration sceneriesManager;
+	public ProcessManagerConfiguration processManager;
 
 	public Map<String, LightObjectConfiguration> lightObjectConfigurations = new HashMap<String, LightObjectConfiguration>();
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
-	public List<EventProcessConfiguration> processes = new ArrayList<EventProcessConfiguration>();
 
 
 	public Map<String, Switchable> getSwitchableActors() {

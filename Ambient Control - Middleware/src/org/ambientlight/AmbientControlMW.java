@@ -7,9 +7,9 @@ import java.util.Timer;
 
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.process.ProcessFactory;
+import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.Room;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.room.RoomFactory;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.lightobject.Renderer;
@@ -33,7 +33,7 @@ public class AmbientControlMW {
 
 	static RoomFactory roomFactory;
 
-	static ProcessFactory processFactory;
+	static ProcessManager processFactory;
 
 	public static final int FREQUENCY = 25;
 
@@ -79,7 +79,7 @@ public class AmbientControlMW {
 
 		roomFactory.initRoom(roomConfiguration);
 
-		processFactory = new ProcessFactory(room);
+		processFactory = new ProcessManager(room);
 		processFactory.initProcesses();
 
 		renderer = new Renderer(room);
@@ -89,7 +89,7 @@ public class AmbientControlMW {
 
 	private static RoomConfiguration initModel() {
 		try {
-			return RoomConfigurationFactory.getRoomConfigByName(roomConfigFileName);
+			return Persistence.getRoomConfigByName(roomConfigFileName);
 		} catch (Exception e) {
 			System.out.println("error reading config file.");
 			System.out.println(e.getMessage());
@@ -162,7 +162,7 @@ public class AmbientControlMW {
 	}
 
 
-	public static ProcessFactory getProcessFactory() {
+	public static ProcessManager getProcessFactory() {
 		return processFactory;
 	}
 }

@@ -27,7 +27,7 @@ import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration
 import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 
 
 public class KuecheTestConfig {
@@ -39,8 +39,8 @@ public class KuecheTestConfig {
 	public static void main(String[] args) throws IOException {
 		DeviceDriverFactory df = new DeviceDriverFactory();
 		KuecheTestConfig test = new KuecheTestConfig();
-		RoomConfigurationFactory.beginTransaction();
-		RoomConfigurationFactory.commitTransaction(test.getTestRoom(), "Kochen");
+		Persistence.beginTransaction();
+		Persistence.commitTransaction(test.getTestRoom(), "Kochen");
 	}
 
 

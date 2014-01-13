@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
-import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver;
+import org.ambientlight.device.drivers.ledstripes.MultistripeOverEthernetClientDeviceDriver;
 import org.ambientlight.device.led.Stripe;
 
 

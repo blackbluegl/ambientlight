@@ -39,7 +39,7 @@ import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 
 
 public class CreateTestConfig {
@@ -49,11 +49,11 @@ public class CreateTestConfig {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 		DeviceDriverFactory df = new DeviceDriverFactory();
 		CreateTestConfig test = new CreateTestConfig();
 
-		RoomConfigurationFactory.commitTransaction(test.getTestRoom(), "default");
+		Persistence.commitTransaction(test.getTestRoom(), "default");
 	}
 
 
