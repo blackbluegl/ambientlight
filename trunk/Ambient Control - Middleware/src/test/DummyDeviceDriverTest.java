@@ -3,14 +3,14 @@ package test;
 import java.awt.Color;
 
 import org.ambientlight.config.device.led.StripeConfiguration;
-import org.ambientlight.device.drivers.dummy.DummyDeviceDriver;
+import org.ambientlight.device.drivers.ledstripes.DummyLedStripeDeviceDriver;
 import org.ambientlight.device.led.Stripe;
 
 public class DummyDeviceDriverTest {
 
 	public static void main(String[] args) throws InterruptedException {
 
-		DummyDeviceDriver dummy = new DummyDeviceDriver();
+		DummyLedStripeDeviceDriver dummy = new DummyLedStripeDeviceDriver();
 
 		StripeConfiguration sc = new StripeConfiguration();
 		sc.pixelAmount = 128;

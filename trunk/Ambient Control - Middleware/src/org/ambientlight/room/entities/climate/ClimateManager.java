@@ -49,7 +49,7 @@ import org.ambientlight.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 import org.ambientlight.messages.max.MaxWakeUpMessage;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.climate.handlers.AddShutterContactHandler;
 import org.ambientlight.room.entities.climate.handlers.AddThermostateHandler;
 import org.ambientlight.room.entities.climate.handlers.MessageActionHandler;
@@ -160,7 +160,7 @@ public class ClimateManager implements MessageListener {
 			}
 
 			// common handling of unhandled responses
-			RoomConfigurationFactory.beginTransaction();
+			Persistence.beginTransaction();
 
 			if (state == State.TIMED_OUT) {
 				device.timedOut = true;
@@ -175,12 +175,12 @@ public class ClimateManager implements MessageListener {
 				System.out.println("Climate Manager - onResponse(): did not handle message");
 			}
 
-			RoomConfigurationFactory.commitTransaction();
+			Persistence.commitTransaction();
 
 		} catch (Exception e) {
 			System.out.println("ClimateManager - onResponse: caught exception: ");
 			e.printStackTrace();
-			RoomConfigurationFactory.cancelTransaction();
+			Persistence.cancelTransaction();
 		} finally {
 			clearFinishedActionHandlers();
 			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
@@ -263,13 +263,13 @@ public class ClimateManager implements MessageListener {
 			return;
 		}
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		config.mode = message.getMode();
 		config.setTemp = message.getTemp();
 		config.temporaryUntilDate = message.getTemporaryUntil();
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 
@@ -341,7 +341,7 @@ public class ClimateManager implements MessageListener {
 			return;
 		}
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) config.devices.get(message.getFromAdress());
 		shutter.batteryLow = message.isBatteryLow();
@@ -349,12 +349,13 @@ public class ClimateManager implements MessageListener {
 		shutter.rfError = message.hadRfError();
 		shutter.lastUpdate = new Date(System.currentTimeMillis());
 
-		RoomConfigurationFactory.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		Persistence.commitTransaction();
 
 		// inform thermostates
 		boolean open = isAWindowOpen();
 		sendWindowStateToThermostates(open);
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 
 
@@ -371,7 +372,7 @@ public class ClimateManager implements MessageListener {
 			return;
 		}
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		thermostat.batteryLow = message.isBatteryLow();
 		thermostat.isLocked = message.isLocked();
@@ -383,7 +384,7 @@ public class ClimateManager implements MessageListener {
 		config.temporaryUntilDate = message.getTemporaryUntil();
 		config.setTemp = message.getSetTemp();
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 
@@ -410,7 +411,7 @@ public class ClimateManager implements MessageListener {
 
 
 	public void setCurrentProfile(String profile) {
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		if (config.weekProfiles.containsKey(profile) == false || config.weekProfiles.get(profile).isEmpty())
 			throw new IllegalArgumentException("the selected weekProfile does not exist or is empty and unusable!");
@@ -433,7 +434,7 @@ public class ClimateManager implements MessageListener {
 
 		queueManager.putOutMessages(messages);
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		// this.setMode(0.0f, MaxThermostateMode.AUTO, null);
 
@@ -443,7 +444,7 @@ public class ClimateManager implements MessageListener {
 
 
 	public void setMode(float temp, MaxThermostateMode mode, Date until) {
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		if (until != null && config.mode != MaxThermostateMode.TEMPORARY)
 			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
@@ -486,7 +487,7 @@ public class ClimateManager implements MessageListener {
 			config.setTemp = nextDayEntry.getTemp();
 		}
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 

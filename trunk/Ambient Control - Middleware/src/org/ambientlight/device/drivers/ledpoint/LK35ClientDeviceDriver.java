@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.drivers.lk35;
+package org.ambientlight.device.drivers.ledpoint;
 
 import java.awt.Color;
 import java.io.IOException;

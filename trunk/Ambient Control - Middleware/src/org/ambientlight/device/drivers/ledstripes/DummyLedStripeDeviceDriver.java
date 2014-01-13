@@ -1,4 +1,4 @@
-package org.ambientlight.device.drivers.dummy;
+package org.ambientlight.device.drivers.ledstripes;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -9,14 +9,14 @@ import org.ambientlight.debug.BufferedImageDisplayOutput;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.led.Stripe;
 
-public class DummyDeviceDriver implements LedStripeDeviceDriver {
+public class DummyLedStripeDeviceDriver implements LedStripeDeviceDriver {
 
 	List<Stripe> myStripes = new ArrayList<Stripe>();
 	BufferedImageDisplayOutput display;
 	BufferedImage stripeContet;
 
 
-	public DummyDeviceDriver() {
+	public DummyLedStripeDeviceDriver() {
 	}
 
 	@Override

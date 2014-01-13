@@ -10,14 +10,16 @@ import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
-import org.ambientlight.device.drivers.SwtichDeviceDriver;
+import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.QeueManager;
-import org.ambientlight.process.entities.Process;
+import org.ambientlight.process.ProcessManager;
+import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
-import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
@@ -34,20 +36,21 @@ public class Room {
 
 	public QeueManager qeueManager;
 
+	public SceneryManager sceneryManager;
+
+	public AlarmManager alarmManager;
+
 	public CallBackManager callBackMananger;
 
 	public EventManager eventManager;
 
-	private List<DeviceDriver> devices;
+	public ProcessManager processManager;
 
-	private List<LightObject> lightObjects;
+	private List<DeviceDriver> devices;
 
 	private BufferedImage roomBitMap;
 
 	public RoomConfiguration config;
-
-	public List<Process> processes;
-
 
 	public BufferedImage getRoomBitMap() {
 		return roomBitMap;
@@ -69,23 +72,6 @@ public class Room {
 	}
 
 
-	public List<LightObject> getLightObjectsInRoom() {
-		return lightObjects;
-	}
-
-
-	public LightObject getLightObjectByName(String name) {
-		for (LightObject current : this.lightObjects) {
-			if (name.equals(current.configuration.getName()))
-				return current;
-		}
-		return null;
-	}
-
-
-	public void setLightObjectsInRoom(List<LightObject> lightObjectsInRoom) {
-		this.lightObjects = lightObjectsInRoom;
-	}
 
 
 	public List<StripePart> getAllStripePartsInRoom() {
@@ -114,14 +100,13 @@ public class Room {
 	}
 
 
-	public SwtichDeviceDriver getSwitchingDevice() {
+	public RemoteSwtichDeviceDriver getSwitchingDevice() {
 		// TODO actually we use the first found device. later a correlation
 		// between the device and the switches could be possible
 		for (DeviceDriver currentDevice : this.devices) {
-			if (currentDevice instanceof SwtichDeviceDriver)
-				return (SwtichDeviceDriver) currentDevice;
+			if (currentDevice instanceof RemoteSwtichDeviceDriver)
+				return (RemoteSwtichDeviceDriver) currentDevice;
 		}
-
 		return null;
 	}
 

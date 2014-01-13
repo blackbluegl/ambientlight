@@ -21,7 +21,7 @@ import net.sourceforge.jeval.Evaluator;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
-import org.ambientlight.process.entities.Token;
+import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.ActionHandlerException;
 import org.ambientlight.room.entities.Sensor;
 

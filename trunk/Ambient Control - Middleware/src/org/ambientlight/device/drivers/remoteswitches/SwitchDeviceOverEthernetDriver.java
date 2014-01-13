@@ -1,4 +1,4 @@
-package org.ambientlight.device.drivers.switchoverethernet;
+package org.ambientlight.device.drivers.remoteswitches;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,9 +7,9 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
-import org.ambientlight.device.drivers.SwtichDeviceDriver;
+import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 
-public class SwitchDeviceOverEthernetDriver implements SwtichDeviceDriver{
+public class SwitchDeviceOverEthernetDriver implements RemoteSwtichDeviceDriver{
 			 
 	SwitchDeviceOverEthernetConfiguration configuration;
 	

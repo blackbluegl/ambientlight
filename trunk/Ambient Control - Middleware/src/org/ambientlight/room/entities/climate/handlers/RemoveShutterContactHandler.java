@@ -25,7 +25,7 @@ import org.ambientlight.messages.max.MaxMessage;
 import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.max.WaitForShutterContactCondition;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -46,7 +46,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 
 	public RemoveShutterContactHandler(ShutterContact device) {
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		this.device = device;
 
@@ -68,7 +68,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		actionState = ActionState.REMOVE_FROM_MODELL;
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		if (isAWindowOpen != isAWindowNowOpen) {
 			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
@@ -85,9 +85,9 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 		AmbientControlMW.getRoom().config.climateManager.devices.remove(device.adress);
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		this.actionState = ActionState.FINISHED;
 

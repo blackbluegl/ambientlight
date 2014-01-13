@@ -1,11 +1,11 @@
-package org.ambientlight.device.drivers.dummyswitching;
+package org.ambientlight.device.drivers.remoteswitches;
 
 import java.io.IOException;
 
 import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
-import org.ambientlight.device.drivers.SwtichDeviceDriver;
+import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 
-public class DummySwitchingDeviceDriver implements SwtichDeviceDriver{
+public class DummySwitchingDeviceDriver implements RemoteSwtichDeviceDriver{
 
 	public void setConfiguration(SwitchDeviceOverEthernetConfiguration configuration) {
 	}

@@ -21,7 +21,7 @@ import org.ambientlight.config.features.sensor.ScenerySensor;
 import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.eventmanager.EventManager;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 
 
 /**
@@ -43,7 +43,7 @@ public class SceneryManager implements ScenerySensor {
 		if (config.sceneries.containsKey(scenery) == false)
 			throw new IllegalArgumentException("Scenery does not exist!");
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		SceneryEntryEvent currentSceneryEntry = new SceneryEntryEvent(SOURCE_NAME, scenery);
 
@@ -51,7 +51,7 @@ public class SceneryManager implements ScenerySensor {
 
 		eventManager.onEvent(currentSceneryEntry);
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}

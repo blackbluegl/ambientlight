@@ -31,7 +31,7 @@ import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
 import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -55,7 +55,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(pairPong);
 
 		// add and setup new device
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 		List<Message> outMessages = new ArrayList<Message>();
 
 		// register the device at the rfmbridge - it will ack some requests
@@ -94,7 +94,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 		}
 
 		AmbientControlMW.getRoom().qeueManager.putOutMessages(outMessages);
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
 		finished = true;

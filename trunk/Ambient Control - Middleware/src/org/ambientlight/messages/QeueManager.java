@@ -174,7 +174,7 @@ public class QeueManager {
 		for (MessageEntry out : outQueue) {
 
 			// only send ready messages
-			if (out.state != State.PENDING) {
+			if (out.state != State.PENDING && out.state != State.SEND_ERROR) {
 				continue;
 			}
 
@@ -192,7 +192,6 @@ public class QeueManager {
 				out.state = State.SEND_ERROR;
 				sendFailureOccured = true;
 			}
-
 		}
 		outQueue.removeAll(removeAfterSent);
 
@@ -350,7 +349,7 @@ public class QeueManager {
 		if (retryOngoin == true)
 			return;
 
-		System.out.println("QeueuManager - retryHandleOutMessages(): some Messages could not be sent. Retrying!");
+		System.out.println("QeueuManager - retryHandleOutMessages(): Retry sending messages!");
 		retryOngoin = true;
 
 		new Thread(new Runnable() {

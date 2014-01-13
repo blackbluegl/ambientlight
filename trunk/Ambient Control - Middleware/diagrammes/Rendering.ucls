@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.4" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" language="java" name="org.ambientlight.room.RoomConfigurationFactory" 
-    project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/RoomConfigurationFactory.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+  <class id="1" language="java" name="org.ambientlight.room.Persistence" project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/room/Persistence.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="241" width="294" x="1366" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -30,8 +28,9 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="org.ambientlight.room.StripePart" project="Ambient Control - Middleware" 
-    file="/Ambient Control - Middleware/src/org/ambientlight/room/StripePart.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="4" language="java" name="org.ambientlight.device.led.StripePart" project="Ambient Control - Middleware" 
+    file="/Ambient Control - Middleware/src/org/ambientlight/device/led/StripePart.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="3289" y="639"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      

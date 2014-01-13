@@ -9,7 +9,7 @@ import java.util.TimerTask;
 
 import org.ambientlight.debug.BufferedImageDisplayOutput;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
-import org.ambientlight.room.StripePart;
+import org.ambientlight.device.led.StripePart;
 
 class RenderingTask extends TimerTask {
 

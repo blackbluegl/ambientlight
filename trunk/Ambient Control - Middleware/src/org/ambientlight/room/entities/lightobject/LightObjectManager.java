@@ -1,13 +1,14 @@
 package org.ambientlight.room.entities.lightobject;
 
 import java.awt.Color;
+import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition;
@@ -21,9 +22,30 @@ public class LightObjectManager {
 
 	RenderingEffectFactory effectFactory;
 
+	private List<LightObject> lightObjects;
+
 
 	public LightObjectManager(RenderingEffectFactory effectFactory) {
 		this.effectFactory = effectFactory;
+	}
+
+
+	public List<LightObject> getLightObjectsInRoom() {
+		return lightObjects;
+	}
+
+
+	public LightObject getLightObjectByName(String name) {
+		for (LightObject current : this.lightObjects) {
+			if (name.equals(current.configuration.getName()))
+				return current;
+		}
+		return null;
+	}
+
+
+	public void setLightObjectsInRoom(List<LightObject> lightObjectsInRoom) {
+		this.lightObjects = lightObjectsInRoom;
 	}
 
 
@@ -31,7 +53,6 @@ public class LightObjectManager {
 
 		if (lightObject.configuration.getPowerState() == false)
 			return;
-
 
 		RenderingProgramm renderProgram = null;
 
@@ -75,9 +96,9 @@ public class LightObjectManager {
 			return;
 		}
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 		lightObject.configuration.setPowerState(powerState);
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 
 		if (powerState == false) {
 
@@ -96,11 +117,11 @@ public class LightObjectManager {
 	public void setRenderingConfigurationForLightObject(Renderer renderer, RenderingProgramConfiguration newConfig,
 			LightObject lightObject) {
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		lightObject.configuration.setRenderProgram(newConfig);
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 		renderer.removeRenderTaskForLightObject(lightObject);
 
 		this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));

@@ -25,7 +25,7 @@ import org.ambientlight.messages.max.MaxFactoryResetMessage;
 import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
@@ -41,7 +41,7 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 	public RemoveThermostatHandler(Thermostat device) {
 
 
-		RoomConfigurationFactory.beginTransaction();
+		Persistence.beginTransaction();
 
 		// unregister link from other thermostates
 		for (MaxComponent currentDevice : AmbientControlMW.getRoom().climateManager.config.devices.values()) {
@@ -68,7 +68,7 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 		// Remove from modell
 		AmbientControlMW.getRoom().climateManager.config.devices.remove(device.adress);
 
-		RoomConfigurationFactory.commitTransaction();
+		Persistence.commitTransaction();
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 		finished = true;
 	}

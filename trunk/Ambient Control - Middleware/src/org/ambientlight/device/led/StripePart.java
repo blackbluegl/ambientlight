@@ -1,7 +1,6 @@
-package org.ambientlight.room;
+package org.ambientlight.device.led;
 
 import org.ambientlight.config.device.led.StripePartConfiguration;
-import org.ambientlight.device.led.Stripe;
 
 public class StripePart {
 	public StripePartConfiguration configuration;

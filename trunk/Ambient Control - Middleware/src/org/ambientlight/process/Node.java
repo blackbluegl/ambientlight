@@ -1,4 +1,4 @@
-package org.ambientlight.process.entities;
+package org.ambientlight.process;
 
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.process.handler.AbstractActionHandler;

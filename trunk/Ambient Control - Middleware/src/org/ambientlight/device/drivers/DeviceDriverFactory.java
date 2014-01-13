@@ -15,15 +15,15 @@ import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfigurat
 import org.ambientlight.config.device.led.LedPointConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
-import org.ambientlight.device.drivers.dummy.DummyDeviceDriver;
-import org.ambientlight.device.drivers.dummyswitching.DummySwitchingDeviceDriver;
-import org.ambientlight.device.drivers.lk35.LK35ClientDeviceDriver;
-import org.ambientlight.device.drivers.multistripeoverethernet.MultistripeOverEthernetClientDeviceDriver;
-import org.ambientlight.device.drivers.switchoverethernet.SwitchDeviceOverEthernetDriver;
+import org.ambientlight.device.drivers.ledpoint.LK35ClientDeviceDriver;
+import org.ambientlight.device.drivers.ledstripes.DummyLedStripeDeviceDriver;
+import org.ambientlight.device.drivers.ledstripes.MultistripeOverEthernetClientDeviceDriver;
+import org.ambientlight.device.drivers.remoteswitches.DummySwitchingDeviceDriver;
+import org.ambientlight.device.drivers.remoteswitches.SwitchDeviceOverEthernetDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.Room;
-import org.ambientlight.room.StripePart;
 
 
 public class DeviceDriverFactory {
@@ -37,7 +37,7 @@ public class DeviceDriverFactory {
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");
-			DummyDeviceDriver device = new DummyDeviceDriver();
+			DummyLedStripeDeviceDriver device = new DummyLedStripeDeviceDriver();
 			DummyLedStripeDeviceConfiguration configuration = (DummyLedStripeDeviceConfiguration) dc;
 
 			for (StripeConfiguration currentStripeConfig : configuration.configuredStripes) {

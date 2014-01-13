@@ -15,12 +15,14 @@
 
 package org.ambientlight.process;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
+import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
@@ -29,8 +31,7 @@ import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfig
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
-import org.ambientlight.process.entities.Node;
-import org.ambientlight.process.entities.Process;
+import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.ConfigurationChangeHandler;
 import org.ambientlight.process.handler.actor.PowerStateHandler;
@@ -39,28 +40,28 @@ import org.ambientlight.process.handler.event.EventToBooleanHandler;
 import org.ambientlight.process.handler.event.FireEventHandler;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionActionHandler;
-import org.ambientlight.room.Room;
-import org.ambientlight.room.RoomConfigurationFactory;
+import org.ambientlight.room.Persistence;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class ProcessFactory {
+public class ProcessManager {
 
-	private final Room room;
+	private ProcessManagerConfiguration config;
 
+	private EventManager eventManager;
 
-	public ProcessFactory(Room room) {
-		super();
-		this.room = room;
-	}
+	private Map<String, Process> processes = new HashMap<String, Process>();
 
 
-	public void initProcesses() {
-		List<Process> processes = new ArrayList<Process>();
-		for (EventProcessConfiguration processConfig : room.config.processes) {
+	public ProcessManager(ProcessManagerConfiguration config, EventManager eventManager) {
+		this.config = config;
+		this.eventManager = eventManager;
+
+		Map<String, Process> processes = new HashMap<String, Process>();
+		for (EventProcessConfiguration processConfig : config.processes.values()) {
 			if (processConfig.run == false) {
 				System.out.println("ProcessFactory: Ommiting process: " + processConfig.id);
 				continue;
@@ -68,77 +69,70 @@ public class ProcessFactory {
 			System.out.println("ProcessFactory: Building process: " + processConfig.id);
 			Process result = createProcess(processConfig);
 			result.start();
-			processes.add(result);
+
+			processes.put(processConfig.id, result);
 
 			System.out.println("ProcessFactory: Built and setup process successfully: " + processConfig.id);
 		}
-		this.room.processes = processes;
+
+		this.processes = processes;
 	}
 
 
-	public synchronized void startProcess(String processId) {
-		ProcessConfiguration processConfig = null;
-		for (ProcessConfiguration currentProcess : room.config.processes) {
-			if (currentProcess.id.equals(processId)) {
-				processConfig = currentProcess;
-				break;
-			}
-		}
+	public void startProcess(String processId) {
+
+		ProcessConfiguration processConfig = config.processes.get(processId);
 
 		if (processConfig == null)
-			return;
+			throw new IllegalArgumentException("ProcessId does not exist!");
 
 		// return if process is already running
-		for (Process currentProcess : room.processes) {
-			if (currentProcess.config.id.equals(processConfig.id)) {
-				System.out.println("ProcessFactory: process already running: " + processConfig.id);
-				return;
-			}
+		if (processes.containsKey(processConfig.id)) {
+			System.out.println("ProcessFactory: process already running: " + processConfig.id);
+			return;
 		}
 
-		// todo this will crash in future if there are more process types
+		Persistence.beginTransaction();
+
 		Process result = createProcess((EventProcessConfiguration) processConfig);
-		room.processes.add(result);
 		result.start();
 
-		RoomConfigurationFactory.beginTransaction();
+		processes.put(processConfig.id, result);
+
 		processConfig.run = true;
-		RoomConfigurationFactory.commitTransaction();
+
+		Persistence.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 		System.out.println("ProcessFactory: started process successfully: " + processConfig.id);
 	}
 
 
-	public synchronized void stopProcess(String processId) {
-		ProcessConfiguration processConfig = null;
-		for (ProcessConfiguration currentProcess : room.config.processes) {
-			if (currentProcess.id.equals(processId)) {
-				processConfig = currentProcess;
-				break;
-			}
-		}
+	public void stopProcess(String processId) {
+
+		ProcessConfiguration processConfig = config.processes.get(processId);
 
 		if (processConfig == null)
-			return;
+			throw new IllegalArgumentException("ProcessId does not exist!");
 
 		// return if process is already stopped
-		Process runningProcess = null;
-		for (Process currentProcess : room.processes) {
-			if (currentProcess.config.id.equals(processConfig.id)) {
-				runningProcess = currentProcess;
-				break;
-			}
-		}
+		Process runningProcess = processes.get(processId);
 		if (runningProcess == null) {
 			System.out.println("ProcessFactory: process already stopped: " + processConfig.id);
 			return;
 		}
 
-
 		runningProcess.suspend();
-		room.processes.remove(runningProcess);
-		RoomConfigurationFactory.beginTransaction();
+		processes.remove(runningProcess);
+
+		Persistence.beginTransaction();
 		processConfig.run = false;
-		RoomConfigurationFactory.commitTransaction();
+
+		Persistence.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 		System.out.println("ProcessFactory: stopped process successfully: " + processConfig.id);
 	}
 
@@ -151,17 +145,12 @@ public class ProcessFactory {
 		Process result = new Process();
 		result.config = processConfig;
 		createNodes(result, 0);
-		result.eventManager = room.eventManager;
+		result.eventManager = eventManager;
 
 		return result;
 	}
 
 
-	/**
-	 * @param processConfig
-	 * @param process
-	 * @param i
-	 */
 	private void createNodes(Process process, int i) {
 		System.out.println("ProcessFactory: creating Node with id: " + i + " for process: " + process.config.id);
 

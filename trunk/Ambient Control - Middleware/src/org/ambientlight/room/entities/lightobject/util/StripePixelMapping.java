@@ -1,6 +1,6 @@
 package org.ambientlight.room.entities.lightobject.util;
 
-import org.ambientlight.room.StripePart;
+import org.ambientlight.device.led.StripePart;
 
 public class StripePixelMapping {
 

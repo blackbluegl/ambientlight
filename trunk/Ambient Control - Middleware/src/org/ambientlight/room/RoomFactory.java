@@ -13,18 +13,16 @@ import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
-import org.ambientlight.config.room.entities.lightobject.ActorConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
-import org.ambientlight.process.ProcessFactory;
-import org.ambientlight.room.entities.EventGenerator;
+import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateFactory;
 import org.ambientlight.room.entities.lightobject.LightObject;
@@ -35,12 +33,10 @@ import org.ambientlight.room.entities.switches.SwitchManager;
 public class RoomFactory {
 
 	DeviceDriverFactory deviceFactory;
-	ProcessFactory processFactory;
 
 
-	public RoomFactory(DeviceDriverFactory deviceFactory, ProcessFactory processFactory) {
+	public RoomFactory(DeviceDriverFactory deviceFactory, ProcessManager processFactory) {
 		this.deviceFactory = deviceFactory;
-		this.processFactory = processFactory;
 	}
 
 

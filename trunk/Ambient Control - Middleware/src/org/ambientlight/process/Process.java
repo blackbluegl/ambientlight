@@ -1,4 +1,4 @@
-package org.ambientlight.process.entities;
+package org.ambientlight.process;
 
 import java.util.HashMap;
 import java.util.Map;
