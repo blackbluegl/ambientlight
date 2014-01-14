@@ -12,6 +12,7 @@ import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 
@@ -29,11 +30,13 @@ public class RoomConfiguration implements Serializable {
 
 	public ClimateManagerConfiguration climateManager;
 	public SwitchManagerConfiguration switchesManager;
+	public RemoteSwitchManagerConfiguration remoteSwitchesManager;
 	public AlarmManagerConfiguration alarmManager;
 	public SceneryManagerConfiguration sceneriesManager;
 	public ProcessManagerConfiguration processManager;
 
 	public Map<String, LightObjectConfiguration> lightObjectConfigurations = new HashMap<String, LightObjectConfiguration>();
+
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
 
 
@@ -43,6 +46,8 @@ public class RoomConfiguration implements Serializable {
 		result.putAll(lightObjectConfigurations);
 
 		result.putAll(switchesManager.switches);
+
+		result.putAll(remoteSwitchesManager.remoteSwitches);
 
 		return result;
 	}

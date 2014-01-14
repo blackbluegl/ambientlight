@@ -58,7 +58,7 @@ public abstract class Alarm implements Switchable {
 	 * @see org.ambientlight.config.features.Entity#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getId() {
 		return this.id;
 	}
 
@@ -69,7 +69,7 @@ public abstract class Alarm implements Switchable {
 	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
 	 */
 	@Override
-	public void setName(String name) {
+	public void setId(String name) {
 		this.id = name;
 	}
 }

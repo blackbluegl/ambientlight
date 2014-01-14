@@ -15,7 +15,7 @@ public class SwitchDeviceOverEthernetDriver implements RemoteSwtichDeviceDriver{
 	
 
 	
-	public void writeData(String type, int housecode,int switchingUnit,boolean state) throws IOException {
+	public void setState(String type, int housecode,int switchingUnit,boolean state) throws IOException {
 		Socket controlSocket = new Socket(this.configuration.hostName,
 				this.configuration.port);
 

@@ -13,17 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.features;
+package org.ambientlight.config.room.entities.remoteswitches;
+
+import java.util.Map;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface Entity {
+public class RemoteSwitchManagerConfiguration {
 
-	public String getId();
-
-
-	public void setId(String name);
+	public Map<String, RemoteSwitch> remoteSwitches;
 }

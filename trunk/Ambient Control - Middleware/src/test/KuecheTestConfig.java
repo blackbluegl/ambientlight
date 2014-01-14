@@ -58,14 +58,14 @@ public class KuecheTestConfig {
 		rc.deviceConfigurations.add(lk35);
 
 		LightObjectConfiguration lo = new LightObjectConfiguration();
-		lo.setName("Highboard");
+		lo.setId("Highboard");
 		lo.height = 10;
 		lo.layerNumber = 1;
 		lo.width = 10;
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.actorConductConfiguration = this.createSimpleColor();
-		rc.lightObjectConfigurations.put(lo.getName(), lo);
+		rc.lightObjectConfigurations.put(lo.getId(), lo);
 
 		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
 		triggerMainSwitch.name = "Lichtschalter";
@@ -167,7 +167,7 @@ public class KuecheTestConfig {
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
 		for (LightObjectConfiguration current : lo) {
-			cHandler.actorConfiguration.put(current.getName(), createSimpleColor());
+			cHandler.actorConfiguration.put(current.getId(), createSimpleColor());
 		}
 		startNode.actionHandler = cHandler;
 		startNode.nextNodeIds.add(1);
@@ -177,7 +177,7 @@ public class KuecheTestConfig {
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
 		for (Switchable current : itemsToPutOn) {
-			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
+			powerstatehandler.powerStateConfiguration.put(current.getId(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;
 

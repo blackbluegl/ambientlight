@@ -13,19 +13,18 @@ import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.device.led.StripePart;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateFactory;
-import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.lightobject.LightObjectManager;
+import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
@@ -41,16 +40,22 @@ public class RoomFactory {
 
 
 	public Room initRoom(RoomConfiguration roomConfig) throws UnknownHostException, IOException {
-		AmbientControlMW.setRoom(new Room());
-		Room room = AmbientControlMW.getRoom();
+		// init room
+		Room room = new Room();
 		room.config = roomConfig;
+		AmbientControlMW.setRoom(room);
 
-		// start DispatcherManager
-		DispatcherManager dispatcherManager = new DispatcherManager();
+		// init rooms pixelmap
+		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);
+		room.setRoomBitMap(pixelMap);
+
+		// init lightObject rendering system
+		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
+		room.lightObjectManager = new LightObjectManager(effectFactory);
 
 		// start queueManager
 		room.qeueManager = new QeueManager();
-		room.qeueManager.dispatcherManager = dispatcherManager;
+		room.qeueManager.dispatcherManager = new DispatcherManager();
 		room.qeueManager.startQeues();
 
 		// start climate Manager
@@ -61,9 +66,7 @@ public class RoomFactory {
 		CallBackManager callbackManager = new CallBackManager();
 		room.callBackMananger = callbackManager;
 
-		// initialize Pixelmap
-		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);
-		room.setRoomBitMap(pixelMap);
+
 
 		// initialize the device drivers
 		List<DeviceDriver> devices = new ArrayList<DeviceDriver>();
@@ -72,15 +75,7 @@ public class RoomFactory {
 		}
 		room.setDevices(devices);
 
-		// initialize the lightObjects
-		List<LightObject> lightObjects = new ArrayList<LightObject>();
-		for (ActorConfiguration currentItemConfiguration : roomConfig.lightObjectConfigurations.values()) {
-			if (currentItemConfiguration instanceof LightObjectConfiguration) {
-				lightObjects.add(this.initializeLightObject((LightObjectConfiguration) currentItemConfiguration,
-						room.getAllStripePartsInRoom()));
-			}
-		}
-		room.setLightObjectsInRoom(lightObjects);
+
 
 		room.eventManager = new EventManager();
 
@@ -120,41 +115,7 @@ public class RoomFactory {
 	}
 
 
-	private LightObject initializeLightObject(LightObjectConfiguration lightObjectConfig, List<StripePart> allStripePartsInRoom) {
-		List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
-				lightObjectConfig);
 
-		return new LightObject(lightObjectConfig, stripePartsInLightObject);
-	}
-
-
-	private List<StripePart> getStripePartsFromRoomForLightObject(List<StripePart> stripesInRoom,
-			LightObjectConfiguration configuration) {
-		int minPositionX = configuration.xOffsetInRoom;
-		int minPositionY = configuration.yOffsetInRoom;
-		int maxPoistionX = configuration.xOffsetInRoom + configuration.width;
-		int maxPositionY = configuration.yOffsetInRoom + configuration.height;
-
-		List<StripePart> result = new ArrayList<StripePart>();
-
-		for (StripePart currentSubStripe : stripesInRoom) {
-			if (minPositionX > currentSubStripe.configuration.startXPositionInRoom) {
-				continue;
-			}
-			if (minPositionY > currentSubStripe.configuration.startYPositionInRoom) {
-				continue;
-			}
-			if (maxPoistionX < currentSubStripe.configuration.endXPositionInRoom) {
-				continue;
-			}
-			if (maxPositionY < currentSubStripe.configuration.endYPositionInRoom) {
-				continue;
-			}
-			result.add(currentSubStripe);
-		}
-
-		return result;
-	}
 
 
 	private DeviceDriver initializeDevice(DeviceConfiguration deviceConfig, Room room) throws UnknownHostException, IOException {

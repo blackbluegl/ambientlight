@@ -7,5 +7,5 @@ import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfigurat
 public interface RemoteSwtichDeviceDriver extends DeviceDriver {
 	
 	public void setConfiguration(SwitchDeviceOverEthernetConfiguration configuration);
-	public void writeData(String type, int housecode,int switchingUnit,boolean state) throws IOException;
+	public void setState(String type, int housecode,int switchingUnit,boolean state) throws IOException;
 }
