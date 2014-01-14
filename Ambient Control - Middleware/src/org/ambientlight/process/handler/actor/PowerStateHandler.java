@@ -20,7 +20,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
 			for (Switchable actorConfig : AmbientControlMW.getRoom().config.getSwitchableActors().values()) {
-				switchPowerState(actorConfig.getName(), powerState, actorConfig);
+				switchPowerState(actorConfig.getId(), powerState, actorConfig);
 			}
 			return;
 		}
@@ -43,7 +43,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 				AmbientControlMW
 				.getRoom()
 				.getSwitchingDevice()
-				.writeData(((RemoteSwitch) actorConfig).deviceType,
+				.setState(((RemoteSwitch) actorConfig).deviceType,
 						((RemoteSwitch) actorConfig).houseCode,
 						((RemoteSwitch) actorConfig).switchingUnitCode, powerState);
 

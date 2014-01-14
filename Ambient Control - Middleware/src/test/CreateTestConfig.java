@@ -178,23 +178,23 @@ public class CreateTestConfig {
 		sw1.deviceType = "ELRO";
 		sw1.houseCode = 15;
 		sw1.switchingUnitCode = 3;
-		sw1.setName("kleine Stehlampe");
+		sw1.setId("kleine Stehlampe");
 		sw1.actorConductConfiguration = new SwitchingConfiguration();
-		rc.lightObjectConfigurations.put(sw1.getName(), sw1);
+		rc.lightObjectConfigurations.put(sw1.getId(), sw1);
 
 		LightObjectConfiguration lo = new LightObjectConfiguration();
-		lo.setName("Schrank");
+		lo.setId("Schrank");
 		lo.height = 20;
 		lo.layerNumber = 2;
 		lo.width = 20;
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.actorConductConfiguration = this.createSimpleColor();
-		rc.lightObjectConfigurations.put(lo.getName(), lo);
+		rc.lightObjectConfigurations.put(lo.getId(), lo);
 
 		LightObjectConfiguration background = new LightObjectConfiguration();
 		background.setPowerState(true);
-		background.setName("background");
+		background.setId("background");
 		background.height = 200;
 		background.layerNumber = 1;
 		background.width = 200;
@@ -202,7 +202,7 @@ public class CreateTestConfig {
 		background.yOffsetInRoom = 0;
 		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
 		background.actorConductConfiguration = sunset;
-		rc.lightObjectConfigurations.put(background.getName(), background);
+		rc.lightObjectConfigurations.put(background.getId(), background);
 
 		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
 		triggerMainSwitch.name = "RoomSwitch";
@@ -311,7 +311,7 @@ public class CreateTestConfig {
 
 		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
 		for (LightObjectConfiguration current : lo) {
-			cHandler.actorConfiguration.put(current.getName(), createSimpleColor());
+			cHandler.actorConfiguration.put(current.getId(), createSimpleColor());
 		}
 		startNode.actionHandler = cHandler;
 		startNode.nextNodeIds.add(1);
@@ -321,7 +321,7 @@ public class CreateTestConfig {
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
 		for (Switchable current : itemsToPutOn) {
-			powerstatehandler.powerStateConfiguration.put(current.getName(), true);
+			powerstatehandler.powerStateConfiguration.put(current.getId(), true);
 		}
 		switchNode.actionHandler = powerstatehandler;
 

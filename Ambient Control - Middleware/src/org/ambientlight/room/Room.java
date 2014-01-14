@@ -1,6 +1,5 @@
 package org.ambientlight.room;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
-import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
@@ -19,6 +17,8 @@ import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
+import org.ambientlight.room.entities.lightobject.LightObjectManager;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitchManager;
 import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
@@ -30,9 +30,13 @@ import org.ambientlight.room.entities.switches.SwitchManager;
  */
 public class Room {
 
+	public LightObjectManager lightObjectManager;
+
 	public ClimateManager climateManager;
 
 	public SwitchManager schwitchManager;
+
+	public RemoteSwitchManager remoteSwitchManager;
 
 	public QeueManager qeueManager;
 
@@ -48,28 +52,8 @@ public class Room {
 
 	private List<DeviceDriver> devices;
 
-	private BufferedImage roomBitMap;
 
 	public RoomConfiguration config;
-
-	public BufferedImage getRoomBitMap() {
-		return roomBitMap;
-	}
-
-
-	public void setRoomBitMap(BufferedImage roomBitMap) {
-		this.roomBitMap = roomBitMap;
-	}
-
-
-	public List<DeviceDriver> getDevices() {
-		return devices;
-	}
-
-
-	public void setDevices(List<DeviceDriver> devices) {
-		this.devices = devices;
-	}
 
 
 
@@ -97,17 +81,6 @@ public class Room {
 			}
 		}
 		return result;
-	}
-
-
-	public RemoteSwtichDeviceDriver getSwitchingDevice() {
-		// TODO actually we use the first found device. later a correlation
-		// between the device and the switches could be possible
-		for (DeviceDriver currentDevice : this.devices) {
-			if (currentDevice instanceof RemoteSwtichDeviceDriver)
-				return (RemoteSwtichDeviceDriver) currentDevice;
-		}
-		return null;
 	}
 
 

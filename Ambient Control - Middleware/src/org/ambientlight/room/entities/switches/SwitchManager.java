@@ -19,6 +19,8 @@ import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.room.entities.switches.Switch;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchType;
+import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.room.Persistence;
 
 
@@ -30,8 +32,10 @@ public class SwitchManager {
 
 	public SwitchManagerConfiguration config;
 
+	public RemoteSwtichDeviceDriver remoteSwitches;
 
-	public void handleSwitchChange(String id, boolean powerState) {
+
+	public void setSwitchState(String id, SwitchType type, boolean powerState) {
 		if (config.switches.containsKey(id) == false) {
 			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: =" + id);
 			return;
@@ -39,13 +43,17 @@ public class SwitchManager {
 
 		Persistence.beginTransaction();
 
-		Switch switchConfig = config.switches.get(id);
-		switchConfig.powerState = powerState;
+		Switch switchObject = config.switches.get(id);
+		switchObject.setPowerState(powerState);
 
 		Persistence.commitTransaction();
 
-		SwitchEvent switchEvent = new SwitchEvent(switchConfig.id, powerState, switchConfig.type);
+		// inform eventreceivers - e.g. renderer for lightobjects,
+		SwitchEvent switchEvent = new SwitchEvent(switchObject.getId(), powerState, switchObject.type);
 
 		AmbientControlMW.getRoom().eventManager.onEvent(switchEvent);
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
 	}
 }

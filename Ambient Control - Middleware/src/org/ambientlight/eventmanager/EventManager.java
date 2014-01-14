@@ -13,11 +13,11 @@ import org.ambientlight.room.entities.alarm.AlarmManager;
 
 public class EventManager {
 
-	Map<BroadcastEvent, List<IEventListener>> eventMap = new HashMap<BroadcastEvent, List<IEventListener>>();
+	Map<BroadcastEvent, List<EventListener>> eventMap = new HashMap<BroadcastEvent, List<EventListener>>();
 
 
 
-	public void register(final IEventListener eventListener, final BroadcastEvent triggerConfig) {
+	public void register(final EventListener eventListener, final BroadcastEvent triggerConfig) {
 		System.out.println("EventManager: registering event: " + triggerConfig.toString());
 		if (triggerConfig instanceof DailyAlarmEvent) {
 			DailyAlarmEvent alarmConfig = (DailyAlarmEvent) triggerConfig;
@@ -25,9 +25,9 @@ public class EventManager {
 			.createAlarm((DailyAlarmEvent) triggerConfig);
 		}
 
-		List<IEventListener> eventListenerList = eventMap.get(triggerConfig);
+		List<EventListener> eventListenerList = eventMap.get(triggerConfig);
 		if (eventListenerList == null) {
-			eventListenerList = new ArrayList<IEventListener>();
+			eventListenerList = new ArrayList<EventListener>();
 			eventMap.put(triggerConfig, eventListenerList);
 		}
 		eventListenerList.add(eventListener);
@@ -38,7 +38,7 @@ public class EventManager {
 	 * @param process
 	 * @param event
 	 */
-	public void unregister(IEventListener process, BroadcastEvent event) {
+	public void unregister(EventListener process, BroadcastEvent event) {
 		this.eventMap.get(event).remove(process);
 		if (this.eventMap.get(event).isEmpty()) {
 			this.eventMap.remove(event);
@@ -50,9 +50,9 @@ public class EventManager {
 
 	public void onEvent(BroadcastEvent event) {
 
-		List<IEventListener> eventListeners = this.eventMap.get(event);
+		List<EventListener> eventListeners = this.eventMap.get(event);
 		if (eventListeners != null) {
-			for (IEventListener currentListener : eventListeners) {
+			for (EventListener currentListener : eventListeners) {
 				System.out.println("EventManager: onEvent called: " + event.toString());
 				currentListener.handleEvent(event);
 			}

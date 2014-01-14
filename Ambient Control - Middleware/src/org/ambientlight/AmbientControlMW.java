@@ -8,12 +8,11 @@ import java.util.Timer;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.process.ProcessManager;
-import org.ambientlight.room.Room;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.Room;
 import org.ambientlight.room.RoomFactory;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.lightobject.Renderer;
-import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 
 
 public class AmbientControlMW {
@@ -83,7 +82,6 @@ public class AmbientControlMW {
 		processFactory.initProcesses();
 
 		renderer = new Renderer(room);
-		renderControl = new LightObjectManager(new RenderingEffectFactory(room));
 	}
 
 

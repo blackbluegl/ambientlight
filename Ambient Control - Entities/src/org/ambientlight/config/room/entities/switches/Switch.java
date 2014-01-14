@@ -25,8 +25,8 @@ import org.ambientlight.config.features.actor.Switchable;
 public class Switch implements Switchable {
 
 	public SwitchType type;
-	public String id;
-	public boolean powerState;
+	private String id;
+	private boolean powerState;
 
 
 	/*
@@ -57,7 +57,7 @@ public class Switch implements Switchable {
 	 * @see org.ambientlight.config.room.SwitchableActor#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getId() {
 		return this.id;
 	}
 
@@ -69,7 +69,7 @@ public class Switch implements Switchable {
 	 * org.ambientlight.config.room.SwitchableActor#setName(java.lang.String)
 	 */
 	@Override
-	public void setName(String name) {
+	public void setId(String name) {
 		this.id = name;
 	}
 }

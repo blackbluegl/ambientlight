@@ -7,10 +7,10 @@ import org.ambientlight.config.events.BroadcastEvent;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.eventmanager.EventManager;
-import org.ambientlight.eventmanager.IEventListener;
+import org.ambientlight.eventmanager.EventListener;
 
 
-public class Process implements IEventListener {
+public class Process implements EventListener {
 
 	public EventProcessConfiguration config;
 	public EventManager eventManager;

@@ -1,13 +1,17 @@
 package org.ambientlight.room.entities.lightobject;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
@@ -20,13 +24,32 @@ import org.ambientlight.room.entities.lightobject.programms.Tron;
 
 public class LightObjectManager {
 
-	RenderingEffectFactory effectFactory;
+	private LightObjectManagerConfiguration config;
+
+	private RenderingEffectFactory effectFactory;
 
 	private List<LightObject> lightObjects;
 
+	private BufferedImage roomBitMap;
 
-	public LightObjectManager(RenderingEffectFactory effectFactory) {
+
+
+	public LightObjectManager(LightObjectManagerConfiguration config, RenderingEffectFactory effectFactory) {
 		this.effectFactory = effectFactory;
+		for (LightObjectConfiguration currentItemConfiguration : roomConfig.lightObjectConfigurations.values()) {
+			lightObjects.add(this.initializeLightObject(currentItemConfiguration, room.getAllStripePartsInRoom()));
+		}
+
+	}
+
+
+	public BufferedImage getRoomBitMap() {
+		return roomBitMap;
+	}
+
+
+	public void setRoomBitMap(BufferedImage roomBitMap) {
+		this.roomBitMap = roomBitMap;
 	}
 
 
@@ -37,7 +60,7 @@ public class LightObjectManager {
 
 	public LightObject getLightObjectByName(String name) {
 		for (LightObject current : this.lightObjects) {
-			if (name.equals(current.configuration.getName()))
+			if (name.equals(current.configuration.getId()))
 				return current;
 		}
 		return null;
@@ -91,7 +114,7 @@ public class LightObjectManager {
 	public void setPowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
 
 		if (lightObject.configuration.getPowerState() == powerState) {
-			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getName()
+			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getId()
 					+ " already set to: " + powerState);
 			return;
 		}
@@ -128,5 +151,42 @@ public class LightObjectManager {
 
 		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 
+	}
+
+
+	private LightObject initializeLightObject(LightObjectConfiguration lightObjectConfig, List<StripePart> allStripePartsInRoom) {
+		List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
+				lightObjectConfig);
+
+		return new LightObject(lightObjectConfig, stripePartsInLightObject);
+	}
+
+
+	private List<StripePart> getStripePartsFromRoomForLightObject(List<StripePart> stripesInRoom,
+			LightObjectConfiguration configuration) {
+		int minPositionX = configuration.xOffsetInRoom;
+		int minPositionY = configuration.yOffsetInRoom;
+		int maxPoistionX = configuration.xOffsetInRoom + configuration.width;
+		int maxPositionY = configuration.yOffsetInRoom + configuration.height;
+
+		List<StripePart> result = new ArrayList<StripePart>();
+
+		for (StripePart currentSubStripe : stripesInRoom) {
+			if (minPositionX > currentSubStripe.configuration.startXPositionInRoom) {
+				continue;
+			}
+			if (minPositionY > currentSubStripe.configuration.startYPositionInRoom) {
+				continue;
+			}
+			if (maxPoistionX < currentSubStripe.configuration.endXPositionInRoom) {
+				continue;
+			}
+			if (maxPositionY < currentSubStripe.configuration.endYPositionInRoom) {
+				continue;
+			}
+			result.add(currentSubStripe);
+		}
+
+		return result;
 	}
 }

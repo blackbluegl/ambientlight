@@ -37,7 +37,7 @@ public class LightObjectConfiguration implements Switchable, Renderable, Seriali
 	 * @see org.ambientlight.config.features.Entity#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getId() {
 
 		return id;
 	}
@@ -49,7 +49,7 @@ public class LightObjectConfiguration implements Switchable, Renderable, Seriali
 	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
 	 */
 	@Override
-	public void setName(String name) {
+	public void setId(String name) {
 		this.id = name;
 
 	}

@@ -10,7 +10,7 @@ public class DummySwitchingDeviceDriver implements RemoteSwtichDeviceDriver{
 	public void setConfiguration(SwitchDeviceOverEthernetConfiguration configuration) {
 	}
 
-	public void writeData(String type, int housecode, int switchingUnit, boolean state) throws IOException {
+	public void setState(String type, int housecode, int switchingUnit, boolean state) throws IOException {
 		System.out.println("DummySwitchingDeviceDriver: switching housecode: " + housecode + ", switchunit: " + switchingUnit
 				+ " to state: " + state);
 	}
