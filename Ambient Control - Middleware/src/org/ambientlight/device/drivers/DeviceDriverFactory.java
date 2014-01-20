@@ -23,16 +23,16 @@ import org.ambientlight.device.drivers.remoteswitches.SwitchDeviceOverEthernetDr
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
-import org.ambientlight.room.Room;
+import org.ambientlight.messages.QeueManager;
 
 
 public class DeviceDriverFactory {
 
-	public DeviceDriver createByName(DeviceConfiguration dc, Room room) throws UnknownHostException, IOException {
+	public DeviceDriver createByName(DeviceConfiguration dc, QeueManager qeueManager) throws UnknownHostException, IOException {
 
 		if (dc instanceof MaxVCubeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init MaxVCube device");
-			room.qeueManager.dispatcherManager.createDispatcher((MaxVCubeDeviceConfiguration) dc, room.qeueManager);
+			qeueManager.dispatcherManager.createDispatcher((MaxVCubeDeviceConfiguration) dc, qeueManager);
 		}
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {

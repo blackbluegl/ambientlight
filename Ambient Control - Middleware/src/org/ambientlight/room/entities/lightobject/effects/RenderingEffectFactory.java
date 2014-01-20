@@ -2,7 +2,6 @@ package org.ambientlight.room.entities.lightobject.effects;
 
 import java.awt.image.BufferedImage;
 
-import org.ambientlight.room.Room;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeOutTransition;
@@ -11,15 +10,18 @@ import org.ambientlight.room.entities.lightobject.effects.transitions.SimpleFade
 import org.ambientlight.room.entities.lightobject.util.ImageUtil;
 
 public class RenderingEffectFactory {
-	Room room;
 
-	public RenderingEffectFactory(Room room) {
-		this.room = room;
+
+	BufferedImage roomCanvas;
+
+
+	public RenderingEffectFactory(BufferedImage roomCanvas) {
+		this.roomCanvas = roomCanvas;
 	}
 
 	public FadeInTransition getFadeInEffect(LightObject lightObject) {
 
-		BufferedImage background = ImageUtil.crop(room.getRoomBitMap(), lightObject.configuration.xOffsetInRoom,
+		BufferedImage background = ImageUtil.crop(roomCanvas, lightObject.configuration.xOffsetInRoom,
 				lightObject.configuration.yOffsetInRoom, lightObject.configuration.width, lightObject.configuration.height);
 
 		SimpleFadeInTransitionImpl fader = new SimpleFadeInTransitionImpl(background);

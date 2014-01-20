@@ -17,6 +17,11 @@ import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.device.drivers.LedPointDeviceDriver;
+import org.ambientlight.device.drivers.LedStripeDeviceDriver;
+import org.ambientlight.device.led.LedPoint;
+import org.ambientlight.device.led.Stripe;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
@@ -24,6 +29,7 @@ import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateFactory;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
+import org.ambientlight.room.entities.lightobject.Renderer;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
@@ -40,18 +46,22 @@ public class RoomFactory {
 
 
 	public Room initRoom(RoomConfiguration roomConfig) throws UnknownHostException, IOException {
+
 		// init room
 		Room room = new Room();
 		room.config = roomConfig;
 		AmbientControlMW.setRoom(room);
 
-		// init rooms pixelmap
-		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);
-		room.setRoomBitMap(pixelMap);
-
 		// init lightObject rendering system
-		RenderingEffectFactory effectFactory = new RenderingEffectFactory(room);
-		room.lightObjectManager = new LightObjectManager(effectFactory);
+		List<DeviceDriver> ledDevices = new ArrayList<DeviceDriver>();
+		for (DeviceConfiguration currentDeviceConfig : roomConfig.lightObjectManager.deviceConfigurations) {
+			ledDevices.add(this.initializeDevice(currentDeviceConfig));
+		}
+		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);
+		RenderingEffectFactory effectFactory = new RenderingEffectFactory(pixelMap);
+		Renderer renderer = new Renderer(pixelMap, getAllStripePartsInRoom(), getAllLedPointsInRoom());
+		room.lightObjectManager = new LightObjectManager(pixelMap, roomConfig.lightObjectManager, effectFactory, ledDevices,
+				renderer);
 
 		// start queueManager
 		room.qeueManager = new QeueManager();
@@ -65,17 +75,6 @@ public class RoomFactory {
 		// init CallbackManager
 		CallBackManager callbackManager = new CallBackManager();
 		room.callBackMananger = callbackManager;
-
-
-
-		// initialize the device drivers
-		List<DeviceDriver> devices = new ArrayList<DeviceDriver>();
-		for (DeviceConfiguration currentDeviceConfig : roomConfig.deviceConfigurations) {
-			devices.add(this.initializeDevice(currentDeviceConfig, room));
-		}
-		room.setDevices(devices);
-
-
 
 		room.eventManager = new EventManager();
 
@@ -118,11 +117,37 @@ public class RoomFactory {
 
 
 
-	private DeviceDriver initializeDevice(DeviceConfiguration deviceConfig, Room room) throws UnknownHostException, IOException {
+	private DeviceDriver initializeDevice(DeviceConfiguration deviceConfig) throws UnknownHostException, IOException {
 
 		DeviceDriver device = deviceFactory.createByName(deviceConfig, room);
 
 		return device;
+	}
+
+
+	private List<StripePart> getAllStripePartsInRoom() {
+		List<StripePart> result = new ArrayList<StripePart>();
+		for (DeviceDriver currentDevice : devices) {
+			if (currentDevice instanceof LedStripeDeviceDriver) {
+				LedStripeDeviceDriver currentLedStripeDevice = (LedStripeDeviceDriver) currentDevice;
+				for (Stripe currentStripe : currentLedStripeDevice.getAllStripes()) {
+					result.addAll(currentStripe.getStripeParts());
+				}
+			}
+		}
+		return result;
+	}
+
+
+	private List<LedPoint> getAllLedPointsInRoom() {
+		List<LedPoint> result = new ArrayList<LedPoint>();
+		for (DeviceDriver currentDevice : devices) {
+			if (currentDevice instanceof LedPointDeviceDriver) {
+				LedPointDeviceDriver currentLedPointDevice = (LedPointDeviceDriver) currentDevice;
+				result.addAll(currentLedPointDevice.getLedPoints());
+			}
+		}
+		return result;
 	}
 
 }

@@ -81,7 +81,6 @@ public class AmbientControlMW {
 		processFactory = new ProcessManager(room);
 		processFactory.initProcesses();
 
-		renderer = new Renderer(room);
 	}
 
 
