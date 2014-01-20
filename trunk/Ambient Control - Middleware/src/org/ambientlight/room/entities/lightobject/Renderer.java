@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.device.led.LedPoint;
-import org.ambientlight.room.Room;
+import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeOutTransition;
 import org.ambientlight.room.entities.lightobject.effects.transitions.Transition;
@@ -28,14 +28,14 @@ public class Renderer {
 
 	boolean debug = false;
 
-	Room room;
-
 	List<StripePixelMapping> stripePixelMapping = new ArrayList<StripePixelMapping>();
 	List<LedPoint> ledPoints = new ArrayList<LedPoint>();
 
 	boolean hadDirtyRegionInLastRun = false;
 
 	private final ReentrantLock lightObjectMappingLock = new ReentrantLock();
+
+	BufferedImage roomCanvas;
 
 
 	public boolean hadDirtyRegionInLastRun() {
@@ -45,15 +45,14 @@ public class Renderer {
 	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new HashMap<LightObject, RenderingProgramm>();
 
 
-	public Renderer(Room room) {
-		this.room = room;
+	public Renderer(BufferedImage roomBitMap, List<StripePart> allStripeParts, List<LedPoint> allLedPoints) {
 
-		BufferedImage roomCanvas = room.getRoomBitMap();
+		roomCanvas = roomBitMap;
 		// reset color of background to black
 		roomCanvas = ImageUtil.getPaintedImage(roomCanvas, Color.black);
 
-		this.stripePixelMapping = StripeUtil.getStripePixelMapping(room.getAllStripePartsInRoom());
-		this.ledPoints = room.getAllLedPointsInRoom();
+		this.stripePixelMapping = StripeUtil.getStripePixelMapping(allStripeParts);
+		this.ledPoints = allLedPoints;
 	}
 
 
@@ -105,7 +104,7 @@ public class Renderer {
 
 
 	private void mergeLightObjectsToRoomCanvas() {
-		BufferedImage roomCanvas = room.getRoomBitMap();
+
 		// reset color of background to black
 		roomCanvas = ImageUtil.getPaintedImage(roomCanvas, Color.black);
 
@@ -139,7 +138,7 @@ public class Renderer {
 
 					// merge to room
 					if (result != null) {
-						Graphics2D g2d = room.getRoomBitMap().createGraphics();
+						Graphics2D g2d = roomCanvas.createGraphics();
 						g2d.drawImage(result, null, currentLightObject.configuration.xOffsetInRoom,
 								currentLightObject.configuration.yOffsetInRoom);
 						g2d.dispose();
@@ -183,7 +182,7 @@ public class Renderer {
 		}
 
 		// init effect before the lightobject value was changed
-		BufferedImage background = room.getRoomBitMap().getSubimage(lightObject.configuration.xOffsetInRoom,
+		BufferedImage background = roomCanvas.getSubimage(lightObject.configuration.xOffsetInRoom,
 				lightObject.configuration.yOffsetInRoom, lightObject.configuration.width, lightObject.configuration.height);
 		effect.beforeRendering(background, lightObject.getPixelMap());
 		// render the lightObjectvalue
@@ -201,11 +200,11 @@ public class Renderer {
 
 	public void fillStripesWithLight() {
 		for (StripePixelMapping current : this.stripePixelMapping) {
-			int rgbValue = room.getRoomBitMap().getRGB(current.xPosition, current.yPosition);
+			int rgbValue = roomCanvas.getRGB(current.xPosition, current.yPosition);
 			current.stripePart.setPixelData(current.stripePartPosition, rgbValue);
 		}
 		for (LedPoint current : this.ledPoints) {
-			int rgbValue = room.getRoomBitMap().getRGB(current.configuration.xPosition, current.configuration.yPosition);
+			int rgbValue = roomCanvas.getRGB(current.configuration.xPosition, current.configuration.yPosition);
 			current.setPixel(rgbValue);
 		}
 	}

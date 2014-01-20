@@ -22,7 +22,7 @@ public class TestMultiStripeOEDevice {
 		device.setConfiguration(config);
 
 		float value = 1.0f;
-		float gamma = 2.20f;
+		float gamma = 2.2f;
 		ColorConfiguration cConfig = new ColorConfiguration();
 		cConfig.gammaRed = gamma;
 		cConfig.gammaGreen = gamma;
@@ -43,9 +43,9 @@ public class TestMultiStripeOEDevice {
 		device.connect();
 
 		while (true) {
-			for (int i = 1; i < 255; i++) {
+			for (int i = 0; i < 256; i++) {
 				int color = i;
-				Color c2 = new Color((int) (color * 1.0f), (int) (color * 0.9f), (int) (color * 0.6f));
+				Color c2 = new Color((int) (color * 1f), (int) (color * 1f), (int) (color * 1f));
 
 				for (int g = 0; g < sc.pixelAmount; g++) {
 					myStripe.setPixel(g, c2.getRGB());

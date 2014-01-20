@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
@@ -36,6 +37,8 @@ public class ClimateManagerConfiguration {
 	public static final float DEFAULT_OFFSET = MaxConfigureTemperaturesMessage.DEFAULT_OFFSET;
 	public static final int DEFAULT_MAX_VALVE_POSITION = MaxConfigValveMessage.DEFAULT_MAX_VALVE_POSITION;
 	public static final int DEFAULT_VALVE_OFFSET_PERCENT = 0;
+
+	public MaxVCubeDeviceConfiguration rfmBridge;
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public float setTemp = 22.0f;

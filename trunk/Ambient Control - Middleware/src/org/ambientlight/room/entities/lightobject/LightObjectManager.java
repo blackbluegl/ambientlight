@@ -7,10 +7,14 @@ import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.device.drivers.AnimateableLedDevice;
+import org.ambientlight.device.drivers.DeviceDriver;
+import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
@@ -26,30 +30,52 @@ public class LightObjectManager {
 
 	private LightObjectManagerConfiguration config;
 
+	List<StripePart> allStripePartsInRoom;
+
+	List<LedPoint> ledPointsInRoom;
+
 	private RenderingEffectFactory effectFactory;
 
 	private List<LightObject> lightObjects;
 
-	private BufferedImage roomBitMap;
+	private BufferedImage pixelMap;
+
+	private Renderer renderer;
+
+	List<DeviceDriver> devices;
 
 
+	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
+			RenderingEffectFactory effectFactory,
+ List<DeviceDriver> devices, Renderer renderer) {
 
-	public LightObjectManager(LightObjectManagerConfiguration config, RenderingEffectFactory effectFactory) {
+		this.renderer = renderer;
+
+		this.pixelMap = pixelMap;
+
 		this.effectFactory = effectFactory;
-		for (LightObjectConfiguration currentItemConfiguration : roomConfig.lightObjectConfigurations.values()) {
-			lightObjects.add(this.initializeLightObject(currentItemConfiguration, room.getAllStripePartsInRoom()));
-		}
 
+		this.devices = devices;
+
+		this.config = config;
+		for (LightObjectConfiguration currentItemConfiguration : config.lightObjectConfigurations.values()) {
+
+			List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
+					currentItemConfiguration);
+
+			lightObjects.add(new LightObject(currentItemConfiguration, stripePartsInLightObject));
+
+		}
 	}
 
 
 	public BufferedImage getRoomBitMap() {
-		return roomBitMap;
+		return pixelMap;
 	}
 
 
 	public void setRoomBitMap(BufferedImage roomBitMap) {
-		this.roomBitMap = roomBitMap;
+		this.pixelMap = roomBitMap;
 	}
 
 
@@ -114,8 +140,8 @@ public class LightObjectManager {
 	public void setPowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
 
 		if (lightObject.configuration.getPowerState() == powerState) {
-			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getId()
-					+ " already set to: " + powerState);
+			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getId() + " already set to: "
+					+ powerState);
 			return;
 		}
 
@@ -154,14 +180,6 @@ public class LightObjectManager {
 	}
 
 
-	private LightObject initializeLightObject(LightObjectConfiguration lightObjectConfig, List<StripePart> allStripePartsInRoom) {
-		List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
-				lightObjectConfig);
-
-		return new LightObject(lightObjectConfig, stripePartsInLightObject);
-	}
-
-
 	private List<StripePart> getStripePartsFromRoomForLightObject(List<StripePart> stripesInRoom,
 			LightObjectConfiguration configuration) {
 		int minPositionX = configuration.xOffsetInRoom;
@@ -185,6 +203,18 @@ public class LightObjectManager {
 				continue;
 			}
 			result.add(currentSubStripe);
+		}
+
+		return result;
+	}
+
+
+	public List<AnimateableLedDevice> getLedAnimateableDevices() {
+		List<AnimateableLedDevice> result = new ArrayList<AnimateableLedDevice>();
+		for (DeviceDriver currentDevice : this.devices) {
+			if (currentDevice instanceof AnimateableLedDevice) {
+				result.add((AnimateableLedDevice) currentDevice);
+			}
 		}
 
 		return result;

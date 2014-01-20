@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.entities.lightobject.LightObject;
@@ -35,6 +34,8 @@ public class Tron extends RenderingProgramm {
 
 	int lightObjectXOffset = 0;
 	int lightObjectYOffset = 0;
+
+	List<StripePart> stripeParts;
 
 	Map<Point, PixelColorMapping> pixelMapping = new HashMap<Point, PixelColorMapping>();
 	List<Lane> lanes = new ArrayList<Lane>();
@@ -113,6 +114,8 @@ public class Tron extends RenderingProgramm {
 	public Tron(LightObject lightObject, Color color, double lightImpact, double tailLength, double sparkleStrength,
 			double sparkleSize, double speed, int tokensAmount) {
 
+		this.stripeParts = lightObject.stripeParts;
+
 		this.r = color.getRed();
 		this.g = color.getGreen();
 		this.b = color.getBlue();
@@ -128,11 +131,8 @@ public class Tron extends RenderingProgramm {
 		this.lightObjectXOffset = lightObject.configuration.xOffsetInRoom;
 		this.lightObjectYOffset = lightObject.configuration.yOffsetInRoom;
 
-		List<StripePart> allStripeParts = AmbientControlMW.getRoom().getAllStripePartsInRoom();
-
 		// determine stripeParts within lightobject
-
-		for (StripePart currentStripePart : allStripeParts) {
+		for (StripePart currentStripePart : this.stripeParts) {
 			if (StripeUtil.isStripePartInLightObject(currentStripePart, lightObject.configuration)) {
 				this.lanes.add(new Lane(currentStripePart.configuration));
 			}
