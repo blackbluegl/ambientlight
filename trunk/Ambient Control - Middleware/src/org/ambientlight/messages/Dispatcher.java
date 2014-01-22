@@ -20,8 +20,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
-
 
 /**
  * @author Florian Bornkessel
@@ -31,10 +29,18 @@ public abstract class Dispatcher {
 
 	public ReentrantLock sendLock = new ReentrantLock();
 
-	public RemoteHostConfiguration configuration;
-	public QeueManager queueManager;
+	protected DispatcherConfiguration configuration;
+	protected QeueManager queueManager;
+
 	protected Socket socket;
 	private boolean isConnected = false;
+
+
+	public Dispatcher(DispatcherConfiguration configuration, QeueManager queueManager) {
+		super();
+		this.configuration = configuration;
+		this.queueManager = queueManager;
+	}
 
 
 	public boolean isConnected() {
@@ -52,7 +58,7 @@ public abstract class Dispatcher {
 
 
 	public void connect() throws UnknownHostException, IOException {
-		socket = new Socket(this.configuration.hostName, this.configuration.port);
+		socket = new Socket(this.configuration.device.hostName, this.configuration.device.port);
 		this.isConnected = true;
 	}
 

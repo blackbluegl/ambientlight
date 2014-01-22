@@ -12,6 +12,7 @@ import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfi
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.messages.QeueManagerConfiguration;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -25,6 +26,7 @@ public class RoomConfiguration implements Serializable {
 	public int width;
 	public int height;
 
+	public QeueManagerConfiguration qeueManager;
 	public ClimateManagerConfiguration climateManager;
 	public SwitchManagerConfiguration switchesManager;
 	public RemoteSwitchManagerConfiguration remoteSwitchesManager;

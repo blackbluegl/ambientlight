@@ -17,7 +17,6 @@ package org.ambientlight.messages;
 
 import java.util.HashMap;
 
-import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 import org.ambientlight.messages.max.MaxDispatcher;
 
 
@@ -27,50 +26,54 @@ import org.ambientlight.messages.max.MaxDispatcher;
  */
 public class DispatcherManager {
 
+	QeueManager queueManager;
+
 	HashMap<DispatcherType, Dispatcher> outDispatchers = new HashMap<DispatcherType, Dispatcher>();
 
 
-	public void createDispatcher(final RemoteHostConfiguration config, final QeueManager queueManager) {
+	public DispatcherManager(QeueManager queueManager, HashMap<DispatcherType, Dispatcher> outDispatchers) {
+		this.queueManager = queueManager;
+		this.outDispatchers = outDispatchers;
+	}
 
-		final MaxDispatcher dispatcher = new MaxDispatcher();
-		dispatcher.configuration = config;
-		dispatcher.queueManager = queueManager;
-		outDispatchers.put(DispatcherType.MAX, dispatcher);
-		outDispatchers.put(DispatcherType.SYSTEM, dispatcher);
 
-		connectDispatcher(dispatcher);
+	public void startDispatchers() {
 
-		new Thread(new Runnable() {
+		for (final Dispatcher currentDispatcher : outDispatchers.values()) {
+			connectDispatcher(currentDispatcher);
 
-			@Override
-			public void run() {
-				if (dispatcher instanceof InDispatcher) {
-					startReceiveMessages(dispatcher, queueManager);
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (currentDispatcher instanceof InDispatcher) {
+						startReceiveMessages(currentDispatcher);
+					}
 				}
-			}
-		}).start();
+			}).start();
 
-		queueManager.onConnectDispatcher(DispatcherType.MAX);
-		startHeartBeatCheck(dispatcher, queueManager);
+			queueManager.onConnectDispatcher(DispatcherType.MAX);
+			startHeartBeatCheck(currentDispatcher);
+		}
 	}
 
 
 	/**
 	 * @param dispatcher
 	 */
-	private void connectDispatcher(MaxDispatcher dispatcher) {
+	private void connectDispatcher(Dispatcher dispatcher) {
 		try {
 			dispatcher.connect();
 			System.out.println("DispatcherManager connectDispatcher(): Successfully connected Dispatcher: "
-					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
+					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName);
 		} catch (Exception e) {
 			System.out.println("DispatcherManager connectDispatcher(): could not connect Dispatcher: "
-					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName + ". Retrying.");
+					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName + ". Retrying.");
 		}
 	}
 
 
-	private void startHeartBeatCheck(final Dispatcher dispatcher, final QeueManager queueManager) {
+	private void startHeartBeatCheck(final Dispatcher dispatcher) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -80,18 +83,20 @@ public class DispatcherManager {
 						if (dispatcher.checkConnection() == false) {
 							System.out
 							.println("DispatcherManager startHeartBeatCheck(): Connection lost. Reconnecting Dispatcher: "
-									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
+									+ dispatcher.getClass().getSimpleName()
+									+ " to: "
+									+ dispatcher.configuration.device.hostName);
 							queueManager.onDisconnectDispatcher(dispatcher.getDispatcherType());
 							dispatcher.closeConnection();
 							dispatcher.connect();
 							queueManager.onConnectDispatcher(dispatcher.getDispatcherType());
 							System.out.println("DispatcherManager startHeartBeatCheck(): Connection recovered for Dispatcher: "
-									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
+									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName);
 						}
 
 					} catch (Exception e) {
 						System.out.println("DispatcherManager startHeartBeatCheck(): could not reconnect Dispatcher: "
-								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName
+								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName
 								+ ". Retrying");
 					} finally {
 						try {
@@ -112,7 +117,7 @@ public class DispatcherManager {
 	}
 
 
-	private void startReceiveMessages(final Dispatcher dispatcher, final QeueManager qeueManager) {
+	private void startReceiveMessages(final Dispatcher dispatcher) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -123,13 +128,15 @@ public class DispatcherManager {
 						Message inMessage = ((MaxDispatcher) dispatcher).receiveMessages();
 
 						if (inMessage != null) {
-							qeueManager.putInMessage(inMessage);
+							queueManager.putInMessage(inMessage);
 						}
 					} catch (Exception e) {
 
 						System.out
 						.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect for Dispatcher: "
-								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
+								+ dispatcher.getClass().getSimpleName()
+								+ " to: "
+								+ dispatcher.configuration.device.hostName);
 
 						try {
 							Thread.sleep(5000);
@@ -141,5 +148,4 @@ public class DispatcherManager {
 			}
 		}).start();
 	}
-
 }

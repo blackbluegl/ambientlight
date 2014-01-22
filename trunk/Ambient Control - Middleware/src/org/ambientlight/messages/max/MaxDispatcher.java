@@ -21,9 +21,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.ambientlight.messages.Dispatcher;
+import org.ambientlight.messages.DispatcherConfiguration;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.InDispatcher;
 import org.ambientlight.messages.Message;
+import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.rfm22bridge.PingMessage;
 
 
@@ -33,9 +35,12 @@ import org.ambientlight.messages.rfm22bridge.PingMessage;
  */
 public class MaxDispatcher extends Dispatcher implements InDispatcher {
 
-	// ReentrantLock sendLock = new ReentrantLock();
-
 	private boolean pongReceived = false;
+
+
+	public MaxDispatcher(DispatcherConfiguration configuration, QeueManager queueManager) {
+		super(configuration, queueManager);
+	}
 
 
 	/*

@@ -9,7 +9,6 @@ import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
-import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
@@ -23,17 +22,12 @@ import org.ambientlight.device.drivers.remoteswitches.SwitchDeviceOverEthernetDr
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
-import org.ambientlight.messages.QeueManager;
 
 
 public class DeviceDriverFactory {
 
-	public DeviceDriver createByName(DeviceConfiguration dc, QeueManager qeueManager) throws UnknownHostException, IOException {
 
-		if (dc instanceof MaxVCubeDeviceConfiguration) {
-			System.out.println("DeviceDriverFactory: init MaxVCube device");
-			qeueManager.dispatcherManager.createDispatcher((MaxVCubeDeviceConfiguration) dc, qeueManager);
-		}
+	public DeviceDriver createByName(DeviceConfiguration dc) throws UnknownHostException, IOException {
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");
