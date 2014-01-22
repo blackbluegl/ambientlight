@@ -16,6 +16,9 @@
 package org.ambientlight.room.entities.alarm;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,16 +40,81 @@ public class AlarmManager {
 
 	public EventManager eventManager;
 
+	private Timer timer = new Timer();
+
+	private Map<String, TimerTask> alarmTasks = new HashMap<String, TimerTask>();
+
+
+	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager) {
+		super();
+		this.config = config;
+		this.eventManager = eventManager;
+
+		for (Entry<String, DailyAlarm> current : config.alarms.entrySet()) {
+			createAlarmEvent(current.getKey(), current.getValue());
+		}
+	}
+
 
 	/**
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	public void createAlarm(final String name, final DailyAlarm alarm) {
+	public void deleteAlarm(final String name) {
+
+		Persistence.beginTransaction();
+
+		DailyAlarm alarm = this.config.alarms.get(name);
+
+		removeAlarmEvent(name, alarm);
+
+		this.config.alarms.remove(name);
+
+		Persistence.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+	}
+
+
+	/**
+	 * @param eventListener
+	 * @param triggerConfig
+	 */
+	public void createOrUpdateAlarm(final String name, final DailyAlarm alarm) {
 
 		Persistence.beginTransaction();
 
 		this.config.alarms.put(name, alarm);
+
+		if (alarm.getPowerState()) {
+			createAlarmEvent(name, alarm);
+		} else {
+			removeAlarmEvent(name, alarm);
+		}
+
+		Persistence.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+	}
+
+
+	private void removeAlarmEvent(String name, DailyAlarm alarm) {
+		alarmTasks.get(name).cancel();
+	}
+
+
+	/**
+	 * @param name
+	 * @param alarm
+	 */
+	private void createAlarmEvent(final String name, final DailyAlarm alarm) {
+		Calendar now = Calendar.getInstance();
+		Calendar alarmCalendar = Calendar.getInstance();
+		alarmCalendar.set(Calendar.HOUR_OF_DAY, alarm.hour);
+		alarmCalendar.set(Calendar.MINUTE, alarm.minute);
+		if (alarmCalendar.before(now)) {
+			alarmCalendar.add(Calendar.DAY_OF_MONTH, 1);
+		}
 
 		TimerTask task = new TimerTask() {
 
@@ -58,19 +126,7 @@ public class AlarmManager {
 			}
 		};
 
-		Calendar now = Calendar.getInstance();
-		Calendar alarmCalendar = Calendar.getInstance();
-		alarmCalendar.set(Calendar.HOUR_OF_DAY, alarm.hour);
-		alarmCalendar.set(Calendar.MINUTE, alarm.minute);
-		if (alarmCalendar.before(now)) {
-			alarmCalendar.add(Calendar.DAY_OF_MONTH, 1);
-		}
-
-		Timer timer = new Timer();
-		timer.schedule(task, alarmCalendar.getTime());
-
-		Persistence.commitTransaction();
-
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		timer.scheduleAtFixedRate(task, alarmCalendar.getTime(), 24 * 3600 * 1000);
+		alarmTasks.put(name, task);
 	}
 }

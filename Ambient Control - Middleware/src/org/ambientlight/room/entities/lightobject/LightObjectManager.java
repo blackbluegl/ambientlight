@@ -42,12 +42,12 @@ public class LightObjectManager {
 
 	private Renderer renderer;
 
-	List<DeviceDriver> devices;
+	public List<DeviceDriver> devices;
 
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
 			RenderingEffectFactory effectFactory,
- List<DeviceDriver> devices, Renderer renderer) {
+			List<DeviceDriver> devices, Renderer renderer) {
 
 		this.renderer = renderer;
 

@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.events.BroadcastEvent;
-import org.ambientlight.config.events.DailyAlarmEvent;
-import org.ambientlight.room.entities.alarm.AlarmManager;
 
 
 public class EventManager {
@@ -19,11 +16,6 @@ public class EventManager {
 
 	public void register(final EventListener eventListener, final BroadcastEvent triggerConfig) {
 		System.out.println("EventManager: registering event: " + triggerConfig.toString());
-		if (triggerConfig instanceof DailyAlarmEvent) {
-			DailyAlarmEvent alarmConfig = (DailyAlarmEvent) triggerConfig;
-			((AlarmManager) AmbientControlMW.getRoom().eventGenerators.get(alarmConfig.sourceId))
-			.createAlarm((DailyAlarmEvent) triggerConfig);
-		}
 
 		List<EventListener> eventListenerList = eventMap.get(triggerConfig);
 		if (eventListenerList == null) {

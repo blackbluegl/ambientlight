@@ -6,5 +6,5 @@ import java.util.Map;
 
 public class AlarmManagerConfiguration {
 
-	public Map<String, Alarm> alarms = new HashMap<String, Alarm>();
+	public Map<String, DailyAlarm> alarms = new HashMap<String, DailyAlarm>();
 }
