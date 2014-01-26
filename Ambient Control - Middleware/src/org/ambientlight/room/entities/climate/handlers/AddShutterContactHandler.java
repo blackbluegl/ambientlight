@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.climate.MaxComponent;
 import org.ambientlight.config.room.entities.climate.ShutterContact;
 import org.ambientlight.config.room.entities.climate.Thermostat;
@@ -44,7 +45,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 	boolean finished = false;
 
 
-	public AddShutterContactHandler(MaxPairPingMessage pairMessage) {
+	public AddShutterContactHandler(MaxPairPingMessage pairMessage, CallBackManager callbackManager) {
 
 		// Send pair pong
 		MaxPairPongMessage pairPong = new MaxPairPongMessage();
@@ -95,7 +96,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 
 		AmbientControlMW.getRoom().qeueManager.putOutMessages(outMessages);
 		Persistence.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callbackManager.roomConfigurationChanged();
 
 		finished = true;
 	}

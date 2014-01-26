@@ -15,7 +15,7 @@
 
 package org.ambientlight.room.entities.sceneries;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.events.SceneryEntryEvent;
 import org.ambientlight.config.features.sensor.ScenerySensor;
 import org.ambientlight.config.room.entities.scenery.Scenery;
@@ -33,9 +33,19 @@ public class SceneryManager implements ScenerySensor {
 
 	public static final String SOURCE_NAME = "SceneryManager";
 
-	public SceneryManagerConfiguration config;
+	private SceneryManagerConfiguration config;
 
-	public EventManager eventManager;
+	private EventManager eventManager;
+
+	private CallBackManager callbackManager;
+
+
+	public SceneryManager(SceneryManagerConfiguration config, EventManager eventManager, CallBackManager callbackManager) {
+		super();
+		this.config = config;
+		this.eventManager = eventManager;
+		this.callbackManager = callbackManager;
+	}
 
 
 	public void setCurrentScenery(String scenery) {
@@ -53,9 +63,8 @@ public class SceneryManager implements ScenerySensor {
 
 		Persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callbackManager.roomConfigurationChanged();
 	}
-
 
 
 	/*

@@ -15,6 +15,8 @@
 
 package org.ambientlight.config.room.entities.alarm;
 
+import org.ambientlight.room.entities.alarm.Alarm;
+
 /**
  * @author Florian Bornkessel
  * 

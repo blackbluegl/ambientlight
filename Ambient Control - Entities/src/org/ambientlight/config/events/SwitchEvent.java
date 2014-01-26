@@ -2,7 +2,7 @@ package org.ambientlight.config.events;
 
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.config.room.entities.switches.SwitchType;
+import org.ambientlight.room.entities.switches.SwitchType;
 
 
 public class SwitchEvent extends BroadcastEvent {

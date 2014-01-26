@@ -23,8 +23,6 @@ public class RoomConfiguration implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public String roomName;
-	public int width;
-	public int height;
 
 	public QeueManagerConfiguration qeueManager;
 	public ClimateManagerConfiguration climateManager;

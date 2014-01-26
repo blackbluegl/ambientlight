@@ -1,4 +1,4 @@
-package org.ambientlight.config.room.entities.remoteswitches;
+package org.ambientlight.room.entities.remoteswitches;
 
 import org.ambientlight.config.features.actor.Switchable;
 

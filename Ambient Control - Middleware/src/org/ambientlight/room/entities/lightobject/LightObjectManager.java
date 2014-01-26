@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
@@ -30,6 +30,8 @@ public class LightObjectManager {
 
 	private LightObjectManagerConfiguration config;
 
+	private CallBackManager callBackMananger;
+
 	List<StripePart> allStripePartsInRoom;
 
 	List<LedPoint> ledPointsInRoom;
@@ -46,8 +48,9 @@ public class LightObjectManager {
 
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
-			RenderingEffectFactory effectFactory,
-			List<DeviceDriver> devices, Renderer renderer) {
+			RenderingEffectFactory effectFactory, List<DeviceDriver> devices, Renderer renderer, CallBackManager callBackMananger) {
+
+		this.callBackMananger = callBackMananger;
 
 		this.renderer = renderer;
 
@@ -175,7 +178,7 @@ public class LightObjectManager {
 
 		this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackMananger.roomConfigurationChanged();
 
 	}
 

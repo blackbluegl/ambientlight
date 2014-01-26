@@ -45,7 +45,7 @@ public class TestMultiStripeOEDevice {
 		while (true) {
 			for (int i = 0; i < 256; i++) {
 				int color = i;
-				Color c2 = new Color((int) (color * 1f), (int) (color * 1f), (int) (color * 1f));
+				Color c2 = new Color((int) (color * 1f), (int) (color * 0.8f), (int) (color * .4f));
 
 				for (int g = 0; g < sc.pixelAmount; g++) {
 					myStripe.setPixel(g, c2.getRGB());

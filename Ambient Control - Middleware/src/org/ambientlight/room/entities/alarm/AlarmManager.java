@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.DailyAlarm;
@@ -36,19 +36,22 @@ import org.ambientlight.room.Persistence;
  */
 public class AlarmManager {
 
-	public AlarmManagerConfiguration config;
+	private AlarmManagerConfiguration config;
 
-	public EventManager eventManager;
+	private CallBackManager callBackManager;
+
+	private EventManager eventManager;
 
 	private Timer timer = new Timer();
 
 	private Map<String, TimerTask> alarmTasks = new HashMap<String, TimerTask>();
 
 
-	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager) {
+	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager, CallBackManager callBackMananger) {
 		super();
 		this.config = config;
 		this.eventManager = eventManager;
+		this.callBackManager = callBackMananger;
 
 		for (Entry<String, DailyAlarm> current : config.alarms.entrySet()) {
 			createAlarmEvent(current.getKey(), current.getValue());
@@ -72,7 +75,7 @@ public class AlarmManager {
 
 		Persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackManager.roomConfigurationChanged();
 	}
 
 
@@ -94,7 +97,7 @@ public class AlarmManager {
 
 		Persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackManager.roomConfigurationChanged();
 	}
 
 

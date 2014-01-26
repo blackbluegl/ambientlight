@@ -12,7 +12,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
 package org.ambientlight.room.entities.climate;
 
 import java.io.IOException;
@@ -26,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.MaxComponent;
 import org.ambientlight.config.room.entities.climate.ShutterContact;
@@ -66,9 +66,11 @@ public class ClimateManager implements MessageListener {
 
 	public static int WAIT_FOR_NEW_DEVICES = 90;
 
-	public QeueManager queueManager;
+	private CallBackManager callBackMananger;
 
-	public ClimateManagerConfiguration config;
+	private QeueManager queueManager;
+
+	private ClimateManagerConfiguration config;
 
 	private List<MessageActionHandler> actionHandlers = new ArrayList<MessageActionHandler>();
 
@@ -83,7 +85,12 @@ public class ClimateManager implements MessageListener {
 	boolean learnMode = false;
 
 
-	public ClimateManager() {
+	public ClimateManager(CallBackManager callBackMananger, QeueManager queueManager, ClimateManagerConfiguration config) {
+		super();
+		this.callBackMananger = callBackMananger;
+		this.queueManager = queueManager;
+		this.config = config;
+
 		// set time to thermostates at 3:00 every day
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
@@ -183,7 +190,7 @@ public class ClimateManager implements MessageListener {
 			Persistence.cancelTransaction();
 		} finally {
 			clearFinishedActionHandlers();
-			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+			callBackMananger.roomConfigurationChanged();
 		}
 	}
 
@@ -270,7 +277,7 @@ public class ClimateManager implements MessageListener {
 		config.temporaryUntilDate = message.getTemporaryUntil();
 
 		Persistence.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackMananger.roomConfigurationChanged();
 	}
 
 
@@ -312,13 +319,13 @@ public class ClimateManager implements MessageListener {
 		else if (learnMode && message.isReconnecting() == false) {
 			switch (message.getDeviceType()) {
 			case HEATING_THERMOSTAT:
-				registerActionHandler(new AddThermostateHandler(message));
+				registerActionHandler(new AddThermostateHandler(message, callBackMananger));
 				break;
 			case HEATING_THERMOSTAT_PLUS:
-				registerActionHandler(new AddThermostateHandler(message));
+				registerActionHandler(new AddThermostateHandler(message, callBackMananger));
 				break;
 			case SHUTTER_CONTACT:
-				registerActionHandler(new AddShutterContactHandler(message));
+				registerActionHandler(new AddShutterContactHandler(message, callBackMananger));
 				break;
 			default:
 				System.out.println("ClimateManager handlePairPing(): The devicetype is not supported yet: "
@@ -355,7 +362,7 @@ public class ClimateManager implements MessageListener {
 		boolean open = isAWindowOpen();
 		sendWindowStateToThermostates(open);
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackMananger.roomConfigurationChanged();
 	}
 
 
@@ -385,7 +392,8 @@ public class ClimateManager implements MessageListener {
 		config.setTemp = message.getSetTemp();
 
 		Persistence.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
+		callBackMananger.roomConfigurationChanged();
 	}
 
 
@@ -398,12 +406,12 @@ public class ClimateManager implements MessageListener {
 		}
 
 		if (device instanceof Thermostat) {
-			RemoveThermostatHandler remove = new RemoveThermostatHandler((Thermostat) device);
+			RemoveThermostatHandler remove = new RemoveThermostatHandler((Thermostat) device, config.devices, callBackMananger);
 			this.actionHandlers.add(remove);
 		}
 
 		if (device instanceof ShutterContact) {
-			RemoveShutterContactHandler remove = new RemoveShutterContactHandler((ShutterContact) device);
+			RemoveShutterContactHandler remove = new RemoveShutterContactHandler((ShutterContact) device, callBackMananger);
 			this.actionHandlers.add(remove);
 		}
 
@@ -438,7 +446,7 @@ public class ClimateManager implements MessageListener {
 
 		// this.setMode(0.0f, MaxThermostateMode.AUTO, null);
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackMananger.roomConfigurationChanged();
 
 	}
 
@@ -488,7 +496,7 @@ public class ClimateManager implements MessageListener {
 		}
 
 		Persistence.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callBackMananger.roomConfigurationChanged();
 	}
 
 

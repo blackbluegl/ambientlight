@@ -42,6 +42,4 @@ public class Room {
 
 	public RoomConfiguration config;
 
-
-
 }

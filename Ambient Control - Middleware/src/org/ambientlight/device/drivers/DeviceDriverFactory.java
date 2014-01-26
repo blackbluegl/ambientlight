@@ -1,7 +1,5 @@
 package org.ambientlight.device.drivers;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +8,7 @@ import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
-import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
+import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
@@ -26,8 +24,27 @@ import org.ambientlight.device.led.StripePart;
 
 public class DeviceDriverFactory {
 
+	public RemoteSwtichDeviceDriver createRemoteSwitchDevice(DeviceConfiguration dc) {
+		if (dc instanceof DummySwitchDeviceConfiguration) {
+			System.out.println("DeviceDriverFactory: init DummySwitchingDeviceDriver device");
 
-	public DeviceDriver createByName(DeviceConfiguration dc) throws UnknownHostException, IOException {
+			return new DummySwitchingDeviceDriver();
+		}
+
+		if (dc instanceof RemoteSwitchBridgeConfiguration) {
+			System.out.println("DeviceDriverFactory: init RemoteSwitchBridgeConfiguration device");
+			RemoteSwitchBridgeConfiguration config = (RemoteSwitchBridgeConfiguration) dc;
+			SwitchDeviceOverEthernetDriver device = new SwitchDeviceOverEthernetDriver();
+			device.setConfiguration(config);
+
+			return device;
+		}
+
+		return null;
+	}
+
+
+	public DeviceDriver createLedDevice(DeviceConfiguration dc) {
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");
@@ -40,21 +57,6 @@ public class DeviceDriverFactory {
 			}
 
 			device.connect();
-
-			return device;
-		}
-
-		if (dc instanceof DummySwitchDeviceConfiguration) {
-			System.out.println("DeviceDriverFactory: init DummySwitchingDeviceDriver device");
-
-			return new DummySwitchingDeviceDriver();
-		}
-
-		if (dc instanceof SwitchDeviceOverEthernetConfiguration) {
-			System.out.println("DeviceDriverFactory: init SwitchDeviceOverEthernetDriver device");
-			SwitchDeviceOverEthernetConfiguration config = (SwitchDeviceOverEthernetConfiguration) dc;
-			SwitchDeviceOverEthernetDriver device = new SwitchDeviceOverEthernetDriver();
-			device.setConfiguration(config);
 
 			return device;
 		}

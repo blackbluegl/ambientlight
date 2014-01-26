@@ -13,11 +13,15 @@ import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
+import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.LedStripeDeviceDriver;
+import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
@@ -27,6 +31,7 @@ import org.ambientlight.messages.DispatcherConfiguration;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.QeueManager;
+import org.ambientlight.messages.QeueManagerConfiguration;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxDispatcher;
@@ -36,6 +41,8 @@ import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.lightobject.Renderer;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitchManager;
+import org.ambientlight.room.entities.switches.SwitchManager;
 
 
 public class RoomFactory {
@@ -48,35 +55,36 @@ public class RoomFactory {
 	}
 
 
-	public Room initRoom(RoomConfiguration roomConfig) throws UnknownHostException, IOException {
+	public Room initRoom(RoomConfiguration roomConfig) {
 
 		// init room
 		Room room = new Room();
 		room.config = roomConfig;
 		AmbientControlMW.setRoom(room);
 
+		// init CallbackManager
+		room.callBackMananger = new CallBackManager();
+
 		// init eventmanager
 		room.eventManager = new EventManager();
 
-		// init AlarmManager
-		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager);
+		// init alarmManager
+		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger);
 
 		// init remoteSwitchManager
+		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger);
 
 		// init switchManager
+		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger);
 
 		// init lightObject rendering system
-		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager);
+		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger);
 
-		// TODO init wie alarmManager bei allen weiteren
 		// init queueManager
-		initQeueManager(roomConfig, room);
+		room.qeueManager = initQeueManager(roomConfig.qeueManager);
 
 		// init climate Manager
-		initClimateManager(room, roomConfig, room.qeueManager);
-
-		// init CallbackManager
-		room.callBackMananger = new CallBackManager();
+		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger);
 
 		System.out.println("RoomFactory initRoom(): finished");
 
@@ -85,69 +93,146 @@ public class RoomFactory {
 
 
 	/**
+	 * @param callBackMananger
+	 * @param eventManager
+	 * @param switchesManager
+	 * @return
+	 */
+	private SwitchManager initSwitchManager(SwitchManagerConfiguration config, EventManager eventManager,
+			CallBackManager callBackMananger) {
+
+		if (config == null) {
+			System.out.println("RoomFactory initSwitchManager(): no configuration - skipping!");
+			return null;
+		}
+
+		return new SwitchManager(config, eventManager, callBackMananger);
+	}
+
+
+	/**
+	 * @param remoteSwitchesManager
+	 * @return
+	 */
+	private RemoteSwitchManager initRemoteSwitchManager(RemoteSwitchManagerConfiguration config, CallBackManager callBackManager) {
+		if (config == null) {
+
+			System.out.println("RoomFactory initRemoteSwitchManager(): no configuration - skipping!");
+			return null;
+		}
+
+		RemoteSwtichDeviceDriver device = deviceFactory.createRemoteSwitchDevice(config.device);
+
+		return new RemoteSwitchManager(config, device, callBackManager);
+	}
+
+
+	/**
 	 * @param roomConfig
 	 * @param room
 	 */
-	private AlarmManager initAlarmManager(AlarmManagerConfiguration config, EventManager eventManager) {
+	private AlarmManager initAlarmManager(AlarmManagerConfiguration config, EventManager eventManager,
+			CallBackManager callBackManager) {
+
 		if (config == null) {
 			System.out.println("RoomFactory initAlarmManager(): no configuration - skipping!");
+			return null;
 		}
 
-		AlarmManager alarmManager = new AlarmManager(config, eventManager);
+		AlarmManager alarmManager = new AlarmManager(config, eventManager, callBackManager);
 
 		return alarmManager;
 	}
 
 
-	/**
-	 * @param roomConfig
-	 * @param room
-	 */
-	private void initQeueManager(RoomConfiguration roomConfig, Room room) {
-		room.qeueManager = new QeueManager();
+	private QeueManager initQeueManager(QeueManagerConfiguration config) {
+
+		if (config == null) {
+			System.out.println("RoomFactory initQeueManager(): no configuration - skipping!");
+			return null;
+		}
+
+		QeueManager qeueManager = new QeueManager();
 
 		HashMap<DispatcherType, Dispatcher> dispatcherModules = new HashMap<DispatcherType, Dispatcher>();
-		for (DispatcherConfiguration dispatcherConfig : roomConfig.qeueManager.dispatchers) {
+		for (DispatcherConfiguration dispatcherConfig : config.dispatchers) {
 			if (dispatcherConfig.type.equals(DispatcherType.MAX)) {
-				MaxDispatcher dispatcher = new MaxDispatcher(dispatcherConfig, room.qeueManager);
+				MaxDispatcher dispatcher = new MaxDispatcher(dispatcherConfig, qeueManager);
 				dispatcherModules.put(DispatcherType.MAX, dispatcher);
 				dispatcherModules.put(DispatcherType.SYSTEM, dispatcher);
 			}
 		}
 
-		room.qeueManager.dispatcherManager = new DispatcherManager(room.qeueManager, dispatcherModules);
+		qeueManager.dispatcherManager = new DispatcherManager(qeueManager, dispatcherModules);
 
-		room.qeueManager.startQeues();
+		qeueManager.startQeues();
 
-		room.qeueManager.dispatcherManager.startDispatchers();
+		qeueManager.dispatcherManager.startDispatchers();
+
+		return qeueManager;
 	}
 
 
 	/**
-	 * @param roomConfig
+	 * @param config
 	 * @param room
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration roomConfig) throws UnknownHostException,
-			IOException {
-		if (roomConfig == null) {
+	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager) {
+
+		if (config == null) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
 		}
 
-		BufferedImage pixelMap = new BufferedImage(roomConfig.width, roomConfig.height, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage pixelMap = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_ARGB);
 
 		List<DeviceDriver> ledDevices = new ArrayList<DeviceDriver>();
-		for (DeviceConfiguration currentDeviceConfig : roomConfig.lightObjectManager.deviceConfigurations) {
-			ledDevices.add(deviceFactory.createByName(currentDeviceConfig));
+		for (DeviceConfiguration currentDeviceConfig : config.deviceConfigurations) {
+			ledDevices.add(deviceFactory.createLedDevice(currentDeviceConfig));
 		}
 
 		RenderingEffectFactory effectFactory = new RenderingEffectFactory(pixelMap);
 
 		Renderer renderer = new Renderer(pixelMap, getAllStripePartsInRoom(ledDevices), getAllLedPointsInRoom(ledDevices));
 
-		return new LightObjectManager(pixelMap, roomConfig.lightObjectManager, effectFactory, ledDevices,
-				renderer);
+		return new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer, callBackManager);
+	}
+
+
+	public ClimateManager initClimateManager(ClimateManagerConfiguration config, QeueManager queueManager,
+			CallBackManager callBackManager) {
+
+		if (config == null) {
+			System.out.println("RoomFactory initClimateManager(): no configuration - skipping!");
+		}
+
+		// parse weekProfiles
+		List<String> invalidWeekProfiles = new ArrayList<String>();
+		for (Entry<String, HashMap<MaxDayInWeek, List<DayEntry>>> currentWeekProfileEntrySet : config.weekProfiles.entrySet()) {
+
+			System.out.println("ClimateFactory initClimateManager(): " + "parsing weekprofile: "
+					+ currentWeekProfileEntrySet.getKey());
+
+			boolean validProfile = this.parseWeekProfile(currentWeekProfileEntrySet.getValue());
+
+			if (validProfile == false) {
+				System.out.println(currentWeekProfileEntrySet.getKey() + " is invalid an will be skipped");
+				invalidWeekProfiles.add(currentWeekProfileEntrySet.getKey());
+			}
+		}
+
+		for (String currentWeekProfileToRemove : invalidWeekProfiles) {
+			config.weekProfiles.remove(currentWeekProfileToRemove);
+		}
+
+		ClimateManager climateManager = new ClimateManager(callBackManager, queueManager, config);
+
+		queueManager.registerMessageListener(DispatcherType.MAX, climateManager);
+
+		System.out.println("ClimateFactory initClimateManager(): initialized ClimateManager");
+
+		return climateManager;
 	}
 
 
@@ -177,36 +262,6 @@ public class RoomFactory {
 	}
 
 
-	public void initClimateManager(Room room, RoomConfiguration roomConfig, QeueManager queueManager) {
-
-		// init ClimateManager
-		if (roomConfig.climateManager != null) {
-
-			List<String> invalidWeekProfiles = new ArrayList<String>();
-			for (Entry<String, HashMap<MaxDayInWeek, List<DayEntry>>> currentWeekProfileEntrySet : room.config.climateManager.weekProfiles
-					.entrySet()) {
-				System.out.println("ClimateFactory initClimateManager(): parsing weekprofile: "
-						+ currentWeekProfileEntrySet.getKey());
-				boolean validProfile = this.parseWeekProfile(currentWeekProfileEntrySet.getValue());
-				if (validProfile == false) {
-					System.out.println(currentWeekProfileEntrySet.getKey() + " is invalid an will be skipped");
-					invalidWeekProfiles.add(currentWeekProfileEntrySet.getKey());
-				}
-			}
-			for (String currentWeekProfileToRemove : invalidWeekProfiles) {
-				room.config.climateManager.weekProfiles.remove(currentWeekProfileToRemove);
-			}
-
-			room.climateManager = new ClimateManager();
-			room.climateManager.config = room.config.climateManager;
-			room.climateManager.queueManager = queueManager;
-			room.qeueManager.registerMessageListener(DispatcherType.MAX, room.climateManager);
-
-			System.out.println("ClimateFactory initClimateManager(): initialized ClimateManager");
-		}
-	}
-
-
 	public boolean parseWeekProfile(HashMap<MaxDayInWeek, List<DayEntry>> currentWeekProfile) {
 		for (Entry<MaxDayInWeek, List<DayEntry>> currentDayEntry : currentWeekProfile.entrySet()) {
 
@@ -233,5 +288,4 @@ public class RoomFactory {
 		}
 		return true;
 	}
-
 }

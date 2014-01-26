@@ -5,10 +5,10 @@ import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
 
 public class PowerStateHandler extends AbstractActionHandler {

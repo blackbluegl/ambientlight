@@ -17,10 +17,11 @@ public class LightObject {
 
 	public LightObject(LightObjectConfiguration configuration, List<StripePart> stripesParts) {
 		this.configuration = configuration;
-		this.stripeParts= stripesParts;
+		this.stripeParts = stripesParts;
 		this.pixelMap = new BufferedImage(configuration.width, configuration.height, BufferedImage.TYPE_INT_ARGB);
 		this.pixelMapAfterEffect = new BufferedImage(configuration.width, configuration.height, BufferedImage.TYPE_INT_ARGB);
 	}
+
 
 	public BufferedImage getPixelMapAfterEffect() {
 		return pixelMapAfterEffect;
@@ -41,12 +42,12 @@ public class LightObject {
 		this.pixelMap = pixelMap;
 	}
 
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((configuration == null) ? 0 : configuration.hashCode());
+		result = prime * result + ((configuration == null) ? 0 : configuration.hashCode());
 		return result;
 	}
 
@@ -67,6 +68,5 @@ public class LightObject {
 			return false;
 		return true;
 	}
-
 
 }

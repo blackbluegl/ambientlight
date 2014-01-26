@@ -6,12 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
+import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 
 public class SwitchDeviceOverEthernetDriver implements RemoteSwtichDeviceDriver{
 			 
-	SwitchDeviceOverEthernetConfiguration configuration;
+	RemoteSwitchBridgeConfiguration configuration;
 	
 
 	
@@ -38,7 +38,7 @@ public class SwitchDeviceOverEthernetDriver implements RemoteSwtichDeviceDriver{
 	}
 
 	
-	public void setConfiguration(SwitchDeviceOverEthernetConfiguration configuration){
+	public void setConfiguration(RemoteSwitchBridgeConfiguration configuration){
 		this.configuration =  configuration;
 	}
 }

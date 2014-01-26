@@ -15,7 +15,10 @@
 
 package org.ambientlight.room.entities.climate.handlers;
 
+import java.util.Map;
+
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.climate.MaxComponent;
 import org.ambientlight.config.room.entities.climate.Thermostat;
 import org.ambientlight.messages.DispatcherType;
@@ -38,13 +41,12 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 	boolean finished = false;
 
 
-	public RemoveThermostatHandler(Thermostat device) {
-
+	public RemoveThermostatHandler(Thermostat device, Map<Integer, MaxComponent> devices, CallBackManager callbackManager) {
 
 		Persistence.beginTransaction();
 
 		// unregister link from other thermostates
-		for (MaxComponent currentDevice : AmbientControlMW.getRoom().climateManager.config.devices.values()) {
+		for (MaxComponent currentDevice : devices.values()) {
 
 			// only other thermostates
 			if (currentDevice.adress == device.adress || currentDevice instanceof Thermostat == false) {
@@ -66,10 +68,10 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
-		AmbientControlMW.getRoom().climateManager.config.devices.remove(device.adress);
+		devices.remove(device.adress);
 
 		Persistence.commitTransaction();
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callbackManager.roomConfigurationChanged();
 		finished = true;
 	}
 

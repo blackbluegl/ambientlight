@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
-import org.ambientlight.config.device.drivers.SwitchDeviceOverEthernetConfiguration;
+import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -17,7 +17,7 @@ import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguratio
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -106,7 +106,7 @@ public class Persistence {
 		xstream.processAnnotations(RemoteSwitch.class);
 		xstream.processAnnotations(StripeConfiguration.class);
 		xstream.processAnnotations(DeviceConfiguration.class);
-		xstream.processAnnotations(SwitchDeviceOverEthernetConfiguration.class);
+		xstream.processAnnotations(RemoteSwitchBridgeConfiguration.class);
 		xstream.processAnnotations(SimpleColorRenderingProgramConfiguration.class);
 		xstream.processAnnotations(SunSetRenderingProgrammConfiguration.class);
 		xstream.processAnnotations(TronRenderingProgrammConfiguration.class);
