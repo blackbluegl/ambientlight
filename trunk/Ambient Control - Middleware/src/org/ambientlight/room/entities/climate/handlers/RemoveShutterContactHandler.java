@@ -16,6 +16,7 @@
 package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.climate.ShutterContact;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
@@ -39,13 +40,18 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		SETUP, REMOVE_FROM_MODELL, FINISHED
 	};
 
+	private CallBackManager callbackManager;
+
 	private ActionState actionState = ActionState.SETUP;
 
 	private int sequenceNumberForDeletedDevice;
 	private ShutterContact device;
 
 
-	public RemoveShutterContactHandler(ShutterContact device) {
+	public RemoveShutterContactHandler(ShutterContact device, CallBackManager callbackManager) {
+
+		this.callbackManager = callbackManager;
+
 		Persistence.beginTransaction();
 
 		this.device = device;
@@ -71,7 +77,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		Persistence.commitTransaction();
 
 		if (isAWindowOpen != isAWindowNowOpen) {
-			AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+			callbackManager.roomConfigurationChanged();
 		}
 	}
 
@@ -79,8 +85,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 	private void handleRemoveFromModell() {
 
 		// remove correlator
-		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
- device.adress,
+		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, device.adress,
 				AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		AmbientControlMW.getRoom().qeueManager.putOutMessage(unRegisterCorelator);
 
@@ -91,7 +96,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		this.actionState = ActionState.FINISHED;
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callbackManager.roomConfigurationChanged();
 	}
 
 

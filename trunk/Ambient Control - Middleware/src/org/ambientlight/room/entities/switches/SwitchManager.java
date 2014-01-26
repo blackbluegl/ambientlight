@@ -15,12 +15,10 @@
 
 package org.ambientlight.room.entities.switches;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.room.entities.switches.Switch;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.config.room.entities.switches.SwitchType;
-import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
+import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.room.Persistence;
 
 
@@ -30,9 +28,19 @@ import org.ambientlight.room.Persistence;
  */
 public class SwitchManager {
 
-	public SwitchManagerConfiguration config;
+	private SwitchManagerConfiguration config;
 
-	public RemoteSwtichDeviceDriver remoteSwitches;
+	private EventManager eventManager;
+
+	private CallBackManager callback;
+
+
+	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback) {
+		super();
+		this.config = config;
+		this.eventManager = eventManager;
+		this.callback = callback;
+	}
 
 
 	public void setSwitchState(String id, SwitchType type, boolean powerState) {
@@ -51,9 +59,8 @@ public class SwitchManager {
 		// inform eventreceivers - e.g. renderer for lightobjects,
 		SwitchEvent switchEvent = new SwitchEvent(switchObject.getId(), powerState, switchObject.type);
 
-		AmbientControlMW.getRoom().eventManager.onEvent(switchEvent);
+		eventManager.onEvent(switchEvent);
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
-
+		callback.roomConfigurationChanged();
 	}
 }

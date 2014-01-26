@@ -3,7 +3,7 @@ package org.ambientlight.config.device.drivers;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("switchingOverEthernetDeviceConfiguration")
-public class SwitchDeviceOverEthernetConfiguration extends RemoteHostConfiguration {
+public class RemoteSwitchBridgeConfiguration extends RemoteHostConfiguration {
 
 	/**
 	 * 

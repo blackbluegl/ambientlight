@@ -25,9 +25,12 @@ import org.ambientlight.config.device.drivers.DeviceConfiguration;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class LightObjectManagerConfiguration {
+
+	public int width;
+	public int height;
 
 	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
 	public Map<String, LightObjectConfiguration> lightObjectConfigurations = new HashMap<String, LightObjectConfiguration>();

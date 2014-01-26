@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.alarm;
+package org.ambientlight.room.entities.alarm;
 
 import org.ambientlight.config.features.actor.Switchable;
 

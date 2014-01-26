@@ -17,12 +17,17 @@ package org.ambientlight.config.room.entities.remoteswitches;
 
 import java.util.Map;
 
+import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
 public class RemoteSwitchManagerConfiguration {
+
+	public RemoteSwitchBridgeConfiguration device;
 
 	public Map<String, RemoteSwitch> remoteSwitches;
 }

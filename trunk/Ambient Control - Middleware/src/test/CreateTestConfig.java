@@ -32,7 +32,6 @@ import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguratio
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
@@ -40,6 +39,7 @@ import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
 
 public class CreateTestConfig {

@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.switches;
+package org.ambientlight.room.entities.switches;
 
 /**
  * @author Florian Bornkessel

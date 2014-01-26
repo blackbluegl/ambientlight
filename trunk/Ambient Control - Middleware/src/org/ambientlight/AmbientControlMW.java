@@ -24,9 +24,6 @@ public class AmbientControlMW {
 		return roomConfigFileName;
 	}
 
-	static LightObjectManager renderControl;
-
-	static Renderer renderer;
 
 	static Room room;
 

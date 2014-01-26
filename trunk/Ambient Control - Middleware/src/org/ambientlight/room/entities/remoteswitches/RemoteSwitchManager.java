@@ -15,10 +15,11 @@
 
 package org.ambientlight.room.entities.remoteswitches;
 
-import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
+import java.io.IOException;
+
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.room.Persistence;
 
 
@@ -29,12 +30,17 @@ import org.ambientlight.room.Persistence;
 public class RemoteSwitchManager {
 
 	private RemoteSwitchManagerConfiguration config;
-	private EventManager eventManager;
+
+	private RemoteSwtichDeviceDriver device;
+
+	private CallBackManager callbackManager;
 
 
-	public RemoteSwitchManager(RemoteSwitchManagerConfiguration config, EventManager eventManager) {
+	public RemoteSwitchManager(RemoteSwitchManagerConfiguration config, RemoteSwtichDeviceDriver device,
+			CallBackManager callbackManager) {
 		this.config = config;
-		this.eventManager = eventManager;
+		this.device = device;
+		this.callbackManager = callbackManager;
 	}
 
 
@@ -53,7 +59,13 @@ public class RemoteSwitchManager {
 
 		Persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		try {
+			device.setState("ELRO", remoteSwitch.houseCode, remoteSwitch.switchingUnitCode, powerState);
+		} catch (IOException e) {
+			System.out.println("RemoteSwitchManager handleSwitchChange():could not change remoteswitchs powerstate!");
+			e.printStackTrace();
+		}
 
+		callbackManager.roomConfigurationChanged();
 	}
 }

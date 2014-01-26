@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ambientlight.room.entities.switches.Switch;
+
 
 
 public class SwitchManagerConfiguration implements Serializable {

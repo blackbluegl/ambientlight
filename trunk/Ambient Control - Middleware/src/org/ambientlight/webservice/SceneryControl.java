@@ -19,10 +19,10 @@ import org.ambientlight.config.room.entities.lightobject.ActorConductConfigurati
 import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
-import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.config.room.triggers.EventGeneratorConfiguration;
 import org.ambientlight.room.RoomConfigurationFactory;
 import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
 
 //TODO should be better named: entitiy Control
