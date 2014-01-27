@@ -15,10 +15,9 @@ import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.config.events.SceneryEntryEvent;
 import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
-import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.EventGeneratorSensorAdapterConfiguration;
@@ -28,7 +27,6 @@ import org.ambientlight.config.process.handler.expression.DecisionHandlerConfigu
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
@@ -39,6 +37,8 @@ import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
 
@@ -182,7 +182,7 @@ public class CreateTestConfig {
 		sw1.actorConductConfiguration = new SwitchingConfiguration();
 		rc.lightObjectConfigurations.put(sw1.getId(), sw1);
 
-		LightObjectConfiguration lo = new LightObjectConfiguration();
+		LightObject lo = new LightObject();
 		lo.setId("Schrank");
 		lo.height = 20;
 		lo.layerNumber = 2;
@@ -192,7 +192,7 @@ public class CreateTestConfig {
 		lo.actorConductConfiguration = this.createSimpleColor();
 		rc.lightObjectConfigurations.put(lo.getId(), lo);
 
-		LightObjectConfiguration background = new LightObjectConfiguration();
+		LightObject background = new LightObject();
 		background.setPowerState(true);
 		background.setId("background");
 		background.height = 200;
@@ -281,7 +281,7 @@ public class CreateTestConfig {
 		turnOffNode.actionHandler = powerDownHandler;
 		roomSwitchProcess.nodes.put(3, turnOffNode);
 
-		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
+		ArrayList<LightObject> changeConfigFor = new ArrayList<LightObject>();
 		changeConfigFor.add(background);
 		changeConfigFor.add(lo);
 		ArrayList<Switchable> turnLightOnFor = new ArrayList<Switchable>();
@@ -296,7 +296,7 @@ public class CreateTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, Scenery userScenario,
-			List<LightObjectConfiguration> lo, List<Switchable> itemsToPutOn) {
+			List<LightObject> lo, List<Switchable> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -309,8 +309,8 @@ public class CreateTestConfig {
 		triggerSceneryChange.sourceId = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
-		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
-		for (LightObjectConfiguration current : lo) {
+		RenderingProgrammChangeHandlerConfiguration cHandler = new RenderingProgrammChangeHandlerConfiguration();
+		for (LightObject current : lo) {
 			cHandler.actorConfiguration.put(current.getId(), createSimpleColor());
 		}
 		startNode.actionHandler = cHandler;

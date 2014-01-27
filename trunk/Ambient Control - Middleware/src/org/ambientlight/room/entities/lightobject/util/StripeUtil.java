@@ -3,8 +3,8 @@ package org.ambientlight.room.entities.lightobject.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.device.led.StripePart;
+import org.ambientlight.room.entities.lightobject.LightObject;
 
 
 public class StripeUtil {
@@ -45,7 +45,7 @@ public class StripeUtil {
 	 * @param lightObjectConfig
 	 * @return true if any pixel of the stripe is within the lightObject
 	 */
-	public static boolean isStripePartInLightObject(StripePart stripePart, LightObjectConfiguration lightObjectConfig) {
+	public static boolean isStripePartInLightObject(StripePart stripePart, LightObject lightObjectConfig) {
 		// first get all pixelPositions we will check each pixel afterwards
 		List<StripePixelMapping> pixelMapping = getStripePixelMapping(stripePart);
 

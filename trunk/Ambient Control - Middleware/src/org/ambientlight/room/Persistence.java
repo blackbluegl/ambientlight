@@ -13,10 +13,10 @@ import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
 import com.thoughtworks.xstream.XStream;
@@ -102,7 +102,7 @@ public class Persistence {
 		XStream xstream = new XStream();
 		xstream.processAnnotations(RoomConfiguration.class);
 		xstream.processAnnotations(StripePartConfiguration.class);
-		xstream.processAnnotations(LightObjectConfiguration.class);
+		xstream.processAnnotations(LightObject.class);
 		xstream.processAnnotations(RemoteSwitch.class);
 		xstream.processAnnotations(StripeConfiguration.class);
 		xstream.processAnnotations(DeviceConfiguration.class);

@@ -13,15 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.features.sensor;
+package org.ambientlight.room.entities.features.sensor;
 
+import org.ambientlight.config.room.entities.scenery.Scenery;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface Sensor {
+public interface ScenerySensor extends Sensor {
 
-	public String getSensorName();
+	public Scenery getCurrentScenery();
 }

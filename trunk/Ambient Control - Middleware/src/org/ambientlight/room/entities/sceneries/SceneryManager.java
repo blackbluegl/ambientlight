@@ -17,11 +17,11 @@ package org.ambientlight.room.entities.sceneries;
 
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.events.SceneryEntryEvent;
-import org.ambientlight.config.features.sensor.ScenerySensor;
 import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 
 
 /**

@@ -24,7 +24,7 @@ import org.ambientlight.room.entities.lightobject.util.StripeUtil;
 
 public class Renderer {
 
-	List<LightObject> queueDeleteLightObjects = new ArrayList<LightObject>();
+	List<RenderObject> queueDeleteLightObjects = new ArrayList<RenderObject>();
 
 	boolean debug = false;
 
@@ -42,7 +42,7 @@ public class Renderer {
 		return hadDirtyRegionInLastRun;
 	}
 
-	private final Map<LightObject, RenderingProgramm> renderLightObjectMapping = new HashMap<LightObject, RenderingProgramm>();
+	private final Map<RenderObject, RenderingProgramm> renderLightObjectMapping = new HashMap<RenderObject, RenderingProgramm>();
 
 
 	public Renderer(BufferedImage roomBitMap, List<StripePart> allStripeParts, List<LedPoint> allLedPoints) {
@@ -56,7 +56,7 @@ public class Renderer {
 	}
 
 
-	public void addRenderTaskForLightObject(LightObject lightObject, RenderingProgramm programm) {
+	public void addRenderTaskForLightObject(RenderObject lightObject, RenderingProgramm programm) {
 		try {
 			lightObjectMappingLock.lock();
 			renderLightObjectMapping.put(lightObject, programm);
@@ -66,7 +66,7 @@ public class Renderer {
 	}
 
 
-	public synchronized void removeRenderTaskForLightObject(LightObject lightObject) {
+	public synchronized void removeRenderTaskForLightObject(RenderObject lightObject) {
 		try {
 			lightObjectMappingLock.lock();
 			renderLightObjectMapping.remove(lightObject);
@@ -76,7 +76,7 @@ public class Renderer {
 	}
 
 
-	public RenderingProgramm getProgramForLightObject(LightObject lightObject) {
+	public RenderingProgramm getProgramForLightObject(RenderObject lightObject) {
 		return renderLightObjectMapping.get(lightObject);
 	}
 
@@ -92,7 +92,7 @@ public class Renderer {
 				this.fillStripesWithLight();
 			}
 
-			for (LightObject current : this.queueDeleteLightObjects) {
+			for (RenderObject current : this.queueDeleteLightObjects) {
 				this.removeRenderTaskForLightObject(current);
 			}
 			this.queueDeleteLightObjects.clear();
@@ -108,12 +108,12 @@ public class Renderer {
 		// reset color of background to black
 		roomCanvas = ImageUtil.getPaintedImage(roomCanvas, Color.black);
 
-		Set<LightObject> lightObjects = renderLightObjectMapping.keySet();
+		Set<RenderObject> lightObjects = renderLightObjectMapping.keySet();
 
 		int maxLayer = 0;
-		for (LightObject current : lightObjects) {
-			if (current.configuration.layerNumber > maxLayer) {
-				maxLayer = current.configuration.layerNumber;
+		for (RenderObject current : lightObjects) {
+			if (current.lightObject.layerNumber > maxLayer) {
+				maxLayer = current.lightObject.layerNumber;
 			}
 		}
 
@@ -121,11 +121,11 @@ public class Renderer {
 		while (currentLayer <= maxLayer) {
 			// iterate through all objects and look if the layer is the current
 			// layer to merge
-			Iterator<LightObject> lightObjectIterator = lightObjects.iterator();
+			Iterator<RenderObject> lightObjectIterator = lightObjects.iterator();
 			while (lightObjectIterator.hasNext()) {
-				LightObject currentLightObject = lightObjectIterator.next();
+				RenderObject currentLightObject = lightObjectIterator.next();
 
-				if (currentLightObject.configuration.layerNumber == currentLayer) {
+				if (currentLightObject.lightObject.layerNumber == currentLayer) {
 
 					BufferedImage result = null;
 					try {
@@ -139,8 +139,8 @@ public class Renderer {
 					// merge to room
 					if (result != null) {
 						Graphics2D g2d = roomCanvas.createGraphics();
-						g2d.drawImage(result, null, currentLightObject.configuration.xOffsetInRoom,
-								currentLightObject.configuration.yOffsetInRoom);
+						g2d.drawImage(result, null, currentLightObject.lightObject.xOffsetInRoom,
+								currentLightObject.lightObject.yOffsetInRoom);
 						g2d.dispose();
 					}
 					else{
@@ -155,7 +155,7 @@ public class Renderer {
 	}
 
 
-	private BufferedImage renderLightObjectCanvas(LightObject lightObject) {
+	private BufferedImage renderLightObjectCanvas(RenderObject lightObject) {
 		// render here
 		RenderingProgramm currentRenderProgramm = this.renderLightObjectMapping.get(lightObject);
 		RenderingEffect effect = currentRenderProgramm.getEffect();
@@ -182,8 +182,8 @@ public class Renderer {
 		}
 
 		// init effect before the lightobject value was changed
-		BufferedImage background = roomCanvas.getSubimage(lightObject.configuration.xOffsetInRoom,
-				lightObject.configuration.yOffsetInRoom, lightObject.configuration.width, lightObject.configuration.height);
+		BufferedImage background = roomCanvas.getSubimage(lightObject.lightObject.xOffsetInRoom,
+				lightObject.lightObject.yOffsetInRoom, lightObject.lightObject.width, lightObject.lightObject.height);
 		effect.beforeRendering(background, lightObject.getPixelMap());
 		// render the lightObjectvalue
 		currentRenderProgramm.renderLightObject(lightObject);

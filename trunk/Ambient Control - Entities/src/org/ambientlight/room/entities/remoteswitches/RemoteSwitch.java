@@ -1,6 +1,6 @@
 package org.ambientlight.room.entities.remoteswitches;
 
-import org.ambientlight.config.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.Switchable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

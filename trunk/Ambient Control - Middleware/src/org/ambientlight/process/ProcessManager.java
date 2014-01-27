@@ -23,7 +23,7 @@ import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
-import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.EventGeneratorSensorAdapterConfiguration;
@@ -33,7 +33,7 @@ import org.ambientlight.config.process.handler.expression.DecisionHandlerConfigu
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.eventmanager.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.process.handler.actor.ConfigurationChangeHandler;
+import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
 import org.ambientlight.process.handler.actor.PowerStateHandler;
 import org.ambientlight.process.handler.event.EventGeneratorSensorAdapterHandler;
 import org.ambientlight.process.handler.event.EventToBooleanHandler;
@@ -159,8 +159,8 @@ public class ProcessManager {
 		node.config = nodeConfig;
 
 		AbstractActionHandler handler = null;
-		if (nodeConfig.actionHandler instanceof ConfigurationChangeHandlerConfiguration) {
-			handler = new ConfigurationChangeHandler();
+		if (nodeConfig.actionHandler instanceof RenderingProgrammChangeHandlerConfiguration) {
+			handler = new RenderingProgrammChangeHandler();
 		} else if (nodeConfig.actionHandler instanceof PowerstateHandlerConfiguration) {
 			handler = new PowerStateHandler();
 		} else if (nodeConfig.actionHandler instanceof SimplePowerStateHandlerConfiguration) {

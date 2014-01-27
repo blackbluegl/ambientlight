@@ -13,26 +13,23 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.lightobject;
+package org.ambientlight.room.entities.features;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.ambientlight.config.device.drivers.DeviceConfiguration;
-import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.eventmanager.EventManager;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class LightObjectManagerConfiguration {
+public interface Entity {
 
-	public int width;
-	public int height;
 
-	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
-	public Map<String, LightObject> lightObjectConfigurations = new HashMap<String, LightObject>();
+	public String getId();
+
+
+	public void setId(String name);
+
+
+	public void setEvenManager(EventManager eventManager);
 }

@@ -13,12 +13,12 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.climate;
+package org.ambientlight.room.entities.climate;
 
 import java.util.Date;
 
-import org.ambientlight.config.features.sensor.TemperatureSensor;
 import org.ambientlight.messages.max.DeviceType;
+import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
 
 /**

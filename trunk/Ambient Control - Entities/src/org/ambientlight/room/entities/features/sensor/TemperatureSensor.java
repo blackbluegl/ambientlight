@@ -13,17 +13,19 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.alarm;
+package org.ambientlight.room.entities.features.sensor;
 
-import org.ambientlight.room.entities.alarm.Alarm;
+import java.util.Date;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class DailyAlarm extends Alarm {
+public interface TemperatureSensor extends Sensor {
 
-	public int hour;
-	public int minute;
+	public float getTemperature();
 
+
+	public Date getMessureDate();
 }

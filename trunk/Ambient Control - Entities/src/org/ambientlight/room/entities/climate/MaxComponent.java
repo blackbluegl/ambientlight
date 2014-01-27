@@ -13,16 +13,28 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.features.sensor;
+package org.ambientlight.room.entities.climate;
 
-import org.ambientlight.config.room.entities.scenery.Scenery;
+import java.util.Date;
 
+import org.ambientlight.messages.max.DeviceType;
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public interface ScenerySensor extends Sensor {
+public abstract class MaxComponent {
 
-	public Scenery getCurrentScenery();
+	public abstract DeviceType getDeviceType();
+
+	public String label;
+	public int adress;
+	public String firmware;
+	public String serial;
+	public Date lastUpdate;
+	public boolean rfError = false;
+	public boolean timedOut = false;
+	public boolean invalidArgument = false;
+	public boolean batteryLow = false;
+
 }

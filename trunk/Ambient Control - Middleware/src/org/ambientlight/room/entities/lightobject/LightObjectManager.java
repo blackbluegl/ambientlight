@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
@@ -38,7 +38,7 @@ public class LightObjectManager {
 
 	private RenderingEffectFactory effectFactory;
 
-	private List<LightObject> lightObjects;
+	private Map<String, RenderObject> lightObjectRenderObjects;
 
 	private BufferedImage pixelMap;
 
@@ -61,13 +61,12 @@ public class LightObjectManager {
 		this.devices = devices;
 
 		this.config = config;
-		for (LightObjectConfiguration currentItemConfiguration : config.lightObjectConfigurations.values()) {
+		for (LightObject currentItemConfiguration : config.lightObjectConfigurations.values()) {
 
 			List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
 					currentItemConfiguration);
-
-			lightObjects.add(new LightObject(currentItemConfiguration, stripePartsInLightObject));
-
+			lightObjectRenderObjects.put(currentItemConfiguration.getId(), new RenderObject(currentItemConfiguration,
+					stripePartsInLightObject));
 		}
 	}
 
@@ -82,43 +81,43 @@ public class LightObjectManager {
 	}
 
 
-	public List<LightObject> getLightObjectsInRoom() {
-		return lightObjects;
+	public List<RenderObject> getLightObjectsInRoom() {
+		return lightObjectRenderObjects;
 	}
 
 
-	public LightObject getLightObjectByName(String name) {
-		for (LightObject current : this.lightObjects) {
-			if (name.equals(current.configuration.getId()))
+	public RenderObject getLightObjectByName(String name) {
+		for (RenderObject current : this.lightObjectRenderObjects) {
+			if (name.equals(current.lightObject.getId()))
 				return current;
 		}
 		return null;
 	}
 
 
-	public void setLightObjectsInRoom(List<LightObject> lightObjectsInRoom) {
-		this.lightObjects = lightObjectsInRoom;
+	public void setLightObjectsInRoom(List<RenderObject> lightObjectsInRoom) {
+		this.lightObjectRenderObjects = lightObjectsInRoom;
 	}
 
 
-	private void addLightObjectToRender(Renderer renderer, LightObject lightObject, FadeInTransition transition) {
+	private void addLightObjectToRender(Renderer renderer, RenderObject lightObject, FadeInTransition transition) {
 
-		if (lightObject.configuration.getPowerState() == false)
+		if (lightObject.lightObject.getPowerState() == false)
 			return;
 
 		RenderingProgramm renderProgram = null;
 
 		// create SimpleColor
-		if (lightObject.configuration.getRenderingProgramConfiguration() instanceof SimpleColorRenderingProgramConfiguration) {
-			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.configuration
+		if (lightObject.lightObject.getRenderingProgramConfiguration() instanceof SimpleColorRenderingProgramConfiguration) {
+			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject
 					.getRenderingProgramConfiguration();
 			Color simpleColor = new Color(config.rgb);
 			renderProgram = new SimpleColor(simpleColor);
 		}
 
 		// create Tron
-		if (lightObject.configuration.getRenderingProgramConfiguration() instanceof TronRenderingProgrammConfiguration) {
-			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.configuration
+		if (lightObject.lightObject.getRenderingProgramConfiguration() instanceof TronRenderingProgrammConfiguration) {
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject
 					.getRenderingProgramConfiguration();
 			Color color = new Color(config.rgb);
 			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength, config.sparkleStrength,
@@ -126,8 +125,8 @@ public class LightObjectManager {
 		}
 
 		// create Sunset
-		if (lightObject.configuration.getRenderingProgramConfiguration() instanceof SunSetRenderingProgrammConfiguration) {
-			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.configuration
+		if (lightObject.lightObject.getRenderingProgramConfiguration() instanceof SunSetRenderingProgrammConfiguration) {
+			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject
 					.getRenderingProgramConfiguration();
 			renderProgram = new Sunset(config.duration, config.position, config.sunStartX, config.sunStartY, config.sunSetX,
 					config.sizeOfSun, config.gamma);
@@ -140,16 +139,16 @@ public class LightObjectManager {
 	}
 
 
-	public void setPowerStateForLightObject(Renderer renderer, LightObject lightObject, Boolean powerState) {
+	public void setPowerStateForLightObject(RenderObject lightObject, Boolean powerState) {
 
-		if (lightObject.configuration.getPowerState() == powerState) {
-			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.configuration.getId() + " already set to: "
+		if (lightObject.lightObject.getPowerState() == powerState) {
+			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.lightObject.getId() + " already set to: "
 					+ powerState);
 			return;
 		}
 
 		Persistence.beginTransaction();
-		lightObject.configuration.setPowerState(powerState);
+		lightObject.lightObject.setPowerState(powerState);
 		Persistence.commitTransaction();
 
 		if (powerState == false) {
@@ -164,27 +163,34 @@ public class LightObjectManager {
 			this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
 		}
 	}
+	2 fragen:
+		doch zurück zu persistenz und oder arbeitsobjekte?
+				webservice facade benutzt persistenzobjekte?
 
+						public void setRenderingConfiguration(RenderingProgramConfiguration newConfig, String id) {
 
-	public void setRenderingConfigurationForLightObject(Renderer renderer, RenderingProgramConfiguration newConfig,
-			LightObject lightObject) {
+		RenderObject renderObject = lightObjectRenderObjects.get(id);
+
+		if (renderObject == null) {
+			System.out.println("LightObjectManager setRenderingConfiguration: unknown renderable Id: " + id);
+			return;
+		}
 
 		Persistence.beginTransaction();
 
-		lightObject.configuration.setRenderProgram(newConfig);
+		renderObject.lightObject.setRenderProgram(newConfig);
 
 		Persistence.commitTransaction();
-		renderer.removeRenderTaskForLightObject(lightObject);
+		renderer.removeRenderTaskForLightObject(renderObject);
 
-		this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
+		this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
 
 		callBackMananger.roomConfigurationChanged();
 
 	}
 
 
-	private List<StripePart> getStripePartsFromRoomForLightObject(List<StripePart> stripesInRoom,
-			LightObjectConfiguration configuration) {
+	private List<StripePart> getStripePartsFromRoomForLightObject(List<StripePart> stripesInRoom, LightObject configuration) {
 		int minPositionX = configuration.xOffsetInRoom;
 		int minPositionY = configuration.yOffsetInRoom;
 		int maxPoistionX = configuration.xOffsetInRoom + configuration.width;
