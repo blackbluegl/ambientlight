@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.device.led.StripePart;
-import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.lightobject.RenderObject;
 import org.ambientlight.room.entities.lightobject.util.ImageUtil;
 import org.ambientlight.room.entities.lightobject.util.StripeUtil;
 
@@ -111,7 +111,7 @@ public class Tron extends RenderingProgramm {
 	}
 
 
-	public Tron(LightObject lightObject, Color color, double lightImpact, double tailLength, double sparkleStrength,
+	public Tron(RenderObject lightObject, Color color, double lightImpact, double tailLength, double sparkleStrength,
 			double sparkleSize, double speed, int tokensAmount) {
 
 		this.stripeParts = lightObject.stripeParts;
@@ -128,12 +128,12 @@ public class Tron extends RenderingProgramm {
 		this.speed = (int) Math.sqrt(speed * 8);
 		this.tokensAmount = tokensAmount;
 
-		this.lightObjectXOffset = lightObject.configuration.xOffsetInRoom;
-		this.lightObjectYOffset = lightObject.configuration.yOffsetInRoom;
+		this.lightObjectXOffset = lightObject.lightObject.xOffsetInRoom;
+		this.lightObjectYOffset = lightObject.lightObject.yOffsetInRoom;
 
 		// determine stripeParts within lightobject
 		for (StripePart currentStripePart : this.stripeParts) {
-			if (StripeUtil.isStripePartInLightObject(currentStripePart, lightObject.configuration)) {
+			if (StripeUtil.isStripePartInLightObject(currentStripePart, lightObject.lightObject)) {
 				this.lanes.add(new Lane(currentStripePart.configuration));
 			}
 		}
@@ -277,7 +277,7 @@ public class Tron extends RenderingProgramm {
 
 
 	@Override
-	public BufferedImage renderLightObject(LightObject lightObject) {
+	public BufferedImage renderLightObject(RenderObject lightObject) {
 		if (this.lanes.size() == 0)
 			return lightObject.getPixelMap();
 		for (int i = 0; i < this.speed; i++) {

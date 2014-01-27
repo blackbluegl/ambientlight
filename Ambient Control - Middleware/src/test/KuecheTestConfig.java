@@ -9,10 +9,9 @@ import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
 import org.ambientlight.config.events.SceneryEntryEvent;
 import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
-import org.ambientlight.config.process.handler.actor.ConfigurationChangeHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.EventGeneratorSensorAdapterConfiguration;
@@ -21,13 +20,14 @@ import org.ambientlight.config.process.handler.event.FireEventHandlerConfigurati
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.lightobject.LightObject;
 
 
 public class KuecheTestConfig {
@@ -57,7 +57,7 @@ public class KuecheTestConfig {
 		lk35.configuredLeds.add(ledPoint);
 		rc.deviceConfigurations.add(lk35);
 
-		LightObjectConfiguration lo = new LightObjectConfiguration();
+		LightObject lo = new LightObject();
 		lo.setId("Highboard");
 		lo.height = 10;
 		lo.layerNumber = 1;
@@ -140,7 +140,7 @@ public class KuecheTestConfig {
 		turnOffNode.actionHandler = powerDownHandler;
 		roomSwitchProcess.nodes.put(3, turnOffNode);
 
-		ArrayList<LightObjectConfiguration> changeConfigFor = new ArrayList<LightObjectConfiguration>();
+		ArrayList<LightObject> changeConfigFor = new ArrayList<LightObject>();
 		changeConfigFor.add(lo);
 		ArrayList<Switchable> turnLightOnFor = new ArrayList<Switchable>();
 		turnLightOnFor.add(lo);
@@ -152,7 +152,7 @@ public class KuecheTestConfig {
 
 
 	private void createUserScenario(RoomConfiguration rc, Scenery userScenario,
-			List<LightObjectConfiguration> lo, List<Switchable> itemsToPutOn) {
+			List<LightObject> lo, List<Switchable> itemsToPutOn) {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -165,8 +165,8 @@ public class KuecheTestConfig {
 		triggerSceneryChange.sourceId = "RoomSceneryEventGenerator";
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
-		ConfigurationChangeHandlerConfiguration cHandler = new ConfigurationChangeHandlerConfiguration();
-		for (LightObjectConfiguration current : lo) {
+		RenderingProgrammChangeHandlerConfiguration cHandler = new RenderingProgrammChangeHandlerConfiguration();
+		for (LightObject current : lo) {
 			cHandler.actorConfiguration.put(current.getId(), createSimpleColor());
 		}
 		startNode.actionHandler = cHandler;

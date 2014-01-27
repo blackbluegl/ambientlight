@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.lightobject.RenderObject;
 
 public class SimpleColor extends RenderingProgramm {
 
@@ -17,7 +17,7 @@ public class SimpleColor extends RenderingProgramm {
 	}
 
 	@Override
-	public BufferedImage renderLightObject(LightObject lightObject) {
+	public BufferedImage renderLightObject(RenderObject lightObject) {
 		Color actualColor = new Color(lightObject.getPixelMap().getRGB(0, 0));
 		
 		if(actualColor.equals(this.color) == false){

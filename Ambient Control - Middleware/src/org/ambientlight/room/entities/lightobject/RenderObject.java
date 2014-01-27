@@ -3,23 +3,22 @@ package org.ambientlight.room.entities.lightobject;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.device.led.StripePart;
 
 
-public class LightObject {
+public class RenderObject {
 
-	public LightObjectConfiguration configuration;
+	public LightObject lightObject;
 	public List<StripePart> stripeParts;
 	BufferedImage pixelMap;
 	BufferedImage pixelMapAfterEffect;
 
 
-	public LightObject(LightObjectConfiguration configuration, List<StripePart> stripesParts) {
-		this.configuration = configuration;
+	public RenderObject(LightObject lightObject, List<StripePart> stripesParts) {
+		this.lightObject = lightObject;
 		this.stripeParts = stripesParts;
-		this.pixelMap = new BufferedImage(configuration.width, configuration.height, BufferedImage.TYPE_INT_ARGB);
-		this.pixelMapAfterEffect = new BufferedImage(configuration.width, configuration.height, BufferedImage.TYPE_INT_ARGB);
+		this.pixelMap = new BufferedImage(lightObject.width, lightObject.height, BufferedImage.TYPE_INT_ARGB);
+		this.pixelMapAfterEffect = new BufferedImage(lightObject.width, lightObject.height, BufferedImage.TYPE_INT_ARGB);
 	}
 
 
@@ -47,7 +46,7 @@ public class LightObject {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((configuration == null) ? 0 : configuration.hashCode());
+		result = prime * result + ((lightObject == null) ? 0 : lightObject.hashCode());
 		return result;
 	}
 
@@ -60,11 +59,11 @@ public class LightObject {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LightObject other = (LightObject) obj;
-		if (configuration == null) {
-			if (other.configuration != null)
+		RenderObject other = (RenderObject) obj;
+		if (lightObject == null) {
+			if (other.lightObject != null)
 				return false;
-		} else if (!configuration.equals(other.configuration))
+		} else if (!lightObject.equals(other.lightObject))
 			return false;
 		return true;
 	}

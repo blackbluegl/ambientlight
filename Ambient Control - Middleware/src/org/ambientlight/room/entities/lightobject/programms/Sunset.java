@@ -25,7 +25,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.lightobject.RenderObject;
 
 
 /**
@@ -96,7 +96,7 @@ public class Sunset extends RenderingProgramm {
 	 * (org.ambientlight.room.entities.LightObject)
 	 */
 	@Override
-	public BufferedImage renderLightObject(LightObject lightObject) {
+	public BufferedImage renderLightObject(RenderObject lightObject) {
 
 		if (hasDirtyRegion() == false)
 			return lightObject.getPixelMap();

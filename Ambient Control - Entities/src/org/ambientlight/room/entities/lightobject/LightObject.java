@@ -1,16 +1,16 @@
-package org.ambientlight.config.room.entities.lightobject;
+package org.ambientlight.room.entities.lightobject;
 
 import java.io.Serializable;
 
-import org.ambientlight.config.features.actor.Renderable;
-import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.features.actor.Renderable;
+import org.ambientlight.room.entities.features.actor.Switchable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("lightObject")
-public class LightObjectConfiguration implements Switchable, Renderable, Serializable {
+public class LightObject implements Switchable, Renderable, Serializable {
 
 	private static final long serialVersionUID = 1L;
 

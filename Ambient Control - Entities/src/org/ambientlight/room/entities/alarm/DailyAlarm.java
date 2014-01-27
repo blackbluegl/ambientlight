@@ -13,30 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.room.entities.climate;
-
-import org.ambientlight.messages.max.DeviceType;
+package org.ambientlight.room.entities.alarm;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class ShutterContact extends MaxComponent {
+public class DailyAlarm extends Alarm {
 
-	public boolean isOpen = false;
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType
-	 * ()
-	 */
-	@Override
-	public DeviceType getDeviceType() {
-		return DeviceType.SHUTTER_CONTACT;
-	}
+	public int hour;
+	public int minute;
 
 }

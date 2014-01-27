@@ -13,19 +13,19 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.features.sensor;
+package org.ambientlight.room.entities.features.actor;
 
-import java.util.Date;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.features.Entity;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface TemperatureSensor extends Sensor {
+public interface Renderable extends Entity {
 
-	public float getTemperature();
+	RenderingProgramConfiguration getRenderingProgramConfiguration();
 
-
-	public Date getMessureDate();
+	void setRenderProgram(RenderingProgramConfiguration programConfig);
 }

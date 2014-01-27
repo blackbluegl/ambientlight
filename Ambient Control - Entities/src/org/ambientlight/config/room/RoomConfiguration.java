@@ -1,10 +1,7 @@
 package org.ambientlight.config.room;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
@@ -32,16 +29,4 @@ public class RoomConfiguration implements Serializable {
 	public SceneryManagerConfiguration sceneriesManager;
 	public ProcessManagerConfiguration processManager;
 	public LightObjectManagerConfiguration lightObjectManager;
-
-	public Map<String, Switchable> getSwitchableActors() {
-		Map<String, Switchable> result = new HashMap<String, Switchable>();
-
-		result.putAll(lightObjectManager.lightObjectConfigurations);
-
-		result.putAll(switchesManager.switches);
-
-		result.putAll(remoteSwitchesManager.remoteSwitches);
-
-		return result;
-	}
 }

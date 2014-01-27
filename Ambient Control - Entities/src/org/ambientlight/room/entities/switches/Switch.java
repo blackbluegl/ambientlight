@@ -15,7 +15,7 @@
 
 package org.ambientlight.room.entities.switches;
 
-import org.ambientlight.config.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.Switchable;
 
 
 /**

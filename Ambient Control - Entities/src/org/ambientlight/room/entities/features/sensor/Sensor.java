@@ -13,20 +13,15 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.features.actor;
+package org.ambientlight.room.entities.features.sensor;
 
-import org.ambientlight.config.features.Entity;
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public interface Renderable extends Entity {
+public interface Sensor {
 
-	RenderingProgramConfiguration getRenderingProgramConfiguration();
-
-
-	void setRenderProgram(RenderingProgramConfiguration programConfig);
+	public String getSensorName();
 }

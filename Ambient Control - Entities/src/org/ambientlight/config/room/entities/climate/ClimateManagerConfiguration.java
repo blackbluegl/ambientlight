@@ -26,6 +26,7 @@ import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxThermostateMode;
+import org.ambientlight.room.entities.climate.MaxComponent;
 
 
 /**

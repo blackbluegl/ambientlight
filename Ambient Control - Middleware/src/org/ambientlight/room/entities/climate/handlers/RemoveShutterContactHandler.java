@@ -17,7 +17,6 @@ package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.config.room.entities.climate.ShutterContact;
 import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
@@ -27,6 +26,7 @@ import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.max.WaitForShutterContactCondition;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.climate.ShutterContact;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 

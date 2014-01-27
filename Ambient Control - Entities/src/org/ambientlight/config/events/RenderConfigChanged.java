@@ -13,17 +13,21 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.features;
+package org.ambientlight.config.events;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface Entity {
+public class RenderConfigChanged extends BroadcastEvent {
 
-	public String getId();
+	/**
+	 * @param sourceId
+	 */
+	public RenderConfigChanged(String sourceId) {
+		super(sourceId);
+		// TODO Auto-generated constructor stub
+	}
 
-
-	public void setId(String name);
 }

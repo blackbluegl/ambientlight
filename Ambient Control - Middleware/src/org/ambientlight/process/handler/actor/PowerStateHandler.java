@@ -1,12 +1,12 @@
 package org.ambientlight.process.handler.actor;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.features.actor.Switchable;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.room.entities.lightobject.LightObjectConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
+import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.lightobject.RenderObject;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 
@@ -19,7 +19,7 @@ public class PowerStateHandler extends AbstractActionHandler {
 		// if simple mode handle all actors the same way
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
-			for (Switchable actorConfig : AmbientControlMW.getRoom().config.getSwitchableActors().values()) {
+			for (Switchable actorConfig : AmbientControlMW.getRoom().getSwitchableActors().values()) {
 				switchPowerState(actorConfig.getId(), powerState, actorConfig);
 			}
 			return;
@@ -47,9 +47,9 @@ public class PowerStateHandler extends AbstractActionHandler {
 						((RemoteSwitch) actorConfig).houseCode,
 						((RemoteSwitch) actorConfig).switchingUnitCode, powerState);
 
-			} else if (actorConfig instanceof LightObjectConfiguration) {
+			} else if (actorConfig instanceof LightObject) {
 				// update renderer for light objects and update model
-				LightObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(currentActorName);
+				RenderObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(currentActorName);
 				AmbientControlMW.getRenderProgrammFactory().setPowerStateForLightObject(AmbientControlMW.getRenderer(),
 						lightObject, powerState);
 			}
