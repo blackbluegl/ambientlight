@@ -1,4 +1,4 @@
-package org.ambientlight.config.events;
+package org.ambientlight.events;
 
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
@@ -7,6 +7,8 @@ import org.ambientlight.annotations.ValueBindingPath;
 
 
 public class SceneryEntryEvent extends BroadcastEvent {
+
+	public static final String SOURCE_NAME = "SceneryManager";
 
 
 	public SceneryEntryEvent(String sourceId, String sceneryName) {

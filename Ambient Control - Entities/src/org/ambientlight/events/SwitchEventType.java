@@ -13,19 +13,12 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.features;
-
+package org.ambientlight.events;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface Entity {
-
-
-	public String getId();
-
-
-	public void setId(String name);
-
+public enum SwitchEventType {
+	VIRTUAL_MAIN, VIRTUAL, NFC, LED
 }

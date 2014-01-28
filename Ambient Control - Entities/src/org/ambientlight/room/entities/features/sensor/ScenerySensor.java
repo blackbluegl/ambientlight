@@ -15,7 +15,7 @@
 
 package org.ambientlight.room.entities.features.sensor;
 
-import org.ambientlight.config.room.entities.scenery.Scenery;
+import org.ambientlight.room.entities.sceneries.Scenery;
 
 
 /**

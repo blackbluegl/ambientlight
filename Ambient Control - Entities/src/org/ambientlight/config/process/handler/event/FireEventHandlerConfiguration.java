@@ -20,9 +20,9 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
-import org.ambientlight.config.events.BroadcastEvent;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.events.BroadcastEvent;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 

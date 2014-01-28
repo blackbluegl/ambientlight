@@ -15,10 +15,37 @@
 
 package org.ambientlight.room.entities.switches;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.ambientlight.events.SwitchEventType;
+
+
 /**
  * @author Florian Bornkessel
  * 
  */
 public enum SwitchType {
-	VIRTUAL_MAIN, VIRTUAL, NFC, MAX
+	VIRTUAL_MAIN(SwitchEventType.VIRTUAL_MAIN), VIRTUAL(SwitchEventType.VIRTUAL), NFC(SwitchEventType.NFC);
+
+	public final SwitchEventType switchEventType;
+
+	private static final Map<SwitchEventType, SwitchType> SWITCH_EVENT_TYPE_MAP = new LinkedHashMap<SwitchEventType, SwitchType>();
+
+	static {
+		for (SwitchType rae : SwitchType.values()) {
+			SWITCH_EVENT_TYPE_MAP.put(rae.switchEventType, rae);
+		}
+	}
+
+
+	SwitchType(SwitchEventType switchEventType) {
+		this.switchEventType = switchEventType;
+	}
+
+
+	public static SwitchType forCode(SwitchEventType code) {
+		return SWITCH_EVENT_TYPE_MAP.get(code);
+	}
+
 }

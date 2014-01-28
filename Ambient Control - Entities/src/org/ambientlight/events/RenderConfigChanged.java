@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.events;
+package org.ambientlight.events;
 
 
 /**

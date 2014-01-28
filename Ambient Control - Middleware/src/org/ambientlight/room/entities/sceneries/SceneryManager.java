@@ -16,10 +16,11 @@
 package org.ambientlight.room.entities.sceneries;
 
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.config.events.SceneryEntryEvent;
-import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.events.EventListener;
+import org.ambientlight.events.EventManager;
+import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 
@@ -29,13 +30,11 @@ import org.ambientlight.room.entities.features.sensor.ScenerySensor;
  * 
  * 
  */
-public class SceneryManager implements ScenerySensor {
+public class SceneryManager implements ScenerySensor, EventListener {
 
-	public static final String SOURCE_NAME = "SceneryManager";
 
 	private SceneryManagerConfiguration config;
 
-	private EventManager eventManager;
 
 	private CallBackManager callbackManager;
 
@@ -43,23 +42,23 @@ public class SceneryManager implements ScenerySensor {
 	public SceneryManager(SceneryManagerConfiguration config, EventManager eventManager, CallBackManager callbackManager) {
 		super();
 		this.config = config;
-		this.eventManager = eventManager;
 		this.callbackManager = callbackManager;
+
+		for (Scenery scenery : config.sceneries.values()) {
+			SceneryEntryEvent event = new SceneryEntryEvent(SceneryEntryEvent.SOURCE_NAME, scenery.id);
+			eventManager.register(this, event);
+		}
 	}
 
 
-	public void setCurrentScenery(String scenery) {
+	private void setCurrentScenery(String scenery) {
 
 		if (config.sceneries.containsKey(scenery) == false)
 			throw new IllegalArgumentException("Scenery does not exist!");
 
 		Persistence.beginTransaction();
 
-		SceneryEntryEvent currentSceneryEntry = new SceneryEntryEvent(SOURCE_NAME, scenery);
-
 		this.config.currentScenery = config.sceneries.get(scenery);
-
-		eventManager.onEvent(currentSceneryEntry);
 
 		Persistence.commitTransaction();
 
@@ -86,7 +85,20 @@ public class SceneryManager implements ScenerySensor {
 	 */
 	@Override
 	public String getSensorName() {
-		return SOURCE_NAME;
+		return SOURCE_NAME; 
+		source name doch wieder zurückholen???
 	}
 
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
+	 * .BroadcastEvent)
+	 */
+	@Override
+	public void handleEvent(BroadcastEvent event) {
+		this.setCurrentScenery(((SceneryEntryEvent) event).sceneryName);
+	}
 }

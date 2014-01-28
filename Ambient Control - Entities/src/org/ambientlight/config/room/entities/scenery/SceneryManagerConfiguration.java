@@ -18,6 +18,8 @@ package org.ambientlight.config.room.entities.scenery;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ambientlight.room.entities.sceneries.Scenery;
+
 
 /**
  * @author Florian Bornkessel

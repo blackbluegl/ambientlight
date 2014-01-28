@@ -1,4 +1,4 @@
-package org.ambientlight.config.room.entities.scenery;
+package org.ambientlight.room.entities.sceneries;
 
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;

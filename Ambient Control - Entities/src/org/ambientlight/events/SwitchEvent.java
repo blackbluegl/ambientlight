@@ -1,8 +1,7 @@
-package org.ambientlight.config.events;
+package org.ambientlight.events;
 
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.room.entities.switches.SwitchType;
 
 
 public class SwitchEvent extends BroadcastEvent {
@@ -12,10 +11,10 @@ public class SwitchEvent extends BroadcastEvent {
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean powerState;
 
-	public SwitchType type;
+	public SwitchEventType type;
 
 
-	public SwitchEvent(String sourceId, boolean powerState, SwitchType type) {
+	public SwitchEvent(String sourceId, boolean powerState, SwitchEventType type) {
 		super(sourceId);
 		this.powerState = powerState;
 		this.type = type;

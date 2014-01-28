@@ -16,9 +16,11 @@
 package org.ambientlight.room.entities.switches;
 
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.events.EventListener;
+import org.ambientlight.events.EventManager;
+import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.room.Persistence;
 
 
@@ -26,11 +28,9 @@ import org.ambientlight.room.Persistence;
  * @author Florian Bornkessel
  * 
  */
-public class SwitchManager {
+public class SwitchManager implements EventListener {
 
 	private SwitchManagerConfiguration config;
-
-	private EventManager eventManager;
 
 	private CallBackManager callback;
 
@@ -38,12 +38,19 @@ public class SwitchManager {
 	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback) {
 		super();
 		this.config = config;
-		this.eventManager = eventManager;
 		this.callback = callback;
+
+		// register listener for switchEvents
+		for (Switch currentSwitch : config.switches.values()) {
+			SwitchEvent svitchEventOn = new SwitchEvent(currentSwitch.getId(), true, currentSwitch.type.switchEventType);
+			SwitchEvent svitchEventOff = new SwitchEvent(currentSwitch.getId(), false, currentSwitch.type.switchEventType);
+			eventManager.register(this, svitchEventOn);
+			eventManager.register(this, svitchEventOff);
+		}
 	}
 
 
-	public void setSwitchState(String id, SwitchType type, boolean powerState) {
+	private void setSwitchState(String id, SwitchType type, boolean powerState) {
 		if (config.switches.containsKey(id) == false) {
 			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: =" + id);
 			return;
@@ -56,11 +63,23 @@ public class SwitchManager {
 
 		Persistence.commitTransaction();
 
-		// inform eventreceivers - e.g. renderer for lightobjects,
-		SwitchEvent switchEvent = new SwitchEvent(switchObject.getId(), powerState, switchObject.type);
-
-		eventManager.onEvent(switchEvent);
 
 		callback.roomConfigurationChanged();
 	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
+	 * .BroadcastEvent)
+	 */
+	@Override
+	public void handleEvent(BroadcastEvent event) {
+		SwitchEvent switchEvent = (SwitchEvent) event;
+		setSwitchState(switchEvent.sourceId, SwitchType.forCode(switchEvent.type), switchEvent.powerState);
+	}
+
+
 }
