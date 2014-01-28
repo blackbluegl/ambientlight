@@ -25,7 +25,7 @@ import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.events.EventManager;
 import org.ambientlight.messages.Dispatcher;
 import org.ambientlight.messages.DispatcherConfiguration;
 import org.ambientlight.messages.DispatcherManager;

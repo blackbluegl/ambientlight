@@ -23,9 +23,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.config.events.DailyAlarmEvent;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.events.DailyAlarmEvent;
+import org.ambientlight.events.EventManager;
 import org.ambientlight.room.Persistence;
 
 

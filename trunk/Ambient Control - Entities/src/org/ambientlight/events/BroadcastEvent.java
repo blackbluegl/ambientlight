@@ -1,4 +1,4 @@
-package org.ambientlight.config.events;
+package org.ambientlight.events;
 
 import java.io.Serializable;
 

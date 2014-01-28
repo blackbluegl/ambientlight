@@ -13,8 +13,6 @@ import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
-import org.ambientlight.config.events.SceneryEntryEvent;
-import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
@@ -31,15 +29,17 @@ import org.ambientlight.config.room.entities.lightobject.renderingprogram.Simple
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.events.SceneryEntryEvent;
+import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
+import org.ambientlight.room.entities.sceneries.Scenery;
 
 
 public class CreateTestConfig {

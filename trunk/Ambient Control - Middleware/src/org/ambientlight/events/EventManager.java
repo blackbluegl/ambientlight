@@ -1,11 +1,11 @@
-package org.ambientlight.eventmanager;
+package org.ambientlight.events;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambientlight.config.events.BroadcastEvent;
+import org.ambientlight.events.BroadcastEvent;
 
 
 public class EventManager {

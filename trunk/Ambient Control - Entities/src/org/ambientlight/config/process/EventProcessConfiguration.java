@@ -9,7 +9,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
-import org.ambientlight.config.events.BroadcastEvent;
+import org.ambientlight.events.BroadcastEvent;
 
 
 public class EventProcessConfiguration extends ProcessConfiguration implements Serializable {

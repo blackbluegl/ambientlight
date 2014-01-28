@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
-import org.ambientlight.config.events.SceneryEntryEvent;
-import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
@@ -22,12 +20,14 @@ import org.ambientlight.config.process.handler.expression.ExpressionConfiguratio
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.config.room.entities.scenery.Scenery;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.events.SceneryEntryEvent;
+import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.room.entities.sceneries.Scenery;
 
 
 public class KuecheTestConfig {

@@ -15,10 +15,10 @@
 
 package org.ambientlight.process.handler.event;
 
-import org.ambientlight.config.events.DailyAlarmEvent;
-import org.ambientlight.config.events.SceneryEntryEvent;
-import org.ambientlight.config.events.SwitchEvent;
 import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.events.DailyAlarmEvent;
+import org.ambientlight.events.SceneryEntryEvent;
+import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 

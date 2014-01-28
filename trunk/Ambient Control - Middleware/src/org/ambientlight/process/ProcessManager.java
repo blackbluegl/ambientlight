@@ -31,7 +31,7 @@ import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfig
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
 import org.ambientlight.process.handler.actor.PowerStateHandler;

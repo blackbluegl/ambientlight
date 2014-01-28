@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.eventmanager.EventManager;
+import org.ambientlight.events.EventManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.entities.alarm.AlarmManager;

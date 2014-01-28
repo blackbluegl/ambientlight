@@ -1,4 +1,4 @@
-package org.ambientlight.config.events;
+package org.ambientlight.events;
 
 public class DailyAlarmEvent extends BroadcastEvent {
 
