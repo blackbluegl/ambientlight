@@ -20,5 +20,5 @@ package org.ambientlight.events;
  * 
  */
 public enum SwitchEventType {
-	VIRTUAL_MAIN, VIRTUAL, NFC, LED
+	VIRTUAL_MAIN, VIRTUAL, NFC, LED, REMOTE
 }

@@ -43,4 +43,5 @@ public class SunSetRenderingProgrammConfiguration extends RenderingProgramConfig
 	@TypeDef(min = "0", max = "6")
 	public double gamma = 2.2;
 
+
 }

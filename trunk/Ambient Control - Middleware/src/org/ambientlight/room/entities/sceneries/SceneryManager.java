@@ -17,8 +17,6 @@ package org.ambientlight.room.entities.sceneries;
 
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.events.BroadcastEvent;
-import org.ambientlight.events.EventListener;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.room.Persistence;
@@ -30,7 +28,7 @@ import org.ambientlight.room.entities.features.sensor.ScenerySensor;
  * 
  * 
  */
-public class SceneryManager implements ScenerySensor, EventListener {
+public class SceneryManager implements ScenerySensor {
 
 
 	private SceneryManagerConfiguration config;
@@ -39,19 +37,18 @@ public class SceneryManager implements ScenerySensor, EventListener {
 	private CallBackManager callbackManager;
 
 
+	private EventManager eventManager;
+
+
 	public SceneryManager(SceneryManagerConfiguration config, EventManager eventManager, CallBackManager callbackManager) {
 		super();
 		this.config = config;
 		this.callbackManager = callbackManager;
-
-		for (Scenery scenery : config.sceneries.values()) {
-			SceneryEntryEvent event = new SceneryEntryEvent(SceneryEntryEvent.SOURCE_NAME, scenery.id);
-			eventManager.register(this, event);
-		}
+		this.eventManager = eventManager;
 	}
 
 
-	private void setCurrentScenery(String scenery) {
+	public void setCurrentScenery(String scenery) {
 
 		if (config.sceneries.containsKey(scenery) == false)
 			throw new IllegalArgumentException("Scenery does not exist!");
@@ -61,6 +58,9 @@ public class SceneryManager implements ScenerySensor, EventListener {
 		this.config.currentScenery = config.sceneries.get(scenery);
 
 		Persistence.commitTransaction();
+
+		SceneryEntryEvent event = new SceneryEntryEvent(SceneryEntryEvent.SOURCE_NAME, scenery);
+		eventManager.onEvent(event);
 
 		callbackManager.roomConfigurationChanged();
 	}
@@ -85,20 +85,6 @@ public class SceneryManager implements ScenerySensor, EventListener {
 	 */
 	@Override
 	public String getSensorName() {
-		return SOURCE_NAME; 
-		source name doch wieder zurückholen???
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
-	 * .BroadcastEvent)
-	 */
-	@Override
-	public void handleEvent(BroadcastEvent event) {
-		this.setCurrentScenery(((SceneryEntryEvent) event).sceneryName);
+		return ScenerySensor.SOURCE_NAME;
 	}
 }

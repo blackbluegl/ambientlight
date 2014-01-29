@@ -24,5 +24,8 @@ import org.ambientlight.room.entities.sceneries.Scenery;
  */
 public interface ScenerySensor extends Sensor {
 
+	public static final String SOURCE_NAME = "SceneryManager";
+
+
 	public Scenery getCurrentScenery();
 }

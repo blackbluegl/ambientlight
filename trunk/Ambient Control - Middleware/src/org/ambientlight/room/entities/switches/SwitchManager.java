@@ -34,11 +34,14 @@ public class SwitchManager implements EventListener {
 
 	private CallBackManager callback;
 
+	private EventManager eventManager;
+
 
 	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback) {
 		super();
 		this.config = config;
 		this.callback = callback;
+		this.eventManager = eventManager;
 
 		// register listener for switchEvents
 		for (Switch currentSwitch : config.switches.values()) {
@@ -63,6 +66,7 @@ public class SwitchManager implements EventListener {
 
 		Persistence.commitTransaction();
 
+		eventManager.onEvent(new SwitchEvent(id, powerState, type.switchEventType));
 
 		callback.roomConfigurationChanged();
 	}
@@ -79,7 +83,12 @@ public class SwitchManager implements EventListener {
 	public void handleEvent(BroadcastEvent event) {
 		SwitchEvent switchEvent = (SwitchEvent) event;
 		setSwitchState(switchEvent.sourceId, SwitchType.forCode(switchEvent.type), switchEvent.powerState);
+
+		Persistence.beginTransaction();
+
+		Switch switchObject = config.switches.get(switchEvent.sourceId);
+		switchObject.setPowerState(switchEvent.powerState);
+
+		Persistence.commitTransaction();
 	}
-
-
 }

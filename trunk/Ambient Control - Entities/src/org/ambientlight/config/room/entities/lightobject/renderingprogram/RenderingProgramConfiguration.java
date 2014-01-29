@@ -13,9 +13,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 public abstract class RenderingProgramConfiguration {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 }

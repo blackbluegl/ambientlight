@@ -20,6 +20,11 @@ import java.io.IOException;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
+import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.events.EventListener;
+import org.ambientlight.events.EventManager;
+import org.ambientlight.events.SwitchEvent;
+import org.ambientlight.events.SwitchEventType;
 import org.ambientlight.room.Persistence;
 
 
@@ -27,7 +32,7 @@ import org.ambientlight.room.Persistence;
  * @author Florian Bornkessel
  * 
  */
-public class RemoteSwitchManager {
+public class RemoteSwitchManager implements EventListener {
 
 	private RemoteSwitchManagerConfiguration config;
 
@@ -37,10 +42,16 @@ public class RemoteSwitchManager {
 
 
 	public RemoteSwitchManager(RemoteSwitchManagerConfiguration config, RemoteSwtichDeviceDriver device,
-			CallBackManager callbackManager) {
+			CallBackManager callbackManager, EventManager eventManager) {
 		this.config = config;
 		this.device = device;
 		this.callbackManager = callbackManager;
+		for(RemoteSwitch current : config.remoteSwitches.values()){
+			SwitchEvent switchOff = new SwitchEvent(current.getId(), false, SwitchEventType.REMOTE);
+			SwitchEvent switchOn = new SwitchEvent(current.getId(), true, SwitchEventType.REMOTE);
+			eventManager.register(this, switchOn);
+			eventManager.register(this, switchOff);
+		}
 	}
 
 
@@ -67,5 +78,21 @@ public class RemoteSwitchManager {
 		}
 
 		callbackManager.roomConfigurationChanged();
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
+	 * .BroadcastEvent)
+	 */
+	@Override
+	public void handleEvent(BroadcastEvent event) {
+		if (event instanceof SwitchEvent) {
+			SwitchEvent switchEvent = (SwitchEvent) event;
+			this.setPowerStateForRemoteSwitch(switchEvent.sourceId, switchEvent.powerState);
+		}
 	}
 }
