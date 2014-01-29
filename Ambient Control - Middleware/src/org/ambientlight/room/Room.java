@@ -10,7 +10,6 @@ import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
-import org.ambientlight.room.entities.features.actor.Renderable;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitchManager;
@@ -51,7 +50,7 @@ public class Room {
 	public Map<String, Switchable> getSwitchableActors() {
 		Map<String, Switchable> result = new HashMap<String, Switchable>();
 
-		result.putAll(lightObjectManager.lightObjectConfigurations);
+		result.putAll(lightObjectManager.getLightObjects());
 
 		result.putAll(switchesManager.switches);
 

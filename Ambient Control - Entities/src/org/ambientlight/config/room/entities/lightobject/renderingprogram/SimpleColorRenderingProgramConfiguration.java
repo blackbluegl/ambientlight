@@ -28,4 +28,5 @@ public class SimpleColorRenderingProgramConfiguration extends RenderingProgramCo
 		}
 		return null;
 	}
+
 }

@@ -3,14 +3,13 @@ package org.ambientlight.room.entities.lightobject;
 import java.io.Serializable;
 
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.room.entities.features.actor.Renderable;
 import org.ambientlight.room.entities.features.actor.Switchable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("lightObject")
-public class LightObject implements Switchable, Renderable, Serializable {
+public class LightObject implements Switchable, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,7 +27,7 @@ public class LightObject implements Switchable, Renderable, Serializable {
 
 	private String id;
 
-	private RenderingProgramConfiguration renderingProgrammConfiguration;
+	public RenderingProgramConfiguration renderingProgrammConfiguration;
 
 
 	/*
@@ -52,32 +51,6 @@ public class LightObject implements Switchable, Renderable, Serializable {
 	public void setId(String name) {
 		this.id = name;
 
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.features.actor.Renderable#
-	 * getRenderingProgramConfiguration()
-	 */
-	@Override
-	public RenderingProgramConfiguration getRenderingProgramConfiguration() {
-		return this.renderingProgrammConfiguration;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.config.features.actor.Renderable#setRenderProgram(org
-	 * .ambientlight
-	 * .config.room.entities.led.renderingprogram.RenderingProgramConfiguration)
-	 */
-	@Override
-	public void setRenderProgram(RenderingProgramConfiguration programConfig) {
-		this.renderingProgrammConfiguration = programConfig;
 	}
 
 

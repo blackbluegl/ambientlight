@@ -10,7 +10,6 @@ public class SceneryEntryEvent extends BroadcastEvent {
 
 	public static final String SOURCE_NAME = "SceneryManager";
 
-
 	public SceneryEntryEvent(String sourceId, String sceneryName) {
 		super(sourceId);
 		this.sceneryName = sceneryName;

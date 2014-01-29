@@ -16,6 +16,11 @@ import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.StripePart;
+import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.events.EventListener;
+import org.ambientlight.events.EventManager;
+import org.ambientlight.events.SwitchEvent;
+import org.ambientlight.events.SwitchEventType;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
@@ -26,7 +31,7 @@ import org.ambientlight.room.entities.lightobject.programms.Sunset;
 import org.ambientlight.room.entities.lightobject.programms.Tron;
 
 
-public class LightObjectManager {
+public class LightObjectManager implements EventListener {
 
 	private LightObjectManagerConfiguration config;
 
@@ -44,11 +49,12 @@ public class LightObjectManager {
 
 	private Renderer renderer;
 
-	public List<DeviceDriver> devices;
+	private List<DeviceDriver> devices;
 
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
-			RenderingEffectFactory effectFactory, List<DeviceDriver> devices, Renderer renderer, CallBackManager callBackMananger) {
+			RenderingEffectFactory effectFactory, List<DeviceDriver> devices, Renderer renderer,
+			CallBackManager callBackMananger, EventManager eventManager) {
 
 		this.callBackMananger = callBackMananger;
 
@@ -68,6 +74,14 @@ public class LightObjectManager {
 			lightObjectRenderObjects.put(currentItemConfiguration.getId(), new RenderObject(currentItemConfiguration,
 					stripePartsInLightObject));
 		}
+
+		// listen for switchable events
+		for (LightObject lightObject : config.lightObjectConfigurations.values()) {
+			SwitchEvent switchOff = new SwitchEvent(lightObject.getId(), false, SwitchEventType.LED);
+			SwitchEvent switchOn = new SwitchEvent(lightObject.getId(), true, SwitchEventType.LED);
+			eventManager.register(this, switchOn);
+			eventManager.register(this, switchOff);
+		}
 	}
 
 
@@ -81,24 +95,26 @@ public class LightObjectManager {
 	}
 
 
-	public List<RenderObject> getLightObjectsInRoom() {
-		return lightObjectRenderObjects;
+	public Map<String, LightObject> getLightObjects() {
+		return config.lightObjectConfigurations;
 	}
 
 
-	public RenderObject getLightObjectByName(String name) {
-		for (RenderObject current : this.lightObjectRenderObjects) {
-			if (name.equals(current.lightObject.getId()))
-				return current;
-		}
-		return null;
-	}
-
-
-	public void setLightObjectsInRoom(List<RenderObject> lightObjectsInRoom) {
-		this.lightObjectRenderObjects = lightObjectsInRoom;
-	}
-
+	//
+	//
+	// public RenderObject getLightObjectByName(String name) {
+	// for (RenderObject current : this.lightObjectRenderObjects) {
+	// if (name.equals(current.lightObject.getId()))
+	// return current;
+	// }
+	// return null;
+	// }
+	//
+	//
+	// public void setLightObjectsInRoom(List<RenderObject> lightObjectsInRoom)
+	// {
+	// this.lightObjectRenderObjects = lightObjectsInRoom;
+	// }
 
 	private void addLightObjectToRender(Renderer renderer, RenderObject lightObject, FadeInTransition transition) {
 
@@ -108,26 +124,23 @@ public class LightObjectManager {
 		RenderingProgramm renderProgram = null;
 
 		// create SimpleColor
-		if (lightObject.lightObject.getRenderingProgramConfiguration() instanceof SimpleColorRenderingProgramConfiguration) {
-			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject
-					.getRenderingProgramConfiguration();
+		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
+			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			Color simpleColor = new Color(config.rgb);
 			renderProgram = new SimpleColor(simpleColor);
 		}
 
 		// create Tron
-		if (lightObject.lightObject.getRenderingProgramConfiguration() instanceof TronRenderingProgrammConfiguration) {
-			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject
-					.getRenderingProgramConfiguration();
+		if (lightObject.lightObject.renderingProgrammConfiguration instanceof TronRenderingProgrammConfiguration) {
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			Color color = new Color(config.rgb);
 			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength, config.sparkleStrength,
 					config.sparkleSize, config.speed, config.lightPointAmount);
 		}
 
 		// create Sunset
-		if (lightObject.lightObject.getRenderingProgramConfiguration() instanceof SunSetRenderingProgrammConfiguration) {
-			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject
-					.getRenderingProgramConfiguration();
+		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SunSetRenderingProgrammConfiguration) {
+			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			renderProgram = new Sunset(config.duration, config.position, config.sunStartX, config.sunStartY, config.sunSetX,
 					config.sizeOfSun, config.gamma);
 		}
@@ -139,35 +152,40 @@ public class LightObjectManager {
 	}
 
 
-	public void setPowerStateForLightObject(RenderObject lightObject, Boolean powerState) {
+	public void setPowerStateForLightObject(String lightObjectId, Boolean powerState) {
 
-		if (lightObject.lightObject.getPowerState() == powerState) {
-			System.out.println("RenderingProgrammFactory: lightObject" + lightObject.lightObject.getId() + " already set to: "
+		RenderObject renderObject = lightObjectRenderObjects.get(lightObjectId);
+
+		if (renderObject == null) {
+			System.out.println("RenderingProgrammFactory: lightObject with ID does not exist: " + lightObjectId);
+			return;
+		}
+
+		if (renderObject.lightObject.getPowerState() == powerState) {
+			System.out.println("RenderingProgrammFactory: lightObject" + renderObject.lightObject.getId() + " already set to: "
 					+ powerState);
 			return;
 		}
 
 		Persistence.beginTransaction();
-		lightObject.lightObject.setPowerState(powerState);
+		renderObject.lightObject.setPowerState(powerState);
 		Persistence.commitTransaction();
 
 		if (powerState == false) {
 
 			// set fadeout effect
-			RenderingEffect effect = effectFactory.getFadeOutEffect(lightObject);
-			RenderingProgramm renderProgram = renderer.getProgramForLightObject(lightObject);
+			RenderingEffect effect = effectFactory.getFadeOutEffect(renderObject);
+			RenderingProgramm renderProgram = renderer.getProgramForLightObject(renderObject);
 			renderProgram.addEffect(effect);
-			renderer.addRenderTaskForLightObject(lightObject, renderProgram);
+			renderer.addRenderTaskForLightObject(renderObject, renderProgram);
 
 		} else {
-			this.addLightObjectToRender(renderer, lightObject, effectFactory.getFadeInEffect(lightObject));
+			this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
 		}
 	}
-	2 fragen:
-		doch zurück zu persistenz und oder arbeitsobjekte?
-				webservice facade benutzt persistenzobjekte?
 
-						public void setRenderingConfiguration(RenderingProgramConfiguration newConfig, String id) {
+
+	public void setRenderingConfiguration(RenderingProgramConfiguration newConfig, String id) {
 
 		RenderObject renderObject = lightObjectRenderObjects.get(id);
 
@@ -178,7 +196,7 @@ public class LightObjectManager {
 
 		Persistence.beginTransaction();
 
-		renderObject.lightObject.setRenderProgram(newConfig);
+		renderObject.lightObject.renderingProgrammConfiguration = newConfig;
 
 		Persistence.commitTransaction();
 		renderer.removeRenderTaskForLightObject(renderObject);
@@ -227,5 +245,22 @@ public class LightObjectManager {
 		}
 
 		return result;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
+	 * .BroadcastEvent)
+	 */
+	@Override
+	public void handleEvent(BroadcastEvent event) {
+		if (event instanceof SwitchEvent) {
+			SwitchEvent switchEvent = (SwitchEvent) event;
+			this.setPowerStateForLightObject(switchEvent.sourceId, switchEvent.powerState);
+		}
+
 	}
 }
