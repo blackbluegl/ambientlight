@@ -26,6 +26,7 @@ import org.ambientlight.messages.max.MaxUnregisterCorrelationMessage;
 import org.ambientlight.messages.max.WaitForShutterContactCondition;
 import org.ambientlight.messages.rfm22bridge.UnRegisterCorrelatorMessage;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.climate.ShutterContact;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
@@ -48,7 +49,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 	private ShutterContact device;
 
 
-	public RemoveShutterContactHandler(ShutterContact device, CallBackManager callbackManager) {
+	public RemoveShutterContactHandler(ClimateManager climateManager, ShutterContact device, CallBackManager callbackManager) {
 
 		this.callbackManager = callbackManager;
 
@@ -58,11 +59,11 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		// check if removal of shuttercontact changes the open window state of
 		// the thermostates
-		boolean isAWindowOpen = AmbientControlMW.getRoom().climateManager.isAWindowOpen();
+		boolean isAWindowOpen = climateManager.isAWindowOpen();
 		this.device.isOpen = false;
-		boolean isAWindowNowOpen = AmbientControlMW.getRoom().climateManager.isAWindowOpen();
+		boolean isAWindowNowOpen = climateManager.isAWindowOpen();
 		if (isAWindowOpen != isAWindowNowOpen) {
-			AmbientControlMW.getRoom().climateManager.sendWindowStateToThermostates(isAWindowNowOpen);
+			climateManager.sendWindowStateToThermostates(isAWindowNowOpen);
 		}
 
 		// Wait until shutterContact comes alive and remove it

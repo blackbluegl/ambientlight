@@ -13,12 +13,12 @@
    limitations under the License.
  */
 
-package org.ambientlight.events;
+package org.ambientlight.room.entities.features.sensor.types;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public enum SwitchEventType {
-	VIRTUAL_MAIN, VIRTUAL, NFC, LED, ELRO, ALARM
+public enum TemperatureSensorType {
+	MAX_THERMOSTATE, SET_ROOM_TEMPERATURE
 }

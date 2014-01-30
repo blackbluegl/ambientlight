@@ -408,7 +408,7 @@ public class ClimateManager implements MessageListener {
 		}
 
 		if (device instanceof ShutterContact) {
-			RemoveShutterContactHandler remove = new RemoveShutterContactHandler((ShutterContact) device, callBackMananger);
+			RemoveShutterContactHandler remove = new RemoveShutterContactHandler(this, (ShutterContact) device, callBackMananger);
 			this.actionHandlers.add(remove);
 		}
 

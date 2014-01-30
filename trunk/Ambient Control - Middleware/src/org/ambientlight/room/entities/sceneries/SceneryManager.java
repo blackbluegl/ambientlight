@@ -84,7 +84,7 @@ public class SceneryManager implements ScenerySensor {
 	 * @see org.ambientlight.config.features.sensor.Sensor#getSensorName()
 	 */
 	@Override
-	public String getSensorName() {
+	public String getSensorId() {
 		return ScenerySensor.SOURCE_NAME;
 	}
 }

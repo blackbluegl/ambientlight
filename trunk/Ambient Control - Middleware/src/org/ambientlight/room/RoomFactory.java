@@ -36,6 +36,7 @@ import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxDispatcher;
 import org.ambientlight.process.ProcessManager;
+import org.ambientlight.room.entities.EntitiesFacade;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
@@ -62,6 +63,9 @@ public class RoomFactory {
 		room.config = roomConfig;
 		AmbientControlMW.setRoom(room);
 
+		// init EntitiesFacade
+		room.entitiesFacade = new EntitiesFacade();
+
 		// init CallbackManager
 		room.callBackMananger = new CallBackManager();
 
@@ -69,16 +73,20 @@ public class RoomFactory {
 		room.eventManager = new EventManager();
 
 		// init alarmManager
-		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger);
+		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger,
+				room.entitiesFacade);
 
 		// init remoteSwitchManager
-		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger);
+		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger,
+				room.entitiesFacade);
 
 		// init switchManager
-		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger);
+		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger,
+				room.entitiesFacade);
 
 		// init lightObject rendering system
-		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger);
+		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger,
+				room.entitiesFacade);
 
 		// init queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
@@ -99,14 +107,14 @@ public class RoomFactory {
 	 * @return
 	 */
 	private SwitchManager initSwitchManager(SwitchManagerConfiguration config, EventManager eventManager,
-			CallBackManager callBackMananger) {
+			CallBackManager callBackMananger, EntitiesFacade entitiesFacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initSwitchManager(): no configuration - skipping!");
 			return null;
 		}
 
-		return new SwitchManager(config, eventManager, callBackMananger);
+		return new SwitchManager(config, eventManager, callBackMananger, entitiesFacade);
 	}
 
 
@@ -114,7 +122,8 @@ public class RoomFactory {
 	 * @param remoteSwitchesManager
 	 * @return
 	 */
-	private RemoteSwitchManager initRemoteSwitchManager(RemoteSwitchManagerConfiguration config, CallBackManager callBackManager) {
+	private RemoteSwitchManager initRemoteSwitchManager(RemoteSwitchManagerConfiguration config, CallBackManager callBackManager,
+			EntitiesFacade entitiesFacade) {
 		if (config == null) {
 
 			System.out.println("RoomFactory initRemoteSwitchManager(): no configuration - skipping!");
@@ -123,7 +132,7 @@ public class RoomFactory {
 
 		RemoteSwtichDeviceDriver device = deviceFactory.createRemoteSwitchDevice(config.device);
 
-		return new RemoteSwitchManager(config, device, callBackManager);
+		return new RemoteSwitchManager(config, device, callBackManager, entitiesFacade);
 	}
 
 
@@ -132,14 +141,14 @@ public class RoomFactory {
 	 * @param room
 	 */
 	private AlarmManager initAlarmManager(AlarmManagerConfiguration config, EventManager eventManager,
-			CallBackManager callBackManager) {
+			CallBackManager callBackManager, EntitiesFacade entitiesFacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initAlarmManager(): no configuration - skipping!");
 			return null;
 		}
 
-		AlarmManager alarmManager = new AlarmManager(config, eventManager, callBackManager);
+		AlarmManager alarmManager = new AlarmManager(config, eventManager, callBackManager, entitiesFacade);
 
 		return alarmManager;
 	}
@@ -179,7 +188,8 @@ public class RoomFactory {
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager) {
+	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager,
+			EntitiesFacade entitiesFacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
@@ -196,7 +206,7 @@ public class RoomFactory {
 
 		Renderer renderer = new Renderer(pixelMap, getAllStripePartsInRoom(ledDevices), getAllLedPointsInRoom(ledDevices));
 
-		return new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer, callBackManager);
+		return new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer, callBackManager, entitiesFacade);
 	}
 
 

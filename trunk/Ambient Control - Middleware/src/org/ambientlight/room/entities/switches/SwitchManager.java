@@ -17,18 +17,19 @@ package org.ambientlight.room.entities.switches;
 
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.events.BroadcastEvent;
-import org.ambientlight.events.EventListener;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class SwitchManager implements EventListener {
+public class SwitchManager implements SwitchablesHandler {
 
 	private SwitchManagerConfiguration config;
 
@@ -37,23 +38,28 @@ public class SwitchManager implements EventListener {
 	private EventManager eventManager;
 
 
-	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback) {
+	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback,
+			EntitiesFacade entityFacade) {
 		super();
 		this.config = config;
 		this.callback = callback;
 		this.eventManager = eventManager;
 
-		// register listener for switchEvents
-		for (Switch currentSwitch : config.switches.values()) {
-			SwitchEvent svitchEventOn = new SwitchEvent(currentSwitch.getId(), true, currentSwitch.type.switchEventType);
-			SwitchEvent svitchEventOff = new SwitchEvent(currentSwitch.getId(), false, currentSwitch.type.switchEventType);
-			eventManager.register(this, svitchEventOn);
-			eventManager.register(this, svitchEventOff);
+		for (Switch currentSwitch : this.config.switches.values()) {
+			entityFacade.registerSwitchable(this, currentSwitch, currentSwitch.type);
 		}
 	}
 
 
-	private void setSwitchState(String id, SwitchType type, boolean powerState) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
+	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 */
+	@Override
+	public void setPowerState(String id, SwitchType type, boolean powerState) {
 		if (config.switches.containsKey(id) == false) {
 			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: =" + id);
 			return;
@@ -69,26 +75,5 @@ public class SwitchManager implements EventListener {
 		eventManager.onEvent(new SwitchEvent(id, powerState, type.switchEventType));
 
 		callback.roomConfigurationChanged();
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
-	 * .BroadcastEvent)
-	 */
-	@Override
-	public void handleEvent(BroadcastEvent event) {
-		SwitchEvent switchEvent = (SwitchEvent) event;
-		setSwitchState(switchEvent.sourceId, SwitchType.forCode(switchEvent.type), switchEvent.powerState);
-
-		Persistence.beginTransaction();
-
-		Switch switchObject = config.switches.get(switchEvent.sourceId);
-		switchObject.setPowerState(switchEvent.powerState);
-
-		Persistence.commitTransaction();
 	}
 }
