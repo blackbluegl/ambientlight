@@ -21,13 +21,12 @@ import java.util.List;
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.room.entities.Sensor;
+import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
 /**
@@ -50,8 +49,8 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 		evaluator.putVariable("tokenValue", token.data.toString());
 
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
-			Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
-			evaluator.putVariable(dataproviderName, getValueFromDataProvider(dataprovider.getValue()));
+			Sensor sensor = findSensor(dataproviderName);
+			evaluator.putVariable(dataproviderName, getValueFromDataProvider(sensor));
 		}
 		try {
 			String resultString = evaluator.evaluate(this.getConfig().expressionConfiguration.expression);
@@ -64,7 +63,17 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 	}
 
 
-	protected String getValueFromDataProvider(Object value) {
+	/**
+	 * @param dataproviderName
+	 * @return
+	 */
+	private Sensor findSensor(String dataproviderName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	protected String getValueFromDataProvider(Sensor value) {
 		if (value instanceof Boolean) {
 			boolean boolValue = (Boolean) value;
 			if (boolValue)

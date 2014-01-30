@@ -13,12 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.events;
+package org.ambientlight.room.entities;
+
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public enum SwitchEventType {
-	VIRTUAL_MAIN, VIRTUAL, NFC, LED, ELRO, ALARM
+public interface SwitchablesHandler {
+
+	public void setPowerState(String id, SwitchType type, boolean powerState);
 }

@@ -27,13 +27,16 @@ import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.events.DailyAlarmEvent;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class AlarmManager {
+public class AlarmManager implements SwitchablesHandler {
 
 	private AlarmManagerConfiguration config;
 
@@ -46,7 +49,8 @@ public class AlarmManager {
 	private Map<String, TimerTask> alarmTasks = new HashMap<String, TimerTask>();
 
 
-	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager, CallBackManager callBackMananger) {
+	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager, CallBackManager callBackMananger,
+			EntitiesFacade entitiesFacade) {
 		super();
 		this.config = config;
 		this.eventManager = eventManager;
@@ -54,6 +58,7 @@ public class AlarmManager {
 
 		for (Entry<String, DailyAlarm> current : config.alarms.entrySet()) {
 			createAlarmEvent(current.getKey(), current.getValue());
+			entitiesFacade.registerSwitchable(this, current.getValue(), SwitchType.ALARM);
 		}
 	}
 
@@ -82,16 +87,16 @@ public class AlarmManager {
 	 * @param eventListener
 	 * @param triggerConfig
 	 */
-	public void createOrUpdateAlarm(final String name, final DailyAlarm alarm) {
+	public void createOrUpdateAlarm(final DailyAlarm alarm) {
 
 		Persistence.beginTransaction();
 
-		this.config.alarms.put(name, alarm);
+		this.config.alarms.put(alarm.getId(), alarm);
 
 		if (alarm.getPowerState()) {
-			createAlarmEvent(name, alarm);
+			createAlarmEvent(alarm.getId(), alarm);
 		} else {
-			removeAlarmEvent(name, alarm);
+			removeAlarmEvent(alarm.getId(), alarm);
 		}
 
 		Persistence.commitTransaction();
@@ -130,5 +135,26 @@ public class AlarmManager {
 
 		timer.scheduleAtFixedRate(task, alarmCalendar.getTime(), 24 * 3600 * 1000);
 		alarmTasks.put(name, task);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
+	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 */
+	@Override
+	public void setPowerState(String id, SwitchType type, boolean powerState) {
+		DailyAlarm alarm = config.alarms.get(id);
+
+		if (alarm == null) {
+			System.out.println("RemoteSwitchManager handleSwitchChange(): got request for unknown device: =" + id);
+			return;
+		}
+
+		alarm.setPowerState(powerState);
+		this.createOrUpdateAlarm(alarm);
 	}
 }

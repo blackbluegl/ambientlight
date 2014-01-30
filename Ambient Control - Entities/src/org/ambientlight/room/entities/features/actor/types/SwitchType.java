@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.switches;
+package org.ambientlight.room.entities.features.actor.types;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +26,8 @@ import org.ambientlight.events.SwitchEventType;
  * 
  */
 public enum SwitchType {
-	VIRTUAL_MAIN(SwitchEventType.VIRTUAL_MAIN), VIRTUAL(SwitchEventType.VIRTUAL), NFC(SwitchEventType.NFC);
+	VIRTUAL_MAIN(SwitchEventType.VIRTUAL_MAIN), VIRTUAL(SwitchEventType.VIRTUAL), NFC(SwitchEventType.NFC), ELRO(
+			SwitchEventType.ELRO), LED(SwitchEventType.LED), ALARM(SwitchEventType.ALARM);
 
 	public final SwitchEventType switchEventType;
 

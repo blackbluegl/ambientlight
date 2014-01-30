@@ -20,19 +20,17 @@ import java.io.IOException;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
-import org.ambientlight.events.BroadcastEvent;
-import org.ambientlight.events.EventListener;
-import org.ambientlight.events.EventManager;
-import org.ambientlight.events.SwitchEvent;
-import org.ambientlight.events.SwitchEventType;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class RemoteSwitchManager implements EventListener {
+public class RemoteSwitchManager implements SwitchablesHandler {
 
 	private RemoteSwitchManagerConfiguration config;
 
@@ -42,21 +40,26 @@ public class RemoteSwitchManager implements EventListener {
 
 
 	public RemoteSwitchManager(RemoteSwitchManagerConfiguration config, RemoteSwtichDeviceDriver device,
-			CallBackManager callbackManager, EventManager eventManager) {
+			CallBackManager callbackManager, EntitiesFacade entitiesFacade) {
 		this.config = config;
 		this.device = device;
 		this.callbackManager = callbackManager;
 		for(RemoteSwitch current : config.remoteSwitches.values()){
-			SwitchEvent switchOff = new SwitchEvent(current.getId(), false, SwitchEventType.REMOTE);
-			SwitchEvent switchOn = new SwitchEvent(current.getId(), true, SwitchEventType.REMOTE);
-			eventManager.register(this, switchOn);
-			eventManager.register(this, switchOff);
+			entitiesFacade.registerSwitchable(this, current, SwitchType.ELRO);
 		}
 	}
 
 
-	public void setPowerStateForRemoteSwitch(String id, boolean powerState) {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
+	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 */
+	@Override
+	public void setPowerState(String id, SwitchType type, boolean powerState) {
 		RemoteSwitch remoteSwitch = config.remoteSwitches.get(id);
 
 		if (config.remoteSwitches.containsKey(id) == false) {
@@ -78,21 +81,6 @@ public class RemoteSwitchManager implements EventListener {
 		}
 
 		callbackManager.roomConfigurationChanged();
-	}
 
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.events.EventListener#handleEvent(org.ambientlight.events
-	 * .BroadcastEvent)
-	 */
-	@Override
-	public void handleEvent(BroadcastEvent event) {
-		if (event instanceof SwitchEvent) {
-			SwitchEvent switchEvent = (SwitchEvent) event;
-			this.setPowerStateForRemoteSwitch(switchEvent.sourceId, switchEvent.powerState);
-		}
 	}
 }

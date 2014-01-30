@@ -23,5 +23,5 @@ package org.ambientlight.room.entities.features.sensor;
  */
 public interface Sensor {
 
-	public String getSensorName();
+	public String getSensorId();
 }

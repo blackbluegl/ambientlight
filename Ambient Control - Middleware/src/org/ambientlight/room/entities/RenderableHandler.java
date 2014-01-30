@@ -13,12 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.events;
+package org.ambientlight.room.entities;
+
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public enum SwitchEventType {
-	VIRTUAL_MAIN, VIRTUAL, NFC, LED, ELRO, ALARM
+public interface RenderableHandler {
+
+	public void setRenderingProgrammConfiguration(String id, RenderingProgramConfiguration config);
 }
