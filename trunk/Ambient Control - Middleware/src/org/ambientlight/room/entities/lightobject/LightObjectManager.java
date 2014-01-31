@@ -17,8 +17,7 @@ import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.Persistence;
-import org.ambientlight.room.entities.EntitiesFacade;
-import org.ambientlight.room.entities.RenderableHandler;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
@@ -30,7 +29,7 @@ import org.ambientlight.room.entities.lightobject.programms.Sunset;
 import org.ambientlight.room.entities.lightobject.programms.Tron;
 
 
-public class LightObjectManager implements SwitchablesHandler, RenderableHandler {
+public class LightObjectManager implements SwitchablesHandler {
 
 	private LightObjectManagerConfiguration config;
 
@@ -53,7 +52,7 @@ public class LightObjectManager implements SwitchablesHandler, RenderableHandler
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
 			RenderingEffectFactory effectFactory, List<DeviceDriver> devices, Renderer renderer,
-			CallBackManager callBackMananger, EntitiesFacade entitiesFacade) {
+			CallBackManager callBackMananger, FeatureFacade entitiesFacade) {
 
 		this.callBackMananger = callBackMananger;
 
@@ -77,7 +76,6 @@ public class LightObjectManager implements SwitchablesHandler, RenderableHandler
 		// listen for switchable events
 		for (LightObject lightObject : config.lightObjectConfigurations.values()) {
 			entitiesFacade.registerSwitchable(this, lightObject, SwitchType.LED);
-			entitiesFacade.registerRenderable(this, lightObject);
 		}
 	}
 
@@ -243,7 +241,6 @@ public class LightObjectManager implements SwitchablesHandler, RenderableHandler
 		Persistence.commitTransaction();
 
 		if (powerState == false) {
-
 			// set fadeout effect
 			RenderingEffect effect = effectFactory.getFadeOutEffect(renderObject);
 			RenderingProgramm renderProgram = renderer.getProgramForLightObject(renderObject);
@@ -253,22 +250,6 @@ public class LightObjectManager implements SwitchablesHandler, RenderableHandler
 		} else {
 			this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
 		}
-
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.RenderableHandler#
-	 * setRenderingProgrammConfiguration(java.lang.String,
-	 * org.ambientlight.config
-	 * .room.entities.lightobject.renderingprogram.RenderingProgramConfiguration
-	 * )
-	 */
-	@Override
-	public void setRenderingProgrammConfiguration(String id, RenderingProgramConfiguration config) {
-		// TODO Auto-generated method stub
 
 	}
 }

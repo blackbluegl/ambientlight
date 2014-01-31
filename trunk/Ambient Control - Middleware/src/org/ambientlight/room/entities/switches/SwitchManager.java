@@ -20,7 +20,7 @@ import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration
 import org.ambientlight.events.EventManager;
 import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.room.Persistence;
-import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
@@ -39,7 +39,7 @@ public class SwitchManager implements SwitchablesHandler {
 
 
 	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback,
-			EntitiesFacade entityFacade) {
+			FeatureFacade entityFacade) {
 		super();
 		this.config = config;
 		this.callback = callback;

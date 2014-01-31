@@ -36,7 +36,7 @@ import org.ambientlight.messages.max.DayEntry;
 import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxDispatcher;
 import org.ambientlight.process.ProcessManager;
-import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
@@ -64,7 +64,7 @@ public class RoomFactory {
 		AmbientControlMW.setRoom(room);
 
 		// init EntitiesFacade
-		room.entitiesFacade = new EntitiesFacade();
+		room.featureFacade = new FeatureFacade();
 
 		// init CallbackManager
 		room.callBackMananger = new CallBackManager();
@@ -74,25 +74,26 @@ public class RoomFactory {
 
 		// init alarmManager
 		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger,
-				room.entitiesFacade);
+				room.featureFacade);
 
 		// init remoteSwitchManager
 		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger,
-				room.entitiesFacade);
+				room.featureFacade);
 
 		// init switchManager
 		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger,
-				room.entitiesFacade);
+				room.featureFacade);
 
 		// init lightObject rendering system
 		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger,
-				room.entitiesFacade);
+ room.featureFacade);
 
 		// init queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
 
 		// init climate Manager
-		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger);
+		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger,
+				room.featureFacade);
 
 		System.out.println("RoomFactory initRoom(): finished");
 
@@ -107,7 +108,7 @@ public class RoomFactory {
 	 * @return
 	 */
 	private SwitchManager initSwitchManager(SwitchManagerConfiguration config, EventManager eventManager,
-			CallBackManager callBackMananger, EntitiesFacade entitiesFacade) {
+			CallBackManager callBackMananger, FeatureFacade entitiesFacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initSwitchManager(): no configuration - skipping!");
@@ -123,7 +124,7 @@ public class RoomFactory {
 	 * @return
 	 */
 	private RemoteSwitchManager initRemoteSwitchManager(RemoteSwitchManagerConfiguration config, CallBackManager callBackManager,
-			EntitiesFacade entitiesFacade) {
+			FeatureFacade entitiesFacade) {
 		if (config == null) {
 
 			System.out.println("RoomFactory initRemoteSwitchManager(): no configuration - skipping!");
@@ -141,7 +142,7 @@ public class RoomFactory {
 	 * @param room
 	 */
 	private AlarmManager initAlarmManager(AlarmManagerConfiguration config, EventManager eventManager,
-			CallBackManager callBackManager, EntitiesFacade entitiesFacade) {
+			CallBackManager callBackManager, FeatureFacade entitiesFacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initAlarmManager(): no configuration - skipping!");
@@ -189,7 +190,7 @@ public class RoomFactory {
 	 * @throws IOException
 	 */
 	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager,
-			EntitiesFacade entitiesFacade) {
+			FeatureFacade entitiesFacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
@@ -211,7 +212,7 @@ public class RoomFactory {
 
 
 	public ClimateManager initClimateManager(ClimateManagerConfiguration config, QeueManager queueManager,
-			CallBackManager callBackManager) {
+			CallBackManager callBackManager, FeatureFacade featurefacade) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initClimateManager(): no configuration - skipping!");
@@ -236,7 +237,7 @@ public class RoomFactory {
 			config.weekProfiles.remove(currentWeekProfileToRemove);
 		}
 
-		ClimateManager climateManager = new ClimateManager(callBackManager, queueManager, config);
+		ClimateManager climateManager = new ClimateManager(callBackManager, queueManager, config, featurefacade);
 
 		queueManager.registerMessageListener(DispatcherType.MAX, climateManager);
 

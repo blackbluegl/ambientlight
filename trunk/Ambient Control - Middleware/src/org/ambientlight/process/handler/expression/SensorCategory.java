@@ -13,16 +13,13 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities;
-
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+package org.ambientlight.process.handler.expression;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface RenderableHandler {
-
-	public void setRenderingProgrammConfiguration(String id, RenderingProgramConfiguration config);
+public enum SensorCategory {
+	SCENERY, TEMPERATURE
 }

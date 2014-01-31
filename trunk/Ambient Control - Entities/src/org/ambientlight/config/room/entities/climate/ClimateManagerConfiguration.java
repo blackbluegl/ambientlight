@@ -42,7 +42,7 @@ public class ClimateManagerConfiguration {
 	public MaxVCubeDeviceConfiguration rfmBridge;
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
-	public float setTemp = 22.0f;
+	public float temperature = 22.0f;
 	public Date temporaryUntilDate;
 	public String currentWeekProfile = "default";
 

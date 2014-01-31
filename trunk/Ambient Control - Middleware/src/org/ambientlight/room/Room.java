@@ -5,7 +5,7 @@ import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.process.ProcessManager;
-import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
@@ -21,7 +21,7 @@ import org.ambientlight.room.entities.switches.SwitchManager;
  */
 public class Room {
 
-	public EntitiesFacade entitiesFacade;
+	public FeatureFacade featureFacade;
 
 	public LightObjectManager lightObjectManager;
 

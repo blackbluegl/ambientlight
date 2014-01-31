@@ -67,7 +67,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// it is the sensor value we can read. but we need something to
 		// start
-		device.setTemperature(AmbientControlMW.getRoom().config.climateManager.setTemp);
+		device.setTemperature(AmbientControlMW.getRoom().config.climateManager.temperature);
 
 		device.offset = AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET;
 		device.label = "Thermostat";
