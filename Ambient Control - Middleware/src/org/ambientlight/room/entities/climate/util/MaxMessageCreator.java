@@ -56,7 +56,7 @@ public class MaxMessageCreator {
 		MaxSetTemperatureMessage outMessage = new MaxSetTemperatureMessage();
 		outMessage.setFromAdress(AmbientControlMW.getRoom().config.climateManager.vCubeAdress);
 		if (AmbientControlMW.getRoom().config.climateManager.mode != MaxThermostateMode.AUTO) {
-			outMessage.setTemp(AmbientControlMW.getRoom().config.climateManager.setTemp);
+			outMessage.setTemp(AmbientControlMW.getRoom().config.climateManager.temperature);
 		} else {
 			outMessage.setTemp(0.0f);
 		}

@@ -30,6 +30,7 @@ import org.ambientlight.room.entities.features.sensor.ScenerySensor;
  */
 public class SceneryManager implements ScenerySensor {
 
+	public static final String SENSOR_NAME = "SceneryManager";
 
 	private SceneryManagerConfiguration config;
 
@@ -85,6 +86,6 @@ public class SceneryManager implements ScenerySensor {
 	 */
 	@Override
 	public String getSensorId() {
-		return ScenerySensor.SOURCE_NAME;
+		return SENSOR_NAME;
 	}
 }

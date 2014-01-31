@@ -47,21 +47,26 @@ import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
 import org.ambientlight.messages.max.MaxWakeUpMessage;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.climate.handlers.AddShutterContactHandler;
 import org.ambientlight.room.entities.climate.handlers.AddThermostateHandler;
 import org.ambientlight.room.entities.climate.handlers.MessageActionHandler;
 import org.ambientlight.room.entities.climate.handlers.RemoveShutterContactHandler;
 import org.ambientlight.room.entities.climate.handlers.RemoveThermostatHandler;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
+import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
+import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorType;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class ClimateManager implements MessageListener {
+public class ClimateManager implements MessageListener, TemperatureSensor {
 
-	public static int WAIT_FOR_NEW_DEVICES = 90;
+	private static final String SENSOR_ID = "Roomtemperature";
+
+	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 90;
 
 	private CallBackManager callBackMananger;
 
@@ -82,7 +87,8 @@ public class ClimateManager implements MessageListener {
 	boolean learnMode = false;
 
 
-	public ClimateManager(CallBackManager callBackMananger, QeueManager queueManager, ClimateManagerConfiguration config) {
+	public ClimateManager(CallBackManager callBackMananger, QeueManager queueManager, ClimateManagerConfiguration config,
+			FeatureFacade featureFacade) {
 		super();
 		this.callBackMananger = callBackMananger;
 		this.queueManager = queueManager;
@@ -97,6 +103,14 @@ public class ClimateManager implements MessageListener {
 			threePm.add(Calendar.DAY_OF_MONTH, 1);
 		}
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
+
+		// register sensors
+		featureFacade.registerTemperatureSensor(this, TemperatureSensorType.SET_ROOM_TEMPERATURE);
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+				featureFacade.registerTemperatureSensor((TemperatureSensor) current, TemperatureSensorType.MAX_THERMOSTATE);
+			}
+		}
 	}
 
 
@@ -128,7 +142,7 @@ public class ClimateManager implements MessageListener {
 
 			this.sendTimeInfoToThermostates();
 
-			this.setMode(config.setTemp, config.mode, config.temporaryUntilDate);
+			this.setMode(config.temperature, config.mode, config.temporaryUntilDate);
 		}
 	}
 
@@ -270,7 +284,7 @@ public class ClimateManager implements MessageListener {
 		Persistence.beginTransaction();
 
 		config.mode = message.getMode();
-		config.setTemp = message.getTemp();
+		config.temperature = message.getTemp();
 		config.temporaryUntilDate = message.getTemporaryUntil();
 
 		Persistence.commitTransaction();
@@ -386,7 +400,7 @@ public class ClimateManager implements MessageListener {
 
 		config.mode = message.getMode();
 		config.temporaryUntilDate = message.getTemporaryUntil();
-		config.setTemp = message.getSetTemp();
+		config.temperature = message.getSetTemp();
 
 		Persistence.commitTransaction();
 
@@ -455,7 +469,7 @@ public class ClimateManager implements MessageListener {
 			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
 
 		config.mode = mode;
-		config.setTemp = temp;
+		config.temperature = temp;
 		config.temporaryUntilDate = until;
 
 		List<Message> messages = new ArrayList<Message>();
@@ -489,7 +503,7 @@ public class ClimateManager implements MessageListener {
 					nextDayEntry = current;
 				}
 			}
-			config.setTemp = nextDayEntry.getTemp();
+			config.temperature = nextDayEntry.getTemp();
 		}
 
 		Persistence.commitTransaction();
@@ -505,7 +519,7 @@ public class ClimateManager implements MessageListener {
 			public void run() {
 				try {
 					System.out.println("ClimateManager - startPairing(): Waiting for new Devices");
-					Thread.sleep(WAIT_FOR_NEW_DEVICES * 1000);
+					Thread.sleep(WAIT_FOR_NEW_DEVICES_TIMEOUT * 1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} finally {
@@ -584,6 +598,41 @@ public class ClimateManager implements MessageListener {
 				return true;
 		}
 		return false;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
+	 */
+	@Override
+	public String getSensorId() {
+		return ClimateManager.SENSOR_ID;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.TemperatureSensor#
+	 * getTemperature()
+	 */
+	@Override
+	public float getTemperature() {
+		return this.config.temperature;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.TemperatureSensor#
+	 * getMessureDate()
+	 */
+	@Override
+	public Date getMessureDate() {
+		return new Date();
 	}
 
 }

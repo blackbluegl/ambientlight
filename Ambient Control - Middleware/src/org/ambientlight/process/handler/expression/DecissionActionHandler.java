@@ -18,12 +18,11 @@ package org.ambientlight.process.handler.expression;
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.room.entities.Sensor;
+import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
 /**
@@ -52,10 +51,11 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 			if (dataproviderName.equals("tokenValue")) {
 				evaluator.putVariable("tokenValue", tokenValue);
 			} else {
-				Sensor dataprovider = AmbientControlMW.getRoom().sensors.get(dataproviderName);
-				evaluator.putVariable(dataproviderName, getValueFromDataProvider(dataprovider.getValue()));
+				Sensor sensor = findSensor(dataproviderName);
+				evaluator.putVariable(dataproviderName, getValueFromDataProvider(sensor));
 			}
 		}
+
 		try {
 			takeDefaultTransition = evaluator.getBooleanResult(this.getConfig().expressionConfiguration.expression);
 			token.data = takeDefaultTransition;

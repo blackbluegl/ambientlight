@@ -27,7 +27,7 @@ import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.events.DailyAlarmEvent;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.room.Persistence;
-import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
@@ -50,7 +50,7 @@ public class AlarmManager implements SwitchablesHandler {
 
 
 	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager, CallBackManager callBackMananger,
-			EntitiesFacade entitiesFacade) {
+			FeatureFacade entitiesFacade) {
 		super();
 		this.config = config;
 		this.eventManager = eventManager;

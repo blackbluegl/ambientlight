@@ -21,7 +21,7 @@ import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.room.Persistence;
-import org.ambientlight.room.entities.EntitiesFacade;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
@@ -40,7 +40,7 @@ public class RemoteSwitchManager implements SwitchablesHandler {
 
 
 	public RemoteSwitchManager(RemoteSwitchManagerConfiguration config, RemoteSwtichDeviceDriver device,
-			CallBackManager callbackManager, EntitiesFacade entitiesFacade) {
+			CallBackManager callbackManager, FeatureFacade entitiesFacade) {
 		this.config = config;
 		this.device = device;
 		this.callbackManager = callbackManager;

@@ -13,9 +13,8 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities;
+package org.ambientlight.room.entities.features.actor.types;
 
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
 /**
  * @author Florian Bornkessel
