@@ -5,18 +5,33 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.io.IOException;
+import java.util.List;
 import java.util.TimerTask;
 
 import org.ambientlight.debug.BufferedImageDisplayOutput;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.led.StripePart;
+import org.ambientlight.room.entities.lightobject.LightObjectManager;
+import org.ambientlight.room.entities.lightobject.Renderer;
 
 class RenderingTask extends TimerTask {
+
+	private Renderer renderer;
+	private LightObjectManager manager;
+	private List<AnimateableLedDevice> devices;
+
+
+	public RenderingTask(Renderer renderer, LightObjectManager manager, List<AnimateableLedDevice> devices) {
+		super();
+		this.renderer = renderer;
+		this.manager = manager;
+		this.devices = devices;
+	}
 
 	private BufferedImageDisplayOutput debugRoomDisplay;
 
 	private void resetConnection() {
-		for (AnimateableLedDevice currentDevice : AmbientControlMW.room.getLedAnimateableDevices()) {
+		for (AnimateableLedDevice currentDevice : devices) {
 			try {
 				System.out.println("resetting connection");
 				currentDevice.closeConnection();
@@ -31,15 +46,14 @@ class RenderingTask extends TimerTask {
 
 	@Override
 	public void run() {
-		AmbientControlMW.renderer.render();
 
 		if(AmbientControlMW.debug){
 			handleDebug();
 		}
 
-		for (AnimateableLedDevice currentDevice : AmbientControlMW.room.getLedAnimateableDevices()) {
+		for (AnimateableLedDevice currentDevice : devices) {
 			try {
-				if(AmbientControlMW.renderer.hadDirtyRegionInLastRun()){
+				if (renderer.hadDirtyRegionInLastRun()) {
 					currentDevice.writeData();
 				}
 			} catch (IOException e) {

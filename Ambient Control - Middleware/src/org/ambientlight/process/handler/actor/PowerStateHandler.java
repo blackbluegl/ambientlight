@@ -5,10 +5,7 @@ import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfigurat
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.lightobject.RenderObject;
-import org.ambientlight.room.entities.lightobject.LightObject;
-import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
+import org.ambientlight.room.entities.features.actor.types.SwitcheableId;
 
 
 public class PowerStateHandler extends AbstractActionHandler {
@@ -19,46 +16,17 @@ public class PowerStateHandler extends AbstractActionHandler {
 		// if simple mode handle all actors the same way
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
-			for (Switchable actorConfig : AmbientControlMW.getRoom().getSwitchableActors().values()) {
-				switchPowerState(actorConfig.getId(), powerState, actorConfig);
+
+			for (SwitcheableId switchableIds : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
+				AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(switchableIds.type, switchableIds.id,
+						powerState);
 			}
 			return;
 		}
 
-		for (String currentActorName : getConfig().powerStateConfiguration.keySet()) {
-			boolean powerState = getConfig().powerStateConfiguration.get(currentActorName);
-			Switchable actorConfig = AmbientControlMW.getRoom().config.getSwitchableActors().get(currentActorName);
-			switchPowerState(currentActorName, powerState, actorConfig);
-		}
-	}
-
-
-	/**
-	 * @param currentActorName
-	 */
-	public void switchPowerState(String currentActorName, boolean powerState, Switchable actorConfig) {
-		try {
-			if (actorConfig instanceof RemoteSwitch) {
-				// update switch device
-				AmbientControlMW
-				.getRoom()
-				.getSwitchingDevice()
-				.setState(((RemoteSwitch) actorConfig).deviceType,
-						((RemoteSwitch) actorConfig).houseCode,
-						((RemoteSwitch) actorConfig).switchingUnitCode, powerState);
-
-			} else if (actorConfig instanceof LightObject) {
-				// update renderer for light objects and update model
-				RenderObject lightObject = AmbientControlMW.getRoom().getLightObjectByName(currentActorName);
-				AmbientControlMW.getRenderProgrammFactory().setPowerStateForLightObject(AmbientControlMW.getRenderer(),
-						lightObject, powerState);
-			}
-
-			// update model
-			actorConfig.setPowerState(powerState);
-		} catch (Exception e) {
-			System.out.println("error while trying to set Powerstate for: " + currentActorName + ". Exception was: ");
-			e.printStackTrace();
+		for (SwitcheableId currentId : getConfig().powerStateConfiguration.keySet()) {
+			boolean powerState = getConfig().powerStateConfiguration.get(currentId);
+			AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(currentId.type, currentId.id, powerState);
 		}
 	}
 

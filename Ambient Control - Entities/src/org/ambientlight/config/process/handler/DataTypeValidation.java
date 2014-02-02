@@ -6,7 +6,7 @@ import java.util.List;
 
 public enum DataTypeValidation {
 	CONSUMES_NO_DATA("Konsumiert keine Eingangsdaten"), CREATES_NO_DATA("Erzeugt keine Daten"), EVENT("Events"), BOOLEAN(
-			"Boolscher Ausdruck"), NUMERIC("Numerischer Wert");
+			"Boolscher Ausdruck"), NUMERIC("Numerischer Wert"), SENSOR("Sensor Daten");
 
 	public String description;
 
@@ -30,6 +30,9 @@ public enum DataTypeValidation {
 
 		case NUMERIC:
 			return new DataTypeValidation[] { DataTypeValidation.NUMERIC, DataTypeValidation.CONSUMES_NO_DATA };
+
+		case SENSOR:
+			return new DataTypeValidation[] { DataTypeValidation.SENSOR, DataTypeValidation.CONSUMES_NO_DATA };
 
 		default:
 			throw new IllegalArgumentException(outputPreviousNode.toString() + "is no OutputFormat");

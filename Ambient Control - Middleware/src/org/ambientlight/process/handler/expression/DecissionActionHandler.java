@@ -22,6 +22,7 @@ import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.ActionHandlerException;
+import org.ambientlight.process.handler.Util;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
@@ -51,8 +52,8 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 			if (dataproviderName.equals("tokenValue")) {
 				evaluator.putVariable("tokenValue", tokenValue);
 			} else {
-				Sensor sensor = findSensor(dataproviderName);
-				evaluator.putVariable(dataproviderName, getValueFromDataProvider(sensor));
+				Sensor sensor = Util.findSensor(dataproviderName);
+				evaluator.putVariable(dataproviderName, Util.getDataFromSensor(sensor));
 			}
 		}
 

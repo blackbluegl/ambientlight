@@ -17,7 +17,6 @@ package org.ambientlight.config.process.handler.event;
 
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
-import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
@@ -35,9 +34,6 @@ public class FireEventHandlerConfiguration extends AbstractActionHandlerConfigur
 
 	private static final long serialVersionUID = 1L;
 
-	@Presentation(name = "Events aus Prozess verwenden", position = 0)
-	@TypeDef(fieldType = FieldType.BOOLEAN)
-	public boolean useFromToken;
 
 	@TypeDef(fieldType = FieldType.BEAN)
 	@AlternativeValues(values = {

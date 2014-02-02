@@ -15,20 +15,21 @@
 
 package org.ambientlight.process.handler.event;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.handler.event.EventGeneratorSensorAdapterConfiguration;
+import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.process.Token;
+import org.ambientlight.process.TokenSensorValue;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.room.entities.EventSensor;
+import org.ambientlight.process.handler.Util;
+import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public class EventGeneratorSensorAdapterHandler extends AbstractActionHandler {
+public class SensorToTokenHandler extends AbstractActionHandler {
 
 	/*
 	 * (non-Javadoc)
@@ -39,13 +40,16 @@ public class EventGeneratorSensorAdapterHandler extends AbstractActionHandler {
 	 */
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
-		EventSensor sensor = AmbientControlMW.getRoom().getEventSensorById(this.getConfig().eventSensorId);
-		token.data = sensor.getValue();
-		token.valueType = DataTypeValidation.EVENT;
+		Sensor sensor = Util.findSensor(this.getConfig().sensorId);
+		TokenSensorValue value = new TokenSensorValue();
+		value.sensorId = sensor.getSensorId();
+		value.value = Util.getDataFromSensor(sensor);
+		token.valueType = DataTypeValidation.SENSOR;
+		token.data = value;
 	}
 
 
-	private EventGeneratorSensorAdapterConfiguration getConfig() {
-		return (EventGeneratorSensorAdapterConfiguration) this.config;
+	private SensorToTokenConfiguration getConfig() {
+		return (SensorToTokenConfiguration) this.config;
 	}
 }
