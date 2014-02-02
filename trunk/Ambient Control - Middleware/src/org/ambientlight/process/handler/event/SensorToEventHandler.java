@@ -16,30 +16,51 @@
 package org.ambientlight.process.handler.event;
 
 import org.ambientlight.AmbientControlMW;
-import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.events.SceneryEntryEvent;
+import org.ambientlight.process.SensorCategory;
 import org.ambientlight.process.Token;
+import org.ambientlight.process.TokenSensorValue;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
+import org.ambientlight.process.handler.Util;
+import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class FireEventHandler extends AbstractActionHandler {
+public class SensorToEventHandler extends AbstractActionHandler {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.ambientlight.process.handler.AbstractActionHandler#performAction(
-	 * org.ambientlight.process.entities.Token)
+	 * org.ambientlight.process.Token)
 	 */
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
-		BroadcastEvent event = ((FireEventHandlerConfiguration) this.config).event;
+
+		BroadcastEvent event = getEventForTokenSensorValue((TokenSensorValue) token.data);
+
 		AmbientControlMW.getRoom().eventManager.onEvent(event);
+
 	}
 
+
+	/**
+	 * @param data
+	 * @return
+	 */
+	private BroadcastEvent getEventForTokenSensorValue(TokenSensorValue data) {
+
+		Sensor sensor = Util.findSensor(data.sensorId);
+		if (Util.getSensorCategory(data.sensorId).equals(SensorCategory.SCENERY)) {
+			SceneryEntryEvent event = new SceneryEntryEvent(sensor.getSensorId(), data.value);
+			return event;
+		}
+		return null;
+	}
 }

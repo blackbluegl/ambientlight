@@ -26,7 +26,7 @@ import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.EventGeneratorSensorAdapterConfiguration;
+import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
@@ -35,7 +35,7 @@ import org.ambientlight.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
 import org.ambientlight.process.handler.actor.PowerStateHandler;
-import org.ambientlight.process.handler.event.EventGeneratorSensorAdapterHandler;
+import org.ambientlight.process.handler.event.SensorToTokenHandler;
 import org.ambientlight.process.handler.event.EventToBooleanHandler;
 import org.ambientlight.process.handler.event.FireEventHandler;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
@@ -174,8 +174,8 @@ public class ProcessManager {
 			handler = new EventToBooleanHandler();
 		} else if (nodeConfig.actionHandler instanceof FireEventHandlerConfiguration) {
 			handler = new FireEventHandler();
-		} else if (nodeConfig.actionHandler instanceof EventGeneratorSensorAdapterConfiguration) {
-			handler = new EventGeneratorSensorAdapterHandler();
+		} else if (nodeConfig.actionHandler instanceof SensorToTokenConfiguration) {
+			handler = new SensorToTokenHandler();
 		}
 		System.out.println("ProcessFactory: actionhandler for node id: " + i + " is a: " + handler.getClass().getSimpleName());
 		handler.config = nodeConfig.actionHandler;

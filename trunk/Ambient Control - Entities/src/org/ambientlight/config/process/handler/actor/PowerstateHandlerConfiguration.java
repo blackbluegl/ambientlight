@@ -8,6 +8,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.room.entities.features.actor.types.SwitcheableId;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
@@ -18,5 +19,5 @@ public class PowerstateHandlerConfiguration extends AbstractActionHandlerConfigu
 
 	@TypeDef(fieldType = FieldType.MAP)
 	@AlternativeIds(idBinding = "actorConfigurations.keySet()")
-	public Map<String,Boolean> powerStateConfiguration = new HashMap<String, Boolean>();
+	public Map<SwitcheableId, Boolean> powerStateConfiguration = new HashMap<SwitcheableId, Boolean>();
 }

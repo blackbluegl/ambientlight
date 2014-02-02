@@ -30,11 +30,11 @@ import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
  * 
  */
 @HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA }, generates = DataTypeValidation.EVENT)
-public class EventGeneratorSensorAdapterConfiguration extends AbstractActionHandlerConfiguration {
+public class SensorToTokenConfiguration extends AbstractActionHandlerConfiguration {
 
 	private static final long serialVersionUID = 1L;
 	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.keySet()") })
 	@TypeDef(fieldType = FieldType.STRING)
 	@Presentation(name = "Event auslesen und weitergeben", position = 0)
-	public String eventSensorId;
+	public String sensorId;
 }

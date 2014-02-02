@@ -12,7 +12,7 @@ import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.EventGeneratorSensorAdapterConfiguration;
+import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
@@ -120,8 +120,8 @@ public class KuecheTestConfig {
 
 		NodeConfiguration grabCurrentSceneryNode = new NodeConfiguration();
 		grabCurrentSceneryNode.id = 2;
-		EventGeneratorSensorAdapterConfiguration grabSceneryHandler = new EventGeneratorSensorAdapterConfiguration();
-		grabSceneryHandler.eventSensorId = "RoomSceneryEventGenerator";
+		SensorToTokenConfiguration grabSceneryHandler = new SensorToTokenConfiguration();
+		grabSceneryHandler.sensorId = "RoomSceneryEventGenerator";
 		grabCurrentSceneryNode.nextNodeIds.add(4);
 		grabCurrentSceneryNode.actionHandler = grabSceneryHandler;
 		roomSwitchProcess.nodes.put(2, grabCurrentSceneryNode);

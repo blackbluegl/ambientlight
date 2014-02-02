@@ -15,24 +15,19 @@
 
 package org.ambientlight.process.handler.expression;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.room.entities.features.sensor.ScenerySensor;
+import org.ambientlight.process.handler.Util;
 import org.ambientlight.room.entities.features.sensor.Sensor;
-import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorId;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorType;
 
 
 /**
@@ -55,8 +50,8 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 		evaluator.putVariable("tokenValue", token.data.toString());
 
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
-			Sensor sensor = findSensor(dataproviderName);
-			evaluator.putVariable(dataproviderName, getValueFromDataProvider(sensor));
+			Sensor sensor = Util.findSensor(dataproviderName);
+			evaluator.putVariable(dataproviderName, Util.getDataFromSensor(sensor));
 		}
 		try {
 			String resultString = evaluator.evaluate(this.getConfig().expressionConfiguration.expression);
@@ -69,38 +64,7 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 	}
 
 
-	/**
-	 * @param dataproviderName
-	 * @return
-	 */
-	protected Sensor findSensor(String dataproviderName) {
-		String[] strinkTokens = dataproviderName.split(":");
-		SensorCategory category = SensorCategory.valueOf(strinkTokens[0]);
 
-		switch (category) {
-		case SCENERY:
-			return AmbientControlMW.getRoom().featureFacade.getScenerySensor();
-		case TEMPERATURE:
-			TemperatureSensorType sensorType = TemperatureSensorType.valueOf(strinkTokens[1]);
-			TemperatureSensorId id = new TemperatureSensorId();
-			id.type = sensorType;
-			id.id = strinkTokens[2];
-			return AmbientControlMW.getRoom().featureFacade.getTemperatureSensors().get(id);
-		default:
-			break;
-		}
-		return null;
-	}
-
-
-	protected String getValueFromDataProvider(Sensor sensor) {
-		if (sensor instanceof TemperatureSensor)
-			return new DecimalFormat("#.##").format(((TemperatureSensor) sensor).getTemperature());
-		else if (sensor instanceof ScenerySensor)
-			return ((ScenerySensor) sensor).getCurrentScenery().id;
-		else
-			return "0.0";
-	}
 
 
 	protected List<String> extractDataProvider(String expression) {

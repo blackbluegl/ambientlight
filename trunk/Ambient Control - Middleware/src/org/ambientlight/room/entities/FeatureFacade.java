@@ -17,6 +17,7 @@ package org.ambientlight.room.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
@@ -67,6 +68,11 @@ public class FeatureFacade {
 		id.type = type;
 
 		switchableMap.put(id, handler);
+	}
+
+
+	public Set<SwitcheableId> getSwitchableIds() {
+		return this.switchableMap.keySet();
 	}
 
 

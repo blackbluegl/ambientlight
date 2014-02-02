@@ -45,13 +45,13 @@ public class LightObjectManager implements SwitchablesHandler {
 
 	private BufferedImage pixelMap;
 
-	private Renderer renderer;
+	public Renderer renderer;
 
-	private List<DeviceDriver> devices;
+	public List<AnimateableLedDevice> devices;
 
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
-			RenderingEffectFactory effectFactory, List<DeviceDriver> devices, Renderer renderer,
+			RenderingEffectFactory effectFactory, List<AnimateableLedDevice> devices, Renderer renderer,
 			CallBackManager callBackMananger, FeatureFacade entitiesFacade) {
 
 		this.callBackMananger = callBackMananger;
@@ -119,26 +119,23 @@ public class LightObjectManager implements SwitchablesHandler {
 		RenderingProgramm renderProgram = null;
 
 		// create SimpleColor
-		if (lightObject.lightObject.getRenderingProgrammConfiguration() instanceof SimpleColorRenderingProgramConfiguration) {
-			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject
-					.getRenderingProgrammConfiguration();
+		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
+			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			Color simpleColor = new Color(config.rgb);
 			renderProgram = new SimpleColor(simpleColor);
 		}
 
 		// create Tron
-		if (lightObject.lightObject.getRenderingProgrammConfiguration() instanceof TronRenderingProgrammConfiguration) {
-			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject
-					.getRenderingProgrammConfiguration();
+		if (lightObject.lightObject.renderingProgrammConfiguration instanceof TronRenderingProgrammConfiguration) {
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			Color color = new Color(config.rgb);
 			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength, config.sparkleStrength,
 					config.sparkleSize, config.speed, config.lightPointAmount);
 		}
 
 		// create Sunset
-		if (lightObject.lightObject.getRenderingProgrammConfiguration() instanceof SunSetRenderingProgrammConfiguration) {
-			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject
-					.getRenderingProgrammConfiguration();
+		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SunSetRenderingProgrammConfiguration) {
+			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			renderProgram = new Sunset(config.duration, config.position, config.sunStartX, config.sunStartY, config.sunSetX,
 					config.sizeOfSun, config.gamma);
 		}
@@ -161,7 +158,7 @@ public class LightObjectManager implements SwitchablesHandler {
 
 		Persistence.beginTransaction();
 
-		renderObject.lightObject.setRenderingProgrammConfiguration(newConfig);
+		renderObject.lightObject.renderingProgrammConfiguration = newConfig;
 
 		Persistence.commitTransaction();
 		renderer.removeRenderTaskForLightObject(renderObject);
@@ -250,6 +247,5 @@ public class LightObjectManager implements SwitchablesHandler {
 		} else {
 			this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
 		}
-
 	}
 }
