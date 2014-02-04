@@ -14,7 +14,10 @@ import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSet
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
+import org.ambientlight.device.drivers.LedPointDeviceDriver;
+import org.ambientlight.device.drivers.LedStripeDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
+import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.FeatureFacade;
@@ -34,10 +37,6 @@ public class LightObjectManager implements SwitchablesHandler {
 	private LightObjectManagerConfiguration config;
 
 	private CallBackManager callBackMananger;
-
-	List<StripePart> allStripePartsInRoom;
-
-	List<LedPoint> ledPointsInRoom;
 
 	private RenderingEffectFactory effectFactory;
 
@@ -65,9 +64,10 @@ public class LightObjectManager implements SwitchablesHandler {
 		this.devices = devices;
 
 		this.config = config;
+
 		for (LightObject currentItemConfiguration : config.lightObjectConfigurations.values()) {
 
-			List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(allStripePartsInRoom,
+			List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(getAllStripePartsInRoom(),
 					currentItemConfiguration);
 			lightObjectRenderObjects.put(currentItemConfiguration.getId(), new RenderObject(currentItemConfiguration,
 					stripePartsInLightObject));
@@ -232,8 +232,8 @@ public class LightObjectManager implements SwitchablesHandler {
 					+ powerState);
 			return;
 		}
-
 		Persistence.beginTransaction();
+
 		renderObject.lightObject.setPowerState(powerState);
 		Persistence.commitTransaction();
 
@@ -247,5 +247,36 @@ public class LightObjectManager implements SwitchablesHandler {
 		} else {
 			this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
 		}
+	}
+
+
+	public List<StripePart> getAllStripePartsInRoom() {
+		List<StripePart> result = new ArrayList<StripePart>();
+		for (DeviceDriver currentDevice : devices) {
+			if (currentDevice instanceof LedStripeDeviceDriver) {
+				LedStripeDeviceDriver currentLedStripeDevice = (LedStripeDeviceDriver) currentDevice;
+				for (Stripe currentStripe : currentLedStripeDevice.getAllStripes()) {
+					result.addAll(currentStripe.getStripeParts());
+				}
+			}
+		}
+		return result;
+	}
+
+
+	public List<LedPoint> getAllLedPointsInRoom() {
+		List<LedPoint> result = new ArrayList<LedPoint>();
+		for (DeviceDriver currentDevice : devices) {
+			if (currentDevice instanceof LedPointDeviceDriver) {
+				LedPointDeviceDriver currentLedPointDevice = (LedPointDeviceDriver) currentDevice;
+				result.addAll(currentLedPointDevice.getLedPoints());
+			}
+		}
+		return result;
+	}
+
+
+	public BufferedImage getPixelMap() {
+		return pixelMap;
 	}
 }
