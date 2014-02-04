@@ -65,18 +65,18 @@ class RenderingTask extends TimerTask {
 
 	private void handleDebug() {
 		if(this.debugRoomDisplay == null){
-			this.debugRoomDisplay = new BufferedImageDisplayOutput(AmbientControlMW.room
-					.getRoomBitMap().getWidth(), AmbientControlMW.room.getRoomBitMap().getHeight(),
+			this.debugRoomDisplay = new BufferedImageDisplayOutput(manager.getPixelMap().getWidth(), manager.getPixelMap()
+					.getHeight(),
 					"RoomContent");
 		}
 
-		Graphics2D g2d = AmbientControlMW.room.getRoomBitMap().createGraphics();
+		Graphics2D g2d = manager.getPixelMap().createGraphics();
 		AlphaComposite alpha = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.6f);
 		g2d.setComposite(alpha);
 		Font font = new Font("Arial", Font.BOLD, 8);
 		g2d.setFont(font);
 
-		for(StripePart current : AmbientControlMW.room.getAllStripePartsInRoom()){
+		for (StripePart current : manager.getAllStripePartsInRoom()) {
 			g2d.setColor(Color.BLACK);
 			g2d.drawLine(current.configuration.startXPositionInRoom, current.configuration.startYPositionInRoom, 
 					current.configuration.endXPositionInRoom, current.configuration.endYPositionInRoom);
@@ -101,6 +101,6 @@ class RenderingTask extends TimerTask {
 			stringYPos=current.configuration.startYPositionInRoom+stringYPos;
 			g2d.drawString(info, stringXPos,stringYPos);
 		}
-		debugRoomDisplay.setImageContent(AmbientControlMW.room.getRoomBitMap());
+		debugRoomDisplay.setImageContent(manager.getPixelMap());
 	}
 }
