@@ -143,7 +143,6 @@ public class LightObjectManager implements SwitchablesHandler {
 		renderProgram.addEffect(transition);
 
 		renderer.addRenderTaskForLightObject(lightObject, renderProgram);
-
 	}
 
 

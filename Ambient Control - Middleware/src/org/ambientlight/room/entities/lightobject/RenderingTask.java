@@ -1,4 +1,4 @@
-package org.ambientlight;
+package org.ambientlight.room.entities.lightobject;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -11,21 +11,22 @@ import java.util.TimerTask;
 import org.ambientlight.debug.BufferedImageDisplayOutput;
 import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.led.StripePart;
-import org.ambientlight.room.entities.lightobject.LightObjectManager;
-import org.ambientlight.room.entities.lightobject.Renderer;
 
-class RenderingTask extends TimerTask {
+
+public class RenderingTask extends TimerTask {
 
 	private Renderer renderer;
 	private LightObjectManager manager;
 	private List<AnimateableLedDevice> devices;
+	private boolean debug;
 
 
-	public RenderingTask(Renderer renderer, LightObjectManager manager, List<AnimateableLedDevice> devices) {
+	public RenderingTask(Renderer renderer, LightObjectManager manager, List<AnimateableLedDevice> devices, boolean debug) {
 		super();
 		this.renderer = renderer;
 		this.manager = manager;
 		this.devices = devices;
+		this.debug = debug;
 	}
 
 	private BufferedImageDisplayOutput debugRoomDisplay;
@@ -47,7 +48,7 @@ class RenderingTask extends TimerTask {
 	@Override
 	public void run() {
 
-		if(AmbientControlMW.debug){
+		if (debug) {
 			handleDebug();
 		}
 

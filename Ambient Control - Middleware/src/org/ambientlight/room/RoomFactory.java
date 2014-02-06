@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Timer;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
@@ -17,6 +18,7 @@ import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration
 import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.device.drivers.AnimateableLedDevice;
 import org.ambientlight.device.drivers.DeviceDriver;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
@@ -41,12 +43,15 @@ import org.ambientlight.room.entities.alarm.AlarmManager;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.lightobject.Renderer;
+import org.ambientlight.room.entities.lightobject.RenderingTask;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitchManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
 public class RoomFactory {
+
+	public static final int FREQUENCY = 25;
 
 	DeviceDriverFactory deviceFactory;
 
@@ -86,7 +91,7 @@ public class RoomFactory {
 
 		// init lightObject rendering system
 		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger,
- room.featureFacade);
+				room.featureFacade);
 
 		// init queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
@@ -192,13 +197,13 @@ public class RoomFactory {
 	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager,
 			FeatureFacade entitiesFacade) {
 
-		if (config == null) {
+		if (config == null || config.lightObjectConfigurations.isEmpty()) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
 		}
 
 		BufferedImage pixelMap = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_ARGB);
 
-		List<DeviceDriver> ledDevices = new ArrayList<DeviceDriver>();
+		List<AnimateableLedDevice> ledDevices = new ArrayList<AnimateableLedDevice>();
 		for (DeviceConfiguration currentDeviceConfig : config.deviceConfigurations) {
 			ledDevices.add(deviceFactory.createLedDevice(currentDeviceConfig));
 		}
@@ -207,7 +212,14 @@ public class RoomFactory {
 
 		Renderer renderer = new Renderer(pixelMap, getAllStripePartsInRoom(ledDevices), getAllLedPointsInRoom(ledDevices));
 
-		return new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer, callBackManager, entitiesFacade);
+
+		LightObjectManager manager = new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer,
+				callBackManager, entitiesFacade);
+
+		Timer timer = new Timer();
+		timer.schedule(new RenderingTask(renderer, manager, ledDevices, AmbientControlMW.isDebug()), 0, 1000 / FREQUENCY);
+
+		return manager;
 	}
 
 
@@ -247,7 +259,7 @@ public class RoomFactory {
 	}
 
 
-	private List<StripePart> getAllStripePartsInRoom(List<DeviceDriver> devices) {
+	private List<StripePart> getAllStripePartsInRoom(List<AnimateableLedDevice> devices) {
 		List<StripePart> result = new ArrayList<StripePart>();
 		for (DeviceDriver currentDevice : devices) {
 			if (currentDevice instanceof LedStripeDeviceDriver) {
@@ -261,7 +273,7 @@ public class RoomFactory {
 	}
 
 
-	private List<LedPoint> getAllLedPointsInRoom(List<DeviceDriver> devices) {
+	private List<LedPoint> getAllLedPointsInRoom(List<AnimateableLedDevice> devices) {
 		List<LedPoint> result = new ArrayList<LedPoint>();
 		for (DeviceDriver currentDevice : devices) {
 			if (currentDevice instanceof LedPointDeviceDriver) {
