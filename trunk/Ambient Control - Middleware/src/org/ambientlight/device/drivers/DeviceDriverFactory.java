@@ -44,7 +44,7 @@ public class DeviceDriverFactory {
 	}
 
 
-	public DeviceDriver createLedDevice(DeviceConfiguration dc) {
+	public AnimateableLedDevice createLedDevice(DeviceConfiguration dc) {
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");

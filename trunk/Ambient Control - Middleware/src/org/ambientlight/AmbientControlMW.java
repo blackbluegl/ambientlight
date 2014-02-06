@@ -3,7 +3,6 @@ package org.ambientlight;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
-import java.util.Timer;
 
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
@@ -11,8 +10,6 @@ import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.Room;
 import org.ambientlight.room.RoomFactory;
-import org.ambientlight.room.entities.lightobject.LightObjectManager;
-import org.ambientlight.room.entities.lightobject.Renderer;
 
 
 public class AmbientControlMW {
@@ -20,9 +17,6 @@ public class AmbientControlMW {
 	static String roomConfigFileName = "default";
 
 
-	public static String getRoomConfigFileName() {
-		return roomConfigFileName;
-	}
 
 
 	static Room room;
@@ -30,8 +24,6 @@ public class AmbientControlMW {
 	static RoomFactory roomFactory;
 
 	static ProcessManager processFactory;
-
-	public static final int FREQUENCY = 25;
 
 	static boolean debug = false;
 
@@ -42,17 +34,9 @@ public class AmbientControlMW {
 
 		parseArguments(args);
 
-		RoomConfiguration roomConfiguration = initModel();
+		RoomConfiguration roomConfiguration = getModelFromFile();
 
 		initComponents(roomConfiguration);
-
-		// start rendering but only if there is something to render
-		if (roomConfiguration.lightObjectConfigurations.isEmpty() == false) {
-			Timer timer = new Timer();
-			timer.schedule(new RenderingTask(), 0, 1000 / FREQUENCY);
-		} else {
-			System.out.println("disabled the renderer because there are no lightObjects that need to be rendered");
-		}
 
 		new WebserviceTask().start();
 
@@ -74,14 +58,14 @@ public class AmbientControlMW {
 		roomFactory = new RoomFactory(deviceFactory, processFactory);
 
 		roomFactory.initRoom(roomConfiguration);
-
+		// TODO extract to RoomFactory and Room
 		processFactory = new ProcessManager(room);
 		processFactory.initProcesses();
 
 	}
 
 
-	private static RoomConfiguration initModel() {
+	private static RoomConfiguration getModelFromFile() {
 		try {
 			return Persistence.getRoomConfigByName(roomConfigFileName);
 		} catch (Exception e) {
@@ -136,27 +120,17 @@ public class AmbientControlMW {
 	}
 
 
-	public static Renderer getRenderer() {
-		return renderer;
-	}
-
-
-	public static void setRenderer(Renderer renderer) {
-		AmbientControlMW.renderer = renderer;
-	}
-
-
-	public static LightObjectManager getRenderProgrammFactory() {
-		return renderControl;
-	}
-
-
-	public static void setRenderProgrammFactory(LightObjectManager renderProgrammFactory) {
-		AmbientControlMW.renderControl = renderProgrammFactory;
-	}
-
-
 	public static ProcessManager getProcessFactory() {
 		return processFactory;
+	}
+
+
+	public static String getRoomConfigFileName() {
+		return roomConfigFileName;
+	}
+
+
+	public static boolean isDebug() {
+		return debug;
 	}
 }
