@@ -12,6 +12,7 @@ import java.util.Timer;
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
+import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
@@ -51,12 +52,12 @@ import org.ambientlight.room.entities.switches.SwitchManager;
 
 public class RoomFactory {
 
-	public static final int FREQUENCY = 25;
+	public final int FREQUENCY = 25;
 
 	DeviceDriverFactory deviceFactory;
 
 
-	public RoomFactory(DeviceDriverFactory deviceFactory, ProcessManager processFactory) {
+	public RoomFactory(DeviceDriverFactory deviceFactory) {
 		this.deviceFactory = deviceFactory;
 	}
 
@@ -90,19 +91,37 @@ public class RoomFactory {
 				room.featureFacade);
 
 		// init lightObject rendering system
-		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger,
-				room.featureFacade);
+		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger, room.featureFacade);
 
 		// init queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
 
-		// init climate Manager
+		// init climateManager
 		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger,
 				room.featureFacade);
+
+		// init processManager
+		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager);
 
 		System.out.println("RoomFactory initRoom(): finished");
 
 		return room;
+	}
+
+
+	/**
+	 * @param processManager
+	 * @param eventManager
+	 * @return
+	 */
+	private ProcessManager initProcessManager(ProcessManagerConfiguration config, EventManager eventManager) {
+
+		if (config == null) {
+			System.out.println("RoomFactory initProcessManager(): no configuration - skipping!");
+			return null;
+		}
+
+		return new ProcessManager(config, eventManager);
 	}
 
 
@@ -130,8 +149,8 @@ public class RoomFactory {
 	 */
 	private RemoteSwitchManager initRemoteSwitchManager(RemoteSwitchManagerConfiguration config, CallBackManager callBackManager,
 			FeatureFacade entitiesFacade) {
-		if (config == null) {
 
+		if (config == null) {
 			System.out.println("RoomFactory initRemoteSwitchManager(): no configuration - skipping!");
 			return null;
 		}
@@ -212,9 +231,8 @@ public class RoomFactory {
 
 		Renderer renderer = new Renderer(pixelMap, getAllStripePartsInRoom(ledDevices), getAllLedPointsInRoom(ledDevices));
 
-
 		LightObjectManager manager = new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer,
-				callBackManager, entitiesFacade);
+				callBackManager, entitiesFacade, FREQUENCY);
 
 		Timer timer = new Timer();
 		timer.schedule(new RenderingTask(renderer, manager, ledDevices, AmbientControlMW.isDebug()), 0, 1000 / FREQUENCY);
@@ -285,7 +303,7 @@ public class RoomFactory {
 	}
 
 
-	public boolean parseWeekProfile(HashMap<MaxDayInWeek, List<DayEntry>> currentWeekProfile) {
+	private boolean parseWeekProfile(HashMap<MaxDayInWeek, List<DayEntry>> currentWeekProfile) {
 		for (Entry<MaxDayInWeek, List<DayEntry>> currentDayEntry : currentWeekProfile.entrySet()) {
 
 			if (currentDayEntry.getValue().size() > 13) {

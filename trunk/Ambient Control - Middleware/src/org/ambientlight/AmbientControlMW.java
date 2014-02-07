@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.process.ProcessManager;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.Room;
 import org.ambientlight.room.RoomFactory;
@@ -16,14 +15,9 @@ public class AmbientControlMW {
 
 	static String roomConfigFileName = "default";
 
-
-
-
 	static Room room;
 
 	static RoomFactory roomFactory;
-
-	static ProcessManager processFactory;
 
 	static boolean debug = false;
 
@@ -53,14 +47,9 @@ public class AmbientControlMW {
 	private static void initComponents(RoomConfiguration roomConfiguration) throws InterruptedException, UnknownHostException,
 	IOException {
 
-		DeviceDriverFactory deviceFactory = new DeviceDriverFactory();
+		roomFactory = new RoomFactory(new DeviceDriverFactory());
 
-		roomFactory = new RoomFactory(deviceFactory, processFactory);
-
-		roomFactory.initRoom(roomConfiguration);
-		// TODO extract to RoomFactory and Room
-		processFactory = new ProcessManager(room);
-		processFactory.initProcesses();
+		room = roomFactory.initRoom(roomConfiguration);
 
 	}
 
@@ -117,11 +106,6 @@ public class AmbientControlMW {
 
 	public static void setRoom(Room room) {
 		AmbientControlMW.room = room;
-	}
-
-
-	public static ProcessManager getProcessFactory() {
-		return processFactory;
 	}
 
 
