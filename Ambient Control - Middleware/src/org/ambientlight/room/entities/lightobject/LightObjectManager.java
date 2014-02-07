@@ -34,6 +34,8 @@ import org.ambientlight.room.entities.lightobject.programms.Tron;
 
 public class LightObjectManager implements SwitchablesHandler {
 
+	private final int FREQUENCY;
+
 	private LightObjectManagerConfiguration config;
 
 	private CallBackManager callBackMananger;
@@ -51,7 +53,9 @@ public class LightObjectManager implements SwitchablesHandler {
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
 			RenderingEffectFactory effectFactory, List<AnimateableLedDevice> devices, Renderer renderer,
-			CallBackManager callBackMananger, FeatureFacade entitiesFacade) {
+			CallBackManager callBackMananger, FeatureFacade entitiesFacade, int frequency) {
+
+		this.FREQUENCY = frequency;
 
 		this.callBackMananger = callBackMananger;
 
@@ -137,7 +141,7 @@ public class LightObjectManager implements SwitchablesHandler {
 		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SunSetRenderingProgrammConfiguration) {
 			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
 			renderProgram = new Sunset(config.duration, config.position, config.sunStartX, config.sunStartY, config.sunSetX,
-					config.sizeOfSun, config.gamma);
+					config.sizeOfSun, config.gamma, FREQUENCY);
 		}
 
 		renderProgram.addEffect(transition);

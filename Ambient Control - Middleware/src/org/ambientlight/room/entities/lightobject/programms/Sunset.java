@@ -24,7 +24,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.room.entities.lightobject.RenderObject;
 
 
@@ -33,6 +32,8 @@ import org.ambientlight.room.entities.lightobject.RenderObject;
  * 
  */
 public class Sunset extends RenderingProgramm {
+
+	private final int FREQUENCY;
 
 	// position in programm 1 is finished 0 is beginning
 	double position = 0;
@@ -72,7 +73,8 @@ public class Sunset extends RenderingProgramm {
 
 
 	public Sunset(double duration, double position, double sunStartX, double sunStartY, double sunSetX, double sizeOfSun,
-			double gamma) {
+			double gamma, int frequency) {
+		this.FREQUENCY = frequency;
 		this.duration = duration;
 		this.position = position;
 		this.sunStartXPosition = sunStartX;
@@ -84,7 +86,7 @@ public class Sunset extends RenderingProgramm {
 
 
 	private double getStepWidth() {
-		return 1 / (duration * 60 * AmbientControlMW.FREQUENCY);
+		return 1 / (duration * 60 * FREQUENCY);
 	}
 
 
