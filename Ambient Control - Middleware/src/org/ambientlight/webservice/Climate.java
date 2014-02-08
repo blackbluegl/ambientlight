@@ -40,7 +40,7 @@ public class Climate {
 	@Path("/mode")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setTemperatur(TemperaturMode mode) {
+	public Response setMode(TemperaturMode mode) {
 		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
 
 		manager.setMode(mode.temp, mode.mode, mode.until);

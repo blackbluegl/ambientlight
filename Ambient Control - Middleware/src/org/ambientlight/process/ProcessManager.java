@@ -23,24 +23,27 @@ import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
-import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
+import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
+import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
 import org.ambientlight.process.handler.actor.PowerStateHandler;
-import org.ambientlight.process.handler.event.SensorToTokenHandler;
+import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
 import org.ambientlight.process.handler.event.EventToBooleanHandler;
 import org.ambientlight.process.handler.event.FireEventHandler;
+import org.ambientlight.process.handler.event.SensorToTokenHandler;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionActionHandler;
 import org.ambientlight.room.Persistence;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
+import org.ambientlight.ws.process.validation.ValidationResult;
 
 
 /**
@@ -187,5 +190,76 @@ public class ProcessManager {
 		if (nodeConfig.nextNodeIds.isEmpty() == false) {
 			createNodes(process, nodeConfig.nextNodeIds.get(0));
 		}
+	}
+
+
+	public ValidationResult validateProcess(ProcessConfiguration process) {
+		ValidationResult result = new ValidationResult();
+
+		for (NodeConfiguration currentNode : process.nodes.values()) {
+
+			if (currentNode.actionHandler == null) {
+				result.addEmptyActionHandlerEntry(currentNode.id);
+				continue;
+			}
+
+			if (currentNode.nextNodeIds.size() > 1) {
+				if (currentNode.actionHandler instanceof DecisionHandlerConfiguration == false) {
+					result.addForkWithoutCorrespondingHandler(currentNode.id);
+				}
+			}
+
+			HandlerDataTypeValidation currentNodeValidation = currentNode.actionHandler.getClass().getAnnotation(
+					HandlerDataTypeValidation.class);
+
+			for (Integer nextNodeId : currentNode.nextNodeIds) {
+				NodeConfiguration nextNode = process.nodes.get(nextNodeId);
+				if (nextNode.actionHandler == null) {
+					// do not validate this connection because it will be
+					// validatet at the beginning of the outer for loop
+					continue;
+				}
+				HandlerDataTypeValidation nextNodeValidation = nextNode.actionHandler.getClass().getAnnotation(
+						HandlerDataTypeValidation.class);
+				boolean valide = DataTypeValidation.validate(nextNodeValidation.consumes(), currentNodeValidation.generates());
+				if (!valide) {
+					result.addEntry(nextNodeId, currentNode.id, currentNodeValidation.generates(), nextNodeValidation.consumes());
+				}
+			}
+		}
+		return result;
+	}
+
+
+	public ValidationResult createOrUpdateProcess(EventProcessConfiguration process) {
+		ValidationResult result = this.validateProcess(process);
+		if (result.resultIsValid() == false)
+			return result;
+
+		Persistence.beginTransaction();
+
+		config.processes.put(process.id, process);
+
+		Persistence.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+
+		return result;
+	}
+
+
+	public void deleteProcess(String id) {
+		Persistence.beginTransaction();
+		ProcessConfiguration process = config.processes.get(id);
+
+		if (process == null)
+			throw new IllegalArgumentException("ProcessId does not exist!");
+
+		stopProcess(id);
+		config.processes.remove(id);
+
+		Persistence.commitTransaction();
+
+		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
 	}
 }
