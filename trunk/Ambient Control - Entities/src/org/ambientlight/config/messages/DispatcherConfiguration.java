@@ -22,8 +22,7 @@ import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
  * @author Florian Bornkessel
  * 
  */
-public class DispatcherConfiguration {
+public class DispatcherConfiguration extends RemoteHostConfiguration {
 
 	public DispatcherType type;
-	public RemoteHostConfiguration device;
 }

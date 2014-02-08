@@ -61,7 +61,7 @@ public abstract class Dispatcher {
 
 
 	public void connect() throws UnknownHostException, IOException {
-		socket = new Socket(this.configuration.device.hostName, this.configuration.device.port);
+		socket = new Socket(this.configuration.hostName, this.configuration.port);
 		this.isConnected = true;
 	}
 

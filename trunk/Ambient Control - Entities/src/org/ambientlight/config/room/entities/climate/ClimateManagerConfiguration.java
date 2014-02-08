@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
 import org.ambientlight.room.entities.climate.MaxComponent;
 import org.ambientlight.room.entities.climate.MaxThermostateMode;
 
@@ -30,8 +29,6 @@ import org.ambientlight.room.entities.climate.MaxThermostateMode;
  * 
  */
 public class ClimateManagerConfiguration {
-
-	public MaxVCubeDeviceConfiguration rfmBridge;
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public float temperature = 22.0f;

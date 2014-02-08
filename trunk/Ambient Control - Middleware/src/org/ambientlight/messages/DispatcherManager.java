@@ -16,6 +16,7 @@
 package org.ambientlight.messages;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.max.MaxDispatcher;
@@ -29,10 +30,10 @@ public class DispatcherManager {
 
 	QeueManager queueManager;
 
-	HashMap<DispatcherType, Dispatcher> outDispatchers = new HashMap<DispatcherType, Dispatcher>();
+	Map<DispatcherType, Dispatcher> outDispatchers = new HashMap<DispatcherType, Dispatcher>();
 
 
-	public DispatcherManager(QeueManager queueManager, HashMap<DispatcherType, Dispatcher> outDispatchers) {
+	public DispatcherManager(QeueManager queueManager, Map<DispatcherType, Dispatcher> outDispatchers) {
 		this.queueManager = queueManager;
 		this.outDispatchers = outDispatchers;
 	}
@@ -66,10 +67,10 @@ public class DispatcherManager {
 		try {
 			dispatcher.connect();
 			System.out.println("DispatcherManager connectDispatcher(): Successfully connected Dispatcher: "
-					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName);
+					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 		} catch (Exception e) {
 			System.out.println("DispatcherManager connectDispatcher(): could not connect Dispatcher: "
-					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName + ". Retrying.");
+					+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName + ". Retrying.");
 		}
 	}
 
@@ -86,18 +87,18 @@ public class DispatcherManager {
 							.println("DispatcherManager startHeartBeatCheck(): Connection lost. Reconnecting Dispatcher: "
 									+ dispatcher.getClass().getSimpleName()
 									+ " to: "
-									+ dispatcher.configuration.device.hostName);
+									+ dispatcher.configuration.hostName);
 							queueManager.onDisconnectDispatcher(dispatcher.getDispatcherType());
 							dispatcher.closeConnection();
 							dispatcher.connect();
 							queueManager.onConnectDispatcher(dispatcher.getDispatcherType());
 							System.out.println("DispatcherManager startHeartBeatCheck(): Connection recovered for Dispatcher: "
-									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName);
+									+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 						}
 
 					} catch (Exception e) {
 						System.out.println("DispatcherManager startHeartBeatCheck(): could not reconnect Dispatcher: "
-								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.device.hostName
+								+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName
 								+ ". Retrying");
 					} finally {
 						try {
@@ -137,7 +138,7 @@ public class DispatcherManager {
 						.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect for Dispatcher: "
 								+ dispatcher.getClass().getSimpleName()
 								+ " to: "
-								+ dispatcher.configuration.device.hostName);
+								+ dispatcher.configuration.hostName);
 
 						try {
 							Thread.sleep(5000);
