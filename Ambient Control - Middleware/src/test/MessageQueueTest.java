@@ -17,11 +17,15 @@ package test;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
+import org.ambientlight.config.messages.DispatcherConfiguration;
 import org.ambientlight.config.messages.DispatcherType;
+import org.ambientlight.messages.Dispatcher;
 import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
+import org.ambientlight.messages.max.MaxDispatcher;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.room.entities.climate.MaxThermostateMode;
 
@@ -37,12 +41,19 @@ public class MessageQueueTest {
 		MessageDump dump = new MessageDump();
 		manager.registerMessageListener(DispatcherType.MAX, dump);
 
-		MaxVCubeDeviceConfiguration config = new MaxVCubeDeviceConfiguration();
+		DispatcherConfiguration config = new DispatcherConfiguration();
 		config.hostName = "ambi-schlafen";
 		config.port = 30000;
-		DispatcherManager df = new DispatcherManager();
+		config.type = DispatcherType.MAX;
+
+		MaxDispatcher dispatcher = new MaxDispatcher(config, manager);
+
+		Map<DispatcherType, Dispatcher> dispatchers = new HashMap<DispatcherType, Dispatcher>();
+		dispatchers.put(DispatcherType.MAX, dispatcher);
+		dispatchers.put(DispatcherType.SYSTEM, dispatcher);
+
+		DispatcherManager df = new DispatcherManager(manager, dispatchers);
 		manager.dispatcherManager = df;
-		df.createDispatcher(config, manager);
 		manager.startQeues();
 
 		// MaxSetTemperatureMessage tempMsg = new MaxSetTemperatureMessage();

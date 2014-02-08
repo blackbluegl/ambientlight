@@ -11,24 +11,21 @@ import com.sun.jersey.api.json.JSONConfiguration;
 
 public class WebserviceTask extends Thread {
 
-	//static final String BASE_URI = "http://192.168.1.36:9998/rest";
 	static final String BASE_URI = "http://"+AmbientControlMW.bindingAdressAndPort+"/rest";
 
 	@Override
 	public void run() {
 
-		// Start Webservice
+		// start Webservice
 		try {
 			final ResourceConfig rc = new PackagesResourceConfig("org.ambientlight.webservice");
 			rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
 			rc.getFeatures().put("com.sun.jersey.config.feature.Trace", true);
 
-			// HttpServer server = HttpServerFactory.create(BASE_URI, rc);
-
 			HttpServer server = GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
 
-			ThreadPoolConfig config = ThreadPoolConfig.defaultConfig().setPoolName("mypool").setCorePoolSize(10)
-					.setMaxPoolSize(300);
+			ThreadPoolConfig config = ThreadPoolConfig.defaultConfig().setPoolName("mypool").setCorePoolSize(1)
+					.setMaxPoolSize(20);
 
 			NetworkListener listener = server.getListeners().iterator().next();
 			listener.getTransport().setWorkerThreadPoolConfig(config);

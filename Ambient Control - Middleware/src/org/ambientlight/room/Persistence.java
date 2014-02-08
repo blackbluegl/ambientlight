@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
-import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -106,7 +105,6 @@ public class Persistence {
 		xstream.processAnnotations(RemoteSwitch.class);
 		xstream.processAnnotations(StripeConfiguration.class);
 		xstream.processAnnotations(DeviceConfiguration.class);
-		xstream.processAnnotations(RemoteSwitchBridgeConfiguration.class);
 		xstream.processAnnotations(SimpleColorRenderingProgramConfiguration.class);
 		xstream.processAnnotations(SunSetRenderingProgrammConfiguration.class);
 		xstream.processAnnotations(TronRenderingProgrammConfiguration.class);
