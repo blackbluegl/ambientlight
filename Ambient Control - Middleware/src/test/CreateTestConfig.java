@@ -25,6 +25,8 @@ import org.ambientlight.config.process.handler.expression.DecisionHandlerConfigu
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
+import org.ambientlight.config.room.entities.climate.DayEntry;
+import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
@@ -33,8 +35,6 @@ import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration
 import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.events.SwitchEvent;
-import org.ambientlight.messages.max.DayEntry;
-import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.lightobject.LightObject;

@@ -13,28 +13,20 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate;
+package org.ambientlight.ws.climate;
 
 import java.util.Date;
 
-import org.ambientlight.room.entities.climate.util.DeviceType;
+import org.ambientlight.room.entities.climate.MaxThermostateMode;
+
 
 /**
  * @author Florian Bornkessel
  *
  */
-public abstract class MaxComponent {
+public class TemperaturMode {
 
-	public abstract DeviceType getDeviceType();
-
-	public String label;
-	public int adress;
-	public String firmware;
-	public String serial;
-	public Date lastUpdate;
-	public boolean rfError = false;
-	public boolean timedOut = false;
-	public boolean invalidArgument = false;
-	public boolean batteryLow = false;
-
+	public float temp;
+	public Date until;
+	public MaxThermostateMode mode;
 }

@@ -13,28 +13,12 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate;
-
-import java.util.Date;
-
-import org.ambientlight.room.entities.climate.util.DeviceType;
+package org.ambientlight.events.types;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public abstract class MaxComponent {
-
-	public abstract DeviceType getDeviceType();
-
-	public String label;
-	public int adress;
-	public String firmware;
-	public String serial;
-	public Date lastUpdate;
-	public boolean rfError = false;
-	public boolean timedOut = false;
-	public boolean invalidArgument = false;
-	public boolean batteryLow = false;
-
+public enum SwitchEventType {
+	VIRTUAL_MAIN, VIRTUAL, NFC, LED, ELRO, ALARM
 }

@@ -13,28 +13,24 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate;
+package org.ambientlight.messages.max;
 
-import java.util.Date;
+import org.ambientlight.config.messages.DispatcherType;
+import org.ambientlight.messages.rfm22bridge.RegisterCorrelatorMessage;
 
-import org.ambientlight.room.entities.climate.util.DeviceType;
 
 /**
  * @author Florian Bornkessel
  *
  */
-public abstract class MaxComponent {
+public class MaxRegisterCorrelationMessage extends RegisterCorrelatorMessage {
 
-	public abstract DeviceType getDeviceType();
-
-	public String label;
-	public int adress;
-	public String firmware;
-	public String serial;
-	public Date lastUpdate;
-	public boolean rfError = false;
-	public boolean timedOut = false;
-	public boolean invalidArgument = false;
-	public boolean batteryLow = false;
+	/**
+	 * @param dispatcherType
+	 * @param correlator
+	 */
+	public MaxRegisterCorrelationMessage(DispatcherType dispatcherType, int deviceAdress, int vCubeAdress) {
+		super(dispatcherType, deviceAdress + "_" + vCubeAdress);
+	}
 
 }

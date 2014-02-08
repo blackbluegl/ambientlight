@@ -17,7 +17,7 @@ package test;
 
 import java.util.Date;
 
-import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
 import org.ambientlight.messages.QeueManager.State;

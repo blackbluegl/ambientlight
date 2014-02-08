@@ -17,6 +17,7 @@ package org.ambientlight.messages;
 
 import java.util.HashMap;
 
+import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.max.MaxDispatcher;
 
 

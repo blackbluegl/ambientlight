@@ -2,6 +2,7 @@ package org.ambientlight.config.room;
 
 import java.io.Serializable;
 
+import org.ambientlight.config.messages.QeueManagerConfiguration;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
@@ -9,7 +10,6 @@ import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfi
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.messages.QeueManagerConfiguration;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

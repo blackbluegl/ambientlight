@@ -21,10 +21,9 @@ import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
-import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
@@ -33,6 +32,7 @@ import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.climate.MaxComponent;
 import org.ambientlight.room.entities.climate.ShutterContact;
 import org.ambientlight.room.entities.climate.Thermostat;
+import org.ambientlight.room.entities.climate.util.DeviceType;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 

@@ -21,10 +21,9 @@ import java.util.List;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
-import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxPairPingMessage;
 import org.ambientlight.messages.max.MaxPairPongMessage;
@@ -32,7 +31,9 @@ import org.ambientlight.messages.max.MaxRegisterCorrelationMessage;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.climate.MaxComponent;
 import org.ambientlight.room.entities.climate.Thermostat;
+import org.ambientlight.room.entities.climate.util.DeviceType;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
+import org.ambientlight.room.entities.climate.util.MaxUtil;
 
 
 /**
@@ -69,7 +70,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 		// start
 		device.setTemperature(AmbientControlMW.getRoom().config.climateManager.temperature);
 
-		device.offset = AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET;
+		device.offset = MaxUtil.DEFAULT_OFFSET;
 		device.label = "Thermostat";
 		device.adress = pairMessage.getFromAdress();
 		device.batteryLow = false;

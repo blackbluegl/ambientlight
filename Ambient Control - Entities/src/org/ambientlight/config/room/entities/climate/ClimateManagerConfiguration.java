@@ -21,12 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
-import org.ambientlight.messages.max.DayEntry;
-import org.ambientlight.messages.max.MaxConfigValveMessage;
-import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
-import org.ambientlight.messages.max.MaxDayInWeek;
-import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.room.entities.climate.MaxComponent;
+import org.ambientlight.room.entities.climate.MaxThermostateMode;
 
 
 /**
@@ -34,10 +30,6 @@ import org.ambientlight.room.entities.climate.MaxComponent;
  * 
  */
 public class ClimateManagerConfiguration {
-
-	public static final float DEFAULT_OFFSET = MaxConfigureTemperaturesMessage.DEFAULT_OFFSET;
-	public static final int DEFAULT_MAX_VALVE_POSITION = MaxConfigValveMessage.DEFAULT_MAX_VALVE_POSITION;
-	public static final int DEFAULT_VALVE_OFFSET_PERCENT = 0;
 
 	public MaxVCubeDeviceConfiguration rfmBridge;
 
@@ -52,8 +44,6 @@ public class ClimateManagerConfiguration {
 
 	public float comfortTemperatur = 21.0f;
 	public float ecoTemperatur = 17.0f;
-	public float maxTemp = MaxConfigureTemperaturesMessage.MAX_TEMPERATURE;
-	public float minTemp = MaxConfigureTemperaturesMessage.MIN_TEMPERATURE;
 	public float windowOpenTemperatur = 12.0f;
 	public int windowOpenTimeMins = 15;
 	public int boostDurationMins = 5;
