@@ -15,7 +15,8 @@
 
 package org.ambientlight.room.entities.climate;
 
-import org.ambientlight.messages.max.DeviceType;
+import org.ambientlight.room.entities.climate.util.DeviceType;
+
 
 
 /**

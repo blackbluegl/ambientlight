@@ -17,7 +17,7 @@ package org.ambientlight.room.entities.climate.handlers;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.callback.CallBackManager;
-import org.ambientlight.messages.DispatcherType;
+import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.QeueManager.State;
 import org.ambientlight.messages.max.MaxFactoryResetMessage;

@@ -18,7 +18,7 @@ package org.ambientlight.room.entities.features.actor.types;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.ambientlight.events.SwitchEventType;
+import org.ambientlight.events.types.SwitchEventType;
 
 
 /**

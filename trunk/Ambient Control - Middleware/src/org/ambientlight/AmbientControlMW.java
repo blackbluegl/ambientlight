@@ -46,11 +46,8 @@ public class AmbientControlMW {
 
 	private static void initComponents(RoomConfiguration roomConfiguration) throws InterruptedException, UnknownHostException,
 	IOException {
-
 		roomFactory = new RoomFactory(new DeviceDriverFactory());
-
 		room = roomFactory.initRoom(roomConfiguration);
-
 	}
 
 
@@ -91,11 +88,6 @@ public class AmbientControlMW {
 
 	public static RoomFactory getRoomFactory() {
 		return roomFactory;
-	}
-
-
-	public static void setRoomFactory(RoomFactory roomFactory) {
-		AmbientControlMW.roomFactory = roomFactory;
 	}
 
 

@@ -19,11 +19,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
+import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.messages.DispatcherManager;
-import org.ambientlight.messages.DispatcherType;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
-import org.ambientlight.messages.max.MaxThermostateMode;
+import org.ambientlight.room.entities.climate.MaxThermostateMode;
 
 
 /**

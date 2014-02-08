@@ -15,6 +15,8 @@
 
 package org.ambientlight.messages;
 
+import org.ambientlight.config.messages.DispatcherType;
+
 /**
  * @author Florian Bornkessel
  * 

@@ -22,21 +22,20 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.ambientlight.AmbientControlMW;
+import org.ambientlight.config.room.entities.climate.DayEntry;
+import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
 import org.ambientlight.messages.Message;
-import org.ambientlight.messages.max.DayEntry;
-import org.ambientlight.messages.max.DeviceType;
 import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxConfigValveMessage;
 import org.ambientlight.messages.max.MaxConfigValveMessage.DecalcEntry;
 import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
-import org.ambientlight.messages.max.MaxDayInWeek;
 import org.ambientlight.messages.max.MaxFactoryResetMessage;
 import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
-import org.ambientlight.messages.max.MaxThermostateMode;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.room.entities.climate.MaxThermostateMode;
 
 
 /**
@@ -211,9 +210,9 @@ public class MaxMessageCreator {
 		temps.setToAdress(adress);
 		temps.setComfortTemp(AmbientControlMW.getRoom().config.climateManager.comfortTemperatur);
 		temps.setEcoTemp(AmbientControlMW.getRoom().config.climateManager.ecoTemperatur);
-		temps.setMaxTemp(AmbientControlMW.getRoom().config.climateManager.maxTemp);
-		temps.setMinTemp(AmbientControlMW.getRoom().config.climateManager.minTemp);
-		temps.setOffsetTemp(AmbientControlMW.getRoom().config.climateManager.DEFAULT_OFFSET);
+		temps.setMaxTemp(MaxUtil.MAX_TEMPERATURE);
+		temps.setMinTemp(MaxUtil.MIN_TEMPERATURE);
+		temps.setOffsetTemp(MaxUtil.DEFAULT_OFFSET);
 		temps.setWindowOpenTemp(AmbientControlMW.getRoom().config.climateManager.windowOpenTemperatur);
 		temps.setWindowOpenTime(AmbientControlMW.getRoom().config.climateManager.windowOpenTimeMins);
 		return temps;
@@ -235,8 +234,8 @@ public class MaxMessageCreator {
 		decalc.day = AmbientControlMW.getRoom().config.climateManager.decalcDay;
 		decalc.hour = AmbientControlMW.getRoom().config.climateManager.decalcHour;
 		valve.setDecalc(decalc);
-		valve.setMaxValvePosition(AmbientControlMW.getRoom().config.climateManager.DEFAULT_MAX_VALVE_POSITION);
-		valve.setValveOffset(AmbientControlMW.getRoom().config.climateManager.DEFAULT_VALVE_OFFSET_PERCENT);
+		valve.setMaxValvePosition(MaxUtil.DEFAULT_MAX_VALVE_POSITION);
+		valve.setValveOffset(MaxUtil.DEFAULT_VALVE_OFFSET);
 		return valve;
 	}
 

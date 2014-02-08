@@ -13,28 +13,17 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate;
+package org.ambientlight.config.messages;
 
-import java.util.Date;
+import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
 
-import org.ambientlight.room.entities.climate.util.DeviceType;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public abstract class MaxComponent {
+public class DispatcherConfiguration {
 
-	public abstract DeviceType getDeviceType();
-
-	public String label;
-	public int adress;
-	public String firmware;
-	public String serial;
-	public Date lastUpdate;
-	public boolean rfError = false;
-	public boolean timedOut = false;
-	public boolean invalidArgument = false;
-	public boolean batteryLow = false;
-
+	public DispatcherType type;
+	public RemoteHostConfiguration device;
 }

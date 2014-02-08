@@ -13,28 +13,36 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate;
-
-import java.util.Date;
+package org.ambientlight.messages.max;
 
 import org.ambientlight.room.entities.climate.util.DeviceType;
 
+
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public abstract class MaxComponent {
+public class MaxPairPongMessage extends MaxMessage {
 
-	public abstract DeviceType getDeviceType();
+	// there are two types. a repairing and a pairing
 
-	public String label;
-	public int adress;
-	public String firmware;
-	public String serial;
-	public Date lastUpdate;
-	public boolean rfError = false;
-	public boolean timedOut = false;
-	public boolean invalidArgument = false;
-	public boolean batteryLow = false;
+	public MaxPairPongMessage() {
+		payload = new byte[11];
+		setMessageType(MaxMessageType.PAIR_PONG);
+		payload[10] = DeviceType.CUBE.byteValue;
+	}
 
+
+
+	public DeviceType getDeviceType() {
+		return DeviceType.forCode(getPayload()[10]);
+	}
+
+
+	@Override
+	public String toString() {
+		String parent = super.toString();
+		String current = "DeviceType: " + getDeviceType();
+		return parent + "\n" + current;
+	}
 }

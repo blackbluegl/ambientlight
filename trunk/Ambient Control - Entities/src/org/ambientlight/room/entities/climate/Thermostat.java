@@ -17,7 +17,7 @@ package org.ambientlight.room.entities.climate;
 
 import java.util.Date;
 
-import org.ambientlight.messages.max.DeviceType;
+import org.ambientlight.room.entities.climate.util.DeviceType;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
 

@@ -20,6 +20,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.ambientlight.config.messages.DispatcherConfiguration;
+import org.ambientlight.config.messages.DispatcherType;
+
 
 /**
  * @author Florian Bornkessel

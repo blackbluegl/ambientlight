@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.ambientlight.config.messages.DispatcherType;
+
 
 /**
  * @author Florian Bornkessel

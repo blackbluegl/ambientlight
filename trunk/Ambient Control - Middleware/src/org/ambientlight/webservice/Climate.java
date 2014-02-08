@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.room.entities.climate.ClimateManager;
-import org.ambientlight.ws.container.TemperaturMode;
+import org.ambientlight.ws.climate.TemperaturMode;
 
 
 /**
