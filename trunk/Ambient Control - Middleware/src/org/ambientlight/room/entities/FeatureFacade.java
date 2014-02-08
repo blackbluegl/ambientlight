@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitcheableId;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorId;
@@ -34,7 +34,7 @@ import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorTyp
  */
 public class FeatureFacade {
 
-	Map<SwitcheableId, SwitchablesHandler> switchableMap = new HashMap<SwitcheableId, SwitchablesHandler>();
+	Map<SwitchableId, SwitchablesHandler> switchableMap = new HashMap<SwitchableId, SwitchablesHandler>();
 	Map<TemperatureSensorId, TemperatureSensor> tempsensorsMap = new HashMap<TemperatureSensorId, TemperatureSensor>();
 	private ScenerySensor sceneryManager;
 
@@ -63,7 +63,7 @@ public class FeatureFacade {
 
 
 	public void registerSwitchable(SwitchablesHandler handler, Switchable switchable, SwitchType type) {
-		SwitcheableId id = new SwitcheableId();
+		SwitchableId id = new SwitchableId();
 		id.id = switchable.getId();
 		id.type = type;
 
@@ -71,13 +71,13 @@ public class FeatureFacade {
 	}
 
 
-	public Set<SwitcheableId> getSwitchableIds() {
+	public Set<SwitchableId> getSwitchableIds() {
 		return this.switchableMap.keySet();
 	}
 
 
 	public void setSwitcheablePowerState(SwitchType type, String id, boolean powerState) {
-		SwitcheableId switchId = new SwitcheableId();
+		SwitchableId switchId = new SwitchableId();
 		switchId.id = id;
 		switchId.type = type;
 		SwitchablesHandler handler = switchableMap.get(switchId);

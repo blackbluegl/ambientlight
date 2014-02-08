@@ -27,8 +27,10 @@ import org.ambientlight.AmbientControlMW;
 
 
 /**
- * @author Florian Bornkessel
+ * register clients that listen to status changes in the room. see callback
+ * package for details of the comunication.
  * 
+ * @author Florian Bornkessel
  */
 @Path("/callback")
 public class Callback {

@@ -27,156 +27,91 @@ import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.EventProcessConfiguration;
-import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
-import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
-import org.ambientlight.room.Persistence;
-import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
-import org.ambientlight.ws.process.validation.ValidationResult;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-// TODO think about where to handle the file saving operations. in ws or deeper
-// within the actions? where is the api facade?
+
 @Path("/process")
 public class Process {
 
 	@POST
-	@Path("/validation/processes")
+	@Path("/validation")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ValidationResult validateProcess(ProcessConfiguration process) {
-		ValidationResult result = new ValidationResult();
+	public Object validateProcess(ProcessConfiguration process) {
+		try {
+			return AmbientControlMW.getRoom().processManager.validateProcess(process);
 
-		for (NodeConfiguration currentNode : process.nodes.values()) {
-
-			if (currentNode.actionHandler == null) {
-				result.addEmptyActionHandlerEntry(currentNode.id);
-				continue;
-			}
-
-			if (currentNode.nextNodeIds.size() > 1) {
-				if (currentNode.actionHandler instanceof DecisionHandlerConfiguration == false) {
-					result.addForkWithoutCorrespondingHandler(currentNode.id);
-				}
-			}
-
-			HandlerDataTypeValidation currentNodeValidation = currentNode.actionHandler.getClass().getAnnotation(
-					HandlerDataTypeValidation.class);
-
-			for (Integer nextNodeId : currentNode.nextNodeIds) {
-				NodeConfiguration nextNode = process.nodes.get(nextNodeId);
-				if (nextNode.actionHandler == null) {
-					// do not validate this connection because it will be
-					// validatet at the beginning of the outer for loop
-					continue;
-				}
-				HandlerDataTypeValidation nextNodeValidation = nextNode.actionHandler.getClass().getAnnotation(
-						HandlerDataTypeValidation.class);
-				boolean valide = DataTypeValidation.validate(nextNodeValidation.consumes(), currentNodeValidation.generates());
-				if (!valide) {
-					result.addEntry(nextNodeId, currentNode.id, currentNodeValidation.generates(), nextNodeValidation.consumes());
-				}
-			}
+		} catch (Exception e) {
+			return Response.status(500).build();
 		}
-		return result;
 	}
 
 
 	@POST
-	@Path("/processes")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object createOrUpdateProcess(EventProcessConfiguration process) {
-		ValidationResult result = this.validateProcess(process);
-		if (result.resultIsValid() == false)
-			return result;
+		try {
+			return AmbientControlMW.getRoom().processManager.createOrUpdateProcess(process);
 
-		Persistence.beginTransaction();
-		Integer positionToReplace = null;
-		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
-			if (currentProcess.id.equals(process.id)) {
-				positionToReplace = AmbientControlMW.getRoom().config.processes.indexOf(currentProcess);
-				break;
-			}
+		} catch (Exception e) {
+			return Response.status(500).build();
 		}
-
-		if (positionToReplace != null) {
-			AmbientControlMW.getRoom().config.processes.remove(positionToReplace.intValue());
-			AmbientControlMW.getRoom().config.processes.add(positionToReplace, process);
-		} else {
-			AmbientControlMW.getRoom().config.processes.add(process);
-		}
-
-		Persistence.commitTransaction();
-
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
-
-		return result;
 	}
 
 
 	@DELETE
-	@Path("/processes/{id}")
+	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object deleteProcess(@PathParam(value = "id") String id) {
-		Persistence.beginTransaction();
-		for (ProcessConfiguration currentProcess : AmbientControlMW.getRoom().config.processes) {
-			if (currentProcess.id.equals(id)) {
-				stopProcess(id);
-				AmbientControlMW.getRoom().config.processes.remove(currentProcess);
-				break;
-			}
+		try {
+			AmbientControlMW.getRoom().processManager.deleteProcess(id);
+			return Response.status(200).build();
+		} catch (Exception e) {
+			return Response.status(500).build();
 		}
-
-		Persistence.commitTransaction();
-
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
-
-		return Response.status(200).build();
 	}
 
 
 	@GET
-	@Path("/start/processes/{id}")
+	@Path("/start/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object startProcess(@PathParam(value = "id") String id) {
 		System.out.println("ProcessWS: starting Process " + id);
 
 		try {
-			AmbientControlMW.getProcessFactory().startProcess(id);
+			AmbientControlMW.getRoom().processManager.startProcess(id);
+			return Response.status(200).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
-
-
-		return Response.status(200).build();
 	}
 
 
 	@GET
-	@Path("/stop/processes/{id}")
+	@Path("/stop/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object stopProcess(@PathParam(value = "id") String id) {
 		System.out.println("ProcessWS: stopping Process " + id);
 
 		try {
-			AmbientControlMW.getProcessFactory().stopProcess(id);
+			AmbientControlMW.getRoom().processManager.stopProcess(id);
+
+			return Response.status(200).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
 
-
-
-		return Response.status(200).build();
 	}
 }

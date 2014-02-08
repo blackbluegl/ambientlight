@@ -20,7 +20,7 @@ package org.ambientlight.room.entities.features.actor.types;
  * @author Florian Bornkessel
  * 
  */
-public class SwitcheableId {
+public class SwitchableId {
 
 	public String id;
 	public SwitchType type;
@@ -44,7 +44,7 @@ public class SwitcheableId {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SwitcheableId other = (SwitcheableId) obj;
+		SwitchableId other = (SwitchableId) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

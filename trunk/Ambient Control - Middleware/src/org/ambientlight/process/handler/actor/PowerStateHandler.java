@@ -5,7 +5,7 @@ import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfigurat
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.room.entities.features.actor.types.SwitcheableId;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 public class PowerStateHandler extends AbstractActionHandler {
@@ -17,14 +17,14 @@ public class PowerStateHandler extends AbstractActionHandler {
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
 
-			for (SwitcheableId switchableIds : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
+			for (SwitchableId switchableIds : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
 				AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(switchableIds.type, switchableIds.id,
 						powerState);
 			}
 			return;
 		}
 
-		for (SwitcheableId currentId : getConfig().powerStateConfiguration.keySet()) {
+		for (SwitchableId currentId : getConfig().powerStateConfiguration.keySet()) {
 			boolean powerState = getConfig().powerStateConfiguration.get(currentId);
 			AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(currentId.type, currentId.id, powerState);
 		}
