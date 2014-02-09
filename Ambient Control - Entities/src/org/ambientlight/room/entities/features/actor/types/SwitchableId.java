@@ -15,7 +15,6 @@
 
 package org.ambientlight.room.entities.features.actor.types;
 
-
 /**
  * @author Florian Bornkessel
  * 
@@ -24,6 +23,13 @@ public class SwitchableId {
 
 	public String id;
 	public SwitchType type;
+
+
+	public SwitchableId(String id, SwitchType type) {
+		super();
+		this.id = id;
+		this.type = type;
+	}
 
 
 	@Override

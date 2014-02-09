@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
-import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
+import org.ambientlight.config.device.drivers.DummyRemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
@@ -25,7 +25,7 @@ import org.ambientlight.device.led.StripePart;
 public class DeviceDriverFactory {
 
 	public RemoteSwtichDeviceDriver createRemoteSwitchDevice(DeviceConfiguration dc) {
-		if (dc instanceof DummySwitchDeviceConfiguration) {
+		if (dc instanceof DummyRemoteSwitchBridgeConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummySwitchingDeviceDriver device");
 
 			return new DummySwitchingDeviceDriver();

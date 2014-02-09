@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.room.entities.remoteswitches;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
@@ -29,5 +30,5 @@ public class RemoteSwitchManagerConfiguration {
 
 	public RemoteSwitchBridgeConfiguration device;
 
-	public Map<String, RemoteSwitch> remoteSwitches;
+	public Map<String, RemoteSwitch> remoteSwitches = new HashMap<String, RemoteSwitch>();
 }

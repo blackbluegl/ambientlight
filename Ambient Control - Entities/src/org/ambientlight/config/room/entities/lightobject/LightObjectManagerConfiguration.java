@@ -33,6 +33,6 @@ public class LightObjectManagerConfiguration {
 	public int width;
 	public int height;
 
-	public List<DeviceConfiguration> deviceConfigurations = new ArrayList<DeviceConfiguration>();
-	public Map<String, LightObject> lightObjectConfigurations = new HashMap<String, LightObject>();
+	public List<DeviceConfiguration> devices = new ArrayList<DeviceConfiguration>();
+	public Map<String, LightObject> lightObjects = new HashMap<String, LightObject>();
 }
