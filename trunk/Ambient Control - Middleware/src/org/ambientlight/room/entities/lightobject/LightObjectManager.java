@@ -69,7 +69,7 @@ public class LightObjectManager implements SwitchablesHandler {
 
 		this.config = config;
 
-		for (LightObject currentItemConfiguration : config.lightObjectConfigurations.values()) {
+		for (LightObject currentItemConfiguration : config.lightObjects.values()) {
 
 			List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(getAllStripePartsInRoom(),
 					currentItemConfiguration);
@@ -78,7 +78,7 @@ public class LightObjectManager implements SwitchablesHandler {
 		}
 
 		// listen for switchable events
-		for (LightObject lightObject : config.lightObjectConfigurations.values()) {
+		for (LightObject lightObject : config.lightObjects.values()) {
 			entitiesFacade.registerSwitchable(this, lightObject, SwitchType.LED);
 		}
 	}
@@ -95,7 +95,7 @@ public class LightObjectManager implements SwitchablesHandler {
 
 
 	public Map<String, LightObject> getLightObjects() {
-		return config.lightObjectConfigurations;
+		return config.lightObjects;
 	}
 
 

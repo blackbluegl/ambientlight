@@ -216,14 +216,14 @@ public class RoomFactory {
 	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager,
 			FeatureFacade entitiesFacade) {
 
-		if (config == null || config.lightObjectConfigurations.isEmpty()) {
+		if (config == null || config.lightObjects.isEmpty()) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
 		}
 
 		BufferedImage pixelMap = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_ARGB);
 
 		List<AnimateableLedDevice> ledDevices = new ArrayList<AnimateableLedDevice>();
-		for (DeviceConfiguration currentDeviceConfig : config.deviceConfigurations) {
+		for (DeviceConfiguration currentDeviceConfig : config.devices) {
 			ledDevices.add(deviceFactory.createLedDevice(currentDeviceConfig));
 		}
 

@@ -8,41 +8,57 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
-import org.ambientlight.config.device.drivers.DummySwitchDeviceConfiguration;
-import org.ambientlight.config.device.drivers.MaxVCubeDeviceConfiguration;
+import org.ambientlight.config.device.drivers.DummyRemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
+import org.ambientlight.config.messages.DispatcherConfiguration;
+import org.ambientlight.config.messages.DispatcherType;
+import org.ambientlight.config.messages.QeueManagerConfiguration;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
-import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
+import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
+import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.DayEntry;
 import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
+import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.lightobject.switching.SwitchingConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.device.drivers.DeviceDriverFactory;
 import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.events.SwitchEvent;
+import org.ambientlight.events.types.SwitchEventType;
 import org.ambientlight.room.Persistence;
-import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.room.entities.sceneries.Scenery;
+import org.ambientlight.room.entities.sceneries.SceneryManager;
+import org.ambientlight.room.entities.switches.Switch;
 
 
 public class CreateTestConfig {
+
+	public static String VIRTUAL_MAIN_SWITCH_ID = "main";
+	public static String LO_BACKGROUND_ID = "background";
+	public static String LO_LO1_ID = "lightObject1";
+	public static String REMOTE_SWITCH_1 = "remoteSwitch1";
+	public static String SCENERY_SCENERY1 = "Scenario1";
+	public static String SCENERY_SCENERY2 = "Scenario2";
+
 
 	/**
 	 * @param args
@@ -50,7 +66,7 @@ public class CreateTestConfig {
 	 */
 	public static void main(String[] args) throws IOException {
 		Persistence.beginTransaction();
-		DeviceDriverFactory df = new DeviceDriverFactory();
+
 		CreateTestConfig test = new CreateTestConfig();
 
 		Persistence.commitTransaction(test.getTestRoom(), "default");
@@ -60,18 +76,148 @@ public class CreateTestConfig {
 	public RoomConfiguration getTestRoom() {
 		RoomConfiguration rc = new RoomConfiguration();
 
-		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
-		DummySwitchDeviceConfiguration switchingBridge = new DummySwitchDeviceConfiguration();
+		rc.roomName = "testRoom";
 
-		// MultiStripeOverEthernetClientDeviceConfiguration dc = new
-		// MultiStripeOverEthernetClientDeviceConfiguration();
-		// dc.hostName = "ambi-schlafen";
-		// dc.port = 2002;
-		//
+		createSceneryManager(rc);
+
+		createRemoteSwitchManager(rc);
+
+		createSwitchManager(rc);
+
+		createClimate(rc);
+
+		createLightObjectManager(rc);
+
+		createProcessManagerWithMainSwitch(rc);
+		createProcessWithSceneryForProcessManager(rc);
+
+		return rc;
+	}
+
+
+	/**
+	 * @param rc
+	 */
+	private void createSwitchManager(RoomConfiguration rc) {
+		SwitchManagerConfiguration config = new SwitchManagerConfiguration();
+		Switch mainSwitch = new Switch();
+		mainSwitch.type = SwitchType.VIRTUAL_MAIN;
+		mainSwitch.setId(VIRTUAL_MAIN_SWITCH_ID);
+		mainSwitch.setPowerState(false);
+		config.switches.put(mainSwitch.getId(), mainSwitch);
+		rc.switchesManager = config;
+	}
+
+
+	private void createProcessManagerWithMainSwitch(RoomConfiguration rc) {
+
+		ProcessManagerConfiguration config = new ProcessManagerConfiguration();
+		rc.processManager = config;
+
+		EventProcessConfiguration roomSwitchProcess = new EventProcessConfiguration();
+		config.processes.put(roomSwitchProcess.id, roomSwitchProcess);
+		roomSwitchProcess.run = true;
+		roomSwitchProcess.id = "roomSwitchProcess";
+
+		SwitchEvent triggerOn = new SwitchEvent(VIRTUAL_MAIN_SWITCH_ID, true, SwitchEventType.VIRTUAL_MAIN);
+		SwitchEvent triggerOff = new SwitchEvent(VIRTUAL_MAIN_SWITCH_ID, false, SwitchEventType.VIRTUAL_MAIN);
+
+		roomSwitchProcess.eventTriggerConfigurations.add(triggerOn);
+		roomSwitchProcess.eventTriggerConfigurations.add(triggerOff);
+
+		NodeConfiguration eventMapperNode = new NodeConfiguration();
+		eventMapperNode.id = 0;
+		EventToBooleanHandlerConfiguration eventMapper = new EventToBooleanHandlerConfiguration();
+		eventMapperNode.nextNodeIds.add(1);
+		eventMapperNode.actionHandler = eventMapper;
+		roomSwitchProcess.nodes.put(0, eventMapperNode);
+
+		NodeConfiguration decissionNode = new NodeConfiguration();
+		decissionNode.id = 1;
+		DecisionHandlerConfiguration decission = new DecisionHandlerConfiguration();
+		decissionNode.nextNodeIds.add(2);
+		decissionNode.nextNodeIds.add(3);
+		ExpressionConfiguration expression = new ExpressionConfiguration();
+		decission.expressionConfiguration = expression;
+		expression.expression = "#{tokenValue}==1.0";
+		decissionNode.actionHandler = decission;
+		roomSwitchProcess.nodes.put(1, decissionNode);
+
+		NodeConfiguration grabCurrentSceneryNode = new NodeConfiguration();
+		grabCurrentSceneryNode.id = 2;
+		SensorToTokenConfiguration grabSceneryHandler = new SensorToTokenConfiguration();
+		grabSceneryHandler.sensorId = "SCENERY:SceneryManager";
+		grabCurrentSceneryNode.nextNodeIds.add(4);
+		grabCurrentSceneryNode.actionHandler = grabSceneryHandler;
+		roomSwitchProcess.nodes.put(2, grabCurrentSceneryNode);
+
+		NodeConfiguration fireEventNode = new NodeConfiguration();
+		fireEventNode.id = 4;
+		FireEventHandlerConfiguration fireEventHandler = new FireEventHandlerConfiguration();
+		fireEventHandler.event = new SceneryEntryEvent(SceneryManager.SENSOR_NAME, "#{tokenValue}");
+		fireEventNode.actionHandler = fireEventHandler;
+		roomSwitchProcess.nodes.put(4, fireEventNode);
+
+		NodeConfiguration turnOffNode = new NodeConfiguration();
+		turnOffNode.id = 3;
+		SimplePowerStateHandlerConfiguration powerDownHandler = new SimplePowerStateHandlerConfiguration();
+		powerDownHandler.powerState = false;
+		turnOffNode.actionHandler = powerDownHandler;
+		roomSwitchProcess.nodes.put(3, turnOffNode);
+	}
+
+
+	/**
+	 * @param rc
+	 */
+	private void createSceneryManager(RoomConfiguration rc) {
+		SceneryManagerConfiguration config = new SceneryManagerConfiguration();
+		rc.sceneriesManager = config;
+		Scenery userScenario = new Scenery();
+		userScenario.id = CreateTestConfig.SCENERY_SCENERY1;
+		config.currentScenery = userScenario;
+		config.sceneries.put(userScenario.id, userScenario);
+
+		Scenery userScenario2 = new Scenery();
+		userScenario2.id = CreateTestConfig.SCENERY_SCENERY2;
+		config.sceneries.put(userScenario2.id, userScenario2);
+	}
+
+
+	/**
+	 * @param rc
+	 */
+	private void createRemoteSwitchManager(RoomConfiguration rc) {
+
+		DummyRemoteSwitchBridgeConfiguration switchingBridge = new DummyRemoteSwitchBridgeConfiguration();
 		// SwitchDeviceOverEthernetConfiguration switchingBridge = new
 		// SwitchDeviceOverEthernetConfiguration();
 		// switchingBridge.hostName = "rfmbridge";
 		// switchingBridge.port = 2003;
+
+		RemoteSwitchManagerConfiguration config = new RemoteSwitchManagerConfiguration();
+		rc.remoteSwitchesManager = config;
+		config.device = switchingBridge;
+
+		RemoteSwitch sw1 = new RemoteSwitch();
+		sw1.houseCode = 15;
+		sw1.switchingUnitCode = 3;
+		sw1.setId(CreateTestConfig.REMOTE_SWITCH_1);
+		sw1.setPowerState(false);
+
+		config.remoteSwitches.put(sw1.getId(), sw1);
+
+	}
+
+
+	/**
+	 * @param rc
+	 */
+	private void createLightObjectManager(RoomConfiguration rc) {
+
+		LightObjectManagerConfiguration config = new LightObjectManagerConfiguration();
+		config.height = 400;
+		config.width = 400;
 
 		// LK35CLientDeviceConfiguration lk35 = new
 		// LK35CLientDeviceConfiguration();
@@ -90,6 +236,71 @@ public class CreateTestConfig {
 		// ledPoint2.port = 2;
 		// lk35.configuredLeds.add(ledPoint2);
 
+		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
+		// MultiStripeOverEthernetClientDeviceConfiguration dc = new
+		// MultiStripeOverEthernetClientDeviceConfiguration();
+		// dc.hostName = "ambi-schlafen";
+		// dc.port = 2002;
+
+		config.devices.add(dc);
+
+		float value = 1.0f;
+		float gamma = 1.0f;
+		ColorConfiguration cConfig = new ColorConfiguration();
+		cConfig.gammaRed = gamma;
+		cConfig.gammaGreen = gamma;
+		cConfig.gammaBlue = gamma;
+		cConfig.levelRed = value;
+		cConfig.levelBlue = value;
+		cConfig.levelGreen = value;
+
+		StripeConfiguration sc = new StripeConfiguration();
+		sc.colorConfiguration = cConfig;
+
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
+		sc.pixelAmount = 162;
+		sc.port = 0;
+
+		StripePartConfiguration spLo1S1 = new StripePartConfiguration();
+		spLo1S1.endXPositionInRoom = 161;
+		spLo1S1.endYPositionInRoom = 0;
+		spLo1S1.offsetInStripe = 0;
+		spLo1S1.pixelAmount = 162;
+		spLo1S1.startXPositionInRoom = 0;
+		spLo1S1.startYPositionInRoom = 0;
+		sc.stripeParts.add(spLo1S1);
+
+		dc.configuredStripes.add(sc);
+
+		LightObject lo = new LightObject();
+		lo.setId(LO_LO1_ID);
+		lo.height = 20;
+		lo.layerNumber = 2;
+		lo.width = 20;
+		lo.xOffsetInRoom = 0;
+		lo.yOffsetInRoom = 0;
+		lo.renderingProgrammConfiguration = this.createSimpleColor();
+		config.lightObjects.put(lo.getId(), lo);
+
+		LightObject background = new LightObject();
+		background.setPowerState(true);
+		background.setId(LO_BACKGROUND_ID);
+		background.height = 200;
+		background.layerNumber = 1;
+		background.width = 200;
+		background.xOffsetInRoom = 0;
+		background.yOffsetInRoom = 0;
+		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
+		background.renderingProgrammConfiguration = sunset;
+		config.lightObjects.put(background.getId(), background);
+	}
+
+
+	/**
+	 * @param rc
+	 * @return
+	 */
+	private void createClimate(RoomConfiguration rc) {
 		ClimateManagerConfiguration climate = new ClimateManagerConfiguration();
 		climate.vCubeAdress = 1;
 		climate.groupId = 5;
@@ -137,166 +348,28 @@ public class CreateTestConfig {
 
 		rc.climateManager = climate;
 
-		MaxVCubeDeviceConfiguration rfmConfig = new MaxVCubeDeviceConfiguration();
+		DispatcherConfiguration dispatcherConfig = new DispatcherConfiguration();
 
-		rfmConfig.hostName = "ambi-schlafen";
-		rfmConfig.port = 30000;
+		dispatcherConfig.hostName = "ambi-schlafen";
+		dispatcherConfig.port = 30000;
+		dispatcherConfig.type = DispatcherType.MAX;
 
-		rc.deviceConfigurations.add(rfmConfig);
-		rc.deviceConfigurations.add(switchingBridge);
-		rc.deviceConfigurations.add(dc);
-
-		float value = 1.0f;
-		float gamma = 1.0f;
-		ColorConfiguration cConfig = new ColorConfiguration();
-		cConfig.gammaRed = gamma;
-		cConfig.gammaGreen = gamma;
-		cConfig.gammaBlue = gamma;
-		cConfig.levelRed = value;
-		cConfig.levelBlue = value;
-		cConfig.levelGreen = value;
-
-		StripeConfiguration sc = new StripeConfiguration();
-		sc.colorConfiguration = cConfig;
-
-		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_TM1812;
-		sc.pixelAmount = 162;
-		sc.port = 0;
-
-		StripePartConfiguration spLo1S1 = new StripePartConfiguration();
-		spLo1S1.endXPositionInRoom = 161;
-		spLo1S1.endYPositionInRoom = 0;
-		spLo1S1.offsetInStripe = 0;
-		spLo1S1.pixelAmount = 162;
-		spLo1S1.startXPositionInRoom = 0;
-		spLo1S1.startYPositionInRoom = 0;
-		sc.stripeParts.add(spLo1S1);
-
-		dc.configuredStripes.add(sc);
-
-		RemoteSwitch sw1 = new RemoteSwitch();
-		sw1.deviceType = "ELRO";
-		sw1.houseCode = 15;
-		sw1.switchingUnitCode = 3;
-		sw1.setId("kleine Stehlampe");
-		sw1.actorConductConfiguration = new SwitchingConfiguration();
-		rc.lightObjectConfigurations.put(sw1.getId(), sw1);
-
-		LightObject lo = new LightObject();
-		lo.setId("Schrank");
-		lo.height = 20;
-		lo.layerNumber = 2;
-		lo.width = 20;
-		lo.xOffsetInRoom = 0;
-		lo.yOffsetInRoom = 0;
-		lo.actorConductConfiguration = this.createSimpleColor();
-		rc.lightObjectConfigurations.put(lo.getId(), lo);
-
-		LightObject background = new LightObject();
-		background.setPowerState(true);
-		background.setId("background");
-		background.height = 200;
-		background.layerNumber = 1;
-		background.width = 200;
-		background.xOffsetInRoom = 0;
-		background.yOffsetInRoom = 0;
-		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
-		background.actorConductConfiguration = sunset;
-		rc.lightObjectConfigurations.put(background.getId(), background);
-
-		SwitchManagerConfiguration triggerMainSwitch = new SwitchManagerConfiguration();
-		triggerMainSwitch.name = "RoomSwitch";
-		rc.eventGeneratorConfigurations.put("RoomSwitch", triggerMainSwitch);
-
-		SceneryManagerConfiguration sceneryEventGenerator = new SceneryManagerConfiguration();
-		sceneryEventGenerator.name = "RoomSceneryEventGenerator";
-		rc.eventGeneratorConfigurations.put("RoomSceneryEventGenerator", sceneryEventGenerator);
-
-		rc.height = 400;
-		rc.width = 400;
-		rc.roomName = "testRoom";
-
-		Scenery userScenario = new Scenery();
-		userScenario.id = "scenario1";
-		sceneryEventGenerator.sceneries.add(userScenario);
-
-		Scenery userScenario2 = new Scenery();
-		userScenario2.id = "scenario2";
-		sceneryEventGenerator.sceneries.add(userScenario2);
-
-		sceneryEventGenerator.currentScenery = userScenario;
-
-		EventProcessConfiguration roomSwitchProcess = new EventProcessConfiguration();
-		roomSwitchProcess.run = true;
-		roomSwitchProcess.id = "roomSwitch";
-		rc.processes.add(roomSwitchProcess);
-		SwitchEvent triggerConfOn = new SwitchEvent();
-		triggerConfOn.sourceId = triggerMainSwitch.name;
-		triggerConfOn.powerState = true;
-
-		SwitchEvent triggerConfOff = new SwitchEvent();
-		triggerConfOff.sourceId = triggerMainSwitch.name;
-		triggerConfOff.powerState = false;
-
-		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOn);
-		roomSwitchProcess.eventTriggerConfigurations.add(triggerConfOff);
-
-		NodeConfiguration eventMapperNode = new NodeConfiguration();
-		eventMapperNode.id = 0;
-		EventToBooleanHandlerConfiguration eventMapper = new EventToBooleanHandlerConfiguration();
-		eventMapperNode.nextNodeIds.add(1);
-		eventMapperNode.actionHandler = eventMapper;
-		roomSwitchProcess.nodes.put(0, eventMapperNode);
-
-		NodeConfiguration decissionNode = new NodeConfiguration();
-		decissionNode.id = 1;
-		DecisionHandlerConfiguration decission = new DecisionHandlerConfiguration();
-		decissionNode.nextNodeIds.add(2);
-		decissionNode.nextNodeIds.add(3);
-		ExpressionConfiguration expression = new ExpressionConfiguration();
-		decission.expressionConfiguration = expression;
-		expression.expression = "#{tokenValue}==1.0";
-		decissionNode.actionHandler = decission;
-		roomSwitchProcess.nodes.put(1, decissionNode);
-
-		NodeConfiguration grabCurrentSceneryNode = new NodeConfiguration();
-		grabCurrentSceneryNode.id = 2;
-		SensorToTokenConfiguration grabSceneryHandler = new SensorToTokenConfiguration();
-		grabSceneryHandler.sensorId = "RoomSceneryEventGenerator";
-		grabCurrentSceneryNode.nextNodeIds.add(4);
-		grabCurrentSceneryNode.actionHandler = grabSceneryHandler;
-		roomSwitchProcess.nodes.put(2, grabCurrentSceneryNode);
-
-		NodeConfiguration fireEventNode = new NodeConfiguration();
-		fireEventNode.id = 4;
-		FireEventHandlerConfiguration fireEventHandler = new FireEventHandlerConfiguration();
-		fireEventHandler.event = null;
-		fireEventNode.actionHandler = fireEventHandler;
-		roomSwitchProcess.nodes.put(4, fireEventNode);
-
-		NodeConfiguration turnOffNode = new NodeConfiguration();
-		turnOffNode.id = 3;
-		SimplePowerStateHandlerConfiguration powerDownHandler = new SimplePowerStateHandlerConfiguration();
-		powerDownHandler.powerState = false;
-		turnOffNode.actionHandler = powerDownHandler;
-		roomSwitchProcess.nodes.put(3, turnOffNode);
-
-		ArrayList<LightObject> changeConfigFor = new ArrayList<LightObject>();
-		changeConfigFor.add(background);
-		changeConfigFor.add(lo);
-		ArrayList<Switchable> turnLightOnFor = new ArrayList<Switchable>();
-		turnLightOnFor.add(background);
-		turnLightOnFor.add(sw1);
-		turnLightOnFor.add(triggerMainSwitch);
-
-		createUserScenario(rc, userScenario, changeConfigFor, turnLightOnFor);
-
-		return rc;
+		QeueManagerConfiguration qConfig = new QeueManagerConfiguration();
+		qConfig.dispatchers.add(dispatcherConfig);
+		rc.qeueManager = qConfig;
 	}
 
 
-	private void createUserScenario(RoomConfiguration rc, Scenery userScenario,
-			List<LightObject> lo, List<Switchable> itemsToPutOn) {
+	private void createProcessWithSceneryForProcessManager(RoomConfiguration rc) {
+
+		Map<String, RenderingProgramConfiguration> changeConfigFor = new HashMap<String, RenderingProgramConfiguration>();
+		changeConfigFor.put(CreateTestConfig.LO_BACKGROUND_ID, createSimpleColor());
+		changeConfigFor.put(CreateTestConfig.LO_LO1_ID, createSimpleColor());
+
+		Map<SwitchableId, Boolean> turnOnLightFor = new HashMap<SwitchableId, Boolean>();
+		turnOnLightFor.put(new SwitchableId(LO_BACKGROUND_ID, SwitchType.LED), true);
+		turnOnLightFor.put(new SwitchableId(LO_LO1_ID, SwitchType.LED), true);
+		turnOnLightFor.put(new SwitchableId(VIRTUAL_MAIN_SWITCH_ID, SwitchType.VIRTUAL_MAIN), true);
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -304,15 +377,12 @@ public class CreateTestConfig {
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
 
-		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent();
-		triggerSceneryChange.sceneryName = "scenario1";
-		triggerSceneryChange.sourceId = "RoomSceneryEventGenerator";
+		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent(SceneryManager.SENSOR_NAME,
+				CreateTestConfig.SCENERY_SCENERY1);
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		RenderingProgrammChangeHandlerConfiguration cHandler = new RenderingProgrammChangeHandlerConfiguration();
-		for (LightObject current : lo) {
-			cHandler.actorConfiguration.put(current.getId(), createSimpleColor());
-		}
+		cHandler.renderConfig = changeConfigFor;
 		startNode.actionHandler = cHandler;
 		startNode.nextNodeIds.add(1);
 
@@ -320,15 +390,13 @@ public class CreateTestConfig {
 		switchNode.id = 1;
 
 		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		for (Switchable current : itemsToPutOn) {
-			powerstatehandler.powerStateConfiguration.put(current.getId(), true);
-		}
+		powerstatehandler.powerStateConfiguration = turnOnLightFor;
 		switchNode.actionHandler = powerstatehandler;
 
 		process.nodes.put(0, startNode);
 		process.nodes.put(1, switchNode);
 
-		rc.processes.add(process);
+		rc.processManager.processes.put(process.id, process);
 	}
 
 
