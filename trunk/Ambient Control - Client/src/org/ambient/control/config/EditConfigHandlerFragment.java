@@ -41,7 +41,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Group;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

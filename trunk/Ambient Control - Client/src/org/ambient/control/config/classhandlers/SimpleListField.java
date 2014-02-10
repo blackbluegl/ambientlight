@@ -24,7 +24,7 @@ import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
 import org.ambient.util.GuiUtils;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.view.ActionMode;
 import android.view.Menu;

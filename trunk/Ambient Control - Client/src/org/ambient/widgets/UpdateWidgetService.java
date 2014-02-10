@@ -7,9 +7,9 @@ import org.ambient.control.R;
 import org.ambient.rest.RestClient;
 import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.process.events.SwitchEventConfiguration;
-import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.actors.ActorConfiguration;
+import org.ambientlight.config.events.SwitchEvent;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.entities.led.ActorConfiguration;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -200,10 +200,10 @@ public class UpdateWidgetService extends Service {
 		try {
 			// TODO getting just the first switch here. later we have to
 			// determine the mainswitch by some attributes
-			String switchName = (roomService.getRoomConfiguration(serverName).getSwitchGenerators().keySet()
+			String switchName = (roomService.getRoomConfiguration(serverName).getSwitches().keySet()
 					.toArray(new String[1]))[0];
-			SwitchEventConfiguration event = new SwitchEventConfiguration();
-			event.eventGeneratorName = switchName;
+			SwitchEvent event = new SwitchEvent();
+			event.sourceId = switchName;
 			event.powerState = powerState;
 			RestClient.sendEvent(serverName, event);
 		} catch (Exception e) {

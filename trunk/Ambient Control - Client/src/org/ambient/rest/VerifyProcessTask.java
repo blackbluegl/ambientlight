@@ -1,6 +1,6 @@
 package org.ambient.rest;
 
-import org.ambientlight.process.validation.ValidationResult;
+import org.ambientlight.ws.process.validation.ValidationResult;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;

@@ -16,7 +16,7 @@
 package org.ambient.control;
 
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

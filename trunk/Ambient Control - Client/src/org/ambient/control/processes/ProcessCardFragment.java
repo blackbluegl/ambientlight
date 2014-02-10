@@ -27,12 +27,13 @@ import org.ambient.rest.RestClient;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
-import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
-import org.ambientlight.process.validation.ValidationEntry;
-import org.ambientlight.process.validation.ValidationResult;
-import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
+import org.ambientlight.config.process.NodeConfiguration;
+import org.ambientlight.config.process.ProcessConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.room.entities.sceneries.Scenery;
+import org.ambientlight.ws.process.validation.ValidationEntry;
+import org.ambientlight.ws.process.validation.ValidationResult;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -325,7 +326,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 		case R.id.menuEntryProcessSceneries:
 			SceneriesWrapper sceneries = new SceneriesWrapper();
-			sceneries.sceneries = roomService.getRoomConfiguration(selectedServer).getSceneries();
+			sceneries.sceneries = roomService.getRoomConfiguration(selectedServer).getSceneryEventGeneratorConfiguration().sceneriesManager;
 
 			EditConfigHandlerFragment.editConfigBean(this, sceneries, selectedServer,
 					roomService.getRoomConfiguration(selectedServer));
@@ -566,12 +567,21 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 		if (configuration instanceof SceneriesWrapper) {
 			stopEditMode();
-			SceneryEventGeneratorConfiguration sceneryEventGenerator = roomService.getRoomConfiguration(selectedServer)
-					.getSceneryEventGenerator().values().iterator().next();
 
-			sceneryEventGenerator.sceneries = ((SceneriesWrapper) configuration).sceneries;
+			// extract new sceneries
+			SceneryManagerConfiguration sceneryManager = roomService.getRoomConfiguration(selectedServer).sceneriesManager;
+			List<Scenery> addNew = new ArrayList<Scenery>();
+			for (Scenery current : ((SceneriesWrapper) configuration).sceneries) {
+				if (sceneryManager.sceneries.containsKey(current.id) == false) {
+					addNew.add(current);
+				}
+			}
+
+			// create new sceneries on server
 			try {
-				RestClient.createOrUpdateEventGeneratorConfiguration(selectedServer, sceneryEventGenerator);
+				for (Scenery current : addNew) {
+					RestClient.createScenery(selectedServer, current.id);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
