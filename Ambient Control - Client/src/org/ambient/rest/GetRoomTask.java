@@ -1,6 +1,6 @@
 package org.ambient.rest;
 
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;

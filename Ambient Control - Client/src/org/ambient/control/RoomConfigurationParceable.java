@@ -15,7 +15,7 @@
 
 package org.ambient.control;
 
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.os.Parcel;
 import android.os.Parcelable;

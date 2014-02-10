@@ -23,8 +23,8 @@ import java.util.List;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -136,7 +136,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 	 */
 	@Override
 	protected void onResumeWithServiceConnected() {
-		
+
 		for (String serverName : ((MainActivity) getActivity()).getAllRoomServers()) {
 			serverNames.add(serverName);
 			roomNames.add(roomService.getRoomConfiguration(serverName).roomName);
@@ -148,9 +148,9 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 		Spinner spinnerRoom = (Spinner) content.findViewById(R.id.spinnerRoom);
 
 		spinnerRoom.setAdapter(roomAdapter);
-		
+
 		final Spinner spinnerSwitch = (Spinner) content.findViewById(R.id.spinnerSwitch);
-		
+
 		spinnerRoom.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -159,7 +159,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 				RoomConfiguration roomConfig = roomService.getRoomConfiguration(selectedServer);
 
 				List<String> switchNames = new ArrayList<String>();
-				for (SwitchEventGeneratorConfiguration currentSwitch : roomConfig.getSwitchGenerators().values()) {
+				for (SwitchManagerConfiguration currentSwitch : roomConfig.getSwitches().values()) {
 					switchNames.add(currentSwitch.name);
 				}
 

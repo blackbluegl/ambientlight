@@ -30,7 +30,7 @@ import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.Wher
 import org.ambient.util.GuiUtils;
 import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.view.ActionMode;
 import android.view.Menu;

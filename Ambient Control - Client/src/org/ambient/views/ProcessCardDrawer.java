@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ambient.control.R;
-import org.ambientlight.process.NodeConfiguration;
-import org.ambientlight.process.ProcessConfiguration;
-import org.ambientlight.process.validation.ValidationEntry;
+import org.ambientlight.config.process.NodeConfiguration;
+import org.ambientlight.config.process.ProcessConfiguration;
+import org.ambientlight.ws.process.validation.ValidationEntry;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

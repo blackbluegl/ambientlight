@@ -6,9 +6,9 @@ import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
 
-public class CreateEventGeneratorTask extends AsyncTask<Object, Void, Void> {
+public class CreateSceneryTask extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/sceneryControl/config/room/eventGenerator/";
+	private final String URL = "/sceneries/new";
 
 	@Override
 	protected Void doInBackground(Object... params) {
@@ -20,11 +20,7 @@ public class CreateEventGeneratorTask extends AsyncTask<Object, Void, Void> {
 
 		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 
-		// SceneriesContainer sceneryContainer = new SceneriesContainer();
-		// sceneryContainer.sceneries = (List<AbstractSceneryConfiguration>)
-		// params[1];
-
-		restTemplate.put(url, params[2]);
+		restTemplate.put(url, params[1]);
 		return null;
 	}
 }

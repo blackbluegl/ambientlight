@@ -5,11 +5,11 @@ import java.util.Locale;
 
 import org.ambient.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.process.events.SwitchEventConfiguration;
-import org.ambientlight.room.IUserRoomItem;
-import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.eventgenerator.SceneryEventGeneratorConfiguration;
-import org.ambientlight.room.eventgenerator.SwitchEventGeneratorConfiguration;
+import org.ambientlight.config.events.SwitchEvent;
+import org.ambientlight.config.features.actor.Switchable;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -196,23 +196,20 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 			RoomConfiguration config = roomService.getRoomConfiguration(server);
 
 			if (type.equals(TYPE_ROOM_ITEM)) {
-				IUserRoomItem roomItem = config.getUserRoomItems().get(itemName);
+				Switchable roomItem = config.getSwitchableActors().get(itemName);
 				powerState = !roomItem.getPowerState();
 				RestClient.setPowerStateForRoomItem(server, itemName, powerState);
 			}
 
 			if (type.equals(TYPE_SWITCH_EVENT)) {
-				SwitchEventGeneratorConfiguration switchConfig = config.getSwitchGenerators().get(itemName);
-				SwitchEventConfiguration event = new SwitchEventConfiguration();
-				event.eventGeneratorName = itemName;
+				SwitchManagerConfiguration switchConfig = config.getSwitches().get(itemName);
+				SwitchEvent event = new SwitchEvent();
+				event.sourceId = itemName;
 				powerState = !switchConfig.getPowerState();
 				event.powerState = powerState;
 				RestClient.sendEvent(server, event);
 
-				// TODO create attribute so we can discover the
-				// eventgenerator
-				SceneryEventGeneratorConfiguration sceneryEvent = (config.getSceneryEventGenerator().values()
-						.toArray(new SceneryEventGeneratorConfiguration[1]))[0];
+				SceneryManagerConfiguration sceneryEvent = config.getSceneryEventGeneratorConfiguration();
 
 				if (powerState) {
 					speakOut(sceneryEvent.currentScenery.id + ", ein");

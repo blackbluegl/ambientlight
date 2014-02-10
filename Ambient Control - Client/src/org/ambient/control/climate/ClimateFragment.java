@@ -17,7 +17,7 @@ package org.ambient.control.climate;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

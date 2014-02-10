@@ -34,9 +34,7 @@ public class SceneryManager implements ScenerySensor {
 
 	private SceneryManagerConfiguration config;
 
-
 	private CallBackManager callbackManager;
-
 
 	private EventManager eventManager;
 
@@ -62,6 +60,36 @@ public class SceneryManager implements ScenerySensor {
 
 		SceneryEntryEvent event = new SceneryEntryEvent(SceneryEntryEvent.SOURCE_NAME, scenery);
 		eventManager.onEvent(event);
+
+		callbackManager.roomConfigurationChanged();
+	}
+
+
+	public void deleteScenery(String scenery) {
+
+		if (config.sceneries.containsKey(scenery) == false)
+			throw new IllegalArgumentException("Scenery does not exist!");
+
+		Persistence.beginTransaction();
+
+		config.sceneries.remove(scenery);
+
+		Persistence.commitTransaction();
+
+		callbackManager.roomConfigurationChanged();
+	}
+
+
+	public void createScenery(String scenery) {
+
+		Persistence.beginTransaction();
+
+		Scenery newScenery = new Scenery();
+		newScenery.id = scenery;
+
+		config.sceneries.put(scenery, newScenery);
+
+		Persistence.commitTransaction();
 
 		callbackManager.roomConfigurationChanged();
 	}

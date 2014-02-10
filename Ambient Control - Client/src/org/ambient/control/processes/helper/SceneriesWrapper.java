@@ -26,7 +26,7 @@ import org.ambientlight.annotations.Group;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
-import org.ambientlight.scenery.AbstractSceneryConfiguration;
+import org.ambientlight.room.entities.sceneries.Scenery;
 
 
 /**
@@ -41,5 +41,5 @@ public class SceneriesWrapper implements Serializable {
 	@TypeDef(fieldType = FieldType.SIMPLE_LIST)
 	@Presentation(name = "Szenarien verwalten", position = 0, groupPosition = 1)
 	@AlternativeValues(values = { @Value(displayName = "Anwenderszenario", value = "org.ambientlight.scenery.UserSceneryConfiguration") })
-	public List<AbstractSceneryConfiguration> sceneries = new ArrayList<AbstractSceneryConfiguration>();
+	public List<Scenery> sceneries = new ArrayList<Scenery>();
 }

@@ -10,7 +10,7 @@ import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
 import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;

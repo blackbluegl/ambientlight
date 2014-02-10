@@ -27,7 +27,7 @@ import java.util.Map;
 import org.ambient.rest.RestClient;
 import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
-import org.ambientlight.room.RoomConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;

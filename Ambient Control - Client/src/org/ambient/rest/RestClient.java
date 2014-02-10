@@ -2,12 +2,11 @@ package org.ambient.rest;
 
 import java.util.concurrent.ExecutionException;
 
-import org.ambientlight.process.ProcessConfiguration;
-import org.ambientlight.process.events.EventConfiguration;
-import org.ambientlight.process.validation.ValidationResult;
-import org.ambientlight.room.RoomConfiguration;
-import org.ambientlight.room.eventgenerator.EventGeneratorConfiguration;
-import org.ambientlight.scenery.actor.ActorConductConfiguration;
+import org.ambientlight.config.process.ProcessConfiguration;
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.ws.process.validation.ValidationResult;
 
 
 public class RestClient {
@@ -91,21 +90,21 @@ public class RestClient {
 	}
 
 
-	public static void setActorConductConfiguration(String hostName, String itemName, ActorConductConfiguration config) {
+	public static void setRenderingConfiguration(String hostName, String itemName, RenderingProgramConfiguration config) {
 		SetActorConductConfigurationTask task = new SetActorConductConfigurationTask();
 		task.execute(hostName, itemName, config);
 	}
 
 
-	public static void sendEvent(String hostName, EventConfiguration event) {
+	public static void sendEvent(String hostName, BroadcastEvent event) {
 		SendEventTask task = new SendEventTask();
 		task.execute(hostName, event);
 	}
 
 
-	public static void createOrUpdateEventGeneratorConfiguration(String hostName, EventGeneratorConfiguration config)
+	public static void createScenery(String hostName, String scenery)
 			throws Exception {
-		CreateEventGeneratorTask task = new CreateEventGeneratorTask();
-		task.execute(hostName, config.name, config);
+		CreateSceneryTask task = new CreateSceneryTask();
+		task.execute(hostName, scenery);
 	}
 }
