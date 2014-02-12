@@ -31,17 +31,33 @@ public class Features {
 	@Path("/switchables/{type}/{id}/state")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public void setPowerStateForItem(@PathParam("type") String type, @PathParam("id") String itemName, Boolean powerState) {
+	public Object setPowerStateForItem(@PathParam("type") String type, @PathParam("id") String itemName, Boolean powerState) {
 
 		try {
 			SwitchType typeEnume = SwitchType.valueOf(type);
 
 			AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState);
-			Response.status(200).build();
+			return Response.status(200).build();
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			Response.status(500).build();
+			return Response.status(500).build();
+		}
+	}
+
+
+	@GET
+	@Path("/switchables/{type}/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object getSwitchable(@PathParam("type") String type, @PathParam("id") String itemName) {
+
+		try {
+			SwitchType typeEnume = SwitchType.valueOf(type);
+			return AmbientControlMW.getRoom().featureFacade.getSwitchable(typeEnume, itemName);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
 		}
 	}
 }

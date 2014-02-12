@@ -7,6 +7,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
+import org.ambientlight.ws.Room;
 
 
 @Path("/config")
@@ -22,7 +25,13 @@ public class Config {
 	@GET
 	@Path("/room")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RoomConfiguration getRoomConfiguration() {
+	public Room getRoomConfiguration() {
+
+		create list and add to list and add list to room
+		for (SwitchableId currentId : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
+			Switchable currentSwitch = AmbientControlMW.getRoom().featureFacade.getSwitchable(currentId.type, currentId.id);
+		}
+
 		return AmbientControlMW.getRoom().config;
 	}
 }
