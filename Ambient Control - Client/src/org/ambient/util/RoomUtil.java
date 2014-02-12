@@ -13,21 +13,13 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities;
-
-import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
+package org.ambient.util;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface SwitchablesHandler {
+public class RoomUtil {
 
-	public Switchable getSwitchable(SwitchableId id);
-
-
-	public void setPowerState(String id, SwitchType type, boolean powerState);
 }

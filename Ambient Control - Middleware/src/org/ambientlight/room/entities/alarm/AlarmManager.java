@@ -29,7 +29,9 @@ import org.ambientlight.events.EventManager;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -156,5 +158,17 @@ public class AlarmManager implements SwitchablesHandler {
 
 		alarm.setPowerState(powerState);
 		this.createOrUpdateAlarm(alarm);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#getSwitchable(org.
+	 * ambientlight.room.entities.features.actor.types.SwitchableId)
+	 */
+	@Override
+	public Switchable getSwitchable(SwitchableId id) {
+		return config.alarms.get(id.id);
 	}
 }

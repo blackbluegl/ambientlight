@@ -73,6 +73,12 @@ public class FeatureFacade {
 	}
 
 
+	public Switchable getSwitchable(SwitchType type, String id) {
+		SwitchableId switchId = new SwitchableId(id, type);
+		return switchableMap.get(switchId).getSwitchable(switchId);
+	}
+
+
 	public void setSwitcheablePowerState(SwitchType type, String id, boolean powerState) {
 		SwitchableId switchId = new SwitchableId(id, type);
 		SwitchablesHandler handler = switchableMap.get(switchId);

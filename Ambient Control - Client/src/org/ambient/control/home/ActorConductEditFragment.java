@@ -23,7 +23,7 @@ import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.rest.RestClient;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConductConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -66,8 +66,8 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				RestClient rest = new RestClient();
-				rest.setRenderingConfiguration(selectedServer, itemName, (ActorConductConfiguration) myConfigurationData);
+				RestClient.setRenderingConfiguration(selectedServer, itemName,
+						(RenderingProgramConfiguration) myConfigurationData);
 				return true;
 			}
 		});
