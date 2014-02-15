@@ -22,7 +22,9 @@ import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition;
@@ -281,5 +283,17 @@ public class LightObjectManager implements SwitchablesHandler {
 
 	public BufferedImage getPixelMap() {
 		return pixelMap;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#getSwitchable(org.
+	 * ambientlight.room.entities.features.actor.types.SwitchableId)
+	 */
+	@Override
+	public Switchable getSwitchable(SwitchableId id) {
+		return config.lightObjects.get(id.id);
 	}
 }

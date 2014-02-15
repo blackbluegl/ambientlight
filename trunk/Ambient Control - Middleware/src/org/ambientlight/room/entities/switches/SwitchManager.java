@@ -22,7 +22,9 @@ import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -75,5 +77,17 @@ public class SwitchManager implements SwitchablesHandler {
 		eventManager.onEvent(new SwitchEvent(id, powerState, type.switchEventType));
 
 		callback.roomConfigurationChanged();
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#getSwitchable(org.
+	 * ambientlight.room.entities.features.actor.types.SwitchableId)
+	 */
+	@Override
+	public Switchable getSwitchable(SwitchableId id) {
+		return config.switches.get(id.id);
 	}
 }
