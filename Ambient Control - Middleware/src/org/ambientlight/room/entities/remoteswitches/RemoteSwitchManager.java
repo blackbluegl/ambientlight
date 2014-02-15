@@ -23,7 +23,9 @@ import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.room.Persistence;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -44,11 +46,10 @@ public class RemoteSwitchManager implements SwitchablesHandler {
 		this.config = config;
 		this.device = device;
 		this.callbackManager = callbackManager;
-		for(RemoteSwitch current : config.remoteSwitches.values()){
+		for (RemoteSwitch current : config.remoteSwitches.values()) {
 			entitiesFacade.registerSwitchable(this, current, SwitchType.ELRO);
 		}
 	}
-
 
 
 	/*
@@ -82,5 +83,17 @@ public class RemoteSwitchManager implements SwitchablesHandler {
 
 		callbackManager.roomConfigurationChanged();
 
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#getSwitchable(org.
+	 * ambientlight.room.entities.features.actor.types.SwitchableId)
+	 */
+	@Override
+	public Switchable getSwitchable(SwitchableId id) {
+		return config.remoteSwitches.get(id.id);
 	}
 }

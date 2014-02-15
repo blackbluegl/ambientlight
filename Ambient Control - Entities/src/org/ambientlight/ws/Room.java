@@ -15,7 +15,10 @@
 
 package org.ambientlight.ws;
 
+import java.util.List;
+
 import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.room.entities.features.actor.Switchable;
 
 
 /**
@@ -26,4 +29,5 @@ public class Room {
 
 	public RoomConfiguration roomConfig;
 
+	public List<Switchable> switchables;
 }
