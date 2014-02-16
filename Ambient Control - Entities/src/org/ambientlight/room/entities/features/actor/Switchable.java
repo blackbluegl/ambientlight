@@ -1,6 +1,7 @@
 package org.ambientlight.room.entities.features.actor;
 
 import org.ambientlight.room.entities.features.Entity;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
@@ -8,6 +9,9 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public interface Switchable extends Entity {
 
 	public boolean getPowerState();
+
+
+	public SwitchType getType();
 
 
 	public void setPowerState(boolean powerState);

@@ -1,15 +1,15 @@
 package org.ambientlight.room.entities.lightobject;
 
-import java.io.Serializable;
-
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.lightobject.Renderable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("lightObject")
-public class LightObject implements Switchable, Serializable {
+public class LightObject implements Switchable, Renderable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public class LightObject implements Switchable, Serializable {
 
 	private String id;
 
-	public RenderingProgramConfiguration renderingProgrammConfiguration;
+	private RenderingProgramConfiguration renderingProgrammConfiguration;
 
 
 	/*
@@ -74,5 +74,42 @@ public class LightObject implements Switchable, Serializable {
 	@Override
 	public void setPowerState(boolean powerState) {
 		this.powerState = powerState;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.lightobject.Renderable#
+	 * getRenderingProgrammConfiguration()
+	 */
+	@Override
+	public RenderingProgramConfiguration getRenderingProgrammConfiguration() {
+		return this.renderingProgrammConfiguration;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.lightobject.Renderable#
+	 * getRenderingProgrammConfiguration
+	 * (org.ambientlight.config.room.entities.lightobject
+	 * .renderingprogram.RenderingProgramConfiguration)
+	 */
+	@Override
+	public void setRenderingProgrammConfiguration(RenderingProgramConfiguration config) {
+		this.renderingProgrammConfiguration = config;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
+	 */
+	@Override
+	public SwitchType getType() {
+		return SwitchType.LED;
 	}
 }

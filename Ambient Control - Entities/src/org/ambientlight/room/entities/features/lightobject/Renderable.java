@@ -13,21 +13,21 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.features;
+package org.ambientlight.room.entities.features.lightobject;
 
-import java.io.Serializable;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.features.Entity;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public interface Entity extends Serializable {
+public interface Renderable extends Entity {
+
+	public RenderingProgramConfiguration getRenderingProgrammConfiguration();
 
 
-	public String getId();
-
-
-	public void setId(String name);
+	public void setRenderingProgrammConfiguration(RenderingProgramConfiguration config);
 
 }

@@ -7,9 +7,9 @@ import org.ambient.control.R;
 import org.ambient.rest.RestClient;
 import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConfiguration;
+import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.ws.Room;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -135,10 +135,10 @@ public class UpdateWidgetService extends Service {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
-		Map<String, RoomConfiguration> config = new HashMap<String, RoomConfiguration>();
+		Map<String, Room> config = new HashMap<String, Room>();
 
 		for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
-			RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
+			Room roomConfig = roomService.getRoomConfiguration(currentServer);
 			if (roomConfig == null) {
 				continue;
 			}
@@ -157,9 +157,9 @@ public class UpdateWidgetService extends Service {
 			remoteViews.removeAllViews(R.id.layout_widget_roomswitches);
 
 			for (String room : config.keySet()) {
-				RoomConfiguration roomConfig = config.get(room);
+				Room roomConfig = config.get(room);
 				boolean switchOn = false;
-				for (ActorConfiguration current : roomConfig.actorConfigurations.values()) {
+				for (Switchable current : roomConfig.switchables) {
 					if (current.getPowerState() == true) {
 						switchOn = true;
 						break;
@@ -198,14 +198,16 @@ public class UpdateWidgetService extends Service {
 		setWidgetToRefreshView();
 
 		try {
-			// TODO getting just the first switch here. later we have to
-			// determine the mainswitch by some attributes
-			String switchName = (roomService.getRoomConfiguration(serverName).getSwitches().keySet()
-					.toArray(new String[1]))[0];
-			SwitchEvent event = new SwitchEvent();
-			event.sourceId = switchName;
-			event.powerState = powerState;
-			RestClient.sendEvent(serverName, event);
+			Switchable mainSwitch = null;
+			for (Switchable current : roomService.getRoomConfiguration(serverName).switchables) {
+				if (current.getType().equals(SwitchType.VIRTUAL_MAIN)) {
+					mainSwitch = current;
+					break;
+				}
+			}
+
+			RestClient.setSwitchablePowerState(serverName, mainSwitch.getType(), mainSwitch.getId(), powerState);
+
 		} catch (Exception e) {
 			Log.e(LOG,
 					"error while trying to switch room. maybe the server is down or we are in the wrong wifi net. disableing the widget till next wakeup.",

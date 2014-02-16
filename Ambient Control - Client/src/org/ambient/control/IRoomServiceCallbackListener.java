@@ -16,7 +16,7 @@
 package org.ambient.control;
 
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 
 /**
@@ -28,7 +28,7 @@ public interface IRoomServiceCallbackListener {
 	public void onRoomServiceConnected(RoomConfigService service);
 
 
-	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration);
+	public void onRoomConfigurationChange(String serverName, Room roomConfiguration);
 
 
 	public void setRoomService(RoomConfigService roomService);

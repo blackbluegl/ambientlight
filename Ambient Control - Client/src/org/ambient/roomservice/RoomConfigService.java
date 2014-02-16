@@ -27,7 +27,7 @@ import java.util.Map;
 import org.ambient.rest.RestClient;
 import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -56,7 +56,7 @@ public class RoomConfigService extends Service {
 
 	private static final String LOG = "org.ambientcontrol.roomConfigService";
 
-	private Map<String, RoomConfiguration> roomConfiguration = new HashMap<String, RoomConfiguration>();
+	private Map<String, Room> roomConfiguration = new HashMap<String, Room>();
 	private Map<String, String> roomNameServerMapping = new HashMap<String, String>();
 
 	private CallbackSocketServerRunnable callbackSocketServer = null;
@@ -122,7 +122,7 @@ public class RoomConfigService extends Service {
 		String serverName = roomNameServerMapping.get(roomName);
 
 		try {
-			RoomConfiguration roomConfig = RestClient.getRoom(serverName);
+			Room roomConfig = RestClient.getRoom(serverName);
 			// update Model
 			roomConfiguration.put(serverName, roomConfig);
 		} catch (Exception e) {
@@ -195,7 +195,7 @@ public class RoomConfigService extends Service {
 		for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
 
 			try {
-				RoomConfiguration config = RestClient.getRoom(currentServer);
+				Room config = RestClient.getRoom(currentServer);
 				roomConfiguration.put(currentServer, config);
 				if (config != null) {
 					roomNameServerMapping.put(config.roomName, currentServer);
@@ -265,17 +265,17 @@ public class RoomConfigService extends Service {
 	}
 
 
-	public RoomConfiguration getRoomConfiguration(String server) {
+	public Room getRoomConfiguration(String server) {
 		return roomConfiguration.get(server);
 	}
 
 
-	public Collection<RoomConfiguration> getAllRoomConfigurations() {
+	public Collection<Room> getAllRoomConfigurations() {
 		return roomConfiguration.values();
 	}
 
 
-	public Map<String, RoomConfiguration> getAllRoomConfigurationsMap() {
+	public Map<String, Room> getAllRoomConfigurationsMap() {
 		return roomConfiguration;
 	}
 

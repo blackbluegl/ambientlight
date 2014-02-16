@@ -17,7 +17,7 @@ package org.ambient.control.climate;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -63,7 +63,7 @@ public class ClimateFragment extends RoomServiceAwareFragment {
 	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
 	 */
 	@Override
-	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
+	public void onRoomConfigurationChange(String serverName, Room roomConfiguration) {
 		// TODO Auto-generated method stub
 
 	}

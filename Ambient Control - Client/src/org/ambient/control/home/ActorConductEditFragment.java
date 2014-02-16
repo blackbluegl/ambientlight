@@ -22,8 +22,8 @@ import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.rest.RestClient;
 import org.ambientlight.annotations.AlternativeValues;
-import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -80,7 +80,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 	 * @param myself
 	 */
 	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server, final RoomConfiguration roomConfig, final String itemName) {
+			final Fragment fragment, final String server, final Room roomConfig, final String itemName) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -109,7 +109,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 
 	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String server,
-			final RoomConfiguration roomConfiguration, final String itemName) {
+			final Room roomConfiguration, final String itemName) {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);

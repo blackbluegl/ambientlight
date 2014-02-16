@@ -48,7 +48,7 @@ public class SwitchManager implements SwitchablesHandler {
 		this.eventManager = eventManager;
 
 		for (Switch currentSwitch : this.config.switches.values()) {
-			entityFacade.registerSwitchable(this, currentSwitch, currentSwitch.type);
+			entityFacade.registerSwitchable(this, currentSwitch, currentSwitch.getType());
 		}
 	}
 

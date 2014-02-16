@@ -33,17 +33,15 @@ import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.rest.RestClient;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
-import org.ambientlight.config.events.SceneryEntryEvent;
-import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConductConfiguration;
-import org.ambientlight.config.room.entities.led.ActorConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.led.renderingprogram.TronRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.led.switching.SwitchingConfiguration;
-import org.ambientlight.config.room.entities.scenery.AbstractSceneryConfiguration;
-import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
+import org.ambientlight.room.entities.features.Entity;
+import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.lightobject.Renderable;
+import org.ambientlight.ws.Room;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -90,7 +88,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 	// for EditConfigExitListener - handles the preview save action for the led
 	// configuration dialog
-	private ActorConductConfiguration actorConductConfigurationAfterEditItem;
+	private RenderingProgramConfiguration actorConductConfigurationAfterEditItem;
 	private String actorConductConfigurationAfterEditItemName;
 	private String actorConductConfigurationAfterEditItemServerName;
 	private List<String> serverNames;
@@ -153,8 +151,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 
 	/*
-	 * fill values into the rooms after they have been created and
-	 * troomConfigurationhe service is available.
+	 * fill values into the rooms after they have been created and tRoomhe
+	 * service is available.
 	 * 
 	 * @see org.ambient.control.RoomServiceAwareFragment#
 	 * initViewValuesAfterServiceConnection()
@@ -189,7 +187,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	@Override
 	public void onIntegrateConfiguration(String serverName, Object configuration) {
 		this.actorConductConfigurationAfterEditItemServerName = serverName;
-		this.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) configuration;
+		this.actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) configuration;
 	}
 
 
@@ -210,14 +208,12 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambient.control.RoomConfigAdapter.RoomConfigurationUpdateListener
-	 * #onRoomConfigurationChange(java.lang.String,
-	 * org.ambientlight.room.RoomConfiguration)
+	 * @see org.ambient.control.RoomConfigAdapter.RoomUpdateListener
+	 * #onRoomChange(java.lang.String, org.ambientlight.room.Room)
 	 */
 
 	@Override
-	public void onRoomConfigurationChange(String serverName, RoomConfiguration config) {
+	public void onRoomConfigurationChange(String serverName, Room config) {
 
 		// we get update callbacks but if the ui is not prepared and present we
 		// would run into trouble
@@ -242,7 +238,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 			actorConductConfigurationAfterEditItemName = savedInstanceState.getString(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME);
 			// onIntegrate was not called before and the fragment will be
 			// restored
-			actorConductConfigurationAfterEditItem = (ActorConductConfiguration) savedInstanceState
+			actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) savedInstanceState
 					.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM);
 		}
 
@@ -263,7 +259,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 */
 	private void updateRoomContent(String currentServer) {
 
-		RoomConfiguration roomConfig = roomService.getRoomConfiguration(currentServer);
+		Room roomConfig = roomService.getRoomConfiguration(currentServer);
 		if (roomConfig == null) {
 			disableEventListener(currentServer, false);
 			return;
@@ -282,8 +278,10 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		// init room power switch dynamically
 		LinearLayout switchesView = (LinearLayout) roomContainerView.findViewById(R.id.linearLayoutRoomSwitches);
 		switchesView.removeAllViews();
-		for (SwitchManagerConfiguration currentEventGenerator : roomConfig.getSwitches().values()) {
-			createSwitch(currentServer, switchesView, currentEventGenerator);
+		for (org.ambientlight.room.entities.switches.Switch currentSwitch : roomConfig.switchesManager.switches.values()) {
+			if (currentSwitch.getType().equals(SwitchType.VIRTUAL) || currentSwitch.getType().equals(SwitchType.VIRTUAL_MAIN)) {
+				createSwitch(currentServer, switchesView, currentSwitch);
+			}
 		}
 
 		// init scenery Spinner
@@ -303,13 +301,13 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		// update rooftop
 		boolean anyActive = false;
 
-		for (RoomConfiguration currentConfig : roomService.getAllRoomConfigurations()) {
+		for (Room currentConfig : roomService.getAllRoomConfigurations()) {
 			if (currentConfig == null) {
 				continue;
 			}
 
-			for (SwitchManagerConfiguration currentEventGenerator : currentConfig.getSwitches().values()) {
-				if (currentEventGenerator.getPowerState()) {
+			for (Switchable current : currentConfig.switchables) {
+				if (current.getPowerState()) {
 					anyActive = true;
 					break;
 				}
@@ -321,14 +319,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 
 	private void updateScenerySpinner(final String serverName) {
-		final RoomConfiguration roomConfiguration = roomService.getRoomConfiguration(serverName);
+		final Room room = roomService.getRoomConfiguration(serverName);
 
-		List<AbstractSceneryConfiguration> sceneries = roomService.getRoomConfiguration(serverName)
-				.getSceneryEventGeneratorConfiguration().sceneriesManager;
-		String[] sceneryNames = new String[sceneries.size()];
-		for (int i = 0; i < sceneries.size(); i++) {
-			sceneryNames[i] = sceneries.get(i).id;
-		}
+		String[] sceneryNames = room.sceneriesManager.sceneries.keySet().toArray(new String[1]);
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
 				sceneryNames);
@@ -336,21 +329,18 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 		Spinner spinner = (Spinner) roomsContainerView.findViewWithTag("sceneries" + serverName);
 		spinner.setAdapter(adapter);
-		adapter.getPosition(roomConfiguration.getSceneryEventGeneratorConfiguration().currentScenery.id);
-		spinner.setSelection(adapter.getPosition(roomConfiguration.getSceneryEventGeneratorConfiguration().currentScenery.id));
+		adapter.getPosition(room.sceneriesManager.currentScenery.id);
+		spinner.setSelection(adapter.getPosition(room.sceneriesManager.currentScenery.id));
 
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				String selectedScenery = (String) parent.getItemAtPosition(pos);
-				String currentScenery = roomConfiguration.getSceneryEventGeneratorConfiguration().currentScenery.id;
+				String currentScenery = room.sceneriesManager.currentScenery.id;
 
 				if (!selectedScenery.equals(currentScenery)) {
-					SceneryEntryEvent event = new SceneryEntryEvent();
-					event.sourceId = "RoomSceneryEventGenerator";
-					event.sceneryName = selectedScenery;
-					RestClient.sendEvent(serverName, event);
+					RestClient.setCurrentScenery(serverName, currentScenery);
 					disableEventListener(serverName, true);
 				}
 			}
@@ -367,9 +357,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	private void updateRoomBackground(String serverName) {
 		boolean powerSwitchIsChecked = false;
 		RelativeLayout roomBackground = (RelativeLayout) roomsContainerView.findViewWithTag("roomBackground" + serverName);
-		RoomConfiguration roomConfig = roomService.getRoomConfiguration(serverName);
+		Room roomConfig = roomService.getRoomConfiguration(serverName);
 
-		for (SwitchManagerConfiguration currentSwitch : roomConfig.getSwitches().values()) {
+		for (Switchable currentSwitch : roomConfig.switchables) {
 			if (currentSwitch.getPowerState() == true) {
 				powerSwitchIsChecked = true;
 				break;
@@ -397,13 +387,18 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 * @param roomContent
 	 * @param amountPerRow
 	 */
-	private void createRoomItems(String currentServer, RoomConfiguration roomConfig, TableLayout roomContent) {
+	private void createRoomItems(String currentServer, Room roomConfig, TableLayout roomContent) {
 		int amountPerRow = getLightObjectAmountPerRow();
 		TableRow row = new TableRow(roomContent.getContext());
 		row.setGravity(Gravity.CENTER);
 		roomContent.addView(row);
-		Iterator<ActorConfiguration> iterator = roomConfig.actorConfigurations.values().iterator();
-		for (int i = 0; i < roomConfig.actorConfigurations.size(); i++) {
+
+		List<Entity> entitiesForList = new ArrayList<Entity>();
+		entitiesForList.addAll(roomConfig.lightObjectManager.lightObjects.values());
+		entitiesForList.addAll(roomConfig.remoteSwitchesManager.remoteSwitches.values());
+
+		Iterator<Entity> iterator = entitiesForList.iterator();
+		for (int i = 0; i < roomConfig.lightObjectManager.lightObjects.size(); i++) {
 
 			// create a new row if last one is full
 			if (i % amountPerRow == 0) {
@@ -420,7 +415,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private void createRoomItem(final String serverName, final ActorConfiguration currentConfig, View lightObjectView) {
+	private void createRoomItem(final String serverName, final Entity currentConfig, View lightObjectView) {
 
 		final AbstractRoomItemViewMapper roomItemMapper = getLightObjectMapperForLightObjectIcon(currentConfig, lightObjectView);
 
@@ -440,9 +435,13 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 			@Override
 			public boolean onLongClick(View v) {
-				RoomFragment.this.actorConductConfigurationAfterEditItem = (ActorConductConfiguration) GuiUtils
-						.deepCloneSerializeable(currentConfig.actorConductConfiguration);
-				RoomFragment.this.actorConductConfigurationAfterEditItemName = currentConfig.getName();
+				// this long click shall only handle renderables
+				if (currentConfig instanceof Renderable == false)
+					return false;
+
+				RoomFragment.this.actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) GuiUtils
+						.deepCloneSerializeable(((Renderable) currentConfig).getRenderingProgrammConfiguration());
+				RoomFragment.this.actorConductConfigurationAfterEditItemName = currentConfig.getId();
 
 				getActivity().startActionMode(new ActionMode.Callback() {
 
@@ -455,12 +454,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 							ActorConductEditFragment fragEdit = new ActorConductEditFragment();
 							fragEdit.setTargetFragment(RoomFragment.this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 							Bundle arguments = new Bundle();
-							arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE,
-									(ActorConductConfiguration) GuiUtils
-									.deepCloneSerializeable(currentConfig.actorConductConfiguration));
+							arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, (Entity) GuiUtils
+									.deepCloneSerializeable(((Renderable) currentConfig).getRenderingProgrammConfiguration()));
 							arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
 							arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_SERVER, serverName);
-							arguments.putString(ActorConductEditFragment.ITEM_NAME, currentConfig.getName());
+							arguments.putString(ActorConductEditFragment.ITEM_NAME, currentConfig.getId());
 
 							fragEdit.setArguments(arguments);
 
@@ -471,8 +469,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 							break;
 
 						case R.id.menuEntryAddActorConduct:
-							ActorConductEditFragment.createNewConfigBean(ActorConductConfiguration.class, RoomFragment.this,
-									serverName, roomService.getRoomConfiguration(serverName), currentConfig.getName());
+							ActorConductEditFragment.createNewConfigBean(RenderingProgramConfiguration.class, RoomFragment.this,
+									serverName, roomService.getRoomConfiguration(serverName), currentConfig.getId());
 							break;
 
 						default:
@@ -516,7 +514,14 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 				try {
 
-					RestClient.setPowerStateForRoomItem(serverName, roomItemMapper.getItemName(), !roomItemMapper.getPowerState());
+					// only switch switchables
+					if (currentConfig instanceof Switchable == false)
+						return;
+
+					Switchable switchable = (Switchable) currentConfig;
+					RestClient.setSwitchablePowerState(serverName, switchable.getType(), switchable.getId(),
+							!roomItemMapper.getPowerState());
+
 					// update the icon - we prevent that the user experiences a
 					// gap (request to server, response to callback)
 					roomItemMapper.setPowerState(!roomItemMapper.getPowerState());
@@ -535,10 +540,10 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 * @param currentEventGenerator
 	 */
 	private void createSwitch(final String serverName, LinearLayout switchesView,
-			final SwitchManagerConfiguration currentEventGenerator) {
+			final org.ambientlight.room.entities.switches.Switch currentEventGenerator) {
 
 		final Switch powerStateSwitch = new Switch(this.getActivity());
-		powerStateSwitch.setTag("powerStateSwitch" + serverName + currentEventGenerator.getName());
+		powerStateSwitch.setTag("powerStateSwitch" + serverName + currentEventGenerator.getId());
 		switchesView.addView(powerStateSwitch, 0);
 		powerStateSwitch.setChecked(currentEventGenerator.getPowerState());
 		powerStateSwitch.setOnClickListener(new OnClickListener() {
@@ -547,10 +552,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 			public void onClick(View v) {
 				try {
 					disableEventListener(serverName, true);
-					SwitchEvent event = new SwitchEvent();
-					event.sourceId = currentEventGenerator.getName();
-					event.powerState = powerStateSwitch.isChecked();
-					RestClient.sendEvent(serverName, event);
+
+					RestClient.setSwitchablePowerState(serverName, currentEventGenerator.getType(),
+							currentEventGenerator.getId(),
+							powerStateSwitch.isChecked());
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -571,14 +577,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 			public void onClick(View v) {
 				for (String currentServerName : serverNames) {
 					try {
-						RoomConfiguration currentConfig = roomService.getRoomConfiguration(currentServerName);
+						org.ambientlight.ws.Room currentConfig = roomService.getRoomConfiguration(currentServerName);
 
-						for (SwitchManagerConfiguration currentEventGenerator : currentConfig.getSwitches()
-								.values()) {
-							SwitchEvent event = new SwitchEvent();
-							event.sourceId = currentEventGenerator.getName();
-							event.powerState = false;
-							RestClient.sendEvent(currentServerName, event);
+						for (Switchable currentEventGenerator : currentConfig.switchables) {
+							RestClient.setSwitchablePowerState(currentServerName, currentEventGenerator.getType(),
+									currentEventGenerator.getId(), false);
 						}
 					} catch (Exception e) {
 						Log.e(LOG, "error switching masterswitch", e);
@@ -658,31 +661,30 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final ActorConfiguration currentConfig,
-			View lightObjectView) {
+	private AbstractRoomItemViewMapper getLightObjectMapperForLightObjectIcon(final Entity currentConfig, View lightObjectView) {
 		AbstractRoomItemViewMapper result = null;
 
-		ActorConductConfiguration sceneryConfig = currentConfig.actorConductConfiguration;
+		if (currentConfig instanceof Renderable && currentConfig instanceof Switchable) {
 
-		if (sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
-			result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.getName(), R.string.program_simple_color,
-					currentConfig.getPowerState());
+			RenderingProgramConfiguration sceneryConfig = ((Renderable) currentConfig).getRenderingProgrammConfiguration();
+			boolean powerState = ((Switchable) currentConfig).getPowerState();
+
+			if (sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
+				result = new SimpleColorLightItemViewMapper(lightObjectView, currentConfig.getId(),
+						R.string.program_simple_color, powerState);
+			}
+
+			if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
+				result = new TronLightItemViewMapper(lightObjectView, currentConfig.getId(), R.string.program_tron, powerState);
+			}
+
+			if (sceneryConfig instanceof SunSetRenderingProgrammConfiguration) {
+				result = new SunsetLightItemViewMapper(lightObjectView, currentConfig.getId(), R.string.program_tron, powerState);
+			}
+		} else if (currentConfig instanceof Switchable) {
+			boolean powerState = ((Switchable) currentConfig).getPowerState();
+			result = new SwitchItemViewMapper(lightObjectView, currentConfig.getId(), powerState);
 		}
-
-		if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
-			result = new TronLightItemViewMapper(lightObjectView, currentConfig.getName(), R.string.program_tron,
-					currentConfig.getPowerState());
-		}
-
-		if (sceneryConfig instanceof SunSetRenderingProgrammConfiguration) {
-			result = new SunsetLightItemViewMapper(lightObjectView, currentConfig.getName(), R.string.program_tron,
-					currentConfig.getPowerState());
-		}
-
-		if (sceneryConfig instanceof SwitchingConfiguration) {
-			result = new SwitchItemViewMapper(lightObjectView, currentConfig.getName(), currentConfig.getPowerState());
-		}
-
 		return result;
 	}
 

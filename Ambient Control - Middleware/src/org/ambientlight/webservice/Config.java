@@ -27,7 +27,14 @@ public class Config {
 	public Room getRoomConfiguration() {
 
 		Room room = new Room();
-		room.roomConfig = AmbientControlMW.getRoom().config;
+		room.alarmManager = AmbientControlMW.getRoom().config.alarmManager;
+		room.climateManager = AmbientControlMW.getRoom().config.climateManager;
+		room.lightObjectManager = AmbientControlMW.getRoom().config.lightObjectManager;
+		room.processManager = AmbientControlMW.getRoom().config.processManager;
+		room.remoteSwitchesManager = AmbientControlMW.getRoom().config.remoteSwitchesManager;
+		room.roomName = AmbientControlMW.getRoom().config.roomName;
+		room.sceneriesManager = AmbientControlMW.getRoom().config.sceneriesManager;
+		room.switchesManager = AmbientControlMW.getRoom().config.switchesManager;
 
 		for (SwitchableId currentId : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
 			Switchable currentSwitch = AmbientControlMW.getRoom().featureFacade.getSwitchable(currentId.type, currentId.id);

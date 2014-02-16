@@ -101,7 +101,7 @@ public class CreateTestConfig {
 	private void createSwitchManager(RoomConfiguration rc) {
 		SwitchManagerConfiguration config = new SwitchManagerConfiguration();
 		Switch mainSwitch = new Switch();
-		mainSwitch.type = SwitchType.VIRTUAL_MAIN;
+		mainSwitch.setType(SwitchType.VIRTUAL_MAIN);
 		mainSwitch.setId(VIRTUAL_MAIN_SWITCH_ID);
 		mainSwitch.setPowerState(false);
 		config.switches.put(mainSwitch.getId(), mainSwitch);
@@ -279,7 +279,7 @@ public class CreateTestConfig {
 		lo.width = 20;
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
-		lo.renderingProgrammConfiguration = this.createSimpleColor();
+		lo.setRenderingProgrammConfiguration(this.createSimpleColor());
 		config.lightObjects.put(lo.getId(), lo);
 
 		LightObject background = new LightObject();
@@ -291,7 +291,7 @@ public class CreateTestConfig {
 		background.xOffsetInRoom = 0;
 		background.yOffsetInRoom = 0;
 		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
-		background.renderingProgrammConfiguration = sunset;
+		background.setRenderingProgrammConfiguration(sunset);
 		config.lightObjects.put(background.getId(), background);
 	}
 

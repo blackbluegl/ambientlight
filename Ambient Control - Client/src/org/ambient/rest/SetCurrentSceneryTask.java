@@ -7,18 +7,15 @@ import org.springframework.web.client.RestTemplate;
 import android.os.AsyncTask;
 
 
-public class SetSceneryActiveForRoomTask extends AsyncTask<Object, Void, Void> {
+public class SetCurrentSceneryTask extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/sceneryControl/control/room/sceneries/";
+	private final String URL = "/sceneries/current";
 
 
-	private String serverName;
 
 
 	@Override
 	protected Void doInBackground(Object... params) {
-
-		this.serverName = (String) params[0];
 
 		String url = URLUtils.getBaseUrl((String) params[0]) + URL;
 
