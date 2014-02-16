@@ -1,5 +1,7 @@
 package org.ambientlight.config.room.entities.lightobject.renderingprogram;
 
+import java.io.Serializable;
+
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.Value;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -11,7 +13,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 		@Value(displayName = "Sonnenuntergang", value = "org.ambientlight.scenery.actor.renderingprogram.SunSetRenderingProgrammConfiguration") })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 
-public abstract class RenderingProgramConfiguration {
+public abstract class RenderingProgramConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

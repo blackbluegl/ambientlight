@@ -15,19 +15,38 @@
 
 package org.ambientlight.ws;
 
+import java.io.Serializable;
 import java.util.List;
 
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.config.messages.QeueManagerConfiguration;
+import org.ambientlight.config.process.ProcessManagerConfiguration;
+import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
+import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
+import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
+import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
+import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
+import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.room.entities.features.actor.Switchable;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class Room {
+public class Room implements Serializable {
 
-	public RoomConfiguration roomConfig;
+	private static final long serialVersionUID = 1L;
+
+	public String roomName;
+
+	public QeueManagerConfiguration qeueManager;
+	public ClimateManagerConfiguration climateManager;
+	public SwitchManagerConfiguration switchesManager;
+	public RemoteSwitchManagerConfiguration remoteSwitchesManager;
+	public AlarmManagerConfiguration alarmManager;
+	public SceneryManagerConfiguration sceneriesManager;
+	public ProcessManagerConfiguration processManager;
+	public LightObjectManagerConfiguration lightObjectManager;
 
 	public List<Switchable> switchables;
 }

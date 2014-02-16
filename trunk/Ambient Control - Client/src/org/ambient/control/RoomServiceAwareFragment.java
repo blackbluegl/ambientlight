@@ -16,7 +16,7 @@
 package org.ambient.control;
 
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,7 +44,7 @@ public abstract class RoomServiceAwareFragment extends Fragment implements IRoom
 
 
 	@Override
-	public abstract void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration);
+	public abstract void onRoomConfigurationChange(String serverName, Room roomConfiguration);
 
 
 	@Override

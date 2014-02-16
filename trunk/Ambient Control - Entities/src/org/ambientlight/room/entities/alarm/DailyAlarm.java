@@ -15,6 +15,8 @@
 
 package org.ambientlight.room.entities.alarm;
 
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+
 
 /**
  * @author Florian Bornkessel
@@ -22,7 +24,20 @@ package org.ambientlight.room.entities.alarm;
  */
 public class DailyAlarm extends Alarm {
 
+	private static final long serialVersionUID = 1L;
+
 	public int hour;
 	public int minute;
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
+	 */
+	@Override
+	public SwitchType getType() {
+		return SwitchType.ALARM;
+	}
 
 }

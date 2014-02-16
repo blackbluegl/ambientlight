@@ -1,37 +1,34 @@
 package org.ambient.rest;
 
-import org.ambientlight.ws.Room;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 
-public class GetRoomTask extends AsyncTask<String, Void, Object> {
+public class SetSwitchablePowerState extends AsyncTask<Object, Void, Void> {
 
-	private static final String LOG = "GetRoomTask";
-
-	private final String URL = "/sceneryControl/config/room";
+	private final String URL = "/switchables";
+	private final String URL2 = "/state";
 
 
 	@Override
-	protected Room doInBackground(String... params) {
-		Log.i(LOG, "getRoomConfiguration is called");
+	protected Void doInBackground(Object... params) {
 
-		String url = URLUtils.getBaseUrl(params[0]) + URL;
+		SwitchType type = (SwitchType) params[1];
+		String id = (String) params[2];
+		Boolean state = (Boolean) params[3];
+
+		String url = URLUtils.getBaseUrl((String) params[0]) + URL + "/" + type.toString() + "/" + id + URL2;
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
 
 		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
-		Room response = null;
-		try {
-			response = restTemplate.getForObject(url, Room.class, "");
-		} catch (Exception e) {
-			response = null;
-		}
-		return response;
+
+		restTemplate.put(url, state);
+		return null;
 	}
 }

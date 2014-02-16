@@ -125,23 +125,26 @@ public class LightObjectManager implements SwitchablesHandler {
 		RenderingProgramm renderProgram = null;
 
 		// create SimpleColor
-		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SimpleColorRenderingProgramConfiguration) {
-			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
+		if (lightObject.lightObject.getRenderingProgrammConfiguration() instanceof SimpleColorRenderingProgramConfiguration) {
+			SimpleColorRenderingProgramConfiguration config = (SimpleColorRenderingProgramConfiguration) lightObject.lightObject
+					.getRenderingProgrammConfiguration();
 			Color simpleColor = new Color(config.rgb);
 			renderProgram = new SimpleColor(simpleColor);
 		}
 
 		// create Tron
-		if (lightObject.lightObject.renderingProgrammConfiguration instanceof TronRenderingProgrammConfiguration) {
-			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
+		if (lightObject.lightObject.getRenderingProgrammConfiguration() instanceof TronRenderingProgrammConfiguration) {
+			TronRenderingProgrammConfiguration config = (TronRenderingProgrammConfiguration) lightObject.lightObject
+					.getRenderingProgrammConfiguration();
 			Color color = new Color(config.rgb);
 			renderProgram = new Tron(lightObject, color, config.lightImpact, config.tailLength, config.sparkleStrength,
 					config.sparkleSize, config.speed, config.lightPointAmount);
 		}
 
 		// create Sunset
-		if (lightObject.lightObject.renderingProgrammConfiguration instanceof SunSetRenderingProgrammConfiguration) {
-			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject.renderingProgrammConfiguration;
+		if (lightObject.lightObject.getRenderingProgrammConfiguration() instanceof SunSetRenderingProgrammConfiguration) {
+			SunSetRenderingProgrammConfiguration config = (SunSetRenderingProgrammConfiguration) lightObject.lightObject
+					.getRenderingProgrammConfiguration();
 			renderProgram = new Sunset(config.duration, config.position, config.sunStartX, config.sunStartY, config.sunSetX,
 					config.sizeOfSun, config.gamma, FREQUENCY);
 		}
@@ -163,7 +166,7 @@ public class LightObjectManager implements SwitchablesHandler {
 
 		Persistence.beginTransaction();
 
-		renderObject.lightObject.renderingProgrammConfiguration = newConfig;
+		renderObject.lightObject.setRenderingProgrammConfiguration(newConfig);
 
 		Persistence.commitTransaction();
 		renderer.removeRenderTaskForLightObject(renderObject);

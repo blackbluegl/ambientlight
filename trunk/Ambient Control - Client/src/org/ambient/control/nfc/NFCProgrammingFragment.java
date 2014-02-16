@@ -23,8 +23,8 @@ import java.util.List;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -156,7 +156,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				selectedServer = serverNames.get(pos);
-				RoomConfiguration roomConfig = roomService.getRoomConfiguration(selectedServer);
+				Room roomConfig = roomService.getRoomConfiguration(selectedServer);
 
 				List<String> switchNames = new ArrayList<String>();
 				for (SwitchManagerConfiguration currentSwitch : roomConfig.getSwitches().values()) {
@@ -241,7 +241,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
 	 */
 	@Override
-	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
+	public void onRoomConfigurationChange(String serverName, Room roomConfiguration) {
 	}
 
 }

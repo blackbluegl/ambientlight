@@ -10,7 +10,7 @@ import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
 import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;
@@ -76,7 +76,7 @@ public class MainActivity extends FragmentActivity {
 
 			if (action.equals(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG)) {
 				String serverName = intent.getExtras().getString(RoomConfigService.EXTRA_SERVERNAME);
-				RoomConfiguration config = (RoomConfiguration) intent.getExtras().getSerializable(
+				Room config = (Room) intent.getExtras().getSerializable(
 						RoomConfigService.EXTRA_ROOMCONFIG);
 				Log.i(LOG, "got update for Room");
 				for (IRoomServiceCallbackListener listener : roomServiceListeners) {

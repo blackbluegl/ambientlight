@@ -3,18 +3,19 @@ package org.ambient.rest;
 import java.util.concurrent.ExecutionException;
 
 import org.ambientlight.config.process.ProcessConfiguration;
-import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.events.BroadcastEvent;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.ws.Room;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
 
 public class RestClient {
 
-	public static RoomConfiguration getRoom(String hostName) throws InterruptedException, ExecutionException {
+	public static Room getRoom(String hostName) throws InterruptedException, ExecutionException {
 		GetRoomTask task = new GetRoomTask();
 		task.execute(hostName);
-		return (RoomConfiguration) task.get();
+		return (Room) task.get();
 	}
 
 
@@ -22,6 +23,12 @@ public class RestClient {
 		RegisterCallbackTask task = new RegisterCallbackTask();
 		task.execute(hostName, ipAndPort);
 		return task.get();
+	}
+
+
+	public static void setSwitchablePowerState(String hostName, SwitchType type, String id, boolean powestate) {
+		SetSwitchablePowerState task = new SetSwitchablePowerState();
+		task.execute(hostName, type, id, powestate);
 	}
 
 
@@ -43,7 +50,7 @@ public class RestClient {
 	}
 
 
-	public void deleteScenarioFromRoom(String hostName, String sceneryName) {
+	public static void deleteScenarioFromRoom(String hostName, String sceneryName) {
 		DeleteSceneryTask task = new DeleteSceneryTask();
 		task.execute(hostName, sceneryName);
 	}
@@ -77,15 +84,8 @@ public class RestClient {
 	}
 
 
-	public static void setPowerStateForRoomItem(String hostName, String itemName, Boolean state) throws InterruptedException,
-	ExecutionException {
-		ToggleRoomItemPowerStateTask task = new ToggleRoomItemPowerStateTask();
-		task.execute(hostName, itemName, state);
-	}
-
-
-	public void setSceneryActive(String hostName, String sceneryName) {
-		SetSceneryActiveForRoomTask task = new SetSceneryActiveForRoomTask();
+	public static void setCurrentScenery(String hostName, String sceneryName) {
+		SetCurrentSceneryTask task = new SetCurrentSceneryTask();
 		task.execute(hostName, sceneryName);
 	}
 
@@ -102,8 +102,7 @@ public class RestClient {
 	}
 
 
-	public static void createScenery(String hostName, String scenery)
-			throws Exception {
+	public static void createScenery(String hostName, String scenery) throws Exception {
 		CreateSceneryTask task = new CreateSceneryTask();
 		task.execute(hostName, scenery);
 	}

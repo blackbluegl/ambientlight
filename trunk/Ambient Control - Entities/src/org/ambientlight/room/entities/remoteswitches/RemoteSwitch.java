@@ -1,6 +1,7 @@
 package org.ambientlight.room.entities.remoteswitches;
 
 import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -61,6 +62,17 @@ public class RemoteSwitch implements Switchable {
 	@Override
 	public void setPowerState(boolean powerState) {
 		this.powerstate = powerState;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
+	 */
+	@Override
+	public SwitchType getType() {
+		return SwitchType.ELRO;
 	}
 
 }

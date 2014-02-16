@@ -3,7 +3,7 @@
     package="org.ambient.control"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="0.16.0" >
 
     <uses-permission android:name="android.permission.INTERNET" >
     </uses-permission>
