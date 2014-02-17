@@ -13,7 +13,7 @@ public class GetRoomTask extends AsyncTask<String, Void, Object> {
 
 	private static final String LOG = "GetRoomTask";
 
-	private final String URL = "/sceneryControl/config/room";
+	private final String URL = "/config/room";
 
 
 	@Override

@@ -16,6 +16,7 @@
 package org.ambientlight.ws;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.config.messages.QeueManagerConfiguration;
@@ -48,5 +49,5 @@ public class Room implements Serializable {
 	public ProcessManagerConfiguration processManager;
 	public LightObjectManagerConfiguration lightObjectManager;
 
-	public List<Switchable> switchables;
+	public List<Switchable> switchables = new ArrayList<Switchable>();
 }
