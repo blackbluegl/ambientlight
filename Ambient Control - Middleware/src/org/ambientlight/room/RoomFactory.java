@@ -218,6 +218,7 @@ public class RoomFactory {
 
 		if (config == null || config.lightObjects.isEmpty()) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
+			return null;
 		}
 
 		BufferedImage pixelMap = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_ARGB);
@@ -246,6 +247,7 @@ public class RoomFactory {
 
 		if (config == null) {
 			System.out.println("RoomFactory initClimateManager(): no configuration - skipping!");
+			return null;
 		}
 
 		// parse weekProfiles
