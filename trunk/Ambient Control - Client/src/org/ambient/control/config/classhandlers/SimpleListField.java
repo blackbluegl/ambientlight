@@ -24,7 +24,7 @@ import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
 import org.ambient.util.GuiUtils;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.view.ActionMode;
 import android.view.Menu;
@@ -56,7 +56,8 @@ public class SimpleListField {
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
 			final List<String> altValues, LinearLayout contentArea, final String selectedServer,
-			final RoomConfiguration roomConfig) throws IllegalAccessException {
+ final Room roomConfig)
+			throws IllegalAccessException {
 
 		final ListView listView = new ListView(contentArea.getContext());
 		contentArea.addView(listView);

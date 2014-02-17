@@ -3,13 +3,7 @@ package org.ambient.control.nfc;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.ambient.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
-import org.ambientlight.config.events.SwitchEvent;
-import org.ambientlight.config.features.actor.Switchable;
-import org.ambientlight.config.room.RoomConfiguration;
-import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
-import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -193,33 +187,38 @@ public class NFCSwitchHandlerActivity extends Activity implements OnInitListener
 
 		try {
 
-			RoomConfiguration config = roomService.getRoomConfiguration(server);
-
-			if (type.equals(TYPE_ROOM_ITEM)) {
-				Switchable roomItem = config.getSwitchableActors().get(itemName);
-				powerState = !roomItem.getPowerState();
-				RestClient.setPowerStateForRoomItem(server, itemName, powerState);
-			}
-
-			if (type.equals(TYPE_SWITCH_EVENT)) {
-				SwitchManagerConfiguration switchConfig = config.getSwitches().get(itemName);
-				SwitchEvent event = new SwitchEvent();
-				event.sourceId = itemName;
-				powerState = !switchConfig.getPowerState();
-				event.powerState = powerState;
-				RestClient.sendEvent(server, event);
-
-				SceneryManagerConfiguration sceneryEvent = config.getSceneryEventGeneratorConfiguration();
-
-				if (powerState) {
-					speakOut(sceneryEvent.currentScenery.id + ", ein");
-					Toast.makeText(this, "Schalte " + itemName + " ein - Szenario: " + sceneryEvent.currentScenery.id,
-							Toast.LENGTH_LONG).show();
-				} else {
-					speakOut(sceneryEvent.currentScenery.id + ", aus");
-					Toast.makeText(this, "Schalte " + itemName + " aus", Toast.LENGTH_LONG).show();
-				}
-			}
+			// Room config = roomService.getRoomConfiguration(server);
+			//
+			// if (type.equals(TYPE_ROOM_ITEM)) {
+			// Switchable roomItem = config.getSwitchableActors().get(itemName);
+			// powerState = !roomItem.getPowerState();
+			// RestClient.setPowerStateForRoomItem(server, itemName,
+			// powerState);
+			// }
+			//
+			// if (type.equals(TYPE_SWITCH_EVENT)) {
+			// SwitchManagerConfiguration switchConfig =
+			// config.getSwitches().get(itemName);
+			// SwitchEvent event = new SwitchEvent();
+			// event.sourceId = itemName;
+			// powerState = !switchConfig.getPowerState();
+			// event.powerState = powerState;
+			// RestClient.sendEvent(server, event);
+			//
+			// SceneryManagerConfiguration sceneryEvent =
+			// config.getSceneryEventGeneratorConfiguration();
+			//
+			// if (powerState) {
+			// speakOut(sceneryEvent.currentScenery.id + ", ein");
+			// Toast.makeText(this, "Schalte " + itemName + " ein - Szenario: "
+			// + sceneryEvent.currentScenery.id,
+			// Toast.LENGTH_LONG).show();
+			// } else {
+			// speakOut(sceneryEvent.currentScenery.id + ", aus");
+			// Toast.makeText(this, "Schalte " + itemName + " aus",
+			// Toast.LENGTH_LONG).show();
+			// }
+			// }
 
 		} catch (Exception e) {
 			Log.e(LOG, "exception raised during creation of event: ", e);

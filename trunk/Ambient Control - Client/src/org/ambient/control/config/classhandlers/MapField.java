@@ -30,7 +30,7 @@ import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.Wher
 import org.ambient.util.GuiUtils;
 import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.view.ActionMode;
 import android.view.Menu;
@@ -61,7 +61,7 @@ public class MapField {
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
 			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
-			final String selectedServer, final RoomConfiguration roomConfig) throws IllegalAccessException {
+			final String selectedServer, final Room roomConfig) throws IllegalAccessException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);

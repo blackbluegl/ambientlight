@@ -41,7 +41,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Group;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -82,7 +82,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 	protected Object valueToIntegrate = null;
 
-	protected RoomConfiguration roomConfig = null;
+	protected Room roomConfig = null;
 
 	protected String selectedServer = null;
 
@@ -117,7 +117,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		if (getArguments().isEmpty() == false) {
 			createMode = getArguments().getBoolean(ARG_CREATE_MODE);
 			selectedServer = getArguments().getString(ARG_SELECTED_SERVER);
-			this.roomConfig = (RoomConfiguration) getArguments().getSerializable(ARG_ROOM_CONFIG);
+			this.roomConfig = (Room) getArguments().getSerializable(ARG_ROOM_CONFIG);
 		}
 
 		if (savedInstanceState != null) {
@@ -466,7 +466,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param roomConfig
 	 */
 	public static void editConfigBean(Fragment fragment, final Object configValueToEdit, final String selectedServer,
-			final RoomConfiguration roomConfig) {
+			final Room roomConfig) {
 
 		Bundle args = new Bundle();
 		args.putString(ARG_SELECTED_SERVER, selectedServer);
@@ -498,7 +498,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param roomConfig
 	 */
 	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server, final RoomConfiguration roomConfig) {
+			final Fragment fragment, final String server, final Room roomConfig) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -537,7 +537,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param roomConfiguration
 	 */
 	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String server,
-			final RoomConfiguration roomConfiguration) {
+			final Room roomConfiguration) {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(clazz.getAnnotation(AlternativeValues.class),
 				clazz.getName(), roomConfiguration);

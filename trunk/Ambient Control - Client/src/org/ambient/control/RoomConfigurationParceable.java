@@ -15,7 +15,7 @@
 
 package org.ambient.control;
 
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -27,10 +27,10 @@ import android.os.Parcelable;
  */
 public class RoomConfigurationParceable implements Parcelable {
 
-	public RoomConfiguration roomConfiguration;
+	public Room roomConfiguration;
 
 
-	public RoomConfigurationParceable(RoomConfiguration roomConfiguration) {
+	public RoomConfigurationParceable(Room roomConfiguration) {
 		this.roomConfiguration = roomConfiguration;
 	}
 
