@@ -115,9 +115,10 @@ public class CreateTestConfig {
 		rc.processManager = config;
 
 		EventProcessConfiguration roomSwitchProcess = new EventProcessConfiguration();
-		config.processes.put(roomSwitchProcess.id, roomSwitchProcess);
 		roomSwitchProcess.run = true;
 		roomSwitchProcess.id = "roomSwitchProcess";
+
+		config.processes.put(roomSwitchProcess.id, roomSwitchProcess);
 
 		SwitchEvent triggerOn = new SwitchEvent(VIRTUAL_MAIN_SWITCH_ID, true, SwitchEventType.VIRTUAL_MAIN);
 		SwitchEvent triggerOff = new SwitchEvent(VIRTUAL_MAIN_SWITCH_ID, false, SwitchEventType.VIRTUAL_MAIN);

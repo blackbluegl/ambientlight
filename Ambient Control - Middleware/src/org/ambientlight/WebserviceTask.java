@@ -25,7 +25,7 @@ public class WebserviceTask extends Thread {
 			HttpServer server = GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
 
 			ThreadPoolConfig config = ThreadPoolConfig.defaultConfig().setPoolName("mypool").setCorePoolSize(1)
-					.setMaxPoolSize(20);
+					.setMaxPoolSize(15);
 
 			NetworkListener listener = server.getListeners().iterator().next();
 			listener.getTransport().setWorkerThreadPoolConfig(config);
