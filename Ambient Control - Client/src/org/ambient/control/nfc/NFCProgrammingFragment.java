@@ -23,7 +23,7 @@ import java.util.List;
 import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
+import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.ws.Room;
 
 import android.annotation.SuppressLint;
@@ -158,9 +158,10 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 				selectedServer = serverNames.get(pos);
 				Room roomConfig = roomService.getRoomConfiguration(selectedServer);
 
+
 				List<String> switchNames = new ArrayList<String>();
-				for (SwitchManagerConfiguration currentSwitch : roomConfig.getSwitches().values()) {
-					switchNames.add(currentSwitch.name);
+				for (Switchable currentSwitch : roomConfig.switchables) {
+					switchNames.add(currentSwitch.getId());
 				}
 
 				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),

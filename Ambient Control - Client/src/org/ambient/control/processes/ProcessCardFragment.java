@@ -29,9 +29,9 @@ import org.ambient.views.ProcessCardDrawer;
 import org.ambient.views.ProcessCardDrawer.NodeSelectionListener;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
-import org.ambientlight.config.room.RoomConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.room.entities.sceneries.Scenery;
+import org.ambientlight.ws.Room;
 import org.ambientlight.ws.process.validation.ValidationEntry;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
@@ -149,10 +149,10 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 						getActivity().invalidateOptionsMenu();
 
 						selectedServer = serverNames.get(pos);
-						RoomConfiguration selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
+						Room selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
 
 						processNames.clear();
-						for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processes) {
+						for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processManager.processes.values()) {
 							processNames.add(currentProcess.id);
 						}
 
@@ -175,9 +175,10 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
 				getActivity().invalidateOptionsMenu();
-				RoomConfiguration selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
-				selectedProcess = (ProcessConfiguration) GuiUtils.deepCloneSerializeable(selectedRoomConfiguration.processes
-						.get(pos));
+
+				Room selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
+				selectedProcess = (ProcessConfiguration) GuiUtils
+						.deepCloneSerializeable(selectedRoomConfiguration.processManager.processes.get(parent.getSelectedItem()));
 				drawer.setProcess(selectedProcess);
 				getActivity().invalidateOptionsMenu();
 			}
@@ -254,8 +255,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			if (result.resultIsValid()) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Validierung")
-				.setMessage("Die Validierung ist abgeschlossen. Es wurden keine semantische Fehler gefunden.")
-				.setPositiveButton("OK", null).create().show();
+						.setMessage("Die Validierung ist abgeschlossen. Es wurden keine semantische Fehler gefunden.")
+						.setPositiveButton("OK", null).create().show();
 			} else {
 				for (ValidationEntry entry : result.invalidateEntries) {
 					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
@@ -276,7 +277,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		case R.id.menuEntryProcessRevertNew:
 			// restore old process if possible. if not just load 1fst one in
 			// room.
-			selectedProcess = roomService.getRoomConfiguration(selectedServer).processes.get(getPositionOfSelectedProcess());
+			selectedProcess = roomService.getRoomConfiguration(selectedServer).processManager.processes.get(selectedProcess.id);
 			// maybe this could be done in onRoomConfigurationChange (at the
 			// moment the method does exactly this. but maybe this changes in
 			// future - so this commend is a reminder for me
@@ -294,13 +295,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			if (saveProcess == false) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Prozess überschreiben").setMessage("Soll der bestehende Prozess überschrieben werden?")
-				.setPositiveButton("OK", new OnClickListener() {
+						.setPositiveButton("OK", new OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						saveSelectedProcess();
-					}
-				}).setNegativeButton("Abbrechen", null).create().show();
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								saveSelectedProcess();
+							}
+						}).setNegativeButton("Abbrechen", null).create().show();
 			} else {
 				saveSelectedProcess();
 			}
@@ -310,25 +311,27 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		case R.id.menuEntryProcessRemove:
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle("Prozess löschen").setMessage("Soll der Prozess gelöscht werden?")
-			.setPositiveButton("OK", new OnClickListener() {
+					.setPositiveButton("OK", new OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					try {
-						RestClient.deleteProcessFromRoom(selectedServer, selectedProcess.id);
-						selectedProcess = null;
-					} catch (Exception e) {
-						Log.e(LOG, "error deleting process", e);
-					}
-				}
-			}).setNegativeButton("Abbrechen", null).create().show();
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							try {
+								RestClient.deleteProcessFromRoom(selectedServer, selectedProcess.id);
+								selectedProcess = null;
+							} catch (Exception e) {
+								Log.e(LOG, "error deleting process", e);
+							}
+						}
+					}).setNegativeButton("Abbrechen", null).create().show();
 			return true;
 
 		case R.id.menuEntryProcessSceneries:
-			SceneriesWrapper sceneries = new SceneriesWrapper();
-			sceneries.sceneries = roomService.getRoomConfiguration(selectedServer).getSceneryEventGeneratorConfiguration().sceneriesManager;
+			SceneriesWrapper sceneriesWrapper = new SceneriesWrapper();
+			List<Scenery> sceneries = new ArrayList<Scenery>(
+					roomService.getRoomConfiguration(selectedServer).sceneriesManager.sceneries.values());
+			sceneriesWrapper.sceneries = sceneries;
 
-			EditConfigHandlerFragment.editConfigBean(this, sceneries, selectedServer,
+			EditConfigHandlerFragment.editConfigBean(this, sceneriesWrapper, selectedServer,
 					roomService.getRoomConfiguration(selectedServer));
 
 			return true;
@@ -493,7 +496,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			if (result.resultIsValid() == false) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Fehler").setMessage("Es wurden Fehler gefunden. Der Prozess wurde nicht gespeichert.")
-				.setPositiveButton("OK", null).create().show();
+						.setPositiveButton("OK", null).create().show();
 				for (ValidationEntry entry : result.invalidateEntries) {
 					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
 				}
@@ -519,7 +522,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		}
 
 		processNames.clear();
-		for (ProcessConfiguration config : roomService.getRoomConfiguration(selectedServer).processes) {
+		for (ProcessConfiguration config : roomService.getRoomConfiguration(selectedServer).processManager.processes.values()) {
 			processNames.add(config.id);
 		}
 		if (roomAdapter != null) {
@@ -629,7 +632,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
 	 */
 	@Override
-	public void onRoomConfigurationChange(String serverName, RoomConfiguration roomConfiguration) {
+	public void onRoomConfigurationChange(String serverName, Room roomConfiguration) {
 		if (serverName.equals(selectedServer)) {
 			initRoomArrays(selectedServer);
 			if (editMode == false) {
@@ -637,13 +640,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 				spinnerProcess.setSelection(getPositionOfSelectedProcess());
 				// for the case that the spinner has not changed its position we
 				// will restore the process here
-				selectedProcess = roomConfiguration.processes.get(getPositionOfSelectedProcess());
+				selectedProcess = roomConfiguration.processManager.processes.get(selectedProcess.id);
 				getActivity().invalidateOptionsMenu();
 			} else {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Änderung auf dem Server")
-				.setMessage("Möglicherweise wurde der ursprüngliche Prozess im Hintergrund verändert.")
-				.setPositiveButton("OK", null).create().show();
+						.setMessage("Möglicherweise wurde der ursprüngliche Prozess im Hintergrund verändert.")
+						.setPositiveButton("OK", null).create().show();
 			}
 		}
 	}

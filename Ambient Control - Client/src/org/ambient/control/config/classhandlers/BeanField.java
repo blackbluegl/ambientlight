@@ -22,7 +22,7 @@ import org.ambient.control.R;
 import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
-import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.ws.Room;
 
 import android.view.ActionMode;
 import android.view.Menu;
@@ -51,7 +51,7 @@ public class BeanField {
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
 			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
-			final String selectedServer, final RoomConfiguration roomConfig) throws IllegalAccessException {
+			final String selectedServer, final Room roomConfig) throws IllegalAccessException {
 
 		WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
 		whereToStore.fieldName = field.getName();
