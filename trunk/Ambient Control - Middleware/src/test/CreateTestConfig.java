@@ -216,6 +216,7 @@ public class CreateTestConfig {
 	private void createLightObjectManager(RoomConfiguration rc) {
 
 		LightObjectManagerConfiguration config = new LightObjectManagerConfiguration();
+		rc.lightObjectManager = config;
 		config.height = 400;
 		config.width = 400;
 

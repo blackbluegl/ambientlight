@@ -3,6 +3,7 @@ package org.ambientlight.room.entities.lightobject;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class LightObjectManager implements SwitchablesHandler {
 
 	private RenderingEffectFactory effectFactory;
 
-	private Map<String, RenderObject> lightObjectRenderObjects;
+	private Map<String, RenderObject> lightObjectRenderObjects = new HashMap<String, RenderObject>();
 
 	private BufferedImage pixelMap;
 
