@@ -217,7 +217,6 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 	 */
 	@Override
 	public void togglePower(boolean powerState) throws IOException {
-		// TODO which zone is to use for global power switch?
 		final byte CHANNEL_POWER = 0x12;
 
 		final byte ALL_OFF = (byte) 0xa9;
@@ -243,11 +242,6 @@ public class LK35ColorHandlerImpl implements LK35ColorHandler {
 				os.write(this.getMessage(zone, CATEGORY_GLOBAL, zoneKey, 0x19));
 			}
 		}
-		// TODO this code does not match :-(
-		// 55 70 c6 4f 02 01 02 0a 19 a1 aa aa 00 00 00 (Zone 1 aus)
-		//
-		// 55 70 c6 4f 02 01 02 0a 1c a2 aa aa 00 00 00 (Zone 1 ein)
-
 	}
 
 
