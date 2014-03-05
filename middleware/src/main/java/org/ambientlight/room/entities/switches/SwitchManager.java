@@ -16,6 +16,7 @@
 package org.ambientlight.room.entities.switches;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.events.EventManager;
@@ -41,9 +42,10 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 
 
 	public SwitchManager(SwitchManagerConfiguration config, EventManager eventManager, CallBackManager callback,
-			FeatureFacade entityFacade) {
+			FeatureFacade entityFacade, Persistence persistence) {
 		super();
 		this.config = config;
+		this.persistence = persistence;
 		this.callback = callback;
 		this.eventManager = eventManager;
 

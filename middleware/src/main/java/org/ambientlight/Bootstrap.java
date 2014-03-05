@@ -15,11 +15,13 @@
 
 package org.ambientlight;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-
-import org.ambientlight.device.drivers.DeviceDriverFactory;
-import org.ambientlight.room.RoomFactory;
 
 
 /**
@@ -30,21 +32,28 @@ public class Bootstrap extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private RoomFactory roomFactory;
+	private List<String> roomNames = new ArrayList<String>();
 
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
 
-		roomFactory = new RoomFactory(new DeviceDriverFactory());
+		File configDir = new File(Persistence.DATA_DIRECTORY);
+		FilenameFilter filter = new FilenameFilter() {
 
-		AmbientControlMW.roomConfigFileName = "wohnzimmer";
-		AmbientControlMW.debug = true;
-		try {
-			AmbientControlMW.init();
-		} catch (Exception e) {
-			throw new ServletException(e);
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".xml");
+			}
+		};
+		String[] filenames = configDir.list(filter);
+		for (String currentFileName : filenames) {
+			try {
+				roomNames.add(AmbientControlMW.initRoom(currentFileName));
+			} catch (Exception e) {
+				throw new ServletException(e);
+			}
 		}
 	}
 
@@ -52,7 +61,8 @@ public class Bootstrap extends HttpServlet {
 	@Override
 	public void destroy() {
 		super.destroy();
-		AmbientControlMW.getRoomFactory().destroyRoom();
-		AmbientControlMW.room = null;
+		for (String currentRoom : roomNames) {
+			AmbientControlMW.destroyRoom(currentRoom);
+		}
 	}
 }

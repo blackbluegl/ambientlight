@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.requests.UpdateRoomMessage;
 import org.ambientlight.callback.responses.StatusMessage;
 
@@ -38,8 +39,9 @@ public class CallBackManager extends Manager {
 	List<String> clients = new ArrayList<String>();
 
 
-	public CallBackManager(String roomName) {
+	public CallBackManager(String roomName, Persistence persistence) {
 		this.roomName = roomName;
+		this.persistence = persistence;
 	}
 
 

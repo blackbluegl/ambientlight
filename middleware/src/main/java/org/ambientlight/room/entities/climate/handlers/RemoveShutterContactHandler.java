@@ -83,7 +83,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		// Wait until shutterContact comes alive and remove it
 		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.adress,
 				config.vCubeAdress);
-		MaxFactoryResetMessage resetDevice = MaxMessageCreator.getFactoryResetMessageForDevice(device.adress);
+		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.adress);
 		this.sequenceNumberForDeletedDevice = resetDevice.getSequenceNumber();
 		queueManager.putOutMessage(resetDevice, condition);
 

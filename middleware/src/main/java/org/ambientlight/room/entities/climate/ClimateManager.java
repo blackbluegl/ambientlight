@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
@@ -86,11 +87,12 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	public ClimateManager(CallBackManager callBackMananger, QeueManager queueManager, ClimateManagerConfiguration config,
-			FeatureFacade featureFacade) {
+			FeatureFacade featureFacade, Persistence persistence) {
 		super();
 		this.callBackMananger = callBackMananger;
 		this.queueManager = queueManager;
 		this.config = config;
+		this.persistence = persistence;
 
 		// set time to thermostates at 3:00 every day
 		Timer timer = new Timer();
@@ -260,7 +262,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		if (!message.isRequest() || config.devices.get(message.getFromAdress()) == null)
 			return;
 		System.out.println("ClimateManager - getTimeInfo: sending time to device: " + message.getFromAdress());
-		MaxTimeInformationMessage time = MaxMessageCreator.getTimeInfoForDevice(new Date(), message.getFromAdress());
+		MaxTimeInformationMessage time = new MaxMessageCreator(config).getTimeInfoForDevice(new Date(), message.getFromAdress());
 		queueManager.putOutMessage(time);
 
 	}
@@ -328,13 +330,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		else if (learnMode && message.isReconnecting() == false) {
 			switch (message.getDeviceType()) {
 			case HEATING_THERMOSTAT:
-				registerActionHandler(new AddThermostateHandler(message, callBackMananger));
+				registerActionHandler(new AddThermostateHandler(message, callBackMananger, queueManager, persistence, config));
 				break;
 			case HEATING_THERMOSTAT_PLUS:
-				registerActionHandler(new AddThermostateHandler(message, callBackMananger));
+				registerActionHandler(new AddThermostateHandler(message, callBackMananger, queueManager, persistence, config));
 				break;
 			case SHUTTER_CONTACT:
-				registerActionHandler(new AddShutterContactHandler(message, callBackMananger));
+				registerActionHandler(new AddShutterContactHandler(message, config, queueManager, callBackMananger, persistence));
 				break;
 			default:
 				System.out.println("ClimateManager handlePairPing(): The devicetype is not supported yet: "
@@ -415,12 +417,14 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		}
 
 		if (device instanceof Thermostat) {
-			RemoveThermostatHandler remove = new RemoveThermostatHandler((Thermostat) device, config.devices, callBackMananger);
+			RemoveThermostatHandler remove = new RemoveThermostatHandler((Thermostat) device, config.devices, callBackMananger,
+					queueManager, persistence, config);
 			this.actionHandlers.add(remove);
 		}
 
 		if (device instanceof ShutterContact) {
-			RemoveShutterContactHandler remove = new RemoveShutterContactHandler(this, (ShutterContact) device, callBackMananger);
+			RemoveShutterContactHandler remove = new RemoveShutterContactHandler(this, (ShutterContact) device, callBackMananger,
+					queueManager, persistence, config);
 			this.actionHandlers.add(remove);
 		}
 
@@ -442,10 +446,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
 				wakeup.setFromAdress(config.vCubeAdress);
 				wakeup.setToAdress(current.adress);
-				wakeup.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
+				wakeup.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
 				messages.add(wakeup);
 
-				messages.addAll(MaxMessageCreator.getWeekProfileForDevice(current.adress, profile));
+				messages.addAll(new MaxMessageCreator(config).getWeekProfileForDevice(current.adress, profile));
 			}
 		}
 
@@ -474,7 +478,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = MaxMessageCreator.getSetTempForDevice(current.adress);
+				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.adress);
 				messages.add(outMessage);
 			}
 		}
@@ -537,7 +541,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			MaxShutterContactStateMessage sendMessage = new MaxShutterContactStateMessage();
 			sendMessage.setFromAdress(this.config.proxyShutterContactAdress);
 			sendMessage.setFlags(0x6);
-			sendMessage.setSequenceNumber(MaxMessageCreator.getNewSequnceNumber());
+			sendMessage.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
 			sendMessage.setToAdress(current.adress);
 			sendMessage.setOpen(open);
 			queueManager.putOutMessage(sendMessage);
@@ -562,7 +566,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxTimeInformationMessage message = MaxMessageCreator.getTimeInfoForDevice(now, current.adress);
+				MaxTimeInformationMessage message = new MaxMessageCreator(config).getTimeInfoForDevice(now, current.adress);
 				messages.add(message);
 			}
 		}

@@ -86,29 +86,29 @@ public class AddThermostateHandler implements MessageActionHandler {
 		config.devices.put(device.adress, device);
 
 		// setup Time;
-		outMessages.add(MaxMessageCreator.getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
+		outMessages.add(new MaxMessageCreator(config).getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
 
 		// setup valve
-		outMessages.add(MaxMessageCreator.getConfigValveForDevice(pairMessage.getFromAdress()));
+		outMessages.add(new MaxMessageCreator(config).getConfigValveForDevice(pairMessage.getFromAdress()));
 
 		// set Temperatures
-		outMessages.add(MaxMessageCreator.getConfigureTemperatures(pairMessage.getFromAdress()));
+		outMessages.add(new MaxMessageCreator(config).getConfigureTemperatures(pairMessage.getFromAdress()));
 
 		// setup temperatur
-		outMessages.add(MaxMessageCreator.getSetTempForDevice(pairMessage.getFromAdress()));
+		outMessages.add(new MaxMessageCreator(config).getSetTempForDevice(pairMessage.getFromAdress()));
 
 		// set group
-		outMessages.add(MaxMessageCreator.getSetGroupIdForDevice(pairMessage.getFromAdress()));
+		outMessages.add(new MaxMessageCreator(config).getSetGroupIdForDevice(pairMessage.getFromAdress()));
 
 		// setup weekly Profile
-		List<Message> weekProfile = MaxMessageCreator.getWeekProfileForDevice(pairMessage.getFromAdress(),
+		List<Message> weekProfile = new MaxMessageCreator(config).getWeekProfileForDevice(pairMessage.getFromAdress(),
 				config.currentWeekProfile);
 		for (Message dayProfile : weekProfile) {
 			outMessages.add(dayProfile);
 		}
 
 		// link to proxyShutterContact
-		MaxAddLinkPartnerMessage linkToShutterContact = MaxMessageCreator.getLinkMessage(device.adress,
+		MaxAddLinkPartnerMessage linkToShutterContact = new MaxMessageCreator(config).getLinkMessage(device.adress,
 				config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 		outMessages.add(linkToShutterContact);
 
@@ -122,12 +122,12 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 			if (currentConfig instanceof Thermostat) {
 				// link current to new
-				MaxAddLinkPartnerMessage linkCurrentToNew = MaxMessageCreator.getLinkMessage(currentConfig.adress,
+				MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.adress,
 						pairMessage.getFromAdress(), pairMessage.getDeviceType());
 				outMessages.add(linkCurrentToNew);
 
 				// link new device to current
-				MaxAddLinkPartnerMessage linkNewToCurrent = MaxMessageCreator.getLinkMessage(pairMessage.getFromAdress(),
+				MaxAddLinkPartnerMessage linkNewToCurrent = new MaxMessageCreator(config).getLinkMessage(pairMessage.getFromAdress(),
 						currentConfig.adress, currentConfig.getDeviceType());
 				outMessages.add(linkNewToCurrent);
 			}
