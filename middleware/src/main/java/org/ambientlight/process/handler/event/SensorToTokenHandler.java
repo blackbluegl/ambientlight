@@ -27,7 +27,7 @@ import org.ambientlight.room.entities.features.sensor.Sensor;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class SensorToTokenHandler extends AbstractActionHandler {
 
@@ -40,10 +40,11 @@ public class SensorToTokenHandler extends AbstractActionHandler {
 	 */
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
-		Sensor sensor = Util.findSensor(this.getConfig().sensorId);
+		Util util = new Util(featureFacade);
+		Sensor sensor = util.findSensor(this.getConfig().sensorId);
 		TokenSensorValue value = new TokenSensorValue();
 		value.sensorId = sensor.getSensorId();
-		value.value = Util.getDataFromSensor(sensor);
+		value.value = util.getDataFromSensor(sensor);
 		token.valueType = DataTypeValidation.SENSOR;
 		token.data = value;
 	}

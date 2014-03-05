@@ -17,22 +17,29 @@ package org.ambientlight;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+
+import org.ambientlight.config.room.RoomConfiguration;
+import org.ambientlight.device.drivers.DeviceDriverFactory;
+import org.ambientlight.room.Room;
+import org.ambientlight.room.RoomFactory;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class Bootstrap extends HttpServlet {
+public class AmbientControl extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<String> roomNames = new ArrayList<String>();
+	static Map<String, Room> rooms = new HashMap<String, Room>();
+
+	RoomFactory roomFactory = new RoomFactory(new DeviceDriverFactory());
 
 
 	@Override
@@ -50,7 +57,14 @@ public class Bootstrap extends HttpServlet {
 		String[] filenames = configDir.list(filter);
 		for (String currentFileName : filenames) {
 			try {
-				roomNames.add(AmbientControlMW.initRoom(currentFileName));
+
+				Persistence persistence = new Persistence(currentFileName);
+
+				RoomConfiguration roomConfiguration = persistence.getRoomConfiguration();
+
+				Room room = roomFactory.initRoom(roomConfiguration, persistence);
+				rooms.put(roomConfiguration.roomName, room);
+
 			} catch (Exception e) {
 				throw new ServletException(e);
 			}
@@ -58,11 +72,17 @@ public class Bootstrap extends HttpServlet {
 	}
 
 
+	public static Room getRoom(String roomName) {
+		return rooms.get(roomName);
+	}
+
+
 	@Override
 	public void destroy() {
 		super.destroy();
-		for (String currentRoom : roomNames) {
-			AmbientControlMW.destroyRoom(currentRoom);
+
+		for (Room currentRoom : rooms.values()) {
+			roomFactory.destroyRoom(currentRoom);
 		}
 	}
 }

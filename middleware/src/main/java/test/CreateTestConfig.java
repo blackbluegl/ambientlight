@@ -67,8 +67,7 @@ public class CreateTestConfig {
 	public static void main(String[] args) throws IOException {
 		CreateTestConfig test = new CreateTestConfig();
 
-		Persistence p = new Persistence("default", test.getTestRoom());
-		p.saveRoomConfiguration();
+		Persistence.saveRoomConfiguration("default", test.getTestRoom());
 	}
 
 

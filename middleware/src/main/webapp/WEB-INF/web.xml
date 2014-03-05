@@ -5,7 +5,7 @@
 
 	<servlet>
 		<servlet-name>AmbientControl</servlet-name>
-		<servlet-class>org.ambientlight.Bootstrap</servlet-class>
+		<servlet-class>org.ambientlight.AmbientControl</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 

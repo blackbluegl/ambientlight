@@ -15,7 +15,6 @@
 
 package org.ambientlight.process.handler.event;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.events.BroadcastEvent;
 import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.process.SensorCategory;
@@ -44,8 +43,7 @@ public class SensorToEventHandler extends AbstractActionHandler {
 	public void performAction(Token token) throws ActionHandlerException {
 
 		BroadcastEvent event = getEventForTokenSensorValue((TokenSensorValue) token.data);
-
-		AmbientControlMW.getRoom().eventManager.onEvent(event);
+		eventManager.onEvent(event);
 
 	}
 
@@ -56,8 +54,10 @@ public class SensorToEventHandler extends AbstractActionHandler {
 	 */
 	private BroadcastEvent getEventForTokenSensorValue(TokenSensorValue data) {
 
-		Sensor sensor = Util.findSensor(data.sensorId);
-		if (Util.getSensorCategory(data.sensorId).equals(SensorCategory.SCENERY)) {
+		Util util = new Util(featureFacade);
+
+		Sensor sensor = util.findSensor(data.sensorId);
+		if (util.getSensorCategory(data.sensorId).equals(SensorCategory.SCENERY)) {
 			SceneryEntryEvent event = new SceneryEntryEvent(sensor.getSensorId(), data.value);
 			return event;
 		}

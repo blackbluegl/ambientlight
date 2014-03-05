@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.AmbientControl;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
@@ -20,23 +20,24 @@ import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 public class Features {
 
 	@GET
-	@Path("/switchables")
+	@Path("/{roomName}/switchables")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Set<SwitchableId> getSwitchables() {
-		return AmbientControlMW.getRoom().featureFacade.getSwitchableIds();
+	public Set<SwitchableId> getSwitchables(@PathParam("roomName") String roomName) {
+		return AmbientControl.getRoom(roomName).featureFacade.getSwitchableIds();
 	}
 
 
 	@PUT
-	@Path("/switchables/{type}/{id}/state")
+	@Path("/{roomName}/switchables/{type}/{id}/state")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object setPowerStateForItem(@PathParam("type") String type, @PathParam("id") String itemName, Boolean powerState) {
+	public Object setPowerStateForItem(@PathParam("roomName") String roomName, @PathParam("type") String type,
+			@PathParam("id") String itemName, Boolean powerState) {
 
 		try {
 			SwitchType typeEnume = SwitchType.valueOf(type);
 
-			AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState);
+			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState);
 			return Response.status(200).build();
 
 		} catch (Exception e) {
@@ -47,14 +48,15 @@ public class Features {
 
 
 	@GET
-	@Path("/switchables/{type}/{id}")
+	@Path("/{roomName}/switchables/{type}/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getSwitchable(@PathParam("type") String type, @PathParam("id") String itemName) {
+	public Object getSwitchable(@PathParam("roomName") String roomName, @PathParam("type") String type,
+			@PathParam("id") String itemName) {
 
 		try {
 			SwitchType typeEnume = SwitchType.valueOf(type);
-			return AmbientControlMW.getRoom().featureFacade.getSwitchable(typeEnume, itemName);
+			return AmbientControl.getRoom(roomName).featureFacade.getSwitchable(typeEnume, itemName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();

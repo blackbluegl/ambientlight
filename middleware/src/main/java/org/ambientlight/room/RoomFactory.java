@@ -71,9 +71,6 @@ public class RoomFactory {
 		Room room = new Room();
 		room.config = roomConfig;
 
-		// init EntitiesFacade
-		room.featureFacade = new FeatureFacade();
-
 		// init CallbackManager
 		room.callBackMananger = new CallBackManager(roomConfig.roomName, persistence);
 
@@ -103,8 +100,12 @@ public class RoomFactory {
 		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger,
 				room.featureFacade, persistence);
 
+		// init EntitiesFacade
+		room.featureFacade = new FeatureFacade(room.lightObjectManager);
+
 		// init processManager
-		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager, persistence);
+		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager, persistence, room.featureFacade,
+				room.callBackMananger);
 
 		System.out.println("RoomFactory initRoom(): finished");
 
@@ -119,14 +120,14 @@ public class RoomFactory {
 	 * @return
 	 */
 	private ProcessManager initProcessManager(ProcessManagerConfiguration config, EventManager eventManager,
-			Persistence persistence, CallBackManager callback) {
+			Persistence persistence, FeatureFacade featureFacade, CallBackManager callback) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initProcessManager(): no configuration - skipping!");
 			return null;
 		}
 
-		return new ProcessManager(config, eventManager, callback, persistence);
+		return new ProcessManager(config, eventManager, callback, featureFacade, persistence);
 	}
 
 

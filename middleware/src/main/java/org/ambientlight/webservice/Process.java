@@ -25,7 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.AmbientControl;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
 
@@ -39,12 +39,12 @@ import org.ambientlight.config.process.ProcessConfiguration;
 public class Process {
 
 	@POST
-	@Path("/validation")
+	@Path("/{roomName}/validation")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object validateProcess(ProcessConfiguration process) {
+	public Object validateProcess(@PathParam("roomName") String roomName, ProcessConfiguration process) {
 		try {
-			return AmbientControlMW.getRoom().processManager.validateProcess(process);
+			return AmbientControl.getRoom(roomName).processManager.validateProcess(process);
 
 		} catch (Exception e) {
 			return Response.status(500).build();
@@ -53,12 +53,12 @@ public class Process {
 
 
 	@POST
-	@Path("/")
+	@Path("/{roomName}/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object createOrUpdateProcess(EventProcessConfiguration process) {
+	public Object createOrUpdateProcess(@PathParam("roomName") String roomName, EventProcessConfiguration process) {
 		try {
-			return AmbientControlMW.getRoom().processManager.createOrUpdateProcess(process);
+			return AmbientControl.getRoom(roomName).processManager.createOrUpdateProcess(process);
 
 		} catch (Exception e) {
 			return Response.status(500).build();
@@ -67,12 +67,12 @@ public class Process {
 
 
 	@DELETE
-	@Path("/{id}")
+	@Path("/{roomName}/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object deleteProcess(@PathParam(value = "id") String id) {
+	public Object deleteProcess(@PathParam("roomName") String roomName, @PathParam(value = "id") String id) {
 		try {
-			AmbientControlMW.getRoom().processManager.deleteProcess(id);
+			AmbientControl.getRoom(roomName).processManager.deleteProcess(id);
 			return Response.status(200).build();
 		} catch (Exception e) {
 			return Response.status(500).build();
@@ -81,14 +81,14 @@ public class Process {
 
 
 	@GET
-	@Path("/start/{id}")
+	@Path("/{roomName}/start/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object startProcess(@PathParam(value = "id") String id) {
+	public Object startProcess(@PathParam("roomName") String roomName, @PathParam(value = "id") String id) {
 		System.out.println("ProcessWS: starting Process " + id);
 
 		try {
-			AmbientControlMW.getRoom().processManager.startProcess(id);
+			AmbientControl.getRoom(roomName).processManager.startProcess(id);
 			return Response.status(200).build();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -98,14 +98,14 @@ public class Process {
 
 
 	@GET
-	@Path("/stop/{id}")
+	@Path("/{roomName}/stop/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object stopProcess(@PathParam(value = "id") String id) {
+	public Object stopProcess(@PathParam("roomName") String roomName, @PathParam(value = "id") String id) {
 		System.out.println("ProcessWS: stopping Process " + id);
 
 		try {
-			AmbientControlMW.getRoom().processManager.stopProcess(id);
+			AmbientControl.getRoom(roomName).processManager.stopProcess(id);
 
 			return Response.status(200).build();
 		} catch (Exception e) {

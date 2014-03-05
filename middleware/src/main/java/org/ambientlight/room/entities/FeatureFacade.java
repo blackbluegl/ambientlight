@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
@@ -26,6 +27,7 @@ import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorId;
 import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorType;
+import org.ambientlight.room.entities.lightobject.LightObjectManager;
 
 
 /**
@@ -34,9 +36,18 @@ import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorTyp
  */
 public class FeatureFacade {
 
+	private LightObjectManager lightObjectManager;
+
 	Map<SwitchableId, SwitchablesHandler> switchableMap = new HashMap<SwitchableId, SwitchablesHandler>();
 	Map<TemperatureSensorId, TemperatureSensor> tempsensorsMap = new HashMap<TemperatureSensorId, TemperatureSensor>();
+
 	private ScenerySensor sceneryManager;
+
+
+	public FeatureFacade(LightObjectManager lightObjectManager) {
+		super();
+		this.lightObjectManager = lightObjectManager;
+	}
 
 
 	public void registerTemperatureSensor(TemperatureSensor sensor, TemperatureSensorType type) {
@@ -87,5 +98,10 @@ public class FeatureFacade {
 			return;
 
 		handler.setPowerState(id, type, powerState);
+	}
+
+
+	public void setRenderingConfiguration(RenderingProgramConfiguration config, String id) {
+		lightObjectManager.setRenderingConfiguration(config, id);
 	}
 }

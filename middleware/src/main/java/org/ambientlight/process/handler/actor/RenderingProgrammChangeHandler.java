@@ -1,6 +1,5 @@
 package org.ambientlight.process.handler.actor;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.process.Token;
@@ -13,8 +12,7 @@ public class RenderingProgrammChangeHandler extends AbstractActionHandler {
 	public void performAction(Token data) {
 		for (String currentId : getConfig().renderConfig.keySet()) {
 			RenderingProgramConfiguration config = getConfig().renderConfig.get(currentId);
-
-			AmbientControlMW.getRoom().lightObjectManager.setRenderingConfiguration(config, currentId);
+			featureFacade.setRenderingConfiguration(config, currentId);
 		}
 	}
 

@@ -48,12 +48,13 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 
 		String tokenValue = token.data.toString();
 
+		Util util = new Util(featureFacade);
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
 			if (dataproviderName.equals("tokenValue")) {
 				evaluator.putVariable("tokenValue", tokenValue);
 			} else {
-				Sensor sensor = Util.findSensor(dataproviderName);
-				evaluator.putVariable(dataproviderName, Util.getDataFromSensor(sensor));
+				Sensor sensor = util.findSensor(dataproviderName);
+				evaluator.putVariable(dataproviderName, util.getDataFromSensor(sensor));
 			}
 		}
 
