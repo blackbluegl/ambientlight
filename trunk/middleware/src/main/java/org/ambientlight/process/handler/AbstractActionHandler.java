@@ -8,6 +8,7 @@ import org.ambientlight.process.Token;
 
 public abstract class AbstractActionHandler {
 
+
 	public AbstractActionHandlerConfiguration config;
 	public List<Integer> nodeIds;
 

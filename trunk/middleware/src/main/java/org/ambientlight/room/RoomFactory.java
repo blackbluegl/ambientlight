@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.messages.DispatcherConfiguration;
@@ -60,52 +60,51 @@ public class RoomFactory {
 	}
 
 
-	public void destroyRoom() {
-		AmbientControlMW.getRoom().lightObjectManager.destroy();
+	public void destroyRoom(Room room) {
+		room.lightObjectManager.destroy();
 	}
 
 
-	public Room initRoom(RoomConfiguration roomConfig) {
+	public Room initRoom(RoomConfiguration roomConfig, Persistence persistence) {
 
 		// init room
 		Room room = new Room();
 		room.config = roomConfig;
-		AmbientControlMW.setRoom(room);
 
 		// init EntitiesFacade
 		room.featureFacade = new FeatureFacade();
 
 		// init CallbackManager
-		room.callBackMananger = new CallBackManager();
+		room.callBackMananger = new CallBackManager(roomConfig.roomName, persistence);
 
 		// init eventmanager
 		room.eventManager = new EventManager();
 
 		// init alarmManager
 		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger,
-				room.featureFacade);
+				room.featureFacade, persistence);
 
 		// init remoteSwitchManager
 		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger,
-				room.featureFacade);
+				room.featureFacade, persistence);
 
 		// init switchManager
 		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger,
-				room.featureFacade);
+				room.featureFacade, persistence);
 
 		// init lightObject rendering system
 		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger,
-				room.featureFacade, roomConfig.debug);
+				room.featureFacade, persistence, roomConfig.debug);
 
 		// init queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
 
 		// init climateManager
 		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger,
-				room.featureFacade);
+				room.featureFacade, persistence);
 
 		// init processManager
-		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager);
+		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager, persistence);
 
 		System.out.println("RoomFactory initRoom(): finished");
 
@@ -116,43 +115,47 @@ public class RoomFactory {
 	/**
 	 * @param processManager
 	 * @param eventManager
+	 * @param persistence
 	 * @return
 	 */
-	private ProcessManager initProcessManager(ProcessManagerConfiguration config, EventManager eventManager) {
+	private ProcessManager initProcessManager(ProcessManagerConfiguration config, EventManager eventManager,
+			Persistence persistence, CallBackManager callback) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initProcessManager(): no configuration - skipping!");
 			return null;
 		}
 
-		return new ProcessManager(config, eventManager);
+		return new ProcessManager(config, eventManager, callback, persistence);
 	}
 
 
 	/**
 	 * @param callBackMananger
 	 * @param eventManager
+	 * @param persistence
 	 * @param switchesManager
 	 * @return
 	 */
 	private SwitchManager initSwitchManager(SwitchManagerConfiguration config, EventManager eventManager,
-			CallBackManager callBackMananger, FeatureFacade entitiesFacade) {
+			CallBackManager callBackMananger, FeatureFacade entitiesFacade, Persistence persistence) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initSwitchManager(): no configuration - skipping!");
 			return null;
 		}
 
-		return new SwitchManager(config, eventManager, callBackMananger, entitiesFacade);
+		return new SwitchManager(config, eventManager, callBackMananger, entitiesFacade, persistence);
 	}
 
 
 	/**
+	 * @param persistence
 	 * @param remoteSwitchesManager
 	 * @return
 	 */
 	private RemoteSwitchManager initRemoteSwitchManager(RemoteSwitchManagerConfiguration config, CallBackManager callBackManager,
-			FeatureFacade entitiesFacade) {
+			FeatureFacade entitiesFacade, Persistence persistence) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initRemoteSwitchManager(): no configuration - skipping!");
@@ -161,7 +164,7 @@ public class RoomFactory {
 
 		RemoteSwtichDeviceDriver device = deviceFactory.createRemoteSwitchDevice(config.device);
 
-		return new RemoteSwitchManager(config, device, callBackManager, entitiesFacade);
+		return new RemoteSwitchManager(config, device, callBackManager, entitiesFacade, persistence);
 	}
 
 
@@ -170,14 +173,14 @@ public class RoomFactory {
 	 * @param room
 	 */
 	private AlarmManager initAlarmManager(AlarmManagerConfiguration config, EventManager eventManager,
-			CallBackManager callBackManager, FeatureFacade entitiesFacade) {
+			CallBackManager callBackManager, FeatureFacade entitiesFacade, Persistence persistence) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initAlarmManager(): no configuration - skipping!");
 			return null;
 		}
 
-		AlarmManager alarmManager = new AlarmManager(config, eventManager, callBackManager, entitiesFacade);
+		AlarmManager alarmManager = new AlarmManager(config, eventManager, callBackManager, entitiesFacade, persistence);
 
 		return alarmManager;
 	}
@@ -213,12 +216,13 @@ public class RoomFactory {
 
 	/**
 	 * @param config
+	 * @param persistence
 	 * @param room
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
 	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager,
-			FeatureFacade entitiesFacade, boolean debug) {
+			FeatureFacade entitiesFacade, Persistence persistence, boolean debug) {
 
 		if (config == null || config.lightObjects.isEmpty()) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
@@ -237,14 +241,14 @@ public class RoomFactory {
 		Renderer renderer = new Renderer(pixelMap, getAllStripePartsInRoom(ledDevices), getAllLedPointsInRoom(ledDevices));
 
 		LightObjectManager manager = new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer,
-				callBackManager, entitiesFacade, FREQUENCY, debug);
+				callBackManager, entitiesFacade, persistence, FREQUENCY, debug);
 
 		return manager;
 	}
 
 
 	public ClimateManager initClimateManager(ClimateManagerConfiguration config, QeueManager queueManager,
-			CallBackManager callBackManager, FeatureFacade featurefacade) {
+			CallBackManager callBackManager, FeatureFacade featurefacade, Persistence persistence) {
 
 		if (config == null) {
 			System.out.println("RoomFactory initClimateManager(): no configuration - skipping!");
@@ -270,7 +274,7 @@ public class RoomFactory {
 			config.weekProfiles.remove(currentWeekProfileToRemove);
 		}
 
-		ClimateManager climateManager = new ClimateManager(callBackManager, queueManager, config, featurefacade);
+		ClimateManager climateManager = new ClimateManager(callBackManager, queueManager, config, featurefacade, persistence);
 
 		queueManager.registerMessageListener(DispatcherType.MAX, climateManager);
 

@@ -91,7 +91,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 			}
 
 			// link current device to the proxy adress of the shutter
-			MaxAddLinkPartnerMessage linkCurrentToNew = MaxMessageCreator.getLinkMessage(currentConfig.adress,
+			MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.adress,
 					config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 			outMessages.add(linkCurrentToNew);
 		}

@@ -18,6 +18,7 @@ package org.ambientlight.room.entities.remoteswitches;
 import java.io.IOException;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
@@ -42,9 +43,10 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 
 
 	public RemoteSwitchManager(RemoteSwitchManagerConfiguration config, RemoteSwtichDeviceDriver device,
-			CallBackManager callbackManager, FeatureFacade entitiesFacade) {
+			CallBackManager callbackManager, FeatureFacade entitiesFacade, Persistence persistence) {
 		this.config = config;
 		this.device = device;
+		this.persistence = persistence;
 		this.callbackManager = callbackManager;
 		for (RemoteSwitch current : config.remoteSwitches.values()) {
 			entitiesFacade.registerSwitchable(this, current, SwitchType.ELRO);

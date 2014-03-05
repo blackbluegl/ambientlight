@@ -18,8 +18,9 @@ package org.ambientlight.process;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
@@ -56,12 +57,17 @@ public class ProcessManager extends Manager {
 
 	private EventManager eventManager;
 
+	private CallBackManager callback;
+
 	private Map<String, Process> processes = new HashMap<String, Process>();
 
 
-	public ProcessManager(ProcessManagerConfiguration config, EventManager eventManager) {
+	public ProcessManager(ProcessManagerConfiguration config, EventManager eventManager, CallBackManager callback,
+			Persistence persistence) {
 		this.config = config;
 		this.eventManager = eventManager;
+		this.persistence = persistence;
+		this.callback = callback;
 
 		Map<String, Process> processes = new HashMap<String, Process>();
 		for (EventProcessConfiguration processConfig : config.processes.values()) {
@@ -106,7 +112,7 @@ public class ProcessManager extends Manager {
 
 		persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callback.roomConfigurationChanged();
 
 		System.out.println("ProcessFactory: started process successfully: " + processConfig.id);
 	}
@@ -134,7 +140,7 @@ public class ProcessManager extends Manager {
 
 		persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callback.roomConfigurationChanged();
 
 		System.out.println("ProcessFactory: stopped process successfully: " + processConfig.id);
 	}
@@ -242,7 +248,7 @@ public class ProcessManager extends Manager {
 
 		persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callback.roomConfigurationChanged();
 
 		return result;
 	}
@@ -260,6 +266,6 @@ public class ProcessManager extends Manager {
 
 		persistence.commitTransaction();
 
-		AmbientControlMW.getRoom().callBackMananger.roomConfigurationChanged();
+		callback.roomConfigurationChanged();
 	}
 }

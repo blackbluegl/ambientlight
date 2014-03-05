@@ -55,13 +55,13 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 				continue;
 			}
 
-			MaxRemoveLinkPartnerMessage unlink = MaxMessageCreator.getUnlinkMessageForDevice(currentDevice.adress, device.adress,
-					device.getDeviceType());
+			MaxRemoveLinkPartnerMessage unlink = new MaxMessageCreator(config).getUnlinkMessageForDevice(currentDevice.adress,
+					device.adress, device.getDeviceType());
 			queueManager.putOutMessage(unlink);
 		}
 
 		// send remove
-		MaxFactoryResetMessage resetDevice = MaxMessageCreator.getFactoryResetMessageForDevice(device.adress);
+		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.adress);
 		queueManager.putOutMessage(resetDevice);
 
 		// remove correlator - rfm bridge does route its messages to all clients

@@ -22,19 +22,24 @@ import com.thoughtworks.xstream.XStream;
 
 public class Persistence {
 
-	public Persistence(String fileName, RoomConfiguration config) {
+	public Persistence(String fileName) throws FileNotFoundException {
 		this.fileName = fileName;
-		this.roomConfig = config;
+		this.roomConfig = loadRoomConfig();
 	}
 
 	private String fileName;
 
 	private RoomConfiguration roomConfig;
 
-	private final String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight" + File.separator
-			+ "sceneries";
+	public static final String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight"
+			+ File.separator + "sceneries";
 
 	ReentrantLock saveLock = new ReentrantLock();
+
+
+	public RoomConfiguration getRoomConfiguration() {
+		return roomConfig;
+	}
 
 
 	public void beginTransaction() {
@@ -59,9 +64,9 @@ public class Persistence {
 	}
 
 
-	public RoomConfiguration getRoomConfigByName(String configuration) throws FileNotFoundException {
+	private RoomConfiguration loadRoomConfig() throws FileNotFoundException {
 		XStream xstream = getXStream();
-		FileInputStream input = new FileInputStream(DATA_DIRECTORY + File.separator + configuration + ".xml");
+		FileInputStream input = new FileInputStream(DATA_DIRECTORY + File.separator + fileName + ".xml");
 		RoomConfiguration result = (RoomConfiguration) xstream.fromXML(input);
 
 		return result;

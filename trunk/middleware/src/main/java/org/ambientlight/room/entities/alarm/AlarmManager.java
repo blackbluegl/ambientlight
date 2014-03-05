@@ -23,6 +23,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
 import org.ambientlight.events.DailyAlarmEvent;
@@ -52,11 +53,12 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 
 
 	public AlarmManager(AlarmManagerConfiguration config, EventManager eventManager, CallBackManager callBackMananger,
-			FeatureFacade entitiesFacade) {
+			FeatureFacade entitiesFacade, Persistence persistence) {
 		super();
 		this.config = config;
 		this.eventManager = eventManager;
 		this.callBackManager = callBackMananger;
+		this.persistence = persistence;
 
 		for (Entry<String, DailyAlarm> current : config.alarms.entrySet()) {
 			createAlarmEvent(current.getKey(), current.getValue());

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Timer;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
@@ -60,20 +61,15 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 	public LightObjectManager(BufferedImage pixelMap, LightObjectManagerConfiguration config,
 			RenderingEffectFactory effectFactory, List<AnimateableLedDevice> devices, Renderer renderer,
-			CallBackManager callBackMananger, FeatureFacade entitiesFacade, int frequency, boolean debug) {
+			CallBackManager callBackMananger, FeatureFacade entitiesFacade, Persistence persistence, int frequency, boolean debug) {
 
+		this.persistence = persistence;
 		this.FREQUENCY = frequency;
-
 		this.callBackMananger = callBackMananger;
-
 		this.renderer = renderer;
-
 		this.pixelMap = pixelMap;
-
 		this.effectFactory = effectFactory;
-
 		this.devices = devices;
-
 		this.config = config;
 
 		for (LightObject currentItemConfiguration : config.lightObjects.values()) {
