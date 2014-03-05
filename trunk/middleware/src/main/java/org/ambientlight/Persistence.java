@@ -49,7 +49,7 @@ public class Persistence {
 
 	public void commitTransaction() {
 		try {
-			saveRoomConfiguration();
+			saveRoomConfiguration(this.fileName, this.roomConfig);
 		} catch (IOException e) {
 			System.out.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk!");
 			System.exit(1);
@@ -73,10 +73,12 @@ public class Persistence {
 	}
 
 
-	public void saveRoomConfiguration() throws IOException {
+
+
+	public static void saveRoomConfiguration(String fileName, RoomConfiguration config) throws IOException {
 		XStream xstream = getXStream();
 
-		String result = xstream.toXML(this.roomConfig);
+		String result = xstream.toXML(config);
 
 		File dir = new File(DATA_DIRECTORY);
 		if (dir.exists() == false) {

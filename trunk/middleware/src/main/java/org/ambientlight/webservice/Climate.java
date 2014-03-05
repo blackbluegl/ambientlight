@@ -24,7 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.AmbientControl;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.ws.climate.TemperaturMode;
 
@@ -37,11 +37,11 @@ import org.ambientlight.ws.climate.TemperaturMode;
 public class Climate {
 
 	@POST
-	@Path("/mode")
+	@Path("/{roomName}/mode")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setMode(TemperaturMode mode) {
-		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+	public Response setMode(@PathParam("roomName") String roomName, TemperaturMode mode) {
+		ClimateManager manager = (AmbientControl.getRoom(roomName).climateManager);
 
 		manager.setMode(mode.temp, mode.mode, mode.until);
 
@@ -50,11 +50,11 @@ public class Climate {
 
 
 	@GET
-	@Path("/pairing")
+	@Path("/{roomName}/pairing")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response startPairing() {
-		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+	public Response startPairing(@PathParam("roomName") String roomName) {
+		ClimateManager manager = (AmbientControl.getRoom(roomName).climateManager);
 
 		manager.setPairingMode();
 
@@ -63,11 +63,11 @@ public class Climate {
 
 
 	@GET
-	@Path("/unregister/{id}")
+	@Path("/{roomName}/unregister/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response unregister(@PathParam("id") int adress) {
-		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+	public Response unregister(@PathParam("roomName") String roomName, @PathParam("id") int adress) {
+		ClimateManager manager = AmbientControl.getRoom(roomName).climateManager;
 
 		try {
 			manager.setFactoryResetDevice(adress);
@@ -81,11 +81,11 @@ public class Climate {
 
 
 	@GET
-	@Path("/currentWeekProfile/{currentProfile}")
+	@Path("/{roomName}/currentWeekProfile/{currentProfile}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setCurrentWeekProfile(@PathParam("currentProfile") String profile) {
-		ClimateManager manager = (AmbientControlMW.getRoom().climateManager);
+	public Response setCurrentWeekProfile(@PathParam("roomName") String roomName, @PathParam("currentProfile") String profile) {
+		ClimateManager manager = AmbientControl.getRoom(roomName).climateManager;
 
 		try {
 			manager.setCurrentProfile(profile);

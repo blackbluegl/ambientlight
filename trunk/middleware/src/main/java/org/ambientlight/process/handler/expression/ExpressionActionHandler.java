@@ -48,10 +48,10 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 		Evaluator evaluator = new Evaluator();
 
 		evaluator.putVariable("tokenValue", token.data.toString());
-
+		Util util = new Util(featureFacade);
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
-			Sensor sensor = Util.findSensor(dataproviderName);
-			evaluator.putVariable(dataproviderName, Util.getDataFromSensor(sensor));
+			Sensor sensor = util.findSensor(dataproviderName);
+			evaluator.putVariable(dataproviderName, util.getDataFromSensor(sensor));
 		}
 		try {
 			String resultString = evaluator.evaluate(this.getConfig().expressionConfiguration.expression);

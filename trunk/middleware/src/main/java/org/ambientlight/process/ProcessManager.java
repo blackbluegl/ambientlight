@@ -43,6 +43,7 @@ import org.ambientlight.process.handler.event.FireEventHandler;
 import org.ambientlight.process.handler.event.SensorToTokenHandler;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionActionHandler;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
@@ -52,6 +53,8 @@ import org.ambientlight.ws.process.validation.ValidationResult;
  * 
  */
 public class ProcessManager extends Manager {
+
+	private FeatureFacade featureFacade;
 
 	private ProcessManagerConfiguration config;
 
@@ -63,11 +66,12 @@ public class ProcessManager extends Manager {
 
 
 	public ProcessManager(ProcessManagerConfiguration config, EventManager eventManager, CallBackManager callback,
-			Persistence persistence) {
+			FeatureFacade featureFacade, Persistence persistence) {
 		this.config = config;
 		this.eventManager = eventManager;
 		this.persistence = persistence;
 		this.callback = callback;
+		this.featureFacade = featureFacade;
 
 		Map<String, Process> processes = new HashMap<String, Process>();
 		for (EventProcessConfiguration processConfig : config.processes.values()) {
@@ -188,6 +192,8 @@ public class ProcessManager extends Manager {
 		}
 		System.out.println("ProcessFactory: actionhandler for node id: " + i + " is a: " + handler.getClass().getSimpleName());
 		handler.config = nodeConfig.actionHandler;
+		handler.featureFacade = this.featureFacade;
+		handler.eventManager = this.eventManager;
 		handler.nodeIds = nodeConfig.nextNodeIds;
 		node.handler = handler;
 

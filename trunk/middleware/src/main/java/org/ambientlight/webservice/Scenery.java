@@ -24,7 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.AmbientControl;
 
 
 /**
@@ -36,12 +36,12 @@ import org.ambientlight.AmbientControlMW;
 public class Scenery {
 
 	@POST
-	@Path("/new")
+	@Path("/{roomName}/new")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object createScenery(String scenery) {
+	public Object createScenery(@PathParam("roomName") String roomName, String scenery) {
 		try {
-			AmbientControlMW.getRoom().sceneryManager.createScenery(scenery);
+			AmbientControl.getRoom(roomName).sceneryManager.createScenery(scenery);
 			return Response.status(200).build();
 		} catch (Exception e) {
 			return Response.status(500).build();
@@ -50,12 +50,12 @@ public class Scenery {
 
 
 	@POST
-	@Path("/current")
+	@Path("/{roomName}/current")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object setCurrentScenery(String scenery) {
+	public Object setCurrentScenery(@PathParam("roomName") String roomName, String scenery) {
 		try {
-			AmbientControlMW.getRoom().sceneryManager.setCurrentScenery(scenery);
+			AmbientControl.getRoom(roomName).sceneryManager.setCurrentScenery(scenery);
 			return Response.status(200).build();
 		} catch (Exception e) {
 			return Response.status(500).build();
@@ -64,12 +64,12 @@ public class Scenery {
 
 
 	@DELETE
-	@Path("/{id}")
+	@Path("/{roomName}/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object deleteScenery(@PathParam(value = "id") String id) {
+	public Object deleteScenery(@PathParam("roomName") String roomName, @PathParam(value = "id") String id) {
 		try {
-			AmbientControlMW.getRoom().sceneryManager.deleteScenery(id);
+			AmbientControl.getRoom(roomName).sceneryManager.deleteScenery(id);
 			return Response.status(200).build();
 		} catch (Exception e) {
 			return Response.status(500).build();

@@ -1,6 +1,5 @@
 package org.ambientlight.process.handler.actor;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
 import org.ambientlight.process.Token;
@@ -17,16 +16,15 @@ public class PowerStateHandler extends AbstractActionHandler {
 		if (this.config instanceof SimplePowerStateHandlerConfiguration) {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
 
-			for (SwitchableId switchableIds : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
-				AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(switchableIds.type, switchableIds.id,
-						powerState);
+			for (SwitchableId switchableIds : featureFacade.getSwitchableIds()) {
+				featureFacade.setSwitcheablePowerState(switchableIds.type, switchableIds.id, powerState);
 			}
 			return;
 		}
 
 		for (SwitchableId currentId : getConfig().powerStateConfiguration.keySet()) {
 			boolean powerState = getConfig().powerStateConfiguration.get(currentId);
-			AmbientControlMW.getRoom().featureFacade.setSwitcheablePowerState(currentId.type, currentId.id, powerState);
+			featureFacade.setSwitcheablePowerState(currentId.type, currentId.id, powerState);
 		}
 	}
 

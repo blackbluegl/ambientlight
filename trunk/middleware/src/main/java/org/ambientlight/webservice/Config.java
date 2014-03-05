@@ -2,12 +2,12 @@ package org.ambientlight.webservice;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.ambientlight.AmbientControlMW;
+import org.ambientlight.AmbientControl;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.ws.Room;
 
@@ -23,32 +23,24 @@ public class Config {
 
 
 	@GET
-	@Path("/test")
+	@Path("/{roomName}/room")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SwitchableId getTest() {
-		return new SwitchableId("test", SwitchType.ALARM);
-	}
-
-
-	@GET
-	@Path("/room")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Room getRoomConfiguration() {
+	public Room getRoomConfiguration(@PathParam("roomName") String roomName) {
 
 		Room room = new Room();
 
-		room.roomName = AmbientControlMW.getRoom().config.roomName;
+		room.roomName = AmbientControl.getRoom(roomName).config.roomName;
 
-		room.alarmManager = AmbientControlMW.getRoom().config.alarmManager;
-		room.climateManager = AmbientControlMW.getRoom().config.climateManager;
-		room.processManager = AmbientControlMW.getRoom().config.processManager;
-		room.remoteSwitchesManager = AmbientControlMW.getRoom().config.remoteSwitchesManager;
-		room.sceneriesManager = AmbientControlMW.getRoom().config.sceneriesManager;
-		room.switchesManager = AmbientControlMW.getRoom().config.switchesManager;
-		room.lightObjectManager = AmbientControlMW.getRoom().config.lightObjectManager;
+		room.alarmManager = AmbientControl.getRoom(roomName).config.alarmManager;
+		room.climateManager = AmbientControl.getRoom(roomName).config.climateManager;
+		room.processManager = AmbientControl.getRoom(roomName).config.processManager;
+		room.remoteSwitchesManager = AmbientControl.getRoom(roomName).config.remoteSwitchesManager;
+		room.sceneriesManager = AmbientControl.getRoom(roomName).config.sceneriesManager;
+		room.switchesManager = AmbientControl.getRoom(roomName).config.switchesManager;
+		room.lightObjectManager = AmbientControl.getRoom(roomName).config.lightObjectManager;
 
-		for (SwitchableId currentId : AmbientControlMW.getRoom().featureFacade.getSwitchableIds()) {
-			Switchable currentSwitch = AmbientControlMW.getRoom().featureFacade.getSwitchable(currentId.type, currentId.id);
+		for (SwitchableId currentId : AmbientControl.getRoom(roomName).featureFacade.getSwitchableIds()) {
+			Switchable currentSwitch = AmbientControl.getRoom(roomName).featureFacade.getSwitchable(currentId.type, currentId.id);
 			room.switchables.add(currentSwitch);
 		}
 

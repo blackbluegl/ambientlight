@@ -17,8 +17,8 @@ package org.ambientlight.process.handler;
 
 import java.text.DecimalFormat;
 
-import org.ambientlight.AmbientControlMW;
 import org.ambientlight.process.SensorCategory;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
@@ -32,25 +32,34 @@ import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorTyp
  */
 public class Util {
 
-	public static SensorCategory getSensorCategory(String sensorId) {
+	private FeatureFacade featureFacade;
+
+
+	public Util(FeatureFacade featureFacade) {
+		super();
+		this.featureFacade = featureFacade;
+	}
+
+
+	public SensorCategory getSensorCategory(String sensorId) {
 		String[] strinkTokens = sensorId.split(":");
 		return SensorCategory.valueOf(strinkTokens[0]);
 	}
 
 
-	public static Sensor findSensor(String sensorId) {
+	public Sensor findSensor(String sensorId) {
 		String[] strinkTokens = sensorId.split(":");
 		SensorCategory category = SensorCategory.valueOf(strinkTokens[0]);
 
 		switch (category) {
 		case SCENERY:
-			return AmbientControlMW.getRoom().featureFacade.getScenerySensor();
+			return featureFacade.getScenerySensor();
 		case TEMPERATURE:
 			TemperatureSensorType sensorType = TemperatureSensorType.valueOf(strinkTokens[1]);
 			TemperatureSensorId id = new TemperatureSensorId();
 			id.type = sensorType;
 			id.id = strinkTokens[2];
-			return AmbientControlMW.getRoom().featureFacade.getTemperatureSensors().get(id);
+			return featureFacade.getTemperatureSensors().get(id);
 		default:
 			break;
 		}
@@ -58,7 +67,7 @@ public class Util {
 	}
 
 
-	public static String getDataFromSensor(Sensor sensor) {
+	public String getDataFromSensor(Sensor sensor) {
 		if (sensor instanceof TemperatureSensor)
 			return new DecimalFormat("#.##").format(((TemperatureSensor) sensor).getTemperature());
 		else if (sensor instanceof ScenerySensor)
