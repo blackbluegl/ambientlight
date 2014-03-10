@@ -15,16 +15,12 @@
 
 package org.ambientlight.room.entities.features.actor.types;
 
-import org.ambientlight.ws.SwitchableIdSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-@JsonSerialize(using = SwitchableIdSerializer.class)
 public class SwitchableId {
 
 	public String id;

@@ -10,6 +10,9 @@ import org.ambientlight.AmbientControl;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.ws.Room;
+import org.ambientlight.ws.SwitchableIdSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 @Path("/config")
@@ -25,6 +28,7 @@ public class Config {
 	@GET
 	@Path("/{roomName}/room")
 	@Produces(MediaType.APPLICATION_JSON)
+	@JsonSerialize(keyUsing = SwitchableIdSerializer.class)
 	public Room getRoomConfiguration(@PathParam("roomName") String roomName) {
 
 		Room room = new Room();

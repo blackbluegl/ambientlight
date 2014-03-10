@@ -67,9 +67,16 @@ public class RoomFactory {
 
 	public Room initRoom(RoomConfiguration roomConfig, Persistence persistence) {
 
+		if (roomConfig.debug == null) {
+			roomConfig.debug = false;
+		}
+
 		// init room
 		Room room = new Room();
 		room.config = roomConfig;
+
+		// init EntitiesFacade
+		room.featureFacade = new FeatureFacade();
 
 		// init CallbackManager
 		room.callBackMananger = new CallBackManager(roomConfig.roomName, persistence);
@@ -79,14 +86,6 @@ public class RoomFactory {
 
 		// init alarmManager
 		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger,
-				room.featureFacade, persistence);
-
-		// init remoteSwitchManager
-		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger,
-				room.featureFacade, persistence);
-
-		// init switchManager
-		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger,
 				room.featureFacade, persistence);
 
 		// init lightObject rendering system
@@ -100,8 +99,13 @@ public class RoomFactory {
 		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger,
 				room.featureFacade, persistence);
 
-		// init EntitiesFacade
-		room.featureFacade = new FeatureFacade(room.lightObjectManager);
+		// init remoteSwitchManager
+		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger,
+				room.featureFacade, persistence);
+
+		// init switchManager
+		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger,
+				room.featureFacade, persistence);
 
 		// init processManager
 		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager, persistence, room.featureFacade,
@@ -223,7 +227,7 @@ public class RoomFactory {
 	 * @throws IOException
 	 */
 	private LightObjectManager initLightObjectManager(LightObjectManagerConfiguration config, CallBackManager callBackManager,
-			FeatureFacade entitiesFacade, Persistence persistence, boolean debug) {
+			FeatureFacade entitiesFacade, Persistence persistence, Boolean debug) {
 
 		if (config == null || config.lightObjects.isEmpty()) {
 			System.out.println("RoomFactory initLightObjectManager(): no configuration - skipping!");
@@ -243,6 +247,8 @@ public class RoomFactory {
 
 		LightObjectManager manager = new LightObjectManager(pixelMap, config, effectFactory, ledDevices, renderer,
 				callBackManager, entitiesFacade, persistence, FREQUENCY, debug);
+
+		entitiesFacade.registerLightObjectManager(manager);
 
 		return manager;
 	}

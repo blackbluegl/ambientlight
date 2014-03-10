@@ -44,11 +44,9 @@ public class FeatureFacade {
 	private ScenerySensor sceneryManager;
 
 
-	public FeatureFacade(LightObjectManager lightObjectManager) {
-		super();
-		this.lightObjectManager = lightObjectManager;
+	public void registerLightObjectManager(LightObjectManager manager) {
+		lightObjectManager = manager;
 	}
-
 
 	public void registerTemperatureSensor(TemperatureSensor sensor, TemperatureSensorType type) {
 		TemperatureSensorId id = new TemperatureSensorId();
