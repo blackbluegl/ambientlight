@@ -22,14 +22,15 @@ import com.thoughtworks.xstream.XStream;
 
 public class Persistence {
 
+	private String fileName;
+
+	private RoomConfiguration roomConfig;
+
+
 	public Persistence(String fileName) throws FileNotFoundException {
 		this.fileName = fileName;
 		this.roomConfig = loadRoomConfig();
 	}
-
-	private String fileName;
-
-	private RoomConfiguration roomConfig;
 
 	public static final String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight"
 			+ File.separator + "sceneries";
@@ -66,13 +67,11 @@ public class Persistence {
 
 	private RoomConfiguration loadRoomConfig() throws FileNotFoundException {
 		XStream xstream = getXStream();
-		FileInputStream input = new FileInputStream(DATA_DIRECTORY + File.separator + fileName + ".xml");
+		FileInputStream input = new FileInputStream(DATA_DIRECTORY + File.separator + fileName);
 		RoomConfiguration result = (RoomConfiguration) xstream.fromXML(input);
 
 		return result;
 	}
-
-
 
 
 	public static void saveRoomConfiguration(String fileName, RoomConfiguration config) throws IOException {

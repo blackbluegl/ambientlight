@@ -15,9 +15,12 @@
 
 package org.ambientlight;
 
+import javax.ws.rs.ext.ContextResolver;
+
+import org.ambientlight.ws.SwitchableIdModule;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -28,6 +31,15 @@ public class RestConfig extends ResourceConfig {
 
 	public RestConfig() {
 		packages("org.ambientlight.webservice");
-		register(JacksonFeatures.class);
+
+		register(new ContextResolver<ObjectMapper>() {
+
+			@Override
+			public ObjectMapper getContext(Class<?> type) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.registerModule(new SwitchableIdModule());
+				return objectMapper;
+			}
+		});
 	}
 }
