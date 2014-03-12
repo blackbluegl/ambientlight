@@ -20,22 +20,27 @@ import java.io.IOException;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class SwitchableIdDeserializer extends JsonDeserializer<SwitchableId> {
+public class SwitchableIdDeserializer extends KeyDeserializer {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.fasterxml.jackson.databind.KeyDeserializer#deserializeKey(java.lang
+	 * .String, com.fasterxml.jackson.databind.DeserializationContext)
+	 */
 	@Override
-	public SwitchableId deserialize(JsonParser json, DeserializationContext context) throws IOException, JsonProcessingException {
-
-		String tokens[] = json.getText().split("\\|");
+	public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		String tokens[] = key.split("\\|");
 		String id = tokens[0];
 		SwitchType type = SwitchType.valueOf(tokens[1]);
 		SwitchableId result = new SwitchableId(id, type);
