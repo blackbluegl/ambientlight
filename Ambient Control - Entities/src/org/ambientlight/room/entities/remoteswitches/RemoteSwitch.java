@@ -3,6 +3,7 @@ package org.ambientlight.room.entities.remoteswitches;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
@@ -71,6 +72,7 @@ public class RemoteSwitch implements Switchable {
 	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
 	 */
 	@Override
+	@JsonIgnore
 	public SwitchType getType() {
 		return SwitchType.ELRO;
 	}

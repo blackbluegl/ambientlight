@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.Value;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 
 @AlternativeValues(values = {

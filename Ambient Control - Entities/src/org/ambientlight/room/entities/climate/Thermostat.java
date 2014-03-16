@@ -54,7 +54,6 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	 */
 	@Override
 	public float getTemperature() {
-		// TODO Auto-generated method stub
 		return this.temperature;
 	}
 

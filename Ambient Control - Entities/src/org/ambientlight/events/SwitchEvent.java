@@ -15,6 +15,11 @@ public class SwitchEvent extends BroadcastEvent {
 	public SwitchEventType type;
 
 
+	public SwitchEvent() {
+		super();
+	}
+
+
 	public SwitchEvent(String sourceId, boolean powerState, SwitchEventType type) {
 		super(sourceId);
 		this.powerState = powerState;
