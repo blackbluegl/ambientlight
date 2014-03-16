@@ -27,6 +27,8 @@ public class LightObject implements Switchable, Renderable {
 
 	private String id;
 
+	private final SwitchType type = SwitchType.LED;
+
 	private RenderingProgramConfiguration renderingProgrammConfiguration;
 
 
@@ -110,6 +112,6 @@ public class LightObject implements Switchable, Renderable {
 	 */
 	@Override
 	public SwitchType getType() {
-		return SwitchType.LED;
+		return type;
 	}
 }
