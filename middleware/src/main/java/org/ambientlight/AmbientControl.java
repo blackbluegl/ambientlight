@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -76,6 +77,10 @@ public class AmbientControl extends HttpServlet {
 		return rooms.get(roomName);
 	}
 
+
+	public static Set<String> getRoomNames() {
+		return rooms.keySet();
+	}
 
 	@Override
 	public void destroy() {
