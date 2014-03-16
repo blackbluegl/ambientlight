@@ -35,7 +35,6 @@ public abstract class Alarm implements Switchable {
 	 */
 	@Override
 	public boolean getPowerState() {
-		// TODO Auto-generated method stub
 		return active;
 	}
 

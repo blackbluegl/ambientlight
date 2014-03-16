@@ -2,8 +2,7 @@ package org.ambientlight.config.device.drivers;
 
 import java.io.Serializable;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("device")
