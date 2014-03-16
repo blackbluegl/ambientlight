@@ -1,5 +1,7 @@
 package org.ambientlight.webservice;
 
+import java.util.Set;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -10,15 +12,13 @@ import org.ambientlight.AmbientControl;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.ws.Room;
-import org.ambientlight.ws.SwitchableIdSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
-@Path("/config")
-public class Config {
+@Path("/rooms")
+public class Rooms {
 
 	@GET
+	@Path("/version")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getInfo() {
 		return "Version:0.16.0";
@@ -26,9 +26,16 @@ public class Config {
 
 
 	@GET
-	@Path("/{roomName}/room")
+	@Path("/names")
 	@Produces(MediaType.APPLICATION_JSON)
-	@JsonSerialize(keyUsing = SwitchableIdSerializer.class)
+	public Set<String> getRoomNames() {
+		return AmbientControl.getRoomNames();
+	}
+
+
+	@GET
+	@Path("config/{roomName}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Room getRoomConfiguration(@PathParam("roomName") String roomName) {
 
 		Room room = new Room();
