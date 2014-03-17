@@ -14,7 +14,7 @@ public class DeleteProcessTask extends AsyncTask<String, Void, Void> {
 	@Override
 	protected Void doInBackground(String... params) {
 
-		String url = URLUtils.getBaseUrl(params[0]) + URL + params[1];
+		String url = Rest.getBaseUrl(params[0]) + URL + params[1];
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);

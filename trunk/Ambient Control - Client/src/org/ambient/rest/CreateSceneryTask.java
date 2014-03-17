@@ -13,7 +13,7 @@ public class CreateSceneryTask extends AsyncTask<Object, Void, Void> {
 	@Override
 	protected Void doInBackground(Object... params) {
 
-		String url = URLUtils.getBaseUrl((String) params[0]) + URL + (String) params[1];
+		String url = Rest.getBaseUrl((String) params[0]) + URL + (String) params[1];
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);

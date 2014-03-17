@@ -8,7 +8,7 @@ import org.ambient.control.climate.ClimateFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
-import org.ambient.rest.URLUtils;
+import org.ambient.rest.Rest;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.ws.Room;
 
@@ -225,13 +225,13 @@ public class MainActivity extends FragmentActivity {
 	 * @return
 	 */
 	private ArrayList<String> getAllServers() {
-		return new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
+		return new ArrayList<String>(Arrays.asList(Rest.ANDROID_ADT_SERVERS));
 	}
 
 
 	// TODO this here should discover real servers in future
 	public ArrayList<String> getAllRoomServers() {
-		ArrayList<String> result = new ArrayList<String>(Arrays.asList(URLUtils.ANDROID_ADT_SERVERS));
+		ArrayList<String> result = new ArrayList<String>(Arrays.asList(Rest.ANDROID_ADT_SERVERS));
 		return result;
 	}
 
