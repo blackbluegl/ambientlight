@@ -15,7 +15,7 @@ public class VerifyProcessTask extends AsyncTask<Object, Void, ValidationResult>
 	@Override
 	protected ValidationResult doInBackground(Object... params) {
 
-		String url = URLUtils.getBaseUrl((String) params[0]) + URL;
+		String url = Rest.getBaseUrl((String) params[0]) + URL;
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);

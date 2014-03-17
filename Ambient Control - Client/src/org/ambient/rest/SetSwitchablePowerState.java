@@ -21,7 +21,7 @@ public class SetSwitchablePowerState extends AsyncTask<Object, Void, Void> {
 		String id = (String) params[2];
 		Boolean state = (Boolean) params[3];
 
-		String url = URLUtils.getBaseUrl((String) params[0]) + URL + "/" + type.toString() + "/" + id + URL2;
+		String url = Rest.getBaseUrl((String) params[0]) + URL + "/" + type.toString() + "/" + id + URL2;
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);

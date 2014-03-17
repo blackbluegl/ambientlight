@@ -19,7 +19,7 @@ public class UnregisterCallbackTask extends AsyncTask<Object, Void, Void> {
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
 		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 
-		String eventSenderURL = URLUtils.getBaseUrl((String) params[0]) + URL;
+		String eventSenderURL = Rest.getBaseUrl((String) params[0]) + URL;
 		try {
 			restTemplate.delete(eventSenderURL, params[1]);
 		} catch (Exception e) {

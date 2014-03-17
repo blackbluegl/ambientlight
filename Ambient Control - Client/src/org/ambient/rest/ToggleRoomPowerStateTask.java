@@ -20,7 +20,7 @@ public class ToggleRoomPowerStateTask extends AsyncTask<Object, Void, Void> {
 
 		this.serverName = (String) params[0];
 
-		String url = URLUtils.getBaseUrl((String) params[0]) + URL;
+		String url = Rest.getBaseUrl((String) params[0]) + URL;
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);

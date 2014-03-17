@@ -22,10 +22,11 @@ import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.ambient.rest.Rest;
 import org.ambient.rest.RestClient;
-import org.ambient.rest.URLUtils;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
 import org.ambientlight.ws.Room;
 
@@ -52,12 +53,11 @@ public class RoomConfigService extends Service {
 	public static final String BROADCAST_INTENT_UPDATE_ROOMCONFIG = "org.ambientcontrol.callback.updateRoomConfig";
 
 	public static final String EXTRA_ROOMCONFIG = "roomConfiguration";
-	public static final String EXTRA_SERVERNAME = "serverName";
+	public static final String EXTRA_ROOM_NAME = "roomName";
 
 	private static final String LOG = "org.ambientcontrol.roomConfigService";
 
 	private Map<String, Room> roomConfiguration = new HashMap<String, Room>();
-	private Map<String, String> roomNameServerMapping = new HashMap<String, String>();
 
 	private CallbackSocketServerRunnable callbackSocketServer = null;
 	private final IBinder binder = new MyBinder();
@@ -108,8 +108,8 @@ public class RoomConfigService extends Service {
 				roomConfiguration.clear();
 			}
 
-			for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
-				notifyListener(currentServer);
+			for (String currentRoom : roomConfiguration.keySet()) {
+				notifyListener(currentRoom);
 			}
 		}
 	};
@@ -117,32 +117,28 @@ public class RoomConfigService extends Service {
 
 	// update request from server
 	public synchronized void updateRoomConfigForRoomName(String roomName) {
-
-		// todo extract servername
-		String serverName = roomNameServerMapping.get(roomName);
-
 		try {
-			Room roomConfig = RestClient.getRoom(serverName);
+			Room roomConfig = RestClient.getRoom(Rest.SERVER_NAME, roomName);
 			// update Model
-			roomConfiguration.put(serverName, roomConfig);
+			roomConfiguration.put(roomName, roomConfig);
 		} catch (Exception e) {
-			Log.e(LOG, "invalidate failed. set roomConfig to null for: " + serverName, e);
-			roomConfiguration.put(serverName, null);
+			Log.e(LOG, "updateRoomConfigForRoomName() failed. Set roomConfig to null for room: " + roomName, e);
+			roomConfiguration.put(roomName, null);
 		}
-		// send BroadcastMessage to listeners who might be interested
-		notifyListener(serverName);
 
+		// send BroadcastMessage to listeners who might be interested
+		notifyListener(roomName);
 	}
 
 
 	/**
 	 * @param serverName
 	 */
-	private void notifyListener(String serverName) {
+	private void notifyListener(String roomName) {
 		Intent intent = new Intent();
 		intent.setAction(BROADCAST_INTENT_UPDATE_ROOMCONFIG);
-		intent.putExtra(EXTRA_ROOMCONFIG, roomConfiguration.get(serverName));
-		intent.putExtra(EXTRA_SERVERNAME, serverName);
+		intent.putExtra(EXTRA_ROOMCONFIG, roomConfiguration.get(roomName));
+		intent.putExtra(EXTRA_ROOM_NAME, roomName);
 		sendBroadcast(intent);
 	}
 
@@ -188,21 +184,24 @@ public class RoomConfigService extends Service {
 	}
 
 
-	/**
-	 * 
-	 */
 	private void initAllRoomConfigurations(boolean notifyListeners) {
-		for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
+		List<String> roomNames;
 
+		try {
+			roomNames = RestClient.getRoomNames(Rest.SERVER_NAME);
+		} catch (Exception e) {
+			Log.e(LOG, "error could not retreive roomNames. Resetting!", e);
+			roomConfiguration = new HashMap<String, Room>();
+			return;
+		}
+
+		for (String currentRoom : roomNames) {
 			try {
-				Room config = RestClient.getRoom(currentServer);
-				roomConfiguration.put(currentServer, config);
-				if (config != null) {
-					roomNameServerMapping.put(config.roomName, currentServer);
-				}
+				Room config = RestClient.getRoom(Rest.SERVER_NAME, currentRoom);
+				roomConfiguration.put(currentRoom, config);
 			} catch (Exception e) {
-				Log.e(LOG, "error initializing room", e);
-				roomConfiguration.put(currentServer, null);
+				Log.e(LOG, "error loading room. Ignoring this one", e);
+				roomConfiguration.put(currentRoom, null);
 			}
 		}
 	}
@@ -217,9 +216,6 @@ public class RoomConfigService extends Service {
 	}
 
 
-	/**
-	 * 
-	 */
 	private synchronized void startCallBackServer() {
 
 		// start socketServer
@@ -228,32 +224,28 @@ public class RoomConfigService extends Service {
 			new Thread(callbackSocketServer).start();
 
 			String hostname = getIpAdress() + ":4321";
-			for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
+			for (String currentRoom : roomConfiguration.keySet()) {
 				try {
-					if (RestClient.registerCallback(currentServer, hostname) == false) {
-						roomConfiguration.put(currentServer, null);
+					if (RestClient.registerCallback(Rest.SERVER_NAME, currentRoom, hostname) == false) {
+						roomConfiguration.put(currentRoom, null);
 					}
 				} catch (Exception e) {
 					Log.e(LOG, "error trying to register callback. Ommiting server and remove the configuration.");
-					roomConfiguration.put(currentServer, null);
+					roomConfiguration.put(currentRoom, null);
 				}
 			}
 		}
 	}
 
 
-	/**
-	 * 
-	 */
 	private synchronized void stopCallBackServer(boolean notifyServers) {
 		if (callbackSocketServer != null) {
 			try {
-
 				if (notifyServers == true) {
 					String hostname = getIpAdress() + ":4321";
 
-					for (String currentServer : URLUtils.ANDROID_ADT_SERVERS) {
-						RestClient.unregisterCallback(currentServer, hostname);
+					for (String currentRoomName : roomConfiguration.keySet()) {
+						RestClient.unregisterCallback(Rest.SERVER_NAME, currentRoomName, hostname);
 					}
 				}
 				callbackSocketServer.stop();

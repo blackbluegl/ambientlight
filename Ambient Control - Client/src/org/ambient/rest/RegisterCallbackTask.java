@@ -19,7 +19,7 @@ public class RegisterCallbackTask extends AsyncTask<Object, Void, Boolean> {
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
 		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 
-		String eventSenderURL = URLUtils.getBaseUrl((String) params[0]) + URL;
+		String eventSenderURL = Rest.getBaseUrl((String) params[0]) + URL;
 		try {
 			restTemplate.put(eventSenderURL, params[1]);
 		} catch (Exception e) {

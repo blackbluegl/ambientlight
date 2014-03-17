@@ -1,5 +1,6 @@
 package org.ambient.rest;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.ambientlight.config.process.ProcessConfiguration;
@@ -12,13 +13,21 @@ import org.ambientlight.ws.process.validation.ValidationResult;
 
 public class RestClient {
 
-	public static Room getRoom(String hostName) throws InterruptedException, ExecutionException {
+	public static Room getRoom(String hostName, String roomName) throws InterruptedException, ExecutionException {
 		GetRoomTask task = new GetRoomTask();
-		task.execute(hostName);
-		return (Room) task.get();
+		task.execute(hostName, roomName);
+		return task.get();
 	}
 
 
+	public static List<String> getRoomNames(String hostName) throws InterruptedException, ExecutionException {
+		GetRoomTask task = new GetRoomTask();
+		task.execute(hostName);
+		return (List<String>) task.get();
+	}
+
+
+	// TODO adept to server and roomName!
 	public static Boolean registerCallback(String hostName, String ipAndPort) throws InterruptedException, ExecutionException {
 		RegisterCallbackTask task = new RegisterCallbackTask();
 		task.execute(hostName, ipAndPort);

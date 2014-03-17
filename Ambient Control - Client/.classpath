@@ -5,6 +5,6 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Ambient Control - Entities"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/entities"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -1,57 +1,33 @@
 package org.ambient.rest;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.Map;
 
 import org.ambientlight.ws.Room;
-import org.ambientlight.ws.SwitchableIdModule;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-
-public class GetRoomTask extends AsyncTask<String, Void, Object> {
+public class GetRoomTask extends AsyncTask<String, Void, Room> {
 
 	private static final String LOG = "GetRoomTask";
 
-	private final String URL = "/config/room";
+	private final String URL = "/rooms/config/{room}";
 
 
 	@Override
 	protected Room doInBackground(String... params) {
-		Log.i(LOG, "getRoomConfiguration is called");
+		Log.d(LOG, "is called");
 
-		String url = URLUtils.getBaseUrl(params[0]) + URL;
+		String url = Rest.getBaseUrl(params[0]) + URL;
+		Map<String, String> vars = Collections.singletonMap("room", params[1]);
 
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new SwitchableIdModule());
-
-		// set a custom filter
-		Set<String> filterProperties = new HashSet<String>();
-		FilterProvider filters = new SimpleFilterProvider().addFilter("apiFilter",
-				SimpleBeanPropertyFilter.serializeAllExcept(filterProperties));
-		mapper.setFilters(filters);
-
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
-		MappingJackson2HttpMessageConverter conv = new MappingJackson2HttpMessageConverter();
-		conv.setObjectMapper(mapper);
-		restTemplate.getMessageConverters().add(conv);
-		Room response = null;
 		try {
-			response = restTemplate.getForObject(url, Room.class, "");
+			return Rest.getRestTemplate().getForObject(url, Room.class, vars);
 		} catch (Exception e) {
 			Log.e(LOG, e.getMessage());
-			response = null;
+			return null;
 		}
-		return response;
 	}
 }
