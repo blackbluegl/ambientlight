@@ -27,23 +27,23 @@ public class RestClient {
 	}
 
 
-	// TODO adept to server and roomName!
-	public static Boolean registerCallback(String hostName, String ipAndPort) throws InterruptedException, ExecutionException {
+	public static Boolean registerCallback(String hostName, String roomName, String ipAndPort) throws InterruptedException,
+	ExecutionException {
 		RegisterCallbackTask task = new RegisterCallbackTask();
-		task.execute(hostName, ipAndPort);
+		task.execute(hostName, roomName, ipAndPort);
 		return task.get();
+	}
+
+
+	public static void unregisterCallback(String hostName, String roomName, String ipAndPort) {
+		UnregisterCallbackTask task = new UnregisterCallbackTask();
+		task.execute(hostName, roomName, ipAndPort);
 	}
 
 
 	public static void setSwitchablePowerState(String hostName, SwitchType type, String id, boolean powestate) {
 		SetSwitchablePowerState task = new SetSwitchablePowerState();
 		task.execute(hostName, type, id, powestate);
-	}
-
-
-	public static void unregisterCallback(String hostName, String ipAndPort) {
-		UnregisterCallbackTask task = new UnregisterCallbackTask();
-		task.execute(hostName, ipAndPort);
 	}
 
 
