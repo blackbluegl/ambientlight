@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ambient.control.R;
-import org.ambient.rest.RestClient;
 import org.ambient.rest.Rest;
+import org.ambient.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
@@ -137,12 +137,16 @@ public class UpdateWidgetService extends Service {
 
 		Map<String, Room> config = new HashMap<String, Room>();
 
-		for (String currentServer : Rest.ANDROID_ADT_SERVERS) {
-			Room roomConfig = roomService.getRoomConfiguration(currentServer);
-			if (roomConfig == null) {
-				continue;
+		try {
+			for (String currentServer : RestClient.getRoomNames(Rest.SERVER_NAME)) {
+				Room roomConfig = roomService.getRoomConfiguration(currentServer);
+				if (roomConfig == null) {
+					continue;
+				}
+				config.put(currentServer, roomConfig);
 			}
-			config.put(currentServer, roomConfig);
+		} catch (Exception e) {
+			// next step handles empty config and indirect this error
 		}
 
 		if (config.isEmpty()) {

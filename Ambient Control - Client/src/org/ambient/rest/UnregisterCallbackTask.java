@@ -1,29 +1,26 @@
 package org.ambient.rest;
 
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
+import java.util.Collections;
+import java.util.Map;
 
 import android.os.AsyncTask;
 
 
-public class UnregisterCallbackTask extends AsyncTask<Object, Void, Void> {
+public class UnregisterCallbackTask extends AsyncTask<String, Void, Void> {
 
-	private final String URL = "/callback/client";
+	private final String URL = "/callback/{room}/client";
 
 
 	@Override
-	protected Void doInBackground(Object... params) {
+	protected Void doInBackground(String... params) {
 
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
-		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
+		String url = Rest.getBaseUrl(params[0]) + URL;
+		Map<String, String> vars = Collections.singletonMap("room", params[1]);
 
-		String eventSenderURL = Rest.getBaseUrl((String) params[0]) + URL;
 		try {
-			restTemplate.delete(eventSenderURL, params[1]);
+			Rest.getRestTemplate().delete(url, params[2], vars);
 		} catch (Exception e) {
-			// this may happen very often. we cannot do anything here
+			// this may happen. we cannot do anything here
 		}
 		return null;
 	}
