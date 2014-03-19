@@ -13,31 +13,30 @@ import org.ambientlight.ws.process.validation.ValidationResult;
 
 public class RestClient {
 
-	public static Room getRoom(String hostName, String roomName) throws InterruptedException, ExecutionException {
+	public static Room getRoom(String roomName) throws InterruptedException, ExecutionException {
 		GetRoomTask task = new GetRoomTask();
-		task.execute(hostName, roomName);
+		task.execute(Rest.SERVER_NAME, roomName);
 		return task.get();
 	}
 
 
-	public static List<String> getRoomNames(String hostName) throws InterruptedException, ExecutionException {
+	public static List<String> getRoomNames() throws InterruptedException, ExecutionException {
 		GetRoomTask task = new GetRoomTask();
-		task.execute(hostName);
+		task.execute(Rest.SERVER_NAME);
 		return (List<String>) task.get();
 	}
 
 
-	public static Boolean registerCallback(String hostName, String roomName, String ipAndPort) throws InterruptedException,
-	ExecutionException {
+	public static Boolean registerCallback(String roomName, String ipAndPort) throws InterruptedException, ExecutionException {
 		RegisterCallbackTask task = new RegisterCallbackTask();
-		task.execute(hostName, roomName, ipAndPort);
+		task.execute(Rest.SERVER_NAME, roomName, ipAndPort);
 		return task.get();
 	}
 
 
-	public static void unregisterCallback(String hostName, String roomName, String ipAndPort) {
+	public static void unregisterCallback(String roomName, String ipAndPort) {
 		UnregisterCallbackTask task = new UnregisterCallbackTask();
-		task.execute(hostName, roomName, ipAndPort);
+		task.execute(Rest.SERVER_NAME, roomName, ipAndPort);
 	}
 
 
@@ -47,15 +46,15 @@ public class RestClient {
 	}
 
 
-	public static void startProcess(String hostName, String processId) {
+	public static void startProcess(String roomName, String processId) {
 		StartProcessTask task = new StartProcessTask();
-		task.execute(hostName, processId);
+		task.execute(Rest.SERVER_NAME, roomName, processId);
 	}
 
 
-	public static void stopProcess(String hostName, String processId) {
+	public static void stopProcess(String roomName, String processId) {
 		StopProcessTask task = new StopProcessTask();
-		task.execute(hostName, processId);
+		task.execute(Rest.SERVER_NAME, roomName, processId);
 	}
 
 
@@ -65,24 +64,24 @@ public class RestClient {
 	}
 
 
-	public static void deleteProcessFromRoom(String hostName, String processName) {
+	public static void deleteProcessFromRoom(String roomName, String processName) {
 		DeleteProcessTask task = new DeleteProcessTask();
-		task.execute(hostName, processName);
+		task.execute(Rest.SERVER_NAME, roomName, processName);
 	}
 
 
-	public static ValidationResult addProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
+	public static ValidationResult addProcess(String roomName, ProcessConfiguration process) throws InterruptedException,
 	ExecutionException {
 		AddProcessTask task = new AddProcessTask();
-		task.execute(hostName, process);
+		task.execute(Rest.SERVER_NAME, roomName, process);
 		return task.get();
 	}
 
 
-	public static ValidationResult validateProcess(String hostName, ProcessConfiguration process) throws InterruptedException,
+	public static ValidationResult validateProcess(String roomName, ProcessConfiguration process) throws InterruptedException,
 	ExecutionException {
 		VerifyProcessTask task = new VerifyProcessTask();
-		task.execute(hostName, process);
+		task.execute(Rest.SERVER_NAME, roomName, process);
 		return task.get();
 	}
 
@@ -111,8 +110,8 @@ public class RestClient {
 	}
 
 
-	public static void createScenery(String hostName, String scenery) throws Exception {
+	public static void createScenery(String roomName, String scenery) throws Exception {
 		CreateSceneryTask task = new CreateSceneryTask();
-		task.execute(hostName, scenery);
+		task.execute(Rest.SERVER_NAME, roomName, scenery);
 	}
 }

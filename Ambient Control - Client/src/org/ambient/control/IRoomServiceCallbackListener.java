@@ -28,7 +28,7 @@ public interface IRoomServiceCallbackListener {
 	public void onRoomServiceConnected(RoomConfigService service);
 
 
-	public void onRoomConfigurationChange(String serverName, Room roomConfiguration);
+	public void onRoomConfigurationChange(String roomName, Room roomConfiguration);
 
 
 	public void setRoomService(RoomConfigService roomService);

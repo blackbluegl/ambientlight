@@ -60,17 +60,16 @@ import android.widget.Spinner;
 public class ProcessCardFragment extends RoomServiceAwareFragment implements EditConfigOnExitListener {
 
 	private static final String BUNDLE_SELECTED_PROCESS = "bundleSelectedProcess";
-	private static final String BUNDLE_SELECTED_SERVER = "bundleSelectedServer";
+	private static final String BUNDLE_SELECTED_ROOM = "bundleSelectedRoom";
 	private static final String BUNDLE_EDIT_MODE = "bundleEditMode";
 	private static final String LOG = "ProcessCardFragment";
 
 	private ActionMode mode = null;
 
 	// int positionServer = 0;
-	String selectedServer = null;
+	String selectedRoom = null;
 	ProcessConfiguration selectedProcess = null;
 	private boolean editMode = false;
-	private final List<String> serverNames = new ArrayList<String>();
 	private final List<String> roomNames = new ArrayList<String>();
 	private final List<String> processNames = new ArrayList<String>();
 
@@ -94,7 +93,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		spinnerProcess = (Spinner) content.findViewById(R.id.spinnerProcess);
 
 		if (savedInstanceState != null) {
-			selectedServer = savedInstanceState.getString(BUNDLE_SELECTED_SERVER);
+			selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM);
 			selectedProcess = (ProcessConfiguration) savedInstanceState.getSerializable(BUNDLE_SELECTED_PROCESS);
 			editMode = savedInstanceState.getBoolean(BUNDLE_EDIT_MODE);
 		}
@@ -106,14 +105,12 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected
-	 * ()
+	 * @see org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected ()
 	 */
 	@Override
 	protected void onResumeWithServiceConnected() {
 		spinnerRoom.setOnItemSelectedListener(null);
-		selectedServer = initRoomArrays(selectedServer);
+		selectedRoom = initRoomArrays(selectedRoom);
 		drawer.setProcess(selectedProcess);
 
 		roomAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, roomNames);
@@ -131,7 +128,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			getActivity().invalidateOptionsMenu();
 		}
 
-		spinnerRoom.setSelection(serverNames.indexOf(selectedServer));
+		spinnerRoom.setSelection(roomNames.indexOf(selectedRoom));
 
 		// create the listener after the initialisation. we do not want to
 		// affect the second spinner while its in creation. let android this
@@ -148,8 +145,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 						editMode = false;
 						getActivity().invalidateOptionsMenu();
 
-						selectedServer = serverNames.get(pos);
-						Room selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
+						selectedRoom = roomNames.get(pos);
+						Room selectedRoomConfiguration = roomService.getRoomConfiguration(selectedRoom);
 
 						processNames.clear();
 						for (ProcessConfiguration currentProcess : selectedRoomConfiguration.processManager.processes.values()) {
@@ -176,7 +173,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
 				getActivity().invalidateOptionsMenu();
 
-				Room selectedRoomConfiguration = roomService.getRoomConfiguration(selectedServer);
+				Room selectedRoomConfiguration = roomService.getRoomConfiguration(selectedRoom);
 				selectedProcess = (ProcessConfiguration) GuiUtils
 						.deepCloneSerializeable(selectedRoomConfiguration.processManager.processes.get(parent.getSelectedItem()));
 				drawer.setProcess(selectedProcess);
@@ -237,26 +234,26 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		switch (item.getItemId()) {
 
 		case R.id.menuEntryProcessStart:
-			RestClient.startProcess(selectedServer, selectedProcess.id);
+			RestClient.startProcess(selectedRoom, selectedProcess.id);
 
 			return true;
 
 		case R.id.menuEntryProcessStop:
-			RestClient.stopProcess(selectedServer, selectedProcess.id);
+			RestClient.stopProcess(selectedRoom, selectedProcess.id);
 			return true;
 
 		case R.id.menuEntryProcessValidate:
 			ValidationResult result = null;
 			try {
-				result = RestClient.validateProcess(selectedServer, selectedProcess);
+				result = RestClient.validateProcess(selectedRoom, selectedProcess);
 			} catch (Exception e) {
 				Log.e(LOG, "could not validate process", e);
 			}
 			if (result.resultIsValid()) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Validierung")
-						.setMessage("Die Validierung ist abgeschlossen. Es wurden keine semantische Fehler gefunden.")
-						.setPositiveButton("OK", null).create().show();
+				.setMessage("Die Validierung ist abgeschlossen. Es wurden keine semantische Fehler gefunden.")
+				.setPositiveButton("OK", null).create().show();
 			} else {
 				for (ValidationEntry entry : result.invalidateEntries) {
 					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
@@ -265,22 +262,20 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			return true;
 
 		case R.id.menuEntryProcessAdd:
-			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedServer,
-					roomService.getRoomConfiguration(selectedServer));
+			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedRoom,
+					roomService.getRoomConfiguration(selectedRoom));
 			return true;
 
 		case R.id.menuEntryProcessEdit:
-			EditConfigHandlerFragment.editConfigBean(this, this.selectedProcess, this.selectedServer,
-					this.roomService.getRoomConfiguration(selectedServer));
+			EditConfigHandlerFragment.editConfigBean(this, this.selectedProcess, this.selectedRoom,
+					this.roomService.getRoomConfiguration(selectedRoom));
 			return true;
 
 		case R.id.menuEntryProcessRevertNew:
-			// restore old process if possible. if not just load 1fst one in
-			// room.
-			selectedProcess = roomService.getRoomConfiguration(selectedServer).processManager.processes.get(selectedProcess.id);
-			// maybe this could be done in onRoomConfigurationChange (at the
-			// moment the method does exactly this. but maybe this changes in
-			// future - so this commend is a reminder for me
+			// restore old process if possible. if not just load 1fst one in room.
+			selectedProcess = roomService.getRoomConfiguration(selectedRoom).processManager.processes.get(selectedProcess.id);
+			// maybe this could be done in onRoomConfigurationChange (at the moment the method does exactly this. but maybe this
+			// changes in future - so this commend is a reminder for me
 			getActivity().invalidateOptionsMenu();
 			stopEditMode();
 			return true;
@@ -295,13 +290,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			if (saveProcess == false) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Prozess überschreiben").setMessage("Soll der bestehende Prozess überschrieben werden?")
-						.setPositiveButton("OK", new OnClickListener() {
+				.setPositiveButton("OK", new OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								saveSelectedProcess();
-							}
-						}).setNegativeButton("Abbrechen", null).create().show();
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						saveSelectedProcess();
+					}
+				}).setNegativeButton("Abbrechen", null).create().show();
 			} else {
 				saveSelectedProcess();
 			}
@@ -311,28 +306,28 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		case R.id.menuEntryProcessRemove:
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle("Prozess löschen").setMessage("Soll der Prozess gelöscht werden?")
-					.setPositiveButton("OK", new OnClickListener() {
+			.setPositiveButton("OK", new OnClickListener() {
 
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							try {
-								RestClient.deleteProcessFromRoom(selectedServer, selectedProcess.id);
-								selectedProcess = null;
-							} catch (Exception e) {
-								Log.e(LOG, "error deleting process", e);
-							}
-						}
-					}).setNegativeButton("Abbrechen", null).create().show();
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					try {
+						RestClient.deleteProcessFromRoom(selectedRoom, selectedProcess.id);
+						selectedProcess = null;
+					} catch (Exception e) {
+						Log.e(LOG, "error deleting process", e);
+					}
+				}
+			}).setNegativeButton("Abbrechen", null).create().show();
 			return true;
 
 		case R.id.menuEntryProcessSceneries:
 			SceneriesWrapper sceneriesWrapper = new SceneriesWrapper();
 			List<Scenery> sceneries = new ArrayList<Scenery>(
-					roomService.getRoomConfiguration(selectedServer).sceneriesManager.sceneries.values());
+					roomService.getRoomConfiguration(selectedRoom).sceneriesManager.sceneries.values());
 			sceneriesWrapper.sceneries = sceneries;
 
-			EditConfigHandlerFragment.editConfigBean(this, sceneriesWrapper, selectedServer,
-					roomService.getRoomConfiguration(selectedServer));
+			EditConfigHandlerFragment.editConfigBean(this, sceneriesWrapper, selectedRoom,
+					roomService.getRoomConfiguration(selectedRoom));
 
 			return true;
 		default:
@@ -436,8 +431,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					break;
 
 				case R.id.menuEntryProcessEditNode:
-					EditConfigHandlerFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedServer,
-							roomService.getRoomConfiguration(selectedServer));
+					EditConfigHandlerFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedRoom,
+							roomService.getRoomConfiguration(selectedRoom));
 					break;
 
 				default:
@@ -491,12 +486,12 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	private void saveSelectedProcess() {
 		try {
 
-			ValidationResult result = RestClient.addProcess(selectedServer, selectedProcess);
+			ValidationResult result = RestClient.addProcess(selectedRoom, selectedProcess);
 
 			if (result.resultIsValid() == false) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Fehler").setMessage("Es wurden Fehler gefunden. Der Prozess wurde nicht gespeichert.")
-						.setPositiveButton("OK", null).create().show();
+				.setPositiveButton("OK", null).create().show();
 				for (ValidationEntry entry : result.invalidateEntries) {
 					drawer.addNodeWithError(selectedProcess.nodes.get(entry.nodeId), entry);
 				}
@@ -509,20 +504,18 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	}
 
 
-	private String initRoomArrays(String selectedServer) {
+	private String initRoomArrays(String selectedRoom) {
 		roomNames.clear();
-		serverNames.clear();
 		for (String serverName : roomService.getAllRoomConfigurationsMap().keySet()) {
-			serverNames.add(serverName);
 			roomNames.add(roomService.getAllRoomConfigurationsMap().get(serverName).roomName);
 		}
 
-		if (selectedServer == null) {
-			selectedServer = serverNames.get(0);
+		if (selectedRoom == null) {
+			selectedRoom = roomNames.get(0);
 		}
 
 		processNames.clear();
-		for (ProcessConfiguration config : roomService.getRoomConfiguration(selectedServer).processManager.processes.values()) {
+		for (ProcessConfiguration config : roomService.getRoomConfiguration(selectedRoom).processManager.processes.values()) {
 			processNames.add(config.id);
 		}
 		if (roomAdapter != null) {
@@ -531,13 +524,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		if (processAdapter != null) {
 			processAdapter.notifyDataSetChanged();
 		}
-		return selectedServer;
+		return selectedRoom;
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putString(BUNDLE_SELECTED_SERVER, selectedServer);
+		savedInstanceState.putString(BUNDLE_SELECTED_ROOM, selectedRoom);
 		savedInstanceState.putSerializable(BUNDLE_SELECTED_PROCESS, selectedProcess);
 		savedInstanceState.putBoolean(BUNDLE_EDIT_MODE, editMode);
 		super.onSaveInstanceState(savedInstanceState);
@@ -548,8 +541,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	/*
 	 * callback method is called everytime a configuration is edited.
 	 * 
-	 * @see org.ambient.control.processes.IntegrateObjectValueHandler#
-	 * integrateConfiguration(java.lang.Object)
+	 * @see org.ambient.control.processes.IntegrateObjectValueHandler# integrateConfiguration(java.lang.Object)
 	 */
 	@Override
 	public void onIntegrateConfiguration(String serverName, Object configuration) {
@@ -572,7 +564,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			stopEditMode();
 
 			// extract new sceneries
-			SceneryManagerConfiguration sceneryManager = roomService.getRoomConfiguration(selectedServer).sceneriesManager;
+			SceneryManagerConfiguration sceneryManager = roomService.getRoomConfiguration(selectedRoom).sceneriesManager;
 			List<Scenery> addNew = new ArrayList<Scenery>();
 			for (Scenery current : ((SceneriesWrapper) configuration).sceneries) {
 				if (sceneryManager.sceneries.containsKey(current.id) == false) {
@@ -583,7 +575,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			// create new sceneries on server
 			try {
 				for (Scenery current : addNew) {
-					RestClient.createScenery(selectedServer, current.id);
+					RestClient.createScenery(selectedRoom, current.id);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -593,9 +585,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 
 	/*
-	 * do not forget. if a different fragments thread calls this method the
-	 * spinners will not be updated. therefore the boolean flag will signal
-	 * onResumeWith...() to hide the spinners for itself in the right thread
+	 * do not forget. if a different fragments thread calls this method the spinners will not be updated. therefore the boolean
+	 * flag will signal onResumeWith...() to hide the spinners for itself in the right thread
 	 */
 	private void startEditMode() {
 		spinnerRoom.setVisibility(View.GONE);
@@ -614,9 +605,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
-	 * (java.lang.String, java.lang.Object)
+	 * @see org.ambient.control.config.EditConfigExitListener#onRevertConfiguration (java.lang.String, java.lang.Object)
 	 */
 	@Override
 	public void onRevertConfiguration(String serverName, Object configuration) {
@@ -627,14 +616,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambient.control.RoomServiceAwareFragment#onRoomConfigurationChange
-	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
+	 * @see org.ambient.control.RoomServiceAwareFragment#onRoomConfigurationChange (java.lang.String,
+	 * org.ambientlight.room.RoomConfiguration)
 	 */
 	@Override
-	public void onRoomConfigurationChange(String serverName, Room roomConfiguration) {
-		if (serverName.equals(selectedServer)) {
-			initRoomArrays(selectedServer);
+	public void onRoomConfigurationChange(String roomName, Room roomConfiguration) {
+		if (roomName.equals(selectedRoom)) {
+			initRoomArrays(selectedRoom);
 			if (editMode == false) {
 
 				spinnerProcess.setSelection(getPositionOfSelectedProcess());
@@ -645,8 +633,8 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			} else {
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				builder.setTitle("Änderung auf dem Server")
-						.setMessage("Möglicherweise wurde der ursprüngliche Prozess im Hintergrund verändert.")
-						.setPositiveButton("OK", null).create().show();
+				.setMessage("Möglicherweise wurde der ursprüngliche Prozess im Hintergrund verändert.")
+				.setPositiveButton("OK", null).create().show();
 			}
 		}
 	}
