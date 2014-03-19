@@ -75,12 +75,12 @@ public class MainActivity extends FragmentActivity {
 			String action = intent.getAction();
 
 			if (action.equals(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG)) {
-				String serverName = intent.getExtras().getString(RoomConfigService.EXTRA_SERVERNAME);
+				String roomName = intent.getExtras().getString(RoomConfigService.EXTRA_ROOM_NAME);
 				Room config = (Room) intent.getExtras().getSerializable(
 						RoomConfigService.EXTRA_ROOMCONFIG);
 				Log.i(LOG, "got update for Room");
 				for (IRoomServiceCallbackListener listener : roomServiceListeners) {
-					listener.onRoomConfigurationChange(serverName, config);
+					listener.onRoomConfigurationChange(roomName, config);
 				}
 			}
 		}

@@ -63,7 +63,7 @@ public class ClimateFragment extends RoomServiceAwareFragment {
 	 * (java.lang.String, org.ambientlight.room.RoomConfiguration)
 	 */
 	@Override
-	public void onRoomConfigurationChange(String serverName, Room roomConfiguration) {
+	public void onRoomConfigurationChange(String roomName, Room roomConfiguration) {
 		// TODO Auto-generated method stub
 
 	}

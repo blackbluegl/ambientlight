@@ -498,7 +498,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param roomConfig
 	 */
 	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String server, final Room roomConfig) {
+			final Fragment fragment, final String roomName, final Room roomConfig) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -536,7 +536,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param server
 	 * @param roomConfiguration
 	 */
-	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String server,
+	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
 			final Room roomConfiguration) {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(clazz.getAnnotation(AlternativeValues.class),

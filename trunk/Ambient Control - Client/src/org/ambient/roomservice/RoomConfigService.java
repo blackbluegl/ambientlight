@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambient.rest.Rest;
 import org.ambient.rest.RestClient;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
 import org.ambientlight.ws.Room;
@@ -118,7 +117,7 @@ public class RoomConfigService extends Service {
 	// update request from server
 	public synchronized void updateRoomConfigForRoomName(String roomName) {
 		try {
-			Room roomConfig = RestClient.getRoom(Rest.SERVER_NAME, roomName);
+			Room roomConfig = RestClient.getRoom(roomName);
 			// update Model
 			roomConfiguration.put(roomName, roomConfig);
 		} catch (Exception e) {
@@ -188,7 +187,7 @@ public class RoomConfigService extends Service {
 		List<String> roomNames;
 
 		try {
-			roomNames = RestClient.getRoomNames(Rest.SERVER_NAME);
+			roomNames = RestClient.getRoomNames();
 		} catch (Exception e) {
 			Log.e(LOG, "error could not retreive roomNames. Resetting!", e);
 			roomConfiguration = new HashMap<String, Room>();
@@ -197,7 +196,7 @@ public class RoomConfigService extends Service {
 
 		for (String currentRoom : roomNames) {
 			try {
-				Room config = RestClient.getRoom(Rest.SERVER_NAME, currentRoom);
+				Room config = RestClient.getRoom(currentRoom);
 				roomConfiguration.put(currentRoom, config);
 			} catch (Exception e) {
 				Log.e(LOG, "error loading room. Ignoring this one", e);
@@ -226,7 +225,7 @@ public class RoomConfigService extends Service {
 			String hostname = getIpAdress() + ":4321";
 			for (String currentRoom : roomConfiguration.keySet()) {
 				try {
-					if (RestClient.registerCallback(Rest.SERVER_NAME, currentRoom, hostname) == false) {
+					if (RestClient.registerCallback(currentRoom, hostname) == false) {
 						roomConfiguration.put(currentRoom, null);
 					}
 				} catch (Exception e) {
@@ -245,7 +244,7 @@ public class RoomConfigService extends Service {
 					String hostname = getIpAdress() + ":4321";
 
 					for (String currentRoomName : roomConfiguration.keySet()) {
-						RestClient.unregisterCallback(Rest.SERVER_NAME, currentRoomName, hostname);
+						RestClient.unregisterCallback(currentRoomName, hostname);
 					}
 				}
 				callbackSocketServer.stop();
@@ -257,8 +256,8 @@ public class RoomConfigService extends Service {
 	}
 
 
-	public Room getRoomConfiguration(String server) {
-		return roomConfiguration.get(server);
+	public Room getRoomConfiguration(String room) {
+		return roomConfiguration.get(room);
 	}
 
 
