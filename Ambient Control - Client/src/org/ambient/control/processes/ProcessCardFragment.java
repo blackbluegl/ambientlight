@@ -544,7 +544,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 * @see org.ambient.control.processes.IntegrateObjectValueHandler# integrateConfiguration(java.lang.Object)
 	 */
 	@Override
-	public void onIntegrateConfiguration(String serverName, Object configuration) {
+	public void onIntegrateConfiguration(String roomName, Object configuration) {
 
 		if (configuration instanceof ProcessConfiguration) {
 			startEditMode();
@@ -608,7 +608,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 * @see org.ambient.control.config.EditConfigExitListener#onRevertConfiguration (java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public void onRevertConfiguration(String serverName, Object configuration) {
+	public void onRevertConfiguration(String roomName, Object configuration) {
 
 	}
 

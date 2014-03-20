@@ -22,6 +22,8 @@ package org.ambient.control.config;
  */
 public interface EditConfigOnExitListener {
 
-	public void onIntegrateConfiguration(String serverName, Object configuration);
-	public void onRevertConfiguration(String serverName, Object configuration);
+	public void onIntegrateConfiguration(String roomName, Object configuration);
+
+
+	public void onRevertConfiguration(String roomName, Object configuration);
 }

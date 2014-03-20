@@ -40,9 +40,9 @@ public class RestClient {
 	}
 
 
-	public static void setSwitchablePowerState(String hostName, SwitchType type, String id, boolean powestate) {
+	public static void setSwitchablePowerState(String room, SwitchType type, String id, boolean powestate) {
 		SetSwitchablePowerState task = new SetSwitchablePowerState();
-		task.execute(hostName, type, id, powestate);
+		task.execute(Rest.SERVER_NAME, room, type, id, powestate);
 	}
 
 
@@ -98,9 +98,9 @@ public class RestClient {
 	}
 
 
-	public static void setRenderingConfiguration(String hostName, String itemName, RenderingProgramConfiguration config) {
+	public static void setRenderingConfiguration(String roomName, String itemName, RenderingProgramConfiguration config) {
 		SetActorConductConfigurationTask task = new SetActorConductConfigurationTask();
-		task.execute(hostName, itemName, config);
+		task.execute(Rest.SERVER_NAME, roomName, itemName, config);
 	}
 
 
