@@ -70,7 +70,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	public static final String ARG_CREATE_MODE = "creationMode";
 	public static final String ARG_CLASS_NAME = "className";
 	public static final String BUNDLE_OBJECT_VALUE = "objectValue";
-	public static final String ARG_SELECTED_SERVER = "selectedServer";
+	public static final String ARG_SELECTED_ROOM = "selectedRoom";
 	public static final String BUNDLE_WHERE_TO_INTEGRATE = "whereToIntegrate";
 	public static final String ARG_ROOM_CONFIG = "roomConfiguration";
 
@@ -402,7 +402,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * integrateConfiguration(java.lang.Object)
 	 */
 	@Override
-	public void onIntegrateConfiguration(String serverName, Object configuration) {
+	public void onIntegrateConfiguration(String roomName, Object configuration) {
 		this.valueToIntegrate = configuration;
 	}
 
@@ -415,7 +415,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * (java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public void onRevertConfiguration(String serverName, Object configuration) {
+	public void onRevertConfiguration(String roomName, Object configuration) {
 		// do not merge the result
 
 	}

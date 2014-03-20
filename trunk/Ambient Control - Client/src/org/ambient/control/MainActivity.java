@@ -1,14 +1,13 @@
 package org.ambient.control;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.ambient.control.climate.ClimateFragment;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.control.nfc.NFCProgrammingFragment;
 import org.ambient.control.processes.ProcessCardFragment;
-import org.ambient.rest.Rest;
+import org.ambient.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.ws.Room;
 
@@ -76,8 +75,7 @@ public class MainActivity extends FragmentActivity {
 
 			if (action.equals(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG)) {
 				String roomName = intent.getExtras().getString(RoomConfigService.EXTRA_ROOM_NAME);
-				Room config = (Room) intent.getExtras().getSerializable(
-						RoomConfigService.EXTRA_ROOMCONFIG);
+				Room config = (Room) intent.getExtras().getSerializable(RoomConfigService.EXTRA_ROOMCONFIG);
 				Log.i(LOG, "got update for Room");
 				for (IRoomServiceCallbackListener listener : roomServiceListeners) {
 					listener.onRoomConfigurationChange(roomName, config);
@@ -202,16 +200,12 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	/**
-	 * @param content
-	 * @param ft
-	 */
 	public Fragment createHomeFragment(LinearLayout content) {
 		currentDialog = "Mein Ambiente";
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		Bundle argsRoom = new Bundle();
-		argsRoom.putStringArrayList(RoomFragment.BUNDLE_SERVER_NAMES, getAllServers());
+		argsRoom.putStringArrayList(RoomFragment.BUNDLE_ROOM_NAMES, getAllRoomNames());
 
 		RoomFragment roomFragment = new RoomFragment();
 		roomFragment.setArguments(argsRoom);
@@ -221,18 +215,15 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	/**
-	 * @return
-	 */
-	private ArrayList<String> getAllServers() {
-		return new ArrayList<String>(Arrays.asList(Rest.ANDROID_ADT_SERVERS));
-	}
-
-
-	// TODO this here should discover real servers in future
-	public ArrayList<String> getAllRoomServers() {
-		ArrayList<String> result = new ArrayList<String>(Arrays.asList(Rest.ANDROID_ADT_SERVERS));
-		return result;
+	public ArrayList<String> getAllRoomNames() {
+		try {
+			if (this.roomService != null)
+				return new ArrayList<String>(roomService.getAllRoomNames());
+			return new ArrayList<String>(RestClient.getRoomNames());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 

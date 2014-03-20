@@ -20,7 +20,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.MainActivity;
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
 import org.ambientlight.room.entities.features.actor.Switchable;
@@ -60,7 +59,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 
 	private final List<String> serverNames = new ArrayList<String>();
 	private final List<String> roomNames = new ArrayList<String>();
-	private String selectedServer = null;
+	private String selectedRoom = null;
 	private String selectedItem = null;
 
 	private NfcAdapter adapter;
@@ -137,9 +136,8 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 	@Override
 	protected void onResumeWithServiceConnected() {
 
-		for (String serverName : ((MainActivity) getActivity()).getAllRoomServers()) {
-			serverNames.add(serverName);
-			roomNames.add(roomService.getRoomConfiguration(serverName).roomName);
+		for (String currentRoomName : roomService.getAllRoomNames()) {
+			this.roomNames.add(currentRoomName);
 		}
 
 		ArrayAdapter<String> roomAdapter = new ArrayAdapter<String>(this.getActivity(),

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ambient.rest.RestClient;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
@@ -113,6 +114,10 @@ public class RoomConfigService extends Service {
 		}
 	};
 
+
+	public Set<String> getAllRoomNames() {
+		return roomConfiguration.keySet();
+	}
 
 	// update request from server
 	public synchronized void updateRoomConfigForRoomName(String roomName) {
