@@ -15,6 +15,7 @@
 
 package org.ambientlight.room.entities.climate;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.ambientlight.room.entities.climate.util.DeviceType;
@@ -23,7 +24,9 @@ import org.ambientlight.room.entities.climate.util.DeviceType;
  * @author Florian Bornkessel
  *
  */
-public abstract class MaxComponent {
+public abstract class MaxComponent implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public abstract DeviceType getDeviceType();
 

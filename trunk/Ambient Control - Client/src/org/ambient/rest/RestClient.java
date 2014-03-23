@@ -21,9 +21,9 @@ public class RestClient {
 
 
 	public static List<String> getRoomNames() throws InterruptedException, ExecutionException {
-		GetRoomTask task = new GetRoomTask();
+		GetRoomNamesTask task = new GetRoomNamesTask();
 		task.execute(Rest.SERVER_NAME);
-		return (List<String>) task.get();
+		return task.get();
 	}
 
 

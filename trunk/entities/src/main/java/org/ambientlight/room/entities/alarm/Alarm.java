@@ -24,6 +24,8 @@ import org.ambientlight.room.entities.features.actor.Switchable;
  */
 public abstract class Alarm implements Switchable {
 
+	private static final long serialVersionUID = 1L;
+
 	private String id;
 	private boolean active;
 

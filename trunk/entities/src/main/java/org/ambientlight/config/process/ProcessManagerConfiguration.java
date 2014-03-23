@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.process;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,9 @@ import java.util.Map;
  * @author Florian Bornkessel
  * 
  */
-public class ProcessManagerConfiguration {
+public class ProcessManagerConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public Map<String, EventProcessConfiguration> processes = new HashMap<String, EventProcessConfiguration>();
 

@@ -61,7 +61,7 @@ public class MapField {
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
 			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
-			final String selectedServer, final Room roomConfig) throws IllegalAccessException {
+			final String selectedRoom, final Room roomConfig) throws IllegalAccessException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);
@@ -111,11 +111,11 @@ public class MapField {
 
 					if (valueAtPosition == null && altValuesToDisplay.size() > 0) {
 						EditConfigHandlerFragment.createNewConfigBean(altValues,
-								ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedServer, roomConfig);
+								ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
 
 					} else if (valueAtPosition != null) {
 						String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
-						EditConfigHandlerFragment.editConfigBean(context, fieldValue.get(currentText), selectedServer, roomConfig);
+						EditConfigHandlerFragment.editConfigBean(context, fieldValue.get(currentText), selectedRoom, roomConfig);
 					}
 				}
 			});
@@ -149,7 +149,7 @@ public class MapField {
 				case R.id.menuEntryEditConfigurationClass:
 
 					EditConfigHandlerFragment.editConfigBean(context, adapter.getItem(checkedItems.get(0)).getValue(),
-							selectedServer, roomConfig);
+							selectedRoom, roomConfig);
 					break;
 
 				}

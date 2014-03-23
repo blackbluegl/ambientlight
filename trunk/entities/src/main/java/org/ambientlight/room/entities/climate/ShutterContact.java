@@ -25,6 +25,8 @@ import org.ambientlight.room.entities.climate.util.DeviceType;
  */
 public class ShutterContact extends MaxComponent {
 
+	private static final long serialVersionUID = 1L;
+
 	public boolean isOpen = false;
 
 

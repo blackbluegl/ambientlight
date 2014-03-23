@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.messages;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,9 @@ import java.util.List;
  * @author Florian Bornkessel
  * 
  */
-public class QeueManagerConfiguration {
+public class QeueManagerConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public List<DispatcherConfiguration> dispatchers = new ArrayList<DispatcherConfiguration>();
 }

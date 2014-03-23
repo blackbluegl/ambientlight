@@ -55,9 +55,9 @@ public class SimpleListField {
 	 * @throws IllegalAccessException
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			final List<String> altValues, LinearLayout contentArea, final String selectedServer,
- final Room roomConfig)
-			throws IllegalAccessException {
+			final List<String> altValues, LinearLayout contentArea, final String selectedRoom,
+			final Room roomConfig)
+					throws IllegalAccessException {
 
 		final ListView listView = new ListView(contentArea.getContext());
 		contentArea.addView(listView);
@@ -89,7 +89,7 @@ public class SimpleListField {
 				context.whereToPutDataFromChild = whereToStore;
 
 				EditConfigHandlerFragment.createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValues),
-						context, selectedServer, roomConfig);
+						context, selectedRoom, roomConfig);
 			}
 		});
 
@@ -106,7 +106,7 @@ public class SimpleListField {
 
 				Object valueAtPosition = adapter.getItem(paramInt);
 
-				EditConfigHandlerFragment.editConfigBean(context, valueAtPosition, selectedServer, roomConfig);
+				EditConfigHandlerFragment.editConfigBean(context, valueAtPosition, selectedRoom, roomConfig);
 			}
 		});
 
@@ -152,7 +152,7 @@ public class SimpleListField {
 					context.whereToPutDataFromChild = whereToStore;
 
 					EditConfigHandlerFragment.createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValues),
-							context, selectedServer, roomConfig);
+							context, selectedRoom, roomConfig);
 
 					mode.finish();
 

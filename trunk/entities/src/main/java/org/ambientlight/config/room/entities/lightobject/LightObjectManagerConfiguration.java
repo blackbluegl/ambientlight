@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.room.entities.lightobject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,9 @@ import org.ambientlight.room.entities.lightobject.LightObject;
  * @author Florian Bornkessel
  * 
  */
-public class LightObjectManagerConfiguration {
+public class LightObjectManagerConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int width;
 	public int height;
