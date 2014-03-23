@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.room.entities.scenery;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +26,7 @@ import org.ambientlight.room.entities.sceneries.Scenery;
  * @author Florian Bornkessel
  *
  */
-public class SceneryManagerConfiguration {
-
+public class SceneryManagerConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

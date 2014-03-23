@@ -24,5 +24,7 @@ import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
  */
 public class DispatcherConfiguration extends RemoteHostConfiguration {
 
+	private static final long serialVersionUID = 1L;
+
 	public DispatcherType type;
 }

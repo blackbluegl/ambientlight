@@ -57,7 +57,6 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 
 	public Tag mytag = null;
 
-	private final List<String> serverNames = new ArrayList<String>();
 	private final List<String> roomNames = new ArrayList<String>();
 	private String selectedRoom = null;
 	private String selectedItem = null;
@@ -97,7 +96,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 			@Override
 			public void onClick(View v) {
 				try {
-					String message = selectedServer + NFCSwitchHandlerActivity.MESSAGE_DELIMITER
+					String message = selectedRoom + NFCSwitchHandlerActivity.MESSAGE_DELIMITER
 							+ NFCSwitchHandlerActivity.TYPE_SWITCH_EVENT + NFCSwitchHandlerActivity.MESSAGE_DELIMITER
 							+ selectedItem;
 
@@ -153,8 +152,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				selectedServer = serverNames.get(pos);
-				Room roomConfig = roomService.getRoomConfiguration(selectedServer);
+				Room roomConfig = roomService.getRoomConfiguration(roomNames.get(pos));
 
 
 				List<String> switchNames = new ArrayList<String>();

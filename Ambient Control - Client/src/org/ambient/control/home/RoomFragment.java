@@ -456,7 +456,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 						case R.id.menuEntryAddActorConduct:
 							ActorConductEditFragment.createNewConfigBean(RenderingProgramConfiguration.class, RoomFragment.this,
-									serverName, roomService.getRoomConfiguration(serverName), currentConfig.getId());
+									currentRoom, roomService.getRoomConfiguration(currentRoom), currentConfig.getId());
 							break;
 
 						default:

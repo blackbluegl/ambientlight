@@ -25,6 +25,8 @@ import org.ambientlight.room.entities.features.actor.types.SwitchType;
  */
 public class Switch implements Switchable {
 
+	private static final long serialVersionUID = 1L;
+
 	private SwitchType type;
 	private String id;
 	private boolean powerState;

@@ -84,7 +84,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 	protected Room roomConfig = null;
 
-	protected String selectedServer = null;
+	protected String selectedRoom = null;
 
 	protected boolean createMode = false;
 
@@ -116,7 +116,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 		if (getArguments().isEmpty() == false) {
 			createMode = getArguments().getBoolean(ARG_CREATE_MODE);
-			selectedServer = getArguments().getString(ARG_SELECTED_SERVER);
+			selectedRoom = getArguments().getString(ARG_SELECTED_ROOM);
 			this.roomConfig = (Room) getArguments().getSerializable(ARG_ROOM_CONFIG);
 		}
 
@@ -334,7 +334,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		}
 
 		if (typedef.fieldType().equals(FieldType.BEAN)) {
-			BeanField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedServer, roomConfig);
+			BeanField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedRoom, roomConfig);
 		}
 
 		if (typedef.fieldType().equals(FieldType.STRING)) {
@@ -354,14 +354,14 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		}
 
 		if (typedef.fieldType().equals(FieldType.MAP)) {
-			MapField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedServer, roomConfig);
+			MapField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedRoom, roomConfig);
 		}
 
 		if (typedef.fieldType().equals(FieldType.SELECTION_LIST)) {
 			SelectionListField.createView(this, config, field, altValues, contentArea);
 		}
 		if (typedef.fieldType().equals(FieldType.SIMPLE_LIST)) {
-			SimpleListField.createView(this, config, field, altValues, contentArea, selectedServer, roomConfig);
+			SimpleListField.createView(this, config, field, altValues, contentArea, selectedRoom, roomConfig);
 		}
 	}
 
@@ -372,7 +372,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		case R.id.menuEntryFinishEditConfiguration:
 
 			if (this.getTargetFragment() != null) {
-				((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedServer,
+				((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedRoom,
 						myConfigurationData);
 			}
 			getFragmentManager().popBackStack();
@@ -381,7 +381,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		case android.R.id.home:
 			getFragmentManager().popBackStack();
 			if (this.getTargetFragment() != null) {
-				((EditConfigOnExitListener) this.getTargetFragment()).onRevertConfiguration(selectedServer, myConfigurationData);
+				((EditConfigOnExitListener) this.getTargetFragment()).onRevertConfiguration(selectedRoom, myConfigurationData);
 			}
 			return true;
 
@@ -465,15 +465,14 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param selectedServer
 	 * @param roomConfig
 	 */
-	public static void editConfigBean(Fragment fragment, final Object configValueToEdit, final String selectedServer,
+	public static void editConfigBean(Fragment fragment, final Object configValueToEdit, final String selectedRoom,
 			final Room roomConfig) {
 
 		Bundle args = new Bundle();
-		args.putString(ARG_SELECTED_SERVER, selectedServer);
+		args.putString(ARG_SELECTED_ROOM, selectedRoom);
 		args.putBoolean(ARG_CREATE_MODE, false);
 		args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
 		args.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, (Serializable) configValueToEdit);
-		args.putString(ARG_SELECTED_SERVER, selectedServer);
 
 		EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 		configHandler.setArguments(args);
@@ -507,7 +506,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			public void onClick(DialogInterface dialog, int which) {
 				Bundle args = new Bundle();
 				args.putString(ARG_CLASS_NAME, altValues.get(which));
-				args.putString(ARG_SELECTED_SERVER, server);
+				args.putString(ARG_SELECTED_ROOM, roomName);
 				args.putBoolean(ARG_CREATE_MODE, true);
 				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
 
@@ -544,7 +543,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
 				clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
 
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, server,
+		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
 				roomConfiguration);
 	}
 

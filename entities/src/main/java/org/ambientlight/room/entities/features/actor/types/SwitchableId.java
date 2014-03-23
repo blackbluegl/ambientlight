@@ -15,13 +15,17 @@
 
 package org.ambientlight.room.entities.features.actor.types;
 
+import java.io.Serializable;
+
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class SwitchableId {
+public class SwitchableId implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public String id;
 

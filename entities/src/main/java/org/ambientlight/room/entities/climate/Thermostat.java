@@ -27,6 +27,8 @@ import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
 public class Thermostat extends MaxComponent implements TemperatureSensor {
 
+	private static final long serialVersionUID = 1L;
+
 	public float offset;
 	public boolean isLocked;
 	private float temperature;

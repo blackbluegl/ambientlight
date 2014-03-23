@@ -51,7 +51,7 @@ public class BeanField {
 	 */
 	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
 			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
-			final String selectedServer, final Room roomConfig) throws IllegalAccessException {
+			final String selectedRoom, final Room roomConfig) throws IllegalAccessException {
 
 		WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
 		whereToStore.fieldName = field.getName();
@@ -76,9 +76,9 @@ public class BeanField {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
 					EditConfigHandlerFragment.createNewConfigBean(altValues,
-							ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedServer, roomConfig);
+							ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
 				} else if (fieldValue != null) {
-					EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedServer, roomConfig);
+					EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedRoom, roomConfig);
 				}
 			}
 		});
@@ -137,7 +137,7 @@ public class BeanField {
 
 						case R.id.menuEntryEditConfigurationClass:
 
-							EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedServer, roomConfig);
+							EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedRoom, roomConfig);
 
 							break;
 
