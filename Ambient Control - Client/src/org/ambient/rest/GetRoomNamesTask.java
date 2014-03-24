@@ -15,12 +15,8 @@ public class GetRoomNamesTask extends AsyncTask<String, Void, List<String>> {
 
 	@Override
 	protected List<String> doInBackground(String... params) {
-		Log.d(LOG, "is called");
-
-		String url = Rest.getBaseUrl(params[0]) + URL;
-
 		try {
-			return Rest.getRestTemplate().getForObject(url, List.class, "");
+			return Rest.getRestTemplate().getForObject(Rest.getUrl(URL), List.class, "");
 		} catch (Exception e) {
 			Log.e(LOG, e.getMessage());
 			return null;

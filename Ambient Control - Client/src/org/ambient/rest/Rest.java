@@ -10,8 +10,8 @@ public class Rest {
 	public static final String SERVER_NAME = "192.168.1.29:8080";
 
 
-	public static String getBaseUrl(String hostname) {
-		return "http://" + hostname + "/middleware/webapi";
+	public static String getUrl(String suffix) {
+		return "http://" + SERVER_NAME + "/middleware/webapi" + suffix;
 	}
 
 	public static RestTemplate getRestTemplate() {

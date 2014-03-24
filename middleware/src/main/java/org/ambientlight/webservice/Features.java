@@ -16,7 +16,7 @@ import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
-@Path("/feature")
+@Path("/features")
 public class Features {
 
 	@GET

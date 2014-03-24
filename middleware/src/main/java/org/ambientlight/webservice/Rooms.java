@@ -34,7 +34,7 @@ public class Rooms {
 
 
 	@GET
-	@Path("config/{roomName}")
+	@Path("/{roomName}/config")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Room getRoomConfiguration(@PathParam("roomName") String roomName) {
 

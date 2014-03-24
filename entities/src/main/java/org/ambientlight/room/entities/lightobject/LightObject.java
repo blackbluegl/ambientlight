@@ -5,6 +5,7 @@ import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.lightobject.Renderable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
@@ -26,8 +27,6 @@ public class LightObject implements Switchable, Renderable {
 	private boolean powerState;
 
 	private String id;
-
-	private final SwitchType type = SwitchType.LED;
 
 	private RenderingProgramConfiguration renderingProgrammConfiguration;
 
@@ -111,7 +110,8 @@ public class LightObject implements Switchable, Renderable {
 	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
 	 */
 	@Override
+	@JsonIgnore
 	public SwitchType getType() {
-		return type;
+		return SwitchType.LED;
 	}
 }

@@ -20,7 +20,7 @@ public class SetActorConductConfigurationTask extends AsyncTask<Object, Void, Vo
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
 		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
 
-		String urlForUpdateOfConfig = Rest.getBaseUrl((String) params[0]) + URL + (String) params[1] + URL1;
+		String urlForUpdateOfConfig = Rest.getUrl((String) params[0]) + URL + (String) params[1] + URL1;
 		restTemplate.put(urlForUpdateOfConfig, params[2]);
 
 		return null;

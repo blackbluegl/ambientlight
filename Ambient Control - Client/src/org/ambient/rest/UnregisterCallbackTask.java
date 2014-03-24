@@ -14,11 +14,10 @@ public class UnregisterCallbackTask extends AsyncTask<String, Void, Void> {
 	@Override
 	protected Void doInBackground(String... params) {
 
-		String url = Rest.getBaseUrl(params[0]) + URL;
-		Map<String, String> vars = Collections.singletonMap("room", params[1]);
+		Map<String, String> vars = Collections.singletonMap("room", params[0]);
 
 		try {
-			Rest.getRestTemplate().delete(url, params[2], vars);
+			Rest.getRestTemplate().delete(Rest.getUrl(URL), params[1], vars);
 		} catch (Exception e) {
 			// this may happen. we cannot do anything here
 		}
