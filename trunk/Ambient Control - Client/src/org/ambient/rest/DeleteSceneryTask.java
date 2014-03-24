@@ -12,7 +12,7 @@ public class DeleteSceneryTask  extends AsyncTask<String,Void, Void>{
 		@Override
 		protected Void doInBackground(String... params) {
 			
-			String url = Rest.getBaseUrl(params[0])+URL;
+			String url = Rest.getUrl(params[0])+URL;
 			
 			// Create a new RestTemplate instance
 			HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();

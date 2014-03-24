@@ -1,34 +1,26 @@
 package org.ambient.rest;
 
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.os.AsyncTask;
 
 
 public class SetSwitchablePowerState extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/switchables";
-	private final String URL2 = "/state";
+	private final String URL = "/features/{roomName}/switchables/{type}/{id}/state";
 
 
 	@Override
 	protected Void doInBackground(Object... params) {
 
-		SwitchType type = (SwitchType) params[1];
-		String id = (String) params[2];
-		Boolean state = (Boolean) params[3];
+		Map<String, String> vars = new HashMap<String, String>();
+		vars.put("roomName", (String) params[0]);
+		vars.put("type", params[1].toString());
+		vars.put("id", (String) params[2]);
 
-		String url = Rest.getBaseUrl((String) params[0]) + URL + "/" + type.toString() + "/" + id + URL2;
+		Rest.getRestTemplate().put(Rest.getUrl(URL), params[3], vars);
 
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
-
-		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
-
-		restTemplate.put(url, state);
 		return null;
 	}
 }

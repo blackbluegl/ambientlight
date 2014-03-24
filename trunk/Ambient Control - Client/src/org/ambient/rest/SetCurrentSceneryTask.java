@@ -17,7 +17,7 @@ public class SetCurrentSceneryTask extends AsyncTask<Object, Void, Void> {
 	@Override
 	protected Void doInBackground(Object... params) {
 
-		String url = Rest.getBaseUrl((String) params[0]) + URL;
+		String url = Rest.getUrl((String) params[0]) + URL;
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(true, requestFactory);

@@ -14,11 +14,10 @@ public class RegisterCallbackTask extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected Boolean doInBackground(String... params) {
 
-		String url = Rest.getBaseUrl(params[0]) + URL;
-		Map<String, String> vars = Collections.singletonMap("room", params[1]);
+		Map<String, String> vars = Collections.singletonMap("room", params[0]);
 
 		try {
-			Rest.getRestTemplate().put(url, params[2], vars);
+			Rest.getRestTemplate().put(Rest.getUrl(URL), params[1], vars);
 		} catch (Exception e) {
 			return false;
 		}
