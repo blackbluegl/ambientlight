@@ -1,32 +1,27 @@
 package org.ambient.rest;
 
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
 
 
-public class SetCurrentSceneryTask extends AsyncTask<Object, Void, Void> {
+public class SetCurrentSceneryTask extends AsyncTask<String, Void, Void> {
 
-	private final String URL = "/sceneries/current";
-
-
+	private final String URL = "/sceneries/{roomName}/current";
 
 
 	@Override
-	protected Void doInBackground(Object... params) {
+	protected Void doInBackground(String... params) {
 
-		String url = Rest.getUrl((String) params[0]) + URL;
+		String url = Rest.getUrl(URL);
+		Map<String, String> vars = Collections.singletonMap("roomName", params[0]);
 
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
+		RestTemplate restTemplate = Rest.getRestTemplate();
 
-		restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-
-		restTemplate.put(url, params[1]);
+		restTemplate.put(url, params[1], vars);
 		return null;
 	}
-
-
 }

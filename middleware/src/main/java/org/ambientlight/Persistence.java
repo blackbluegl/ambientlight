@@ -84,7 +84,7 @@ public class Persistence {
 			dir.mkdirs();
 		}
 
-		File file = new File(DATA_DIRECTORY + File.separator + fileName + ".xml");
+		File file = new File(DATA_DIRECTORY + File.separator + fileName);
 
 		FileWriter fw = new FileWriter(file);
 
