@@ -42,7 +42,7 @@ public class Event {
 
 		AmbientControl.getRoom(roomName).eventManager.onEvent(event);
 
-		AmbientControl.getRoom(roomName).callBackMananger.roomConfigurationChanged();
+		AmbientControl.getRoom(roomName).callBackManager.roomConfigurationChanged();
 
 		return Response.status(200).build();
 	}

@@ -45,6 +45,7 @@ import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.lightobject.Renderer;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitchManager;
+import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.SwitchManager;
 
 
@@ -79,37 +80,41 @@ public class RoomFactory {
 		room.featureFacade = new FeatureFacade();
 
 		// init CallbackManager
-		room.callBackMananger = new CallBackManager(roomConfig.roomName, persistence);
+		room.callBackManager = new CallBackManager(roomConfig.roomName, persistence);
 
 		// init eventmanager
 		room.eventManager = new EventManager();
 
+		// init sceneryManager
+		room.sceneryManager = new SceneryManager(roomConfig.sceneriesManager, room.eventManager, room.callBackManager,
+				persistence);
+
 		// init alarmManager
-		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackMananger,
+		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackManager,
 				room.featureFacade, persistence);
 
 		// init lightObject rendering system
-		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackMananger,
-				room.featureFacade, persistence, roomConfig.debug);
+		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackManager, room.featureFacade,
+				persistence, roomConfig.debug);
 
 		// init queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
 
 		// init climateManager
-		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackMananger,
+		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackManager,
 				room.featureFacade, persistence);
 
 		// init remoteSwitchManager
-		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackMananger,
+		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackManager,
 				room.featureFacade, persistence);
 
 		// init switchManager
-		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackMananger,
+		room.schwitchManager = initSwitchManager(roomConfig.switchesManager, room.eventManager, room.callBackManager,
 				room.featureFacade, persistence);
 
 		// init processManager
 		room.processManager = initProcessManager(roomConfig.processManager, room.eventManager, persistence, room.featureFacade,
-				room.callBackMananger);
+				room.callBackManager);
 
 		System.out.println("RoomFactory initRoom(): finished");
 

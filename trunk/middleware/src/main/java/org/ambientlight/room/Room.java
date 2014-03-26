@@ -37,7 +37,7 @@ public class Room {
 
 	public AlarmManager alarmManager;
 
-	public CallBackManager callBackMananger;
+	public CallBackManager callBackManager;
 
 	public EventManager eventManager;
 

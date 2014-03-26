@@ -44,6 +44,7 @@ public class Scenery {
 			AmbientControl.getRoom(roomName).sceneryManager.createScenery(scenery);
 			return Response.status(200).build();
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Response.status(500).build();
 		}
 	}
@@ -58,6 +59,7 @@ public class Scenery {
 			AmbientControl.getRoom(roomName).sceneryManager.setCurrentScenery(scenery);
 			return Response.status(200).build();
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Response.status(500).build();
 		}
 	}
@@ -72,6 +74,7 @@ public class Scenery {
 			AmbientControl.getRoom(roomName).sceneryManager.deleteScenery(id);
 			return Response.status(200).build();
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Response.status(500).build();
 		}
 	}
