@@ -16,6 +16,7 @@
 package org.ambientlight.room.entities.sceneries;
 
 import org.ambientlight.Manager;
+import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.events.EventManager;
@@ -39,11 +40,13 @@ public class SceneryManager extends Manager implements ScenerySensor {
 	private EventManager eventManager;
 
 
-	public SceneryManager(SceneryManagerConfiguration config, EventManager eventManager, CallBackManager callbackManager) {
+	public SceneryManager(SceneryManagerConfiguration config, EventManager eventManager, CallBackManager callbackManager,
+			Persistence persistence) {
 		super();
 		this.config = config;
 		this.callbackManager = callbackManager;
 		this.eventManager = eventManager;
+		this.persistence = persistence;
 	}
 
 
@@ -98,8 +101,7 @@ public class SceneryManager extends Manager implements ScenerySensor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.features.sensor.ScenerySensor#getCurrentScenery()
+	 * @see org.ambientlight.config.features.sensor.ScenerySensor#getCurrentScenery()
 	 */
 	@Override
 	public Scenery getCurrentScenery() {

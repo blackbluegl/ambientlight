@@ -41,7 +41,7 @@ public class Callback {
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response register(@PathParam("roomName") String roomName, String ipAndPort) {
-		AmbientControl.getRoom(roomName).callBackMananger.registerClient(ipAndPort);
+		AmbientControl.getRoom(roomName).callBackManager.registerClient(ipAndPort);
 		return Response.status(200).build();
 	}
 
@@ -51,7 +51,7 @@ public class Callback {
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response unregister(@PathParam("roomName") String roomName, String ipAndPort) {
-		AmbientControl.getRoom(roomName).callBackMananger.unregisterClient(ipAndPort);
+		AmbientControl.getRoom(roomName).callBackManager.unregisterClient(ipAndPort);
 		return Response.status(200).build();
 	}
 }
