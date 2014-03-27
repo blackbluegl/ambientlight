@@ -21,6 +21,7 @@ import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.events.SceneryEntryEvent;
+import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 
 
@@ -41,12 +42,14 @@ public class SceneryManager extends Manager implements ScenerySensor {
 
 
 	public SceneryManager(SceneryManagerConfiguration config, EventManager eventManager, CallBackManager callbackManager,
-			Persistence persistence) {
+			FeatureFacade featureFacade, Persistence persistence) {
 		super();
 		this.config = config;
 		this.callbackManager = callbackManager;
 		this.eventManager = eventManager;
 		this.persistence = persistence;
+
+		featureFacade.registerScenerySensor(this);
 	}
 
 

@@ -87,7 +87,7 @@ public class RoomFactory {
 
 		// init sceneryManager
 		room.sceneryManager = new SceneryManager(roomConfig.sceneriesManager, room.eventManager, room.callBackManager,
-				persistence);
+				room.featureFacade, persistence);
 
 		// init alarmManager
 		room.alarmManager = initAlarmManager(roomConfig.alarmManager, room.eventManager, room.callBackManager,
