@@ -3,6 +3,7 @@ package org.ambientlight.process;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.events.BroadcastEvent;
@@ -12,6 +13,7 @@ import org.ambientlight.events.EventManager;
 
 public class Process implements EventListener {
 
+	public CallBackManager callback;
 	public EventProcessConfiguration config;
 	public EventManager eventManager;
 	public Map<Integer, Node> nodes = new HashMap<Integer, Node>();
@@ -51,9 +53,12 @@ public class Process implements EventListener {
 						+ currentNode.handler.getClass().getSimpleName() + " in node: " + currentNode.config.id);
 				currentNode.performAction(token);
 			}
-			System.out.println("Process: " + config.id + " finished.");
+
+			callback.roomConfigurationChanged();
+
+			System.out.println("Process: " + config.id + " finished successfully.");
 		} catch (Exception e) {
-			System.out.println("Process: " + config.id + " stopped during an error in node: " + currentNode.config.id + ":");
+			System.out.println("Process: " + config.id + " canceled with an error in node: " + currentNode.config.id + ":");
 			e.printStackTrace();
 		}
 	}
