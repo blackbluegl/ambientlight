@@ -67,7 +67,7 @@ public class CreateTestConfig {
 	public static void main(String[] args) throws IOException {
 		CreateTestConfig test = new CreateTestConfig();
 
-		Persistence.saveRoomConfiguration("default", test.getTestRoom());
+		Persistence.saveRoomConfiguration("default.xml", test.getTestRoom());
 	}
 
 
@@ -87,8 +87,8 @@ public class CreateTestConfig {
 		createLightObjectManager(rc);
 
 		createProcessManagerWithMainSwitch(rc);
-		createProcessWithSceneryForProcessManager(rc);
-
+		createProcessWithSceneryForProcessManager(rc, "process-scenario1", SCENERY_SCENERY1);
+		createProcessWithSceneryForProcessManager(rc, "process-scenario2", SCENERY_SCENERY2);
 		return rc;
 	}
 
@@ -360,7 +360,7 @@ public class CreateTestConfig {
 	}
 
 
-	private void createProcessWithSceneryForProcessManager(RoomConfiguration rc) {
+	private void createProcessWithSceneryForProcessManager(RoomConfiguration rc, String processName, String scenarioName) {
 
 		Map<String, RenderingProgramConfiguration> changeConfigFor = new HashMap<String, RenderingProgramConfiguration>();
 		changeConfigFor.put(CreateTestConfig.LO_BACKGROUND_ID, createSimpleColor());
@@ -373,12 +373,11 @@ public class CreateTestConfig {
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
-		process.id = "process-scenario1";
+		process.id = processName;
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
 
-		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent(SceneryManager.SENSOR_NAME,
-				CreateTestConfig.SCENERY_SCENERY1);
+		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent(SceneryManager.SENSOR_NAME, scenarioName);
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		RenderingProgrammChangeHandlerConfiguration cHandler = new RenderingProgrammChangeHandlerConfiguration();
