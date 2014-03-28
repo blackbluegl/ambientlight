@@ -57,7 +57,7 @@ public class SceneryManager extends Manager implements ScenerySensor {
 
 		if (config.sceneries.containsKey(scenery) == false)
 			throw new IllegalArgumentException("Scenery does not exist!");
-
+		System.out.println("SceneryManager - setCurrentScenery: setting current scenery " + scenery);
 		persistence.beginTransaction();
 
 		this.config.currentScenery = config.sceneries.get(scenery);
