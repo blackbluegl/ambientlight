@@ -46,6 +46,12 @@ public class CallBackManager extends Manager {
 
 
 	public void roomConfigurationChanged() {
+
+		if (persistence.isTransactionRunning()) {
+			System.out.println("CallbackManager - roomConfigurationChanged(): transaction running. ommiting callback!");
+			return;
+		}
+
 		List<String> removeListeners = new ArrayList<String>();
 
 		for (String currentClient : clients) {

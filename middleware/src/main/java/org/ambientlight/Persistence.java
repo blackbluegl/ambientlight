@@ -38,6 +38,11 @@ public class Persistence {
 	ReentrantLock saveLock = new ReentrantLock();
 
 
+	public boolean isTransactionRunning() {
+		return saveLock.isLocked();
+	}
+
+
 	public RoomConfiguration getRoomConfiguration() {
 		return roomConfig;
 	}
@@ -49,10 +54,15 @@ public class Persistence {
 
 
 	public void commitTransaction() {
+		if (isTransactionRunning() == false) {
+			System.out.println("RoomConfigurationFactory - commitTransaktion(): Warning no transaction running!");
+		}
 		try {
 			saveRoomConfiguration(this.fileName, this.roomConfig);
+			System.out.println("RoomConfigurationFactory - commitTransaktion(): Successfully saved configuration.");
 		} catch (IOException e) {
-			System.out.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk!");
+			System.out
+					.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
 		} finally {
 			saveLock.unlock();

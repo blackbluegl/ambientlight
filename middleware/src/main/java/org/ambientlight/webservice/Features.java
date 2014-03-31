@@ -37,7 +37,7 @@ public class Features {
 		try {
 			SwitchType typeEnume = SwitchType.valueOf(type);
 
-			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState);
+			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState, true);
 			return Response.status(200).build();
 
 		} catch (Exception e) {

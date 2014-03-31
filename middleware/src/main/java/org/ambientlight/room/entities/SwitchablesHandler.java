@@ -29,5 +29,5 @@ public interface SwitchablesHandler {
 	public Switchable getSwitchable(SwitchableId id);
 
 
-	public void setPowerState(String id, SwitchType type, boolean powerState);
+	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent);
 }

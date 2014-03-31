@@ -88,14 +88,14 @@ public class FeatureFacade {
 	}
 
 
-	public void setSwitcheablePowerState(SwitchType type, String id, boolean powerState) {
+	public void setSwitcheablePowerState(SwitchType type, String id, boolean powerState, boolean fireEvent) {
 		SwitchableId switchId = new SwitchableId(id, type);
 		SwitchablesHandler handler = switchableMap.get(switchId);
 
 		if (handler == null)
 			return;
 
-		handler.setPowerState(id, type, powerState);
+		handler.setPowerState(id, type, powerState, fireEvent);
 	}
 
 

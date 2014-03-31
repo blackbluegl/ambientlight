@@ -239,7 +239,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState) {
+	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
 
 		RenderObject renderObject = lightObjectRenderObjects.get(id);
 

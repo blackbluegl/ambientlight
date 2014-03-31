@@ -17,14 +17,14 @@ public class PowerStateHandler extends AbstractActionHandler {
 			boolean powerState = ((SimplePowerStateHandlerConfiguration) config).powerState;
 
 			for (SwitchableId switchableIds : featureFacade.getSwitchableIds()) {
-				featureFacade.setSwitcheablePowerState(switchableIds.type, switchableIds.id, powerState);
+				featureFacade.setSwitcheablePowerState(switchableIds.type, switchableIds.id, powerState, false);
 			}
 			return;
 		}
 
 		for (SwitchableId currentId : getConfig().powerStateConfiguration.keySet()) {
 			boolean powerState = getConfig().powerStateConfiguration.get(currentId);
-			featureFacade.setSwitcheablePowerState(currentId.type, currentId.id, powerState);
+			featureFacade.setSwitcheablePowerState(currentId.type, currentId.id, powerState, false);
 		}
 	}
 
