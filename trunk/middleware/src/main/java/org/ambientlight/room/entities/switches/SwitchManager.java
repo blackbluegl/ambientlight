@@ -58,12 +58,11 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
-	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java. lang.String,
+	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState) {
+	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
 		if (config.switches.containsKey(id) == false) {
 			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: =" + id);
 			return;
@@ -74,9 +73,10 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 		Switch switchObject = config.switches.get(id);
 		switchObject.setPowerState(powerState);
 
+		if (fireEvent) {
+			eventManager.onEvent(new SwitchEvent(id, powerState, type.switchEventType));
+		}
 		persistence.commitTransaction();
-
-		eventManager.onEvent(new SwitchEvent(id, powerState, type.switchEventType));
 
 		callback.roomConfigurationChanged();
 	}

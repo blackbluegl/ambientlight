@@ -145,12 +145,11 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
-	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java. lang.String,
+	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState) {
+	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
 		DailyAlarm alarm = config.alarms.get(id);
 
 		if (alarm == null) {

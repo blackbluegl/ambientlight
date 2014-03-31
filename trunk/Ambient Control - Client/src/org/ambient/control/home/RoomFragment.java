@@ -309,11 +309,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 		String[] sceneryNames = room.sceneriesManager.sceneries.keySet().toArray(new String[1]);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
 				sceneryNames);
 		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
-		Spinner spinner = (Spinner) roomsContainerView.findViewWithTag("sceneries" + currentRoom);
+		final Spinner spinner = (Spinner) roomsContainerView.findViewWithTag("sceneries" + currentRoom);
 		spinner.setAdapter(adapter);
 		adapter.getPosition(room.sceneriesManager.currentScenery.id);
 		spinner.setSelection(adapter.getPosition(room.sceneriesManager.currentScenery.id));
@@ -326,7 +326,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 				String currentScenery = room.sceneriesManager.currentScenery.id;
 
 				if (!selectedScenery.equals(currentScenery)) {
-					RestClient.setCurrentScenery(currentRoom, currentScenery);
+					RestClient.setCurrentScenery(currentRoom, selectedScenery);
+					spinner.setSelection(adapter.getPosition(selectedScenery));
 					disableEventListener(currentRoom, true);
 				}
 			}

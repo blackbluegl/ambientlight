@@ -62,7 +62,7 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState) {
+	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
 		RemoteSwitch remoteSwitch = config.remoteSwitches.get(id);
 
 		if (config.remoteSwitches.containsKey(id) == false) {

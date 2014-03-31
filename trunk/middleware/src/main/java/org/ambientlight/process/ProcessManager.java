@@ -157,6 +157,7 @@ public class ProcessManager extends Manager {
 	private Process createProcess(EventProcessConfiguration processConfig) {
 		Process result = new Process();
 		result.callback = this.callback;
+		result.persistence = this.persistence;
 		result.config = processConfig;
 		createNodes(result, 0);
 		result.eventManager = eventManager;
