@@ -441,7 +441,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 							ActorConductEditFragment fragEdit = new ActorConductEditFragment();
 							fragEdit.setTargetFragment(RoomFragment.this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 							Bundle arguments = new Bundle();
-							arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, (Entity) GuiUtils
+							arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE,
+									(RenderingProgramConfiguration) GuiUtils
 									.deepCloneSerializeable(((Renderable) currentConfig).getRenderingProgrammConfiguration()));
 							arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
 							arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_ROOM, currentRoom);
