@@ -99,7 +99,7 @@ public class RestClient {
 
 
 	public static void setRenderingConfiguration(String roomName, String itemName, RenderingProgramConfiguration config) {
-		SetActorConductConfigurationTask task = new SetActorConductConfigurationTask();
+		SetRenderingConfigurationTask task = new SetRenderingConfigurationTask();
 		task.execute(roomName, itemName, config);
 	}
 

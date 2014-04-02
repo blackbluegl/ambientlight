@@ -99,6 +99,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		}
 	}
 
+
 	public BufferedImage getRoomBitMap() {
 		return pixelMap;
 	}
@@ -170,6 +171,9 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 	public void setRenderingConfiguration(RenderingProgramConfiguration newConfig, String id) {
 
+		System.out.println("LightObjectManager setRenderingConfiguration: setting renderingConfig: "
+				+ newConfig.getClass().getSimpleName() + " for id: " + id);
+
 		RenderObject renderObject = lightObjectRenderObjects.get(id);
 
 		if (renderObject == null) {
@@ -187,7 +191,6 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
 
 		callBackMananger.roomConfigurationChanged();
-
 	}
 
 
@@ -234,9 +237,8 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
-	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java. lang.String,
+	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
 	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {

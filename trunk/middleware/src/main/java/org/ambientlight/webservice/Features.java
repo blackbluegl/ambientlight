@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControl;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
@@ -38,6 +39,24 @@ public class Features {
 			SwitchType typeEnume = SwitchType.valueOf(type);
 
 			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState, true);
+			return Response.status(200).build();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
+	}
+
+
+	@PUT
+	@Path("/{roomName}/renderables/{id}/config")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object setRenderConfigurationForItem(@PathParam("roomName") String roomName, @PathParam("id") String itemName,
+			RenderingProgramConfiguration config) {
+
+		try {
+			AmbientControl.getRoom(roomName).featureFacade.setRenderingConfiguration(config, itemName);
 			return Response.status(200).build();
 
 		} catch (Exception e) {

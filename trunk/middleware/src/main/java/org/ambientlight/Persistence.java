@@ -49,7 +49,12 @@ public class Persistence {
 
 
 	public void beginTransaction() {
-		saveLock.lock();
+		if (isTransactionRunning() == false) {
+			System.out.println("RoomConfigurationFactory - beginTransaction(): beginning transaction.");
+			saveLock.lock();
+		} else {
+			System.out.println("RoomConfigurationFactory - beginTransaction(): transaction currently running.");
+		}
 	}
 
 
@@ -62,7 +67,7 @@ public class Persistence {
 			System.out.println("RoomConfigurationFactory - commitTransaktion(): Successfully saved configuration.");
 		} catch (IOException e) {
 			System.out
-					.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk! Emergency exit!");
+			.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
 		} finally {
 			saveLock.unlock();
@@ -71,6 +76,7 @@ public class Persistence {
 
 
 	public void cancelTransaction() {
+		System.out.println("RoomConfigurationFactory - cancelTransaction(): Canceling transaction");
 		saveLock.unlock();
 	}
 
