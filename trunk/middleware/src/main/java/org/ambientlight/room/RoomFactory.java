@@ -62,7 +62,7 @@ public class RoomFactory {
 
 
 	public void destroyRoom(Room room) {
-		room.lightObjectManager.destroy();
+		room.lightObjectManager.onDestroy();
 	}
 
 

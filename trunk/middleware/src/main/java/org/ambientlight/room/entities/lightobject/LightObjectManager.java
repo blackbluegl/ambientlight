@@ -91,7 +91,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	}
 
 
-	public void destroy() {
+	public void onDestroy() {
 		this.rendeTimer.cancel();
 		this.renderTask.debugRoomDisplay.dispose();
 		for (AnimateableLedDevice current : this.devices) {

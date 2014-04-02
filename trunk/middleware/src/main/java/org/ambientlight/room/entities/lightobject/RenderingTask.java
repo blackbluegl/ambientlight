@@ -48,6 +48,8 @@ public class RenderingTask extends TimerTask {
 	@Override
 	public void run() {
 
+		renderer.render();
+
 		if (debug) {
 			handleDebug();
 		}
