@@ -72,12 +72,17 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		this.devices = devices;
 		this.config = config;
 
-		for (LightObject currentItemConfiguration : config.lightObjects.values()) {
+		for (LightObject currentLightObject : config.lightObjects.values()) {
 
 			List<StripePart> stripePartsInLightObject = this.getStripePartsFromRoomForLightObject(getAllStripePartsInRoom(),
-					currentItemConfiguration);
-			lightObjectRenderObjects.put(currentItemConfiguration.getId(), new RenderObject(currentItemConfiguration,
-					stripePartsInLightObject));
+					currentLightObject);
+
+			RenderObject currentRenderObject = new RenderObject(currentLightObject, stripePartsInLightObject);
+
+			lightObjectRenderObjects.put(currentLightObject.getId(), currentRenderObject);
+			if (currentLightObject.getPowerState()) {
+				addLightObjectToRender(renderer, currentRenderObject, effectFactory.getFadeInEffect(currentRenderObject));
+			}
 		}
 
 		// listen for switchable events
@@ -257,7 +262,6 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		}
 
 		persistence.beginTransaction();
-
 		renderObject.lightObject.setPowerState(powerState);
 		persistence.commitTransaction();
 
