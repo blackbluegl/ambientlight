@@ -47,10 +47,10 @@ public class Callback {
 
 
 	@DELETE
-	@Path("/{roomName}/client")
+	@Path("/{roomName}/client/{ipAndPort}")
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response unregister(@PathParam("roomName") String roomName, String ipAndPort) {
+	public Response unregister(@PathParam("roomName") String roomName, @PathParam("ipAndPort") String ipAndPort) {
 		AmbientControl.getRoom(roomName).callBackManager.unregisterClient(ipAndPort);
 		return Response.status(200).build();
 	}
