@@ -26,6 +26,8 @@ public class Persistence {
 
 	private RoomConfiguration roomConfig;
 
+	private int semaphore = 0;
+
 
 	public Persistence(String fileName) throws FileNotFoundException {
 		this.fileName = fileName;
@@ -49,6 +51,7 @@ public class Persistence {
 
 
 	public void beginTransaction() {
+		semaphore++;
 		if (isTransactionRunning() == false) {
 			System.out.println("RoomConfigurationFactory - beginTransaction(): beginning transaction.");
 			saveLock.lock();
@@ -59,24 +62,35 @@ public class Persistence {
 
 
 	public void commitTransaction() {
-		if (isTransactionRunning() == false) {
-			System.out.println("RoomConfigurationFactory - commitTransaktion(): Warning no transaction running!");
-		}
 		try {
-			saveRoomConfiguration(this.fileName, this.roomConfig);
-			System.out.println("RoomConfigurationFactory - commitTransaktion(): Successfully saved configuration.");
+
+			// first check if this transaction is encapsulated in an outer one. do not save the state then
+			semaphore = semaphore > 0 ? semaphore - 1 : 0;
+			if (semaphore > 0) {
+				System.out.println("RoomConfigurationFactory - commitTransaktion(): "
+						+ "Warning ommitting because an outer transaction is running!");
+				return;
+			}
+
+			// if no transaction is running because it was canceled. do not save anything to disc
+			if (isTransactionRunning() == false) {
+				System.out.println("RoomConfigurationFactory - commitTransaktion(): Warning no transaction running!");
+			} else {
+				saveLock.unlock();
+				saveRoomConfiguration(this.fileName, this.roomConfig);
+				System.out.println("RoomConfigurationFactory - commitTransaktion(): Successfully saved configuration.");
+			}
 		} catch (IOException e) {
-			System.out
-			.println("RoomConfigurationFactory - commitTransaktion(): Error writing roomConfiguration to Disk! Emergency exit!");
+			System.out.println("RoomConfigurationFactory - commitTransaktion(): "
+					+ "Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
-		} finally {
-			saveLock.unlock();
 		}
 	}
 
 
 	public void cancelTransaction() {
 		System.out.println("RoomConfigurationFactory - cancelTransaction(): Canceling transaction");
+		semaphore = 0;
 		saveLock.unlock();
 	}
 
@@ -109,7 +123,7 @@ public class Persistence {
 		fw.flush();
 		fw.close();
 
-		System.out.println("wrote roomConfig to: " + file.getAbsoluteFile());
+		System.out.println("RoomConfigurationFactory - saveRoomConfiguration(): wrote roomConfig to: " + file.getAbsoluteFile());
 	}
 
 
