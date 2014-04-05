@@ -13,6 +13,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("simpleColorRenderingProgram")
 public class SimpleColorRenderingProgramConfiguration extends RenderingProgramConfiguration implements Cloneable {
 
+	private static final long serialVersionUID = 1L;
+
 	@Presentation(name = "Farbe", position = 0, groupPosition = 1)
 	@TypeDef(fieldType = FieldType.COLOR, min = "0", max = "255")
 	public int rgb;
