@@ -6,6 +6,7 @@ import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.ValueBindingPath;
+import org.ambientlight.room.entities.features.EntityId;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -19,7 +20,7 @@ public abstract class BroadcastEvent implements Serializable {
 	@AlternativeValues(valueBinding = {
 			@ValueBindingPath(forSubClass = "org.ambientlight.process.events.SceneryEntryEventConfiguration", valueBinding = "getSceneryEventGenerator().keySet()"),
 			@ValueBindingPath(forSubClass = "org.ambientlight.process.events.SwitchEventConfiguration", valueBinding = "getSwitchGenerators().keySet()") })
-	public String sourceId;
+	public EntityId sourceId;
 
 
 	public BroadcastEvent() {
@@ -27,7 +28,7 @@ public abstract class BroadcastEvent implements Serializable {
 	}
 
 
-	public BroadcastEvent(String sourceId) {
+	public BroadcastEvent(EntityId sourceId) {
 		this.sourceId = sourceId;
 	}
 
@@ -57,5 +58,6 @@ public abstract class BroadcastEvent implements Serializable {
 			return false;
 		return true;
 	}
+
 
 }

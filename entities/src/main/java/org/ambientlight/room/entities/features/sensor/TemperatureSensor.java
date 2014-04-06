@@ -15,7 +15,6 @@
 
 package org.ambientlight.room.entities.features.sensor;
 
-import java.util.Date;
 
 
 /**
@@ -24,8 +23,4 @@ import java.util.Date;
  */
 public interface TemperatureSensor extends Sensor {
 
-	public float getTemperature();
-
-
-	public Date getMessureDate();
 }

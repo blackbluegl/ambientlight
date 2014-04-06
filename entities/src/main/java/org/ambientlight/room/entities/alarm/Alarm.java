@@ -15,6 +15,7 @@
 
 package org.ambientlight.room.entities.alarm;
 
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 
 
@@ -26,8 +27,8 @@ public abstract class Alarm implements Switchable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String id;
-	private boolean active;
+	protected String id;
+	protected boolean active;
 
 
 	/*
@@ -44,8 +45,7 @@ public abstract class Alarm implements Switchable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
+	 * @see org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
 	 */
 	@Override
 	public void setPowerState(boolean powerState) {
@@ -56,21 +56,10 @@ public abstract class Alarm implements Switchable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.config.features.Entity#getName()
-	 */
-	@Override
-	public String getId() {
-		return this.id;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
 	 */
 	@Override
-	public void setId(String name) {
-		this.id = name;
+	public void setId(EntityId id) {
+		this.id = id.id;
 	}
 }

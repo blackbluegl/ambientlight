@@ -27,7 +27,7 @@ import org.ambientlight.messages.DispatcherManager;
 import org.ambientlight.messages.QeueManager;
 import org.ambientlight.messages.max.MaxDispatcher;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
-import org.ambientlight.room.entities.climate.MaxThermostateMode;
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 
 /**

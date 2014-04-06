@@ -17,8 +17,7 @@ package org.ambientlight.ws;
 
 import java.io.IOException;
 
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
+import org.ambientlight.room.entities.features.EntityId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -29,23 +28,20 @@ import com.fasterxml.jackson.databind.KeyDeserializer;
  * @author Florian Bornkessel
  * 
  */
-public class SwitchableIdDeserializer extends KeyDeserializer {
+public class EntityIdDeserializer extends KeyDeserializer {
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.fasterxml.jackson.databind.KeyDeserializer#deserializeKey(java.lang
-	 * .String, com.fasterxml.jackson.databind.DeserializationContext)
+	 * @see com.fasterxml.jackson.databind.KeyDeserializer#deserializeKey(java.lang .String,
+	 * com.fasterxml.jackson.databind.DeserializationContext)
 	 */
 	@Override
 	public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		String tokens[] = key.split("\\|");
-		String id = tokens[0];
-		SwitchType type = SwitchType.valueOf(tokens[1]);
-		SwitchableId result = new SwitchableId(id, type);
-
-		return result;
+		int delim = key.lastIndexOf(".");
+		String domain = key.substring(0, delim - 1);
+		String id = key.substring(delim, key.length());
+		return new EntityId(domain, id);
 	}
 
 }

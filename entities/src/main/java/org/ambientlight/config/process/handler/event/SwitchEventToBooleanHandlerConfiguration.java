@@ -25,7 +25,7 @@ import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
  *
  */
 @HandlerDataTypeValidation(consumes = { DataTypeValidation.EVENT }, generates = DataTypeValidation.BOOLEAN)
-public class EventToBooleanHandlerConfiguration extends AbstractActionHandlerConfiguration {
+public class SwitchEventToBooleanHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
 	private static final long serialVersionUID = 1L;
 }

@@ -22,6 +22,7 @@ import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration
 import org.ambientlight.events.EventManager;
 import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.room.entities.FeatureFacade;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 
 
@@ -31,8 +32,6 @@ import org.ambientlight.room.entities.features.sensor.ScenerySensor;
  * 
  */
 public class SceneryManager extends Manager implements ScenerySensor {
-
-	public static final String SENSOR_NAME = "SceneryManager";
 
 	private SceneryManagerConfiguration config;
 
@@ -49,7 +48,7 @@ public class SceneryManager extends Manager implements ScenerySensor {
 		this.eventManager = eventManager;
 		this.persistence = persistence;
 
-		featureFacade.registerScenerySensor(this);
+		featureFacade.registerSensor(this.getSensorId(), this);
 	}
 
 
@@ -107,7 +106,7 @@ public class SceneryManager extends Manager implements ScenerySensor {
 	 * @see org.ambientlight.config.features.sensor.ScenerySensor#getCurrentScenery()
 	 */
 	@Override
-	public Scenery getCurrentScenery() {
+	public Object getSensorValue() {
 		return config.currentScenery;
 	}
 
@@ -118,7 +117,7 @@ public class SceneryManager extends Manager implements ScenerySensor {
 	 * @see org.ambientlight.config.features.sensor.Sensor#getSensorName()
 	 */
 	@Override
-	public String getSensorId() {
-		return SENSOR_NAME;
+	public EntityId getSensorId() {
+		return new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER);
 	}
 }

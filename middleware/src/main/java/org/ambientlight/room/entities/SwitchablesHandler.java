@@ -15,9 +15,8 @@
 
 package org.ambientlight.room.entities;
 
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -26,8 +25,8 @@ import org.ambientlight.room.entities.features.actor.types.SwitchableId;
  */
 public interface SwitchablesHandler {
 
-	public Switchable getSwitchable(SwitchableId id);
+	public Switchable getSwitchable(EntityId id);
 
 
-	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent);
+	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent);
 }

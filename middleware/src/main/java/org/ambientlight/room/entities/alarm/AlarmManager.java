@@ -30,9 +30,8 @@ import org.ambientlight.events.DailyAlarmEvent;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -62,7 +61,7 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 
 		for (Entry<String, DailyAlarm> current : config.alarms.entrySet()) {
 			createAlarmEvent(current.getKey(), current.getValue());
-			entitiesFacade.registerSwitchable(this, current.getValue(), SwitchType.ALARM);
+			entitiesFacade.registerSwitchable(this, current.getValue());
 		}
 	}
 
@@ -95,12 +94,12 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 
 		persistence.beginTransaction();
 
-		this.config.alarms.put(alarm.getId(), alarm);
+		this.config.alarms.put(alarm.getId().id, alarm);
 
 		if (alarm.getPowerState()) {
-			createAlarmEvent(alarm.getId(), alarm);
+			createAlarmEvent(alarm.getId().id, alarm);
 		} else {
-			removeAlarmEvent(alarm.getId(), alarm);
+			removeAlarmEvent(alarm.getId().id, alarm);
 		}
 
 		persistence.commitTransaction();
@@ -149,7 +148,7 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
+	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
 		DailyAlarm alarm = config.alarms.get(id);
 
 		if (alarm == null) {
@@ -169,7 +168,7 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 	 * ambientlight.room.entities.features.actor.types.SwitchableId)
 	 */
 	@Override
-	public Switchable getSwitchable(SwitchableId id) {
+	public Switchable getSwitchable(EntityId id) {
 		return config.alarms.get(id.id);
 	}
 }

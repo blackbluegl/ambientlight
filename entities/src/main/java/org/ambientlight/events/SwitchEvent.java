@@ -3,6 +3,7 @@ package org.ambientlight.events;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.events.types.SwitchEventType;
+import org.ambientlight.room.entities.features.EntityId;
 
 
 public class SwitchEvent extends BroadcastEvent {
@@ -20,7 +21,7 @@ public class SwitchEvent extends BroadcastEvent {
 	}
 
 
-	public SwitchEvent(String sourceId, boolean powerState, SwitchEventType type) {
+	public SwitchEvent(EntityId sourceId, boolean powerState) {
 		super(sourceId);
 		this.powerState = powerState;
 		this.type = type;

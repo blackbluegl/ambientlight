@@ -13,16 +13,13 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.features.sensor.types;
-
+package org.ambientlight.room.entities.features.sensor;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class TemperatureSensorId {
+public interface SwitchSensor extends Sensor {
 
-	public String id;
-	public TemperatureSensorType type;
 }

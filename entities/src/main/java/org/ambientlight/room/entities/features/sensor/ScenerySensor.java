@@ -15,7 +15,6 @@
 
 package org.ambientlight.room.entities.features.sensor;
 
-import org.ambientlight.room.entities.sceneries.Scenery;
 
 
 /**
@@ -23,9 +22,4 @@ import org.ambientlight.room.entities.sceneries.Scenery;
  * 
  */
 public interface ScenerySensor extends Sensor {
-
-
-
-
-	public Scenery getCurrentScenery();
 }

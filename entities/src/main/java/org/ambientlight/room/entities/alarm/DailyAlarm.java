@@ -15,7 +15,8 @@
 
 package org.ambientlight.room.entities.alarm;
 
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.EntityId;
+
 
 
 /**
@@ -33,11 +34,11 @@ public class DailyAlarm extends Alarm {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
+	 * @see org.ambientlight.room.entities.features.Entity#getId()
 	 */
 	@Override
-	public SwitchType getType() {
-		return SwitchType.ALARM;
+	public EntityId getId() {
+		return new EntityId(EntityId.DOMAIN_ALARM_DAILY, id);
 	}
 
 }

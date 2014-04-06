@@ -20,14 +20,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
-import org.ambientlight.room.entities.features.sensor.ScenerySensor;
-import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorId;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorType;
+import org.ambientlight.room.entities.features.sensor.Sensor;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
+import org.ambientlight.room.entities.sceneries.SceneryManager;
 
 
 /**
@@ -37,65 +34,64 @@ import org.ambientlight.room.entities.lightobject.LightObjectManager;
 public class FeatureFacade {
 
 	private LightObjectManager lightObjectManager;
+	private SceneryManager sceneryManager;
 
-	Map<SwitchableId, SwitchablesHandler> switchableMap = new HashMap<SwitchableId, SwitchablesHandler>();
-	Map<TemperatureSensorId, TemperatureSensor> tempsensorsMap = new HashMap<TemperatureSensorId, TemperatureSensor>();
-
-	private ScenerySensor sceneryManager;
+	Map<EntityId, SwitchablesHandler> switchableMap = new HashMap<EntityId, SwitchablesHandler>();
+	Map<EntityId, Sensor> sensors = new HashMap<EntityId, Sensor>();
 
 
-	public void registerLightObjectManager(LightObjectManager manager) {
-		lightObjectManager = manager;
-	}
-
-	public void registerTemperatureSensor(TemperatureSensor sensor, TemperatureSensorType type) {
-		TemperatureSensorId id = new TemperatureSensorId();
-		id.id = sensor.getSensorId();
-		id.type = type;
-		tempsensorsMap.put(id, sensor);
+	public void registerSceneryManager(SceneryManager manager) {
+		this.sceneryManager = manager;
 	}
 
 
-	public void registerScenerySensor(ScenerySensor sensor) {
-		this.sceneryManager = sensor;
+	public void setCurrentScenery(String scenery) {
+		this.sceneryManager.setCurrentScenery(scenery);
 	}
 
 
-	public ScenerySensor getScenerySensor() {
-		return this.sceneryManager;
+	public void registerSensor(EntityId sensorId, Sensor sensor) {
+		sensors.put(sensorId, sensor);
 	}
 
 
-	public Map<TemperatureSensorId, TemperatureSensor> getTemperatureSensors() {
-		return this.getTemperatureSensors();
+	public Set<EntityId> getSensorsList() {
+		return this.sensors.keySet();
 	}
 
 
-	public void registerSwitchable(SwitchablesHandler handler, Switchable switchable, SwitchType type) {
-		SwitchableId id = new SwitchableId(switchable.getId(), type);
-		switchableMap.put(id, handler);
+	public Sensor getSensor(EntityId id) {
+		return this.sensors.get(id);
 	}
 
 
-	public Set<SwitchableId> getSwitchableIds() {
+	public void registerSwitchable(SwitchablesHandler handler, Switchable switchable) {
+		switchableMap.put(switchable.getId(), handler);
+	}
+
+
+	public Set<EntityId> getSwitchableIds() {
 		return this.switchableMap.keySet();
 	}
 
 
-	public Switchable getSwitchable(SwitchType type, String id) {
-		SwitchableId switchId = new SwitchableId(id, type);
-		return switchableMap.get(switchId).getSwitchable(switchId);
+	public Switchable getSwitchable(EntityId id) {
+		return switchableMap.get(id).getSwitchable(id);
 	}
 
 
-	public void setSwitcheablePowerState(SwitchType type, String id, boolean powerState, boolean fireEvent) {
-		SwitchableId switchId = new SwitchableId(id, type);
-		SwitchablesHandler handler = switchableMap.get(switchId);
+	public void setSwitcheablePowerState(EntityId id, boolean powerState, boolean fireEvent) {
+		SwitchablesHandler handler = switchableMap.get(id);
 
 		if (handler == null)
 			return;
 
-		handler.setPowerState(id, type, powerState, fireEvent);
+		handler.setPowerState(id, powerState, fireEvent);
+	}
+
+
+	public void registerLightObjectManager(LightObjectManager manager) {
+		lightObjectManager = manager;
 	}
 
 

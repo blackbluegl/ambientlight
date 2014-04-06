@@ -29,7 +29,7 @@ import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfiguration;
+import org.ambientlight.config.process.handler.event.SwitchEventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
@@ -38,7 +38,7 @@ import org.ambientlight.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.actor.PowerStateHandler;
 import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
-import org.ambientlight.process.handler.event.EventToBooleanHandler;
+import org.ambientlight.process.handler.event.SwitchEventToBooleanHandler;
 import org.ambientlight.process.handler.event.FireEventHandler;
 import org.ambientlight.process.handler.event.SensorToTokenHandler;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
@@ -185,8 +185,8 @@ public class ProcessManager extends Manager {
 			createNodes(process, nodeConfig.nextNodeIds.get(1));
 		} else if (nodeConfig.actionHandler instanceof ExpressionHandlerConfiguration) {
 			handler = new ExpressionActionHandler();
-		} else if (nodeConfig.actionHandler instanceof EventToBooleanHandlerConfiguration) {
-			handler = new EventToBooleanHandler();
+		} else if (nodeConfig.actionHandler instanceof SwitchEventToBooleanHandlerConfiguration) {
+			handler = new SwitchEventToBooleanHandler();
 		} else if (nodeConfig.actionHandler instanceof FireEventHandlerConfiguration) {
 			handler = new FireEventHandler();
 		} else if (nodeConfig.actionHandler instanceof SensorToTokenConfiguration) {

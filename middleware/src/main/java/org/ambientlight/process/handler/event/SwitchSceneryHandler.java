@@ -15,52 +15,39 @@
 
 package org.ambientlight.process.handler.event;
 
-import org.ambientlight.events.BroadcastEvent;
-import org.ambientlight.events.SceneryEntryEvent;
-import org.ambientlight.process.SensorCategory;
+import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.config.process.handler.event.SwitchSceneryHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.TokenSensorValue;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
-import org.ambientlight.process.handler.Util;
-import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class SensorToEventHandler extends AbstractActionHandler {
+public class SwitchSceneryHandler extends AbstractActionHandler {
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.process.handler.AbstractActionHandler#performAction(
-	 * org.ambientlight.process.Token)
+	 * @see org.ambientlight.process.handler.AbstractActionHandler#performAction(org.ambientlight.process.Token)
 	 */
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
-
-		BroadcastEvent event = getEventForTokenSensorValue((TokenSensorValue) token.data);
-		eventManager.onEvent(event);
-
+		if (getConfig().useTokenValue) {
+			if (token.valueType != DataTypeValidation.SENSOR) {
+				TokenSensorValue tokenValue = (TokenSensorValue) token.data;
+				featureFacade.setCurrentScenery(tokenValue.value);
+			}
+		} else {
+			featureFacade.setCurrentScenery(getConfig().sceneryName);
+		}
 	}
 
 
-	/**
-	 * @param data
-	 * @return
-	 */
-	private BroadcastEvent getEventForTokenSensorValue(TokenSensorValue data) {
-
-		Util util = new Util(featureFacade);
-
-		Sensor sensor = util.findSensor(data.sensorId);
-		if (util.getSensorCategory(data.sensorId).equals(SensorCategory.SCENERY)) {
-			SceneryEntryEvent event = new SceneryEntryEvent(sensor.getSensorId(), data.value);
-			return event;
-		}
-		return null;
+	SwitchSceneryHandlerConfiguration getConfig() {
+		return (SwitchSceneryHandlerConfiguration) this.config;
 	}
 }
