@@ -17,7 +17,7 @@ package org.ambientlight;
 
 import javax.ws.rs.ext.ContextResolver;
 
-import org.ambientlight.ws.SwitchableIdModule;
+import org.ambientlight.ws.EntityIdModule;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +37,7 @@ public class RestConfig extends ResourceConfig {
 			@Override
 			public ObjectMapper getContext(Class<?> type) {
 				ObjectMapper objectMapper = new ObjectMapper();
-				objectMapper.registerModule(new SwitchableIdModule());
+				objectMapper.registerModule(new EntityIdModule());
 				return objectMapper;
 			}
 		});

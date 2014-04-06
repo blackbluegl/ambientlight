@@ -25,9 +25,8 @@ import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition;
@@ -79,7 +78,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 			RenderObject currentRenderObject = new RenderObject(currentLightObject, stripePartsInLightObject);
 
-			lightObjectRenderObjects.put(currentLightObject.getId(), currentRenderObject);
+			lightObjectRenderObjects.put(currentLightObject.getId().id, currentRenderObject);
 			if (currentLightObject.getPowerState()) {
 				addLightObjectToRender(renderer, currentRenderObject, effectFactory.getFadeInEffect(currentRenderObject));
 			}
@@ -87,7 +86,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 		// listen for switchable events
 		for (LightObject lightObject : config.lightObjects.values()) {
-			entitiesFacade.registerSwitchable(this, lightObject, SwitchType.LED);
+			entitiesFacade.registerSwitchable(this, lightObject);
 		}
 
 		this.rendeTimer = new Timer();
@@ -246,9 +245,9 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
+	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
 
-		RenderObject renderObject = lightObjectRenderObjects.get(id);
+		RenderObject renderObject = lightObjectRenderObjects.get(id.id);
 
 		if (renderObject == null) {
 			System.out.println("RenderingProgrammFactory: lightObject with ID does not exist: " + id);
@@ -316,7 +315,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	 * ambientlight.room.entities.features.actor.types.SwitchableId)
 	 */
 	@Override
-	public Switchable getSwitchable(SwitchableId id) {
+	public Switchable getSwitchable(EntityId id) {
 		return config.lightObjects.get(id.id);
 	}
 }

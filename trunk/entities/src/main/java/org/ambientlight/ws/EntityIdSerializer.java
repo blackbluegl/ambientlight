@@ -13,13 +13,27 @@
    limitations under the License.
  */
 
-package org.ambientlight.process;
+package org.ambientlight.ws;
+
+import java.io.IOException;
+
+import org.ambientlight.room.entities.features.EntityId;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public enum SensorCategory {
-	SCENERY, TEMPERATURE
+public class EntityIdSerializer extends JsonSerializer<EntityId> {
+
+	@Override
+	public void serialize(EntityId data, JsonGenerator json, SerializerProvider provider) throws IOException,
+	JsonGenerationException {
+		json.writeFieldName(data.domain + "." + data.id);
+	}
 }

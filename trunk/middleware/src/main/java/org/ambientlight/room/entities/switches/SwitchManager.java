@@ -23,9 +23,8 @@ import org.ambientlight.events.EventManager;
 import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -50,7 +49,7 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 		this.eventManager = eventManager;
 
 		for (Switch currentSwitch : this.config.switches.values()) {
-			entityFacade.registerSwitchable(this, currentSwitch, currentSwitch.getType());
+			entityFacade.registerSwitchable(this, currentSwitch);
 		}
 	}
 
@@ -62,19 +61,19 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
-		if (config.switches.containsKey(id) == false) {
+	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
+		if (config.switches.containsKey(id.id) == false) {
 			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: =" + id);
 			return;
 		}
 
 		persistence.beginTransaction();
 
-		Switch switchObject = config.switches.get(id);
+		Switch switchObject = config.switches.get(id.id);
 		switchObject.setPowerState(powerState);
 
 		if (fireEvent) {
-			eventManager.onEvent(new SwitchEvent(id, powerState, type.switchEventType));
+			eventManager.onEvent(new SwitchEvent(id, powerState));
 		}
 		persistence.commitTransaction();
 
@@ -89,7 +88,7 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 	 * ambientlight.room.entities.features.actor.types.SwitchableId)
 	 */
 	@Override
-	public Switchable getSwitchable(SwitchableId id) {
+	public Switchable getSwitchable(EntityId id) {
 		return config.switches.get(id.id);
 	}
 }

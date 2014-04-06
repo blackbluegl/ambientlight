@@ -53,8 +53,9 @@ import org.ambientlight.room.entities.climate.handlers.MessageActionHandler;
 import org.ambientlight.room.entities.climate.handlers.RemoveShutterContactHandler;
 import org.ambientlight.room.entities.climate.handlers.RemoveThermostatHandler;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorType;
 
 
 /**
@@ -63,7 +64,7 @@ import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorTyp
  */
 public class ClimateManager extends Manager implements MessageListener, TemperatureSensor {
 
-	private static final String SENSOR_ID = "Roomtemperature";
+	private static final String SENSOR_ID = "climateManager";
 
 	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 90;
 
@@ -105,10 +106,11 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 
 		// register sensors
-		featureFacade.registerTemperatureSensor(this, TemperatureSensorType.SET_ROOM_TEMPERATURE);
+		featureFacade.registerSensor(this.getSensorId(), this);
+
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				featureFacade.registerTemperatureSensor((TemperatureSensor) current, TemperatureSensorType.MAX_THERMOSTATE);
+				featureFacade.registerSensor(((Thermostat) current).getSensorId(), (TemperatureSensor) current);
 			}
 		}
 	}
@@ -117,9 +119,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#onConnectionLost(org.ambientlight
-	 * .messages.DispatcherType)
+	 * @see org.ambientlight.messages.MessageListener#onConnectionLost(org.ambientlight .messages.DispatcherType)
 	 */
 	@Override
 	public void onDisconnectDispatcher(DispatcherType dispatcher) {
@@ -130,8 +130,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.messages.MessageListener#onConnectionRecovered(org.
-	 * ambientlight.messages.DispatcherType)
+	 * @see org.ambientlight.messages.MessageListener#onConnectionRecovered(org. ambientlight.messages.DispatcherType)
 	 */
 	@Override
 	public void onConnectDispatcher(DispatcherType dispatcher) {
@@ -150,9 +149,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#handleResponseMessages(org.
-	 * ambientlight.messages.QeueManager.State,
+	 * @see org.ambientlight.messages.MessageListener#handleResponseMessages(org. ambientlight.messages.QeueManager.State,
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
@@ -209,9 +206,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#handleMessage(org.ambientlight
-	 * .messages.Message)
+	 * @see org.ambientlight.messages.MessageListener#handleMessage(org.ambientlight .messages.Message)
 	 */
 	@Override
 	public void onMessage(Message message) {
@@ -609,32 +604,18 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
 	 */
 	@Override
-	public String getSensorId() {
-		return ClimateManager.SENSOR_ID;
+	public EntityId getSensorId() {
+		return new EntityId(EntityId.DOMAIN_TEMP_MAX_ROOM, ClimateManager.SENSOR_ID);
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.room.entities.features.sensor.TemperatureSensor#
-	 * getTemperature()
+	 * @see org.ambientlight.room.entities.features.sensor.TemperatureSensor# getTemperature()
 	 */
 	@Override
-	public float getTemperature() {
+	public Object getSensorValue() {
 		return this.config.temperature;
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.sensor.TemperatureSensor#
-	 * getMessureDate()
-	 */
-	@Override
-	public Date getMessureDate() {
-		return new Date();
-	}
-
 }

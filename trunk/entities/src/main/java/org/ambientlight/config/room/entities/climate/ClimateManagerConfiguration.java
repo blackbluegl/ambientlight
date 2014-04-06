@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.room.entities.climate.MaxComponent;
-import org.ambientlight.room.entities.climate.MaxThermostateMode;
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 
 /**

@@ -13,8 +13,7 @@ import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControl;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
+import org.ambientlight.room.entities.features.EntityId;
 
 
 @Path("/features")
@@ -23,7 +22,7 @@ public class Features {
 	@GET
 	@Path("/{roomName}/switchables")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Set<SwitchableId> getSwitchables(@PathParam("roomName") String roomName) {
+	public Set<EntityId> getSwitchables(@PathParam("roomName") String roomName) {
 		return AmbientControl.getRoom(roomName).featureFacade.getSwitchableIds();
 	}
 
@@ -32,11 +31,10 @@ public class Features {
 	@Path("/{roomName}/switchables/{type}/{id}/state")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object setPowerStateForItem(@PathParam("roomName") String roomName, @PathParam("type") String type,
+	public Object setPowerStateForItem(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
 			@PathParam("id") String itemName, Boolean powerState) {
 
 		try {
-			SwitchType typeEnume = SwitchType.valueOf(type);
 
 			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState, true);
 			return Response.status(200).build();

@@ -15,19 +15,20 @@
 
 package org.ambientlight.room.entities.switches;
 
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.sensor.SwitchSensor;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class Switch implements Switchable {
+public class Switch implements Switchable, SwitchSensor {
 
 	private static final long serialVersionUID = 1L;
 
-	private SwitchType type;
+	private String domain;
 	private String id;
 	private boolean powerState;
 
@@ -60,35 +61,42 @@ public class Switch implements Switchable {
 	 * @see org.ambientlight.config.room.SwitchableActor#getName()
 	 */
 	@Override
-	public String getId() {
-		return this.id;
+	public EntityId getId() {
+		return new EntityId(domain, id);
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.room.SwitchableActor#setName(java.lang.String)
+	 * @see org.ambientlight.config.room.SwitchableActor#setName(java.lang.String)
 	 */
 	@Override
-	public void setId(String name) {
-		this.id = name;
+	public void setId(EntityId name) {
+		this.id = name.id;
+		this.domain = name.domain;
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
 	 */
 	@Override
-	public SwitchType getType() {
-		return this.type;
+	public EntityId getSensorId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
-	public void setType(SwitchType type) {
-		this.type = type;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorValue()
+	 */
+	@Override
+	public Object getSensorValue() {
+		return getPowerState();
 	}
 }

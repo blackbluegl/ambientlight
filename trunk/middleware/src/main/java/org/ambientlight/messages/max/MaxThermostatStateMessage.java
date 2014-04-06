@@ -17,7 +17,7 @@ package org.ambientlight.messages.max;
 
 import java.util.Date;
 
-import org.ambientlight.room.entities.climate.MaxThermostateMode;
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 
 

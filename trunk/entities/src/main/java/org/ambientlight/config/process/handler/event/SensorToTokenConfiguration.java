@@ -22,6 +22,7 @@ import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.ValueBindingPath;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
@@ -36,5 +37,5 @@ public class SensorToTokenConfiguration extends AbstractActionHandlerConfigurati
 	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.keySet()") })
 	@TypeDef(fieldType = FieldType.STRING)
 	@Presentation(name = "Event auslesen und weitergeben", position = 0)
-	public String sensorId;
+	public EntityId sensorId;
 }

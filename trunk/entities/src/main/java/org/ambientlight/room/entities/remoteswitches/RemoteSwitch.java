@@ -1,9 +1,8 @@
 package org.ambientlight.room.entities.remoteswitches;
 
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
@@ -27,8 +26,8 @@ public class RemoteSwitch implements Switchable {
 	 * @see org.ambientlight.config.features.Entity#getName()
 	 */
 	@Override
-	public String getId() {
-		return id;
+	public EntityId getId() {
+		return new EntityId(EntityId.DOMAIN_SWITCH_REMOTE, this.id);
 	}
 
 
@@ -38,8 +37,8 @@ public class RemoteSwitch implements Switchable {
 	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
 	 */
 	@Override
-	public void setId(String name) {
-		this.id = name;
+	public void setId(EntityId name) {
+		this.id = name.id;
 	}
 
 
@@ -57,24 +56,10 @@ public class RemoteSwitch implements Switchable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
+	 * @see org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
 	 */
 	@Override
 	public void setPowerState(boolean powerState) {
 		this.powerstate = powerState;
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
-	 */
-	@Override
-	@JsonIgnore
-	public SwitchType getType() {
-		return SwitchType.ELRO;
-	}
-
 }

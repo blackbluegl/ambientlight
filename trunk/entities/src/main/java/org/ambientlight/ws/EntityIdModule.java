@@ -13,12 +13,24 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.features.sensor.types;
+package org.ambientlight.ws;
+
+import org.ambientlight.room.entities.features.EntityId;
+
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public enum TemperatureSensorType {
-	MAX_THERMOSTATE, SET_ROOM_TEMPERATURE
+public class EntityIdModule extends SimpleModule {
+
+	private static final long serialVersionUID = 1L;
+
+
+	public EntityIdModule() {
+		addKeySerializer(EntityId.class, new EntityIdSerializer());
+		addKeyDeserializer(EntityId.class, new EntityIdDeserializer());
+	}
 }

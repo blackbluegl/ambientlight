@@ -24,9 +24,8 @@ import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerC
 import org.ambientlight.device.drivers.RemoteSwtichDeviceDriver;
 import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
 
 
 /**
@@ -49,7 +48,7 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 		this.persistence = persistence;
 		this.callbackManager = callbackManager;
 		for (RemoteSwitch current : config.remoteSwitches.values()) {
-			entitiesFacade.registerSwitchable(this, current, SwitchType.ELRO);
+			entitiesFacade.registerSwitchable(this, current);
 		}
 	}
 
@@ -62,10 +61,10 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(String id, SwitchType type, boolean powerState, boolean fireEvent) {
+	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
 		RemoteSwitch remoteSwitch = config.remoteSwitches.get(id);
 
-		if (config.remoteSwitches.containsKey(id) == false) {
+		if (config.remoteSwitches.containsKey(id.id) == false) {
 			System.out.println("RemoteSwitchManager handleSwitchChange(): got request for unknown device: =" + id);
 			return;
 		}
@@ -95,7 +94,7 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 	 * ambientlight.room.entities.features.actor.types.SwitchableId)
 	 */
 	@Override
-	public Switchable getSwitchable(SwitchableId id) {
+	public Switchable getSwitchable(EntityId id) {
 		return config.remoteSwitches.get(id.id);
 	}
 }

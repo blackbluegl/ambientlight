@@ -1,11 +1,10 @@
 package org.ambientlight.room.entities.lightobject;
 
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.lightobject.Renderable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
@@ -37,9 +36,8 @@ public class LightObject implements Switchable, Renderable {
 	 * @see org.ambientlight.config.features.Entity#getName()
 	 */
 	@Override
-	public String getId() {
-
-		return id;
+	public EntityId getId() {
+		return new EntityId(EntityId.DOMAIN_LIGHTOBJECT, this.id);
 	}
 
 
@@ -49,9 +47,8 @@ public class LightObject implements Switchable, Renderable {
 	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
 	 */
 	@Override
-	public void setId(String name) {
-		this.id = name;
-
+	public void setId(EntityId name) {
+		this.id = name.id;
 	}
 
 
@@ -69,8 +66,7 @@ public class LightObject implements Switchable, Renderable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
+	 * @see org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
 	 */
 	@Override
 	public void setPowerState(boolean powerState) {
@@ -81,8 +77,7 @@ public class LightObject implements Switchable, Renderable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.room.entities.features.lightobject.Renderable#
-	 * getRenderingProgrammConfiguration()
+	 * @see org.ambientlight.room.entities.features.lightobject.Renderable# getRenderingProgrammConfiguration()
 	 */
 	@Override
 	public RenderingProgramConfiguration getRenderingProgrammConfiguration() {
@@ -93,25 +88,11 @@ public class LightObject implements Switchable, Renderable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.room.entities.features.lightobject.Renderable#
-	 * getRenderingProgrammConfiguration
-	 * (org.ambientlight.config.room.entities.lightobject
-	 * .renderingprogram.RenderingProgramConfiguration)
+	 * @see org.ambientlight.room.entities.features.lightobject.Renderable# getRenderingProgrammConfiguration
+	 * (org.ambientlight.config.room.entities.lightobject .renderingprogram.RenderingProgramConfiguration)
 	 */
 	@Override
 	public void setRenderingProgrammConfiguration(RenderingProgramConfiguration config) {
 		this.renderingProgrammConfiguration = config;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.actor.Switchable#getType()
-	 */
-	@Override
-	@JsonIgnore
-	public SwitchType getType() {
-		return SwitchType.LED;
 	}
 }

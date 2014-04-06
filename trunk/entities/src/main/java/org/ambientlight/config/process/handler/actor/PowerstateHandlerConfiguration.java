@@ -8,8 +8,8 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
-import org.ambientlight.ws.SwitchableIdDeserializer;
+import org.ambientlight.room.entities.features.EntityId;
+import org.ambientlight.ws.EntityIdDeserializer;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,6 +22,6 @@ public class PowerstateHandlerConfiguration extends AbstractActionHandlerConfigu
 
 	@TypeDef(fieldType = FieldType.MAP)
 	@AlternativeIds(idBinding = "actorConfigurations.keySet()")
-	@JsonDeserialize(keyUsing = SwitchableIdDeserializer.class)
-	public Map<SwitchableId, Boolean> powerStateConfiguration = new HashMap<SwitchableId, Boolean>();
+	@JsonDeserialize(keyUsing = EntityIdDeserializer.class)
+	public Map<EntityId, Boolean> powerStateConfiguration = new HashMap<EntityId, Boolean>();
 }

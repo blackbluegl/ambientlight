@@ -15,6 +15,8 @@
 
 package org.ambientlight.room.entities.features.sensor;
 
+import org.ambientlight.room.entities.features.EntityId;
+
 
 
 /**
@@ -23,5 +25,8 @@ package org.ambientlight.room.entities.features.sensor;
  */
 public interface Sensor {
 
-	public String getSensorId();
+	public EntityId getSensorId();
+
+
+	public Object getSensorValue();
 }

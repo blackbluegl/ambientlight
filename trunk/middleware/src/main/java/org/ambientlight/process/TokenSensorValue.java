@@ -15,6 +15,7 @@
 
 package org.ambientlight.process;
 
+import org.ambientlight.room.entities.features.EntityId;
 
 
 /**
@@ -24,7 +25,7 @@ package org.ambientlight.process;
 public class TokenSensorValue {
 
 	public String value;
-	public String sensorId;
+	public EntityId sensorId;
 
 
 	@Override

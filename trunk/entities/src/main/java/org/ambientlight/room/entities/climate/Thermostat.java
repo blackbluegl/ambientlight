@@ -15,9 +15,8 @@
 
 package org.ambientlight.room.entities.climate;
 
-import java.util.Date;
-
 import org.ambientlight.room.entities.climate.util.DeviceType;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
 
@@ -37,26 +36,11 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType
-	 * ()
+	 * @see org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType ()
 	 */
 	@Override
 	public DeviceType getDeviceType() {
 		return DeviceType.HEATING_THERMOSTAT;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ambientlight.config.features.sensor.TemperatureSensor#getTemperature
-	 * ()
-	 */
-	@Override
-	public float getTemperature() {
-		return this.temperature;
 	}
 
 
@@ -68,21 +52,22 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.config.features.sensor.Sensor#getMessureDate()
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
 	 */
 	@Override
-	public Date getMessureDate() {
-		return this.lastUpdate;
+	public EntityId getSensorId() {
+		return new EntityId(EntityId.DOMAIN_TEMP_MAX_THERMOSTATE, this.label);
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.config.features.Entity#getName()
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorValue()
 	 */
 	@Override
-	public String getSensorId() {
-		return this.label;
+	public Object getSensorValue() {
+		return this.temperature;
 	}
+
 }

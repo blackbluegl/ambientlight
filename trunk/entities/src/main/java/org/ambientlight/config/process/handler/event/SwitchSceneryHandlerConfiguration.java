@@ -13,27 +13,18 @@
    limitations under the License.
  */
 
-package org.ambientlight.ws;
+package org.ambientlight.config.process.handler.event;
 
-import java.io.IOException;
-
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class SwitchableIdSerializer extends JsonSerializer<SwitchableId> {
+public class SwitchSceneryHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
-	@Override
-	public void serialize(SwitchableId data, JsonGenerator json, SerializerProvider provider) throws IOException,
-	JsonGenerationException {
-		json.writeFieldName(data.id + "|" + data.type);
-	}
+	public String sceneryName;
+
+	public boolean useTokenValue;
 }

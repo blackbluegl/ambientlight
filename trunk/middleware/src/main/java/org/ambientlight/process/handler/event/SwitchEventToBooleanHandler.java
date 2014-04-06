@@ -16,8 +16,6 @@
 package org.ambientlight.process.handler.event;
 
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.events.DailyAlarmEvent;
-import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.events.SwitchEvent;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
@@ -27,8 +25,8 @@ import org.ambientlight.process.handler.AbstractActionHandler;
  * @author Florian Bornkessel
  * 
  */
-public class EventToBooleanHandler extends AbstractActionHandler {
-
+public class SwitchEventToBooleanHandler extends AbstractActionHandler {
+	todo remove and use sensorhandler and decissionhandler instead!
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -42,10 +40,6 @@ public class EventToBooleanHandler extends AbstractActionHandler {
 			if (token.data instanceof SwitchEvent) {
 				SwitchEvent event = (SwitchEvent) token.data;
 				token.data = event.powerState ? 1.0 : 0.0;
-				token.valueType = DataTypeValidation.BOOLEAN;
-			}
-			if (token.data instanceof DailyAlarmEvent || token.data instanceof SceneryEntryEvent) {
-				token.data = 1.0;
 				token.valueType = DataTypeValidation.BOOLEAN;
 			}
 		}

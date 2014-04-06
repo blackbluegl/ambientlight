@@ -22,7 +22,7 @@ import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.EventToBooleanHandlerConfiguration;
+import org.ambientlight.config.process.handler.event.SwitchEventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
@@ -126,7 +126,7 @@ public class CreateTestConfig {
 
 		NodeConfiguration eventMapperNode = new NodeConfiguration();
 		eventMapperNode.id = 0;
-		EventToBooleanHandlerConfiguration eventMapper = new EventToBooleanHandlerConfiguration();
+		SwitchEventToBooleanHandlerConfiguration eventMapper = new SwitchEventToBooleanHandlerConfiguration();
 		eventMapperNode.nextNodeIds.add(1);
 		eventMapperNode.actionHandler = eventMapper;
 		roomSwitchProcess.nodes.put(0, eventMapperNode);

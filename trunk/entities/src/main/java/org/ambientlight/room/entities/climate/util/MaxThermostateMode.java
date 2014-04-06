@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate;
+package org.ambientlight.room.entities.climate.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

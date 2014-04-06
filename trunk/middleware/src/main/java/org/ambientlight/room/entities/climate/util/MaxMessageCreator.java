@@ -35,7 +35,6 @@ import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
-import org.ambientlight.room.entities.climate.MaxThermostateMode;
 
 
 /**

@@ -18,12 +18,9 @@ package org.ambientlight.process.handler;
 import java.text.DecimalFormat;
 
 import org.ambientlight.process.SensorCategory;
-import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorId;
-import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorType;
 
 
 /**
@@ -32,46 +29,17 @@ import org.ambientlight.room.entities.features.sensor.types.TemperatureSensorTyp
  */
 public class Util {
 
-	private FeatureFacade featureFacade;
-
-
-	public Util(FeatureFacade featureFacade) {
-		super();
-		this.featureFacade = featureFacade;
-	}
-
-
 	public SensorCategory getSensorCategory(String sensorId) {
 		String[] strinkTokens = sensorId.split(":");
 		return SensorCategory.valueOf(strinkTokens[0]);
 	}
 
 
-	public Sensor findSensor(String sensorId) {
-		String[] strinkTokens = sensorId.split(":");
-		SensorCategory category = SensorCategory.valueOf(strinkTokens[0]);
-
-		switch (category) {
-		case SCENERY:
-			return featureFacade.getScenerySensor();
-		case TEMPERATURE:
-			TemperatureSensorType sensorType = TemperatureSensorType.valueOf(strinkTokens[1]);
-			TemperatureSensorId id = new TemperatureSensorId();
-			id.type = sensorType;
-			id.id = strinkTokens[2];
-			return featureFacade.getTemperatureSensors().get(id);
-		default:
-			break;
-		}
-		return null;
-	}
-
-
 	public String getDataFromSensor(Sensor sensor) {
 		if (sensor instanceof TemperatureSensor)
-			return new DecimalFormat("#.##").format(((TemperatureSensor) sensor).getTemperature());
+			return new DecimalFormat("#.##").format(((TemperatureSensor) sensor).getSensorValue());
 		else if (sensor instanceof ScenerySensor)
-			return ((ScenerySensor) sensor).getCurrentScenery().id;
+			return (String) ((ScenerySensor) sensor).getSensorValue();
 		else
 			return "0.0";
 	}
