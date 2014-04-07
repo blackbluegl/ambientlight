@@ -131,7 +131,8 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 			@Override
 			public void run() {
 
-				DailyAlarmEvent alarmEvent = new DailyAlarmEvent(name, alarm.hour, alarm.minute);
+				DailyAlarmEvent alarmEvent = new DailyAlarmEvent(new EntityId(EntityId.DOMAIN_ALARM_DAILY, name), alarm.hour,
+						alarm.minute);
 				eventManager.onEvent(alarmEvent);
 			}
 		};

@@ -2,7 +2,6 @@ package org.ambientlight.events;
 
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.events.types.SwitchEventType;
 import org.ambientlight.room.entities.features.EntityId;
 
 
@@ -13,7 +12,6 @@ public class SwitchEvent extends BroadcastEvent {
 	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean powerState;
 
-	public SwitchEventType type;
 
 
 	public SwitchEvent() {
@@ -24,13 +22,12 @@ public class SwitchEvent extends BroadcastEvent {
 	public SwitchEvent(EntityId sourceId, boolean powerState) {
 		super(sourceId);
 		this.powerState = powerState;
-		this.type = type;
 	}
 
 
 	@Override
 	public String toString() {
-		String value = "Schalter(" + type + "): " + sourceId + " im Zustand: ";
+		String value = "Schalter: " + sourceId + " im Zustand: ";
 		return powerState ? value + "ein" : value + "aus";
 	}
 
@@ -40,7 +37,6 @@ public class SwitchEvent extends BroadcastEvent {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + (powerState ? 1231 : 1237);
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -56,9 +52,6 @@ public class SwitchEvent extends BroadcastEvent {
 		SwitchEvent other = (SwitchEvent) obj;
 		if (powerState != other.powerState)
 			return false;
-		if (type != other.type)
-			return false;
 		return true;
 	}
-
 }

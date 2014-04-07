@@ -28,8 +28,7 @@ public class Switch implements Switchable, SwitchSensor {
 
 	private static final long serialVersionUID = 1L;
 
-	private String domain;
-	private String id;
+	private EntityId id;
 	private boolean powerState;
 
 
@@ -62,7 +61,7 @@ public class Switch implements Switchable, SwitchSensor {
 	 */
 	@Override
 	public EntityId getId() {
-		return new EntityId(domain, id);
+		return this.id;
 	}
 
 
@@ -72,9 +71,8 @@ public class Switch implements Switchable, SwitchSensor {
 	 * @see org.ambientlight.config.room.SwitchableActor#setName(java.lang.String)
 	 */
 	@Override
-	public void setId(EntityId name) {
-		this.id = name.id;
-		this.domain = name.domain;
+	public void setId(EntityId id) {
+		this.id = id;
 	}
 
 
@@ -85,8 +83,7 @@ public class Switch implements Switchable, SwitchSensor {
 	 */
 	@Override
 	public EntityId getSensorId() {
-		// TODO Auto-generated method stub
-		return null;
+		return id;
 	}
 
 

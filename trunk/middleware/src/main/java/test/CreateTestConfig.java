@@ -22,9 +22,8 @@ import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.SwitchEventToBooleanHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
+import org.ambientlight.config.process.handler.event.SwitchEventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -40,9 +39,7 @@ import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
 import org.ambientlight.events.SceneryEntryEvent;
 import org.ambientlight.events.SwitchEvent;
-import org.ambientlight.events.types.SwitchEventType;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
-import org.ambientlight.room.entities.features.actor.types.SwitchableId;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.room.entities.sceneries.Scenery;
@@ -52,7 +49,6 @@ import org.ambientlight.room.entities.switches.Switch;
 
 public class CreateTestConfig {
 
-	public static String VIRTUAL_MAIN_SWITCH_ID = "main";
 	public static String LO_BACKGROUND_ID = "background";
 	public static String LO_LO1_ID = "lightObject1";
 	public static String REMOTE_SWITCH_1 = "remoteSwitch1";
@@ -99,10 +95,9 @@ public class CreateTestConfig {
 	private void createSwitchManager(RoomConfiguration rc) {
 		SwitchManagerConfiguration config = new SwitchManagerConfiguration();
 		Switch mainSwitch = new Switch();
-		mainSwitch.setType(SwitchType.VIRTUAL_MAIN);
-		mainSwitch.setId(VIRTUAL_MAIN_SWITCH_ID);
+		mainSwitch.setId(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN, EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH));
 		mainSwitch.setPowerState(false);
-		config.switches.put(mainSwitch.getId(), mainSwitch);
+		config.switches.put(mainSwitch.getId().id, mainSwitch);
 		rc.switchesManager = config;
 	}
 
@@ -118,8 +113,10 @@ public class CreateTestConfig {
 
 		config.processes.put(roomSwitchProcess.id, roomSwitchProcess);
 
-		SwitchEvent triggerOn = new SwitchEvent(VIRTUAL_MAIN_SWITCH_ID, true, SwitchEventType.VIRTUAL_MAIN);
-		SwitchEvent triggerOff = new SwitchEvent(VIRTUAL_MAIN_SWITCH_ID, false, SwitchEventType.VIRTUAL_MAIN);
+		SwitchEvent triggerOn = new SwitchEvent(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL,
+				EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH), true);
+		SwitchEvent triggerOff = new SwitchEvent(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL,
+				EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH), false);
 
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerOn);
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerOff);
@@ -201,10 +198,10 @@ public class CreateTestConfig {
 		RemoteSwitch sw1 = new RemoteSwitch();
 		sw1.houseCode = 15;
 		sw1.switchingUnitCode = 3;
-		sw1.setId(CreateTestConfig.REMOTE_SWITCH_1);
+		sw1.setId(new EntityId(EntityId.DOMAIN_SWITCH_REMOTE, CreateTestConfig.REMOTE_SWITCH_1));
 		sw1.setPowerState(false);
 
-		config.remoteSwitches.put(sw1.getId(), sw1);
+		config.remoteSwitches.put(sw1.getId().id, sw1);
 
 	}
 
@@ -273,18 +270,18 @@ public class CreateTestConfig {
 		dc.configuredStripes.add(sc);
 
 		LightObject lo = new LightObject();
-		lo.setId(LO_LO1_ID);
+		lo.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_LO1_ID));
 		lo.height = 20;
 		lo.layerNumber = 2;
 		lo.width = 20;
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.setRenderingProgrammConfiguration(this.createSimpleColor());
-		config.lightObjects.put(lo.getId(), lo);
+		config.lightObjects.put(lo.getId().id, lo);
 
 		LightObject background = new LightObject();
 		background.setPowerState(true);
-		background.setId(LO_BACKGROUND_ID);
+		background.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_BACKGROUND_ID));
 		background.height = 200;
 		background.layerNumber = 1;
 		background.width = 200;
@@ -292,7 +289,7 @@ public class CreateTestConfig {
 		background.yOffsetInRoom = 0;
 		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
 		background.setRenderingProgrammConfiguration(sunset);
-		config.lightObjects.put(background.getId(), background);
+		config.lightObjects.put(background.getId().id, background);
 	}
 
 

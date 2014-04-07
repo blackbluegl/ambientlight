@@ -28,7 +28,10 @@ public class EntityId {
 	public static final String ID_SCENERY_MANAGER = "scenerymanager";
 
 	public static final String DOMAIN_SWITCH_VIRTUAL = "switch.virtual";
+
 	public static final String DOMAIN_SWITCH_VIRTUAL_MAIN = "switch.virtual.main";
+	public static final String ID_SWITCH_VIRTUAL_MAIN_SWITCH = "mainswitch";
+
 	public static final String DOMAIN_SWITCH_REMOTE = "switch.remote";
 
 	public static final String DOMAIN_LIGHTOBJECT = "lightobject";

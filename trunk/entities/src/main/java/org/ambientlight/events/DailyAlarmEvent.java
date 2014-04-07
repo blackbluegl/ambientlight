@@ -1,5 +1,8 @@
 package org.ambientlight.events;
 
+import org.ambientlight.room.entities.features.EntityId;
+
+
 public class DailyAlarmEvent extends BroadcastEvent {
 
 	/**
@@ -11,7 +14,7 @@ public class DailyAlarmEvent extends BroadcastEvent {
 	public int minute;
 
 
-	public DailyAlarmEvent(String sourceId, int hour, int minute) {
+	public DailyAlarmEvent(EntityId sourceId, int hour, int minute) {
 		super(sourceId);
 		this.hour = hour;
 		this.minute = minute;
