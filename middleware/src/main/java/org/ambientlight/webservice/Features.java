@@ -36,7 +36,8 @@ public class Features {
 
 		try {
 
-			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(typeEnume, itemName, powerState, true);
+			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(new EntityId(domain, itemName), powerState,
+					true);
 			return Response.status(200).build();
 
 		} catch (Exception e) {
@@ -65,15 +66,15 @@ public class Features {
 
 
 	@GET
-	@Path("/{roomName}/switchables/{type}/{id}")
+	@Path("/{roomName}/switchables/{domain}/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getSwitchable(@PathParam("roomName") String roomName, @PathParam("type") String type,
+	public Object getSwitchable(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
 			@PathParam("id") String itemName) {
 
 		try {
-			SwitchType typeEnume = SwitchType.valueOf(type);
-			return AmbientControl.getRoom(roomName).featureFacade.getSwitchable(typeEnume, itemName);
+
+			return AmbientControl.getRoom(roomName).featureFacade.getSwitchable(new EntityId(domain, itemName));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();

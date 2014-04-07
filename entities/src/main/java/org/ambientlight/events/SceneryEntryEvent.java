@@ -4,11 +4,12 @@ import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.ValueBindingPath;
+import org.ambientlight.room.entities.features.EntityId;
 
 
 public class SceneryEntryEvent extends BroadcastEvent {
 
-	public static final String SOURCE_NAME = "SceneryManager";
+
 
 
 	public SceneryEntryEvent() {
@@ -16,7 +17,7 @@ public class SceneryEntryEvent extends BroadcastEvent {
 	}
 
 
-	public SceneryEntryEvent(String sourceId, String sceneryName) {
+	public SceneryEntryEvent(EntityId sourceId, String sceneryName) {
 		super(sourceId);
 		this.sceneryName = sceneryName;
 	}

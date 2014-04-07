@@ -63,7 +63,8 @@ public class SceneryManager extends Manager implements ScenerySensor {
 
 		persistence.commitTransaction();
 
-		SceneryEntryEvent event = new SceneryEntryEvent(SceneryEntryEvent.SOURCE_NAME, scenery);
+		SceneryEntryEvent event = new SceneryEntryEvent(new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER),
+				scenery);
 		eventManager.onEvent(event);
 
 		callbackManager.roomConfigurationChanged();
