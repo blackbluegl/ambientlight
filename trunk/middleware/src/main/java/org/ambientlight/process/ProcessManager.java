@@ -36,7 +36,7 @@ import org.ambientlight.config.process.handler.expression.DecisionHandlerConfigu
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.process.handler.actor.PowerStateHandler;
+import org.ambientlight.process.handler.actor.SimplePowerStateHandler;
 import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
 import org.ambientlight.process.handler.event.SwitchEventToBooleanHandler;
 import org.ambientlight.process.handler.event.FireEventHandler;
@@ -177,9 +177,9 @@ public class ProcessManager extends Manager {
 		if (nodeConfig.actionHandler instanceof RenderingProgrammChangeHandlerConfiguration) {
 			handler = new RenderingProgrammChangeHandler();
 		} else if (nodeConfig.actionHandler instanceof PowerstateHandlerConfiguration) {
-			handler = new PowerStateHandler();
+			handler = new SimplePowerStateHandler();
 		} else if (nodeConfig.actionHandler instanceof SimplePowerStateHandlerConfiguration) {
-			handler = new PowerStateHandler();
+			handler = new SimplePowerStateHandler();
 		} else if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
 			handler = new DecissionActionHandler();
 			createNodes(process, nodeConfig.nextNodeIds.get(1));

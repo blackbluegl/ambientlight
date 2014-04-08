@@ -16,6 +16,7 @@
 package org.ambientlight.room.entities;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,7 +96,16 @@ public class FeatureFacade {
 	}
 
 
-	public void setRenderingConfiguration(RenderingProgramConfiguration config, String id) {
+	public Set<EntityId> getRenderables() {
+		Set<EntityId> result = new HashSet<EntityId>();
+		for (String current : lightObjectManager.getLightObjects().keySet()) {
+			result.add(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, current));
+		}
+		return result;
+	}
+
+
+	public void setRenderingConfiguration(RenderingProgramConfiguration config, EntityId id) {
 		lightObjectManager.setRenderingConfiguration(config, id);
 	}
 }

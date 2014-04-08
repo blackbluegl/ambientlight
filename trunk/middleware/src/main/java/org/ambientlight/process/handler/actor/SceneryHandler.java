@@ -13,10 +13,10 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler.event;
+package org.ambientlight.process.handler.actor;
 
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.handler.event.SwitchSceneryHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.SceneryHandlerConfiguration;
 import org.ambientlight.process.Token;
 import org.ambientlight.process.TokenSensorValue;
 import org.ambientlight.process.handler.AbstractActionHandler;
@@ -27,7 +27,7 @@ import org.ambientlight.process.handler.ActionHandlerException;
  * @author Florian Bornkessel
  * 
  */
-public class SwitchSceneryHandler extends AbstractActionHandler {
+public class SceneryHandler extends AbstractActionHandler {
 
 	/*
 	 * (non-Javadoc)
@@ -47,7 +47,7 @@ public class SwitchSceneryHandler extends AbstractActionHandler {
 	}
 
 
-	SwitchSceneryHandlerConfiguration getConfig() {
-		return (SwitchSceneryHandlerConfiguration) this.config;
+	SceneryHandlerConfiguration getConfig() {
+		return (SceneryHandlerConfiguration) this.config;
 	}
 }
