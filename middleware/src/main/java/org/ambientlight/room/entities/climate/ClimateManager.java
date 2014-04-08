@@ -64,7 +64,7 @@ import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
  */
 public class ClimateManager extends Manager implements MessageListener, TemperatureSensor {
 
-	private static final String SENSOR_ID = "climateManager";
+
 
 	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 90;
 
@@ -605,7 +605,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 */
 	@Override
 	public EntityId getSensorId() {
-		return new EntityId(EntityId.DOMAIN_TEMP_MAX_ROOM, ClimateManager.SENSOR_ID);
+		return new EntityId(EntityId.DOMAIN_TEMP_MAX_ROOM, EntityId.ID_CLIMATE_MANAGER);
 	}
 
 

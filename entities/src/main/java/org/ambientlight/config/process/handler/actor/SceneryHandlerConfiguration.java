@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.process.handler.event;
+package org.ambientlight.config.process.handler.actor;
 
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 
@@ -22,7 +22,12 @@ import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguratio
  * @author Florian Bornkessel
  * 
  */
-public class SwitchSceneryHandlerConfiguration extends AbstractActionHandlerConfiguration {
+public class SceneryHandlerConfiguration extends AbstractActionHandlerConfiguration {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public String sceneryName;
 

@@ -48,14 +48,14 @@ public class Features {
 
 
 	@PUT
-	@Path("/{roomName}/renderables/{id}/config")
+	@Path("/{roomName}/renderables/{domain}/{id}/config")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object setRenderConfigurationForItem(@PathParam("roomName") String roomName, @PathParam("id") String itemName,
-			RenderingProgramConfiguration config) {
+	public Object setRenderConfigurationForItem(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
+			@PathParam("id") String itemName, RenderingProgramConfiguration config) {
 
 		try {
-			AmbientControl.getRoom(roomName).featureFacade.setRenderingConfiguration(config, itemName);
+			AmbientControl.getRoom(roomName).featureFacade.setRenderingConfiguration(config, new EntityId(domain, itemName));
 			return Response.status(200).build();
 
 		} catch (Exception e) {

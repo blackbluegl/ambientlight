@@ -13,27 +13,30 @@
    limitations under the License.
  */
 
-package org.ambientlight.process.handler;
+package org.ambientlight.config.process.handler.actor;
 
-import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.ambientlight.room.entities.features.sensor.ScenerySensor;
-import org.ambientlight.room.entities.features.sensor.Sensor;
-import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
+import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
+import org.ambientlight.room.entities.features.EntityId;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class Util {
+public class SwitchableHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
-	public String getDataFromSensor(Sensor sensor) {
-		if (sensor instanceof TemperatureSensor)
-			return new DecimalFormat("#.##").format(((TemperatureSensor) sensor).getSensorValue());
-		else if (sensor instanceof ScenerySensor)
-			return (String) ((ScenerySensor) sensor).getSensorValue();
-		else
-			return "0.0";
-	}
+	private static final long serialVersionUID = 1L;
+
+	public List<EntityId> switcheables = new ArrayList<EntityId>();
+
+	public boolean powerState;
+
+	public boolean useTokenValue;
+
+	public boolean fireEvent;
+
+	public boolean invert;
 }
