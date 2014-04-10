@@ -23,6 +23,7 @@ import org.ambientlight.config.process.handler.expression.DecisionHandlerConfigu
 import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.ActionHandlerException;
 import org.ambientlight.process.handler.Util;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
@@ -48,12 +49,12 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 
 		String tokenValue = token.data.toString();
 
-		Util util = new Util(featureFacade);
+		Util util = new Util();
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
 			if (dataproviderName.equals("tokenValue")) {
 				evaluator.putVariable("tokenValue", tokenValue);
 			} else {
-				Sensor sensor = util.findSensor(dataproviderName);
+				Sensor sensor = featureFacade.getSensor(EntityId.fromString(dataproviderName));
 				evaluator.putVariable(dataproviderName, util.getDataFromSensor(sensor));
 			}
 		}
