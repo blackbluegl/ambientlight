@@ -38,10 +38,7 @@ public class EntityIdDeserializer extends KeyDeserializer {
 	 */
 	@Override
 	public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		int delim = key.lastIndexOf(".");
-		String domain = key.substring(0, delim - 1);
-		String id = key.substring(delim, key.length());
-		return new EntityId(domain, id);
+		return EntityId.fromString(key);
 	}
 
 }

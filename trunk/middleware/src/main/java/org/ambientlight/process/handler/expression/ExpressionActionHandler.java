@@ -27,6 +27,7 @@ import org.ambientlight.process.Token;
 import org.ambientlight.process.handler.AbstractActionHandler;
 import org.ambientlight.process.handler.ActionHandlerException;
 import org.ambientlight.process.handler.Util;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 
 
@@ -48,9 +49,9 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 		Evaluator evaluator = new Evaluator();
 
 		evaluator.putVariable("tokenValue", token.data.toString());
-		Util util = new Util(featureFacade);
+		Util util = new Util();
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
-			Sensor sensor = util.findSensor(dataproviderName);
+			Sensor sensor = featureFacade.getSensor(EntityId.fromString(dataproviderName));
 			evaluator.putVariable(dataproviderName, util.getDataFromSensor(sensor));
 		}
 		try {

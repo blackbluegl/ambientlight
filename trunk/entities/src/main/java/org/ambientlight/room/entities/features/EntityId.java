@@ -61,6 +61,13 @@ public class EntityId {
 	}
 
 
+	public static EntityId fromString(String string) {
+		int delim = string.lastIndexOf(".");
+		String domain = string.substring(0, delim - 1);
+		String id = string.substring(delim, string.length());
+		return new EntityId(domain, id);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

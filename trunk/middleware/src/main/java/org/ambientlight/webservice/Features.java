@@ -19,6 +19,24 @@ import org.ambientlight.room.entities.features.EntityId;
 @Path("/features")
 public class Features {
 
+	@PUT
+	@Path("/{roomName}/renderables/{domain}/{id}/program")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public synchronized Response createOrUpdateLightObjectConfiguration(@PathParam("roomName") String roomName,
+			@PathParam("domain") String domain, @PathParam("id") String itemName, RenderingProgramConfiguration itemConfiguration) {
+
+		try {
+			AmbientControl.getRoom(roomName).featureFacade.setRenderingConfiguration(itemConfiguration, new EntityId(domain,
+					itemName));
+			return Response.status(500).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(200).build();
+		}
+	}
+
+
 	@GET
 	@Path("/{roomName}/switchables")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -28,7 +46,7 @@ public class Features {
 
 
 	@PUT
-	@Path("/{roomName}/switchables/{type}/{id}/state")
+	@Path("/{roomName}/switchables/{domain}/{id}/state")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object setPowerStateForItem(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
