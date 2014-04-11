@@ -157,7 +157,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 
 				List<String> switchNames = new ArrayList<String>();
 				for (Switchable currentSwitch : roomConfig.switchables) {
-					switchNames.add(currentSwitch.getId());
+					switchNames.add(currentSwitch.getId().id);
 				}
 
 				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),

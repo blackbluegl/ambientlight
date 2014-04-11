@@ -38,8 +38,8 @@ import org.ambientlight.config.room.entities.lightobject.renderingprogram.Simple
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.room.entities.features.Entity;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.room.entities.features.lightobject.Renderable;
 import org.ambientlight.ws.Room;
 
@@ -87,8 +87,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
 	private RenderingProgramConfiguration actorConductConfigurationAfterEditItem;
 
-	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME = "actorConductConfigurationAfterEditItemName";
-	private String actorConductConfigurationAfterEditItemName;
+	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id = "actorConductConfigurationAfterEditItemId";
+	private EntityId actorConductConfigurationAfterEditItemId;
 
 	private String actorConductConfigurationAfterEditItemRoomName;
 
@@ -169,7 +169,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
-		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME, this.actorConductConfigurationAfterEditItemName);
+		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id, this.actorConductConfigurationAfterEditItemId);
 		super.onSaveInstanceState(bundle);
 	}
 
@@ -227,7 +227,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 */
 	private void handleExitEditConductResult(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
-			actorConductConfigurationAfterEditItemName = savedInstanceState.getString(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_NAME);
+			actorConductConfigurationAfterEditItemId = (EntityId) savedInstanceState
+					.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id);
 			// onIntegrate was not called before and the fragment will be restored
 			actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) savedInstanceState
 					.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM);
@@ -237,7 +238,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		// inconsistent values on server because of preview actions
 		if (actorConductConfigurationAfterEditItem != null) {
 			RestClient.setRenderingConfiguration(this.actorConductConfigurationAfterEditItemRoomName,
-					this.actorConductConfigurationAfterEditItemName, this.actorConductConfigurationAfterEditItem);
+					this.actorConductConfigurationAfterEditItemId, this.actorConductConfigurationAfterEditItem);
 			actorConductConfigurationAfterEditItem = null;
 		}
 	}
@@ -264,8 +265,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		// init room power switch dynamically
 		LinearLayout switchesView = (LinearLayout) roomContainerView.findViewById(R.id.linearLayoutRoomSwitches);
 		switchesView.removeAllViews();
-		for (org.ambientlight.room.entities.switches.Switch currentSwitch : roomConfig.switchesManager.switches.values()) {
-			if (currentSwitch.getType().equals(SwitchType.VIRTUAL) || currentSwitch.getType().equals(SwitchType.VIRTUAL_MAIN)) {
+		for (Switchable currentSwitch : roomConfig.switchesManager.switches.values()) {
+			if (currentSwitch.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL)
+					|| currentSwitch.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN)) {
 				createSwitch(currentRoom, switchesView, currentSwitch);
 			}
 		}
@@ -428,7 +430,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 				RoomFragment.this.actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) GuiUtils
 						.deepCloneSerializeable(((Renderable) currentConfig).getRenderingProgrammConfiguration());
-				RoomFragment.this.actorConductConfigurationAfterEditItemName = currentConfig.getId();
+				RoomFragment.this.actorConductConfigurationAfterEditItemId = currentConfig.getId();
 
 				getActivity().startActionMode(new ActionMode.Callback() {
 
@@ -442,11 +444,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 							fragEdit.setTargetFragment(RoomFragment.this, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
 							Bundle arguments = new Bundle();
 							arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE,
-									(RenderingProgramConfiguration) GuiUtils
-									.deepCloneSerializeable(((Renderable) currentConfig).getRenderingProgrammConfiguration()));
+									(RenderingProgramConfiguration) GuiUtils.deepCloneSerializeable(((Renderable) currentConfig)
+											.getRenderingProgrammConfiguration()));
 							arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
 							arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_ROOM, currentRoom);
-							arguments.putString(ActorConductEditFragment.ITEM_NAME, currentConfig.getId());
+							arguments.putSerializable(ActorConductEditFragment.ITEM_ID, currentConfig.getId());
 
 							fragEdit.setArguments(arguments);
 
@@ -507,8 +509,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 						return;
 
 					Switchable switchable = (Switchable) currentConfig;
-					RestClient.setSwitchablePowerState(currentRoom, switchable.getType(), switchable.getId(),
-							!roomItemMapper.getPowerState());
+					RestClient.setSwitchablePowerState(currentRoom, switchable.getId(), !roomItemMapper.getPowerState());
 
 					// update the icon - we prevent that the user experiences a
 					// gap (request to server, response to callback)
@@ -521,13 +522,12 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private void createSwitch(final String currentRoom, LinearLayout switchesView,
-			final org.ambientlight.room.entities.switches.Switch currentEventGenerator) {
+	private void createSwitch(final String currentRoom, LinearLayout switchesView, final Switchable currentSwitch) {
 
 		final Switch powerStateSwitch = new Switch(this.getActivity());
-		powerStateSwitch.setTag("powerStateSwitch" + currentRoom + currentEventGenerator.getId());
+		powerStateSwitch.setTag("powerStateSwitch" + currentRoom + currentSwitch.getId());
 		switchesView.addView(powerStateSwitch, 0);
-		powerStateSwitch.setChecked(currentEventGenerator.getPowerState());
+		powerStateSwitch.setChecked(currentSwitch.getPowerState());
 		powerStateSwitch.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -535,8 +535,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 				try {
 					disableEventListener(currentRoom, true);
 
-					RestClient.setSwitchablePowerState(currentRoom, currentEventGenerator.getType(),
-							currentEventGenerator.getId(), powerStateSwitch.isChecked());
+					RestClient.setSwitchablePowerState(currentRoom, currentSwitch.getId(), powerStateSwitch.isChecked());
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -560,9 +559,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 					try {
 						org.ambientlight.ws.Room currentConfig = roomService.getRoomConfiguration(currentRoomName);
 
-						for (Switchable currentEventGenerator : currentConfig.switchables) {
-							RestClient.setSwitchablePowerState(currentRoomName, currentEventGenerator.getType(),
-									currentEventGenerator.getId(), false);
+						for (Switchable currentSwitchable : currentConfig.switchables) {
+							RestClient.setSwitchablePowerState(currentRoomName, currentSwitchable.getId(), false);
 						}
 					} catch (Exception e) {
 						Log.e(LOG, "error switching masterswitch", e);

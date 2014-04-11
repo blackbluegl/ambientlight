@@ -12,7 +12,12 @@ import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguratio
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
+import org.ambientlight.ws.EntityIdDeserializer;
+import org.ambientlight.ws.EntityIdSerializer;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 @HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA }, generates = DataTypeValidation.CREATES_NO_DATA)
@@ -24,5 +29,7 @@ public class RenderingProgrammChangeHandlerConfiguration extends AbstractActionH
 	@AlternativeValues(values = {
 			@Value(displayName = "Farbe auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration"),
 			@Value(displayName = "Tron auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration") })
+	@JsonSerialize(keyUsing = EntityIdSerializer.class)
+	@JsonDeserialize(keyUsing = EntityIdDeserializer.class)
 	public Map<EntityId, RenderingProgramConfiguration> renderConfig = new HashMap<EntityId, RenderingProgramConfiguration>();
 }

@@ -6,8 +6,8 @@ import java.util.Map;
 import org.ambient.control.R;
 import org.ambient.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
 import org.ambientlight.ws.Room;
 
 import android.app.PendingIntent;
@@ -203,13 +203,13 @@ public class UpdateWidgetService extends Service {
 		try {
 			Switchable mainSwitch = null;
 			for (Switchable current : roomService.getRoomConfiguration(serverName).switchables) {
-				if (current.getType().equals(SwitchType.VIRTUAL_MAIN)) {
+				if (current.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN)) {
 					mainSwitch = current;
 					break;
 				}
 			}
 
-			RestClient.setSwitchablePowerState(serverName, mainSwitch.getType(), mainSwitch.getId(), powerState);
+			RestClient.setSwitchablePowerState(serverName, mainSwitch.getId(), powerState);
 
 		} catch (Exception e) {
 			Log.e(LOG,

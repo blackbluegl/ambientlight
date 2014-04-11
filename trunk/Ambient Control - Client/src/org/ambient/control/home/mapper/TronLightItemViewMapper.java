@@ -1,14 +1,15 @@
 package org.ambient.control.home.mapper;
 
 import org.ambient.control.R;
+import org.ambientlight.room.entities.features.EntityId;
 
 import android.view.View;
 
 public class TronLightItemViewMapper extends AbstractRoomItemViewMapper{
 
-	public TronLightItemViewMapper(View lightObject, String label, int resourceId,
+	public TronLightItemViewMapper(View lightObject, EntityId id, int resourceId,
 			boolean powerState) {
-		super(lightObject, label, resourceId, powerState);
+		super(lightObject, id, resourceId, powerState);
 	}
 
 	@Override

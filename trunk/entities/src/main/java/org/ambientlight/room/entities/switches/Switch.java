@@ -19,6 +19,8 @@ import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.sensor.SwitchSensor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * @author Florian Bornkessel
@@ -82,6 +84,7 @@ public class Switch implements Switchable, SwitchSensor {
 	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
 	 */
 	@Override
+	@JsonIgnore
 	public EntityId getSensorId() {
 		return id;
 	}
@@ -93,6 +96,7 @@ public class Switch implements Switchable, SwitchSensor {
 	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorValue()
 	 */
 	@Override
+	@JsonIgnore
 	public Object getSensorValue() {
 		return getPowerState();
 	}

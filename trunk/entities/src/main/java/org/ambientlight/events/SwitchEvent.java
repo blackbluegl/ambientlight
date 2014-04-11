@@ -27,7 +27,7 @@ public class SwitchEvent extends BroadcastEvent {
 
 	@Override
 	public String toString() {
-		String value = "Schalter: " + sourceId + " im Zustand: ";
+		String value = "SwitchEvent: " + sourceId + " im Zustand: ";
 		return powerState ? value + "ein" : value + "aus";
 	}
 
@@ -54,4 +54,5 @@ public class SwitchEvent extends BroadcastEvent {
 			return false;
 		return true;
 	}
+
 }

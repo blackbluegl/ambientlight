@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.events.BroadcastEvent;
-import org.ambientlight.room.entities.features.actor.types.SwitchType;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
@@ -40,9 +40,9 @@ public class RestClient {
 	}
 
 
-	public static void setSwitchablePowerState(String room, SwitchType type, String id, boolean powestate) {
+	public static void setSwitchablePowerState(String room, EntityId id, boolean powestate) {
 		SetSwitchablePowerState task = new SetSwitchablePowerState();
-		task.execute(room, type, id, powestate);
+		task.execute(room, id, powestate);
 	}
 
 
@@ -98,9 +98,9 @@ public class RestClient {
 	}
 
 
-	public static void setRenderingConfiguration(String roomName, String itemName, RenderingProgramConfiguration config) {
+	public static void setRenderingConfiguration(String roomName, EntityId itemId, RenderingProgramConfiguration config) {
 		SetRenderingConfigurationTask task = new SetRenderingConfigurationTask();
-		task.execute(roomName, itemName, config);
+		task.execute(roomName, itemId, config);
 	}
 
 
