@@ -23,6 +23,7 @@ import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.rest.RestClient;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 
 import android.app.AlertDialog;
@@ -45,13 +46,13 @@ import android.view.ViewGroup;
  */
 public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
-	final public static String ITEM_NAME = "itemName";
-	String itemName = null;
+	final public static String ITEM_ID = "itemId";
+	EntityId itemId = null;
 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		itemName = getArguments().getString(ITEM_NAME);
+		itemId = (EntityId) getArguments().getSerializable(ITEM_ID);
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
@@ -66,7 +67,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				RestClient.setRenderingConfiguration(selectedRoom, itemName,
+				RestClient.setRenderingConfiguration(selectedRoom, itemId,
 						(RenderingProgramConfiguration) myConfigurationData);
 				return true;
 			}
@@ -80,7 +81,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 	 * @param myself
 	 */
 	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String roomName, final Room roomConfig, final String itemName) {
+			final Fragment fragment, final String roomName, final Room roomConfig, final EntityId itemName) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
@@ -91,7 +92,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 				args.putString(ARG_CLASS_NAME, altValues.get(which));
 				args.putString(ARG_SELECTED_ROOM, roomName);
 				args.putBoolean(ARG_CREATE_MODE, true);
-				args.putString(ITEM_NAME, itemName);
+				args.putSerializable(ITEM_ID, itemName);
 				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -109,7 +110,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 
 	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String roomName,
-			final Room roomConfiguration, final String itemName) {
+			final Room roomConfiguration, final EntityId itemName) {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);

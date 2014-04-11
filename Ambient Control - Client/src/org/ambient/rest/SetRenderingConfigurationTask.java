@@ -3,12 +3,14 @@ package org.ambient.rest;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ambientlight.room.entities.features.EntityId;
+
 import android.os.AsyncTask;
 
 
 public class SetRenderingConfigurationTask extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/features/{roomName}/renderables/{id}/config";
+	private final String URL = "/features/{roomName}/renderables/{domain}/{id}/config";
 
 
 	@Override
@@ -16,7 +18,8 @@ public class SetRenderingConfigurationTask extends AsyncTask<Object, Void, Void>
 
 		Map<String, String> vars = new HashMap<String, String>();
 		vars.put("roomName", (String) params[0]);
-		vars.put("id", params[1].toString());
+		vars.put("domain", ((EntityId) params[1]).domain);
+		vars.put("id", ((EntityId) params[1]).id);
 
 		Rest.getRestTemplate().put(Rest.getUrl(URL), params[2], vars);
 

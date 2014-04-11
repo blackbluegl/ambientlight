@@ -15,11 +15,14 @@
 
 package org.ambientlight.room.entities.features;
 
+import java.io.Serializable;
+
+
 /**
  * @author Florian Bornkessel
  * 
  */
-public class EntityId {
+public class EntityId implements Serializable {
 
 	public static final String DOMAIN_TEMP_MAX_THERMOSTATE = "temperature.max.thermostate";
 	public static final String DOMAIN_TEMP_MAX_ROOM = "temperature.max.room";
@@ -37,6 +40,8 @@ public class EntityId {
 	public static final String DOMAIN_LIGHTOBJECT = "lightobject";
 
 	public static final String DOMAIN_ALARM_DAILY = "alarm.daily";
+
+	private static final long serialVersionUID = 1L;
 
 	public String domain;
 	public String id;
@@ -57,7 +62,7 @@ public class EntityId {
 
 	@Override
 	public String toString() {
-		return "Sensor ID: " + domain + "." + id;
+		return "EntityId: " + domain + "." + id;
 	}
 
 
@@ -67,6 +72,7 @@ public class EntityId {
 		String id = string.substring(delim, string.length());
 		return new EntityId(domain, id);
 	}
+
 
 	@Override
 	public int hashCode() {

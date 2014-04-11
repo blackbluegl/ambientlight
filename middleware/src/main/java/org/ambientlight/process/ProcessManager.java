@@ -26,20 +26,19 @@ import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
-import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.SceneryHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.SwitchEventToBooleanHandlerConfiguration;
-import org.ambientlight.config.process.handler.event.FireEventHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.SwitchableHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionHandlerConfiguration;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.process.handler.AbstractActionHandler;
-import org.ambientlight.process.handler.actor.SimplePowerStateHandler;
 import org.ambientlight.process.handler.actor.RenderingProgrammChangeHandler;
-import org.ambientlight.process.handler.event.SwitchEventToBooleanHandler;
-import org.ambientlight.process.handler.event.FireEventHandler;
+import org.ambientlight.process.handler.actor.SceneryHandler;
+import org.ambientlight.process.handler.actor.SimplePowerStateHandler;
+import org.ambientlight.process.handler.actor.SwitchableHandler;
 import org.ambientlight.process.handler.event.SensorToTokenHandler;
 import org.ambientlight.process.handler.expression.DecissionActionHandler;
 import org.ambientlight.process.handler.expression.ExpressionActionHandler;
@@ -174,24 +173,28 @@ public class ProcessManager extends Manager {
 		node.config = nodeConfig;
 
 		AbstractActionHandler handler = null;
+		// actores
 		if (nodeConfig.actionHandler instanceof RenderingProgrammChangeHandlerConfiguration) {
 			handler = new RenderingProgrammChangeHandler();
-		} else if (nodeConfig.actionHandler instanceof PowerstateHandlerConfiguration) {
-			handler = new SimplePowerStateHandler();
+		} else if (nodeConfig.actionHandler instanceof SceneryHandlerConfiguration) {
+			handler = new SceneryHandler();
+		} else if (nodeConfig.actionHandler instanceof SwitchableHandlerConfiguration) {
+			handler = new SwitchableHandler();
 		} else if (nodeConfig.actionHandler instanceof SimplePowerStateHandlerConfiguration) {
 			handler = new SimplePowerStateHandler();
-		} else if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
+		}
+		// expressions
+		else if (nodeConfig.actionHandler instanceof DecisionHandlerConfiguration) {
 			handler = new DecissionActionHandler();
 			createNodes(process, nodeConfig.nextNodeIds.get(1));
 		} else if (nodeConfig.actionHandler instanceof ExpressionHandlerConfiguration) {
 			handler = new ExpressionActionHandler();
-		} else if (nodeConfig.actionHandler instanceof SwitchEventToBooleanHandlerConfiguration) {
-			handler = new SwitchEventToBooleanHandler();
-		} else if (nodeConfig.actionHandler instanceof FireEventHandlerConfiguration) {
-			handler = new FireEventHandler();
-		} else if (nodeConfig.actionHandler instanceof SensorToTokenConfiguration) {
+		}
+		// sensor
+		else if (nodeConfig.actionHandler instanceof SensorToTokenConfiguration) {
 			handler = new SensorToTokenHandler();
 		}
+
 		System.out.println("ProcessFactory: actionhandler for node id: " + i + " is a: " + handler.getClass().getSimpleName());
 		handler.config = nodeConfig.actionHandler;
 		handler.featureFacade = this.featureFacade;

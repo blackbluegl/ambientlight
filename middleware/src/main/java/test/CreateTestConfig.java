@@ -19,11 +19,11 @@ import org.ambientlight.config.messages.QeueManagerConfiguration;
 import org.ambientlight.config.process.EventProcessConfiguration;
 import org.ambientlight.config.process.NodeConfiguration;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
-import org.ambientlight.config.process.handler.actor.PowerstateHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.RenderingProgrammChangeHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.SceneryHandlerConfiguration;
 import org.ambientlight.config.process.handler.actor.SimplePowerStateHandlerConfiguration;
+import org.ambientlight.config.process.handler.actor.SwitchableHandlerConfiguration;
 import org.ambientlight.config.process.handler.event.SensorToTokenConfiguration;
-import org.ambientlight.config.process.handler.event.SwitchEventToBooleanHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.DecisionHandlerConfiguration;
 import org.ambientlight.config.process.handler.expression.ExpressionConfiguration;
 import org.ambientlight.config.room.RoomConfiguration;
@@ -43,7 +43,6 @@ import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.lightobject.LightObject;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
 import org.ambientlight.room.entities.sceneries.Scenery;
-import org.ambientlight.room.entities.sceneries.SceneryManager;
 import org.ambientlight.room.entities.switches.Switch;
 
 
@@ -69,6 +68,7 @@ public class CreateTestConfig {
 
 	public RoomConfiguration getTestRoom() {
 		RoomConfiguration rc = new RoomConfiguration();
+		rc.debug = true;
 
 		rc.roomName = "testRoom";
 
@@ -97,7 +97,7 @@ public class CreateTestConfig {
 		Switch mainSwitch = new Switch();
 		mainSwitch.setId(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN, EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH));
 		mainSwitch.setPowerState(false);
-		config.switches.put(mainSwitch.getId().id, mainSwitch);
+		config.switches.put(mainSwitch.getId(), mainSwitch);
 		rc.switchesManager = config;
 	}
 
@@ -113,9 +113,9 @@ public class CreateTestConfig {
 
 		config.processes.put(roomSwitchProcess.id, roomSwitchProcess);
 
-		SwitchEvent triggerOn = new SwitchEvent(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL,
+		SwitchEvent triggerOn = new SwitchEvent(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN,
 				EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH), true);
-		SwitchEvent triggerOff = new SwitchEvent(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL,
+		SwitchEvent triggerOff = new SwitchEvent(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN,
 				EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH), false);
 
 		roomSwitchProcess.eventTriggerConfigurations.add(triggerOn);
@@ -123,7 +123,8 @@ public class CreateTestConfig {
 
 		NodeConfiguration eventMapperNode = new NodeConfiguration();
 		eventMapperNode.id = 0;
-		SwitchEventToBooleanHandlerConfiguration eventMapper = new SwitchEventToBooleanHandlerConfiguration();
+		SensorToTokenConfiguration eventMapper = new SensorToTokenConfiguration();
+		eventMapper.sensorId = new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN, EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH);
 		eventMapperNode.nextNodeIds.add(1);
 		eventMapperNode.actionHandler = eventMapper;
 		roomSwitchProcess.nodes.put(0, eventMapperNode);
@@ -142,17 +143,18 @@ public class CreateTestConfig {
 		NodeConfiguration grabCurrentSceneryNode = new NodeConfiguration();
 		grabCurrentSceneryNode.id = 2;
 		SensorToTokenConfiguration grabSceneryHandler = new SensorToTokenConfiguration();
-		grabSceneryHandler.sensorId = "SCENERY:SceneryManager";
+		grabSceneryHandler.sensorId = new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER);
 		grabCurrentSceneryNode.nextNodeIds.add(4);
 		grabCurrentSceneryNode.actionHandler = grabSceneryHandler;
 		roomSwitchProcess.nodes.put(2, grabCurrentSceneryNode);
 
-		NodeConfiguration fireEventNode = new NodeConfiguration();
-		fireEventNode.id = 4;
-		FireEventHandlerConfiguration fireEventHandler = new FireEventHandlerConfiguration();
-		fireEventHandler.event = new SceneryEntryEvent(SceneryManager.SENSOR_NAME, "#{tokenValue}");
-		fireEventNode.actionHandler = fireEventHandler;
-		roomSwitchProcess.nodes.put(4, fireEventNode);
+		NodeConfiguration switchSceneryNode = new NodeConfiguration();
+		switchSceneryNode.id = 4;
+		SceneryHandlerConfiguration sceneryHandler = new SceneryHandlerConfiguration();
+		sceneryHandler.sceneryName = "not used";
+		sceneryHandler.useTokenValue = true;
+		switchSceneryNode.actionHandler = sceneryHandler;
+		roomSwitchProcess.nodes.put(4, switchSceneryNode);
 
 		NodeConfiguration turnOffNode = new NodeConfiguration();
 		turnOffNode.id = 3;
@@ -359,14 +361,14 @@ public class CreateTestConfig {
 
 	private void createProcessWithSceneryForProcessManager(RoomConfiguration rc, String processName, String scenarioName) {
 
-		Map<String, RenderingProgramConfiguration> changeConfigFor = new HashMap<String, RenderingProgramConfiguration>();
-		changeConfigFor.put(CreateTestConfig.LO_BACKGROUND_ID, createSimpleColor());
-		changeConfigFor.put(CreateTestConfig.LO_LO1_ID, createSimpleColor());
+		Map<EntityId, RenderingProgramConfiguration> changeRenderingFor = new HashMap<EntityId, RenderingProgramConfiguration>();
+		changeRenderingFor.put(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_BACKGROUND_ID), createSimpleColor());
+		changeRenderingFor.put(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_LO1_ID), createSimpleColor());
 
-		Map<SwitchableId, Boolean> turnOnLightFor = new HashMap<SwitchableId, Boolean>();
-		turnOnLightFor.put(new SwitchableId(LO_BACKGROUND_ID, SwitchType.LED), true);
-		turnOnLightFor.put(new SwitchableId(LO_LO1_ID, SwitchType.LED), true);
-		turnOnLightFor.put(new SwitchableId(VIRTUAL_MAIN_SWITCH_ID, SwitchType.VIRTUAL_MAIN), true);
+		List<EntityId> turnOnLightFor = new ArrayList<EntityId>();
+		turnOnLightFor.add(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_BACKGROUND_ID));
+		turnOnLightFor.add(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_LO1_ID));
+		turnOnLightFor.add(new EntityId(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN, EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH));
 
 		EventProcessConfiguration process = new EventProcessConfiguration();
 		process.run = true;
@@ -374,20 +376,26 @@ public class CreateTestConfig {
 		NodeConfiguration startNode = new NodeConfiguration();
 		startNode.id = 0;
 
-		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent(SceneryManager.SENSOR_NAME, scenarioName);
+		SceneryEntryEvent triggerSceneryChange = new SceneryEntryEvent(new EntityId(EntityId.DOMAIN_SCENRERY,
+				EntityId.ID_SCENERY_MANAGER), scenarioName);
 		process.eventTriggerConfigurations.add(triggerSceneryChange);
 
 		RenderingProgrammChangeHandlerConfiguration cHandler = new RenderingProgrammChangeHandlerConfiguration();
-		cHandler.renderConfig = changeConfigFor;
+		cHandler.renderConfig = changeRenderingFor;
 		startNode.actionHandler = cHandler;
 		startNode.nextNodeIds.add(1);
 
 		NodeConfiguration switchNode = new NodeConfiguration();
 		switchNode.id = 1;
 
-		PowerstateHandlerConfiguration powerstatehandler = new PowerstateHandlerConfiguration();
-		powerstatehandler.powerStateConfiguration = turnOnLightFor;
-		switchNode.actionHandler = powerstatehandler;
+		SwitchableHandlerConfiguration switchConfig = new SwitchableHandlerConfiguration();
+		switchConfig.fireEvent = false;
+		switchConfig.invert = false;
+		switchConfig.powerState = true;
+		switchConfig.switcheables = turnOnLightFor;
+		switchConfig.useTokenValue = false;
+
+		switchNode.actionHandler = switchConfig;
 
 		process.nodes.put(0, startNode);
 		process.nodes.put(1, switchNode);

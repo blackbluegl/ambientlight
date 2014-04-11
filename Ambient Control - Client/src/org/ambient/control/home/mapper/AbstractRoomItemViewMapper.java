@@ -1,6 +1,7 @@
 package org.ambient.control.home.mapper;
 
 import org.ambient.control.R;
+import org.ambientlight.room.entities.features.EntityId;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -13,17 +14,17 @@ public abstract class AbstractRoomItemViewMapper {
 
 	private boolean powerState = false;
 	private final View itemView;
-	private final String itemName;
+	private final EntityId entityId;
 	private final int resourceId;
 
 
-	public AbstractRoomItemViewMapper(View itemView, String itemName, int resourceId, boolean powerState) {
+	public AbstractRoomItemViewMapper(View itemView, EntityId entityId, int resourceId, boolean powerState) {
 		this.itemView = itemView;
 
 		TextView labelView = (TextView) itemView.findViewById(R.id.textLightObjectName);
-		labelView.setText(itemName);
+		labelView.setText(entityId.id);
 
-		this.itemName = itemName;
+		this.entityId = entityId;
 
 		this.resourceId = resourceId;
 
@@ -44,7 +45,7 @@ public abstract class AbstractRoomItemViewMapper {
 
 
 	public String getItemName() {
-		return itemName;
+		return entityId.id;
 	}
 
 
