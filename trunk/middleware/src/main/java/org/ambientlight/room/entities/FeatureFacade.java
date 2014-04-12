@@ -51,8 +51,8 @@ public class FeatureFacade {
 	}
 
 
-	public void registerSensor(EntityId sensorId, Sensor sensor) {
-		sensors.put(sensorId, sensor);
+	public void registerSensor(Sensor sensor) {
+		sensors.put(sensor.getSensorId(), sensor);
 	}
 
 

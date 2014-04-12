@@ -49,6 +49,7 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 		this.callbackManager = callbackManager;
 		for (RemoteSwitch current : config.remoteSwitches.values()) {
 			entitiesFacade.registerSwitchable(this, current);
+			entitiesFacade.registerSensor(current);
 		}
 	}
 

@@ -203,7 +203,7 @@ public class CreateTestConfig {
 		sw1.setId(new EntityId(EntityId.DOMAIN_SWITCH_REMOTE, CreateTestConfig.REMOTE_SWITCH_1));
 		sw1.setPowerState(false);
 
-		config.remoteSwitches.put(sw1.getId().id, sw1);
+		config.remoteSwitches.put(sw1.getId(), sw1);
 
 	}
 

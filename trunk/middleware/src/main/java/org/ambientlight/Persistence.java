@@ -53,10 +53,10 @@ public class Persistence {
 	public void beginTransaction() {
 		semaphore++;
 		if (isTransactionRunning() == false) {
-			System.out.println("RoomConfigurationFactory - beginTransaction(): beginning transaction.");
+			System.out.println("Persistence - beginTransaction(): beginning transaction.");
 			saveLock.lock();
 		} else {
-			System.out.println("RoomConfigurationFactory - beginTransaction(): transaction currently running.");
+			System.out.println("Persistence - beginTransaction(): transaction currently running.");
 		}
 	}
 
@@ -67,21 +67,22 @@ public class Persistence {
 			// first check if this transaction is encapsulated in an outer one. do not save the state then
 			semaphore = semaphore > 0 ? semaphore - 1 : 0;
 			if (semaphore > 0) {
-				System.out.println("RoomConfigurationFactory - commitTransaktion(): "
+				System.out.println("Persistence - commitTransaktion(): "
 						+ "Warning ommitting because an outer transaction is running!");
 				return;
 			}
 
 			// if no transaction is running because it was canceled. do not save anything to disc
 			if (isTransactionRunning() == false) {
-				System.out.println("RoomConfigurationFactory - commitTransaktion(): Warning no transaction running!");
+				System.out.println("Persistence - commitTransaktion(): Warning no transaction running! No  configuration saved!");
 			} else {
 				saveLock.unlock();
 				saveRoomConfiguration(this.fileName, this.roomConfig);
-				System.out.println("RoomConfigurationFactory - commitTransaktion(): Successfully saved configuration.");
+				System.out.println("Persistence - commitTransaktion(): Successfully saved configuration.");
 			}
 		} catch (IOException e) {
-			System.out.println("RoomConfigurationFactory - commitTransaktion(): "
+			System.out
+					.println("Persistence - commitTransaktion(): "
 					+ "Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
 		}
@@ -89,7 +90,7 @@ public class Persistence {
 
 
 	public void cancelTransaction() {
-		System.out.println("RoomConfigurationFactory - cancelTransaction(): Canceling transaction");
+		System.out.println("Persistence - cancelTransaction(): Canceling transaction");
 		semaphore = 0;
 		saveLock.unlock();
 	}
@@ -123,7 +124,7 @@ public class Persistence {
 		fw.flush();
 		fw.close();
 
-		System.out.println("RoomConfigurationFactory - saveRoomConfiguration(): wrote roomConfig to: " + file.getAbsoluteFile());
+		System.out.println("Persistence - saveRoomConfiguration(): wrote roomConfig to: " + file.getAbsoluteFile());
 	}
 
 

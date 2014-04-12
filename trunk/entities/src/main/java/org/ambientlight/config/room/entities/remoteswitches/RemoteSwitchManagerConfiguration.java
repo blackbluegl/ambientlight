@@ -20,7 +20,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.remoteswitches.RemoteSwitch;
+import org.ambientlight.ws.EntityIdDeserializer;
+import org.ambientlight.ws.EntityIdSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 /**
@@ -33,5 +39,7 @@ public class RemoteSwitchManagerConfiguration implements Serializable {
 
 	public RemoteSwitchBridgeConfiguration device;
 
-	public Map<String, RemoteSwitch> remoteSwitches = new HashMap<String, RemoteSwitch>();
+	@JsonSerialize(keyUsing = EntityIdSerializer.class)
+	@JsonDeserialize(keyUsing = EntityIdDeserializer.class)
+	public Map<EntityId, RemoteSwitch> remoteSwitches = new HashMap<EntityId, RemoteSwitch>();
 }
