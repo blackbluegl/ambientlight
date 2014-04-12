@@ -48,7 +48,7 @@ public class SceneryManager extends Manager implements ScenerySensor {
 		this.eventManager = eventManager;
 		this.persistence = persistence;
 
-		featureFacade.registerSensor(this.getSensorId(), this);
+		featureFacade.registerSensor(this);
 	}
 
 

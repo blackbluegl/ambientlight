@@ -19,7 +19,9 @@ import java.text.DecimalFormat;
 
 import org.ambientlight.room.entities.features.sensor.ScenerySensor;
 import org.ambientlight.room.entities.features.sensor.Sensor;
+import org.ambientlight.room.entities.features.sensor.SwitchSensor;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
+import org.ambientlight.room.entities.sceneries.Scenery;
 
 
 /**
@@ -30,10 +32,13 @@ public class Util {
 
 	public String getDataFromSensor(Sensor sensor) {
 		if (sensor instanceof TemperatureSensor)
-			return new DecimalFormat("#.##").format(((TemperatureSensor) sensor).getSensorValue());
+			return new DecimalFormat("#.##").format(sensor.getSensorValue());
 		else if (sensor instanceof ScenerySensor)
-			return (String) ((ScenerySensor) sensor).getSensorValue();
-		else
-			return "0.0";
+			return ((Scenery) sensor.getSensorValue()).id;
+		else if (sensor instanceof SwitchSensor) {
+			sensor.getSensorValue();
+			return ((Boolean) sensor.getSensorValue()) == true ? "1" : "0";
+		}
+		return "0.0";
 	}
 }

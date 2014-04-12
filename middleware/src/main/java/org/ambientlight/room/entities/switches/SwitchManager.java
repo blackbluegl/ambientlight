@@ -50,6 +50,7 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 
 		for (Switch currentSwitch : this.config.switches.values()) {
 			entityFacade.registerSwitchable(this, currentSwitch);
+			entityFacade.registerSensor(currentSwitch);
 		}
 	}
 
@@ -62,14 +63,14 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 	 */
 	@Override
 	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
-		if (config.switches.containsKey(id.id) == false) {
-			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: =" + id);
+		if (config.switches.containsKey(id) == false) {
+			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: " + id);
 			return;
 		}
 
 		persistence.beginTransaction();
 
-		Switch switchObject = config.switches.get(id.id);
+		Switch switchObject = config.switches.get(id);
 		switchObject.setPowerState(powerState);
 
 		if (fireEvent) {
@@ -89,6 +90,6 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 	 */
 	@Override
 	public Switchable getSwitchable(EntityId id) {
-		return config.switches.get(id.id);
+		return config.switches.get(id);
 	}
 }

@@ -2,12 +2,14 @@ package org.ambientlight.room.entities.remoteswitches;
 
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.sensor.SwitchSensor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("switchObject")
-public class RemoteSwitch implements Switchable {
+public class RemoteSwitch implements Switchable, SwitchSensor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -17,7 +19,7 @@ public class RemoteSwitch implements Switchable {
 
 	private boolean powerstate;
 
-	private String id;
+	private EntityId id;
 
 
 	/*
@@ -27,7 +29,7 @@ public class RemoteSwitch implements Switchable {
 	 */
 	@Override
 	public EntityId getId() {
-		return new EntityId(EntityId.DOMAIN_SWITCH_REMOTE, this.id);
+		return id;
 	}
 
 
@@ -38,7 +40,7 @@ public class RemoteSwitch implements Switchable {
 	 */
 	@Override
 	public void setId(EntityId name) {
-		this.id = name.id;
+		this.id = name;
 	}
 
 
@@ -61,5 +63,28 @@ public class RemoteSwitch implements Switchable {
 	@Override
 	public void setPowerState(boolean powerState) {
 		this.powerstate = powerState;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
+	 */
+	@Override
+	public EntityId getSensorId() {
+		return id;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorValue()
+	 */
+	@Override
+	@JsonIgnore
+	public Object getSensorValue() {
+		return getPowerState();
 	}
 }

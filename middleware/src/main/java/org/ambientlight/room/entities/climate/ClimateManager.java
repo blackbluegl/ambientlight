@@ -106,11 +106,11 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 
 		// register sensors
-		featureFacade.registerSensor(this.getSensorId(), this);
+		featureFacade.registerSensor(this);
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				featureFacade.registerSensor(((Thermostat) current).getSensorId(), (TemperatureSensor) current);
+				featureFacade.registerSensor((TemperatureSensor) current);
 			}
 		}
 	}
