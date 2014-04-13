@@ -54,7 +54,6 @@ public class Rooms {
 			Switchable currentSwitch = AmbientControl.getRoom(roomName).featureFacade.getSwitchable(currentId);
 			room.switchables.add(currentSwitch);
 		}
-
 		return room;
 	}
 }

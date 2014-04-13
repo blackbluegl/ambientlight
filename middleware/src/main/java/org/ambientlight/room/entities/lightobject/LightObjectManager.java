@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 
 import org.ambientlight.Manager;
@@ -49,7 +50,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 	private RenderingEffectFactory effectFactory;
 
-	private Map<String, RenderObject> lightObjectRenderObjects = new HashMap<String, RenderObject>();
+	private Map<EntityId, RenderObject> lightObjectRenderObjects = new HashMap<EntityId, RenderObject>();
 
 	private BufferedImage pixelMap;
 
@@ -78,7 +79,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 			RenderObject currentRenderObject = new RenderObject(currentLightObject, stripePartsInLightObject);
 
-			lightObjectRenderObjects.put(currentLightObject.getId().id, currentRenderObject);
+			lightObjectRenderObjects.put(currentLightObject.getId(), currentRenderObject);
 			if (currentLightObject.getPowerState()) {
 				addLightObjectToRender(renderer, currentRenderObject, effectFactory.getFadeInEffect(currentRenderObject));
 			}
@@ -113,27 +114,6 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		this.pixelMap = roomBitMap;
 	}
 
-
-	public Map<String, LightObject> getLightObjects() {
-		return config.lightObjects;
-	}
-
-
-	//
-	//
-	// public RenderObject getLightObjectByName(String name) {
-	// for (RenderObject current : this.lightObjectRenderObjects) {
-	// if (name.equals(current.lightObject.getId()))
-	// return current;
-	// }
-	// return null;
-	// }
-	//
-	//
-	// public void setLightObjectsInRoom(List<RenderObject> lightObjectsInRoom)
-	// {
-	// this.lightObjectRenderObjects = lightObjectsInRoom;
-	// }
 
 	private void addLightObjectToRender(Renderer renderer, RenderObject lightObject, FadeInTransition transition) {
 
@@ -247,15 +227,16 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	@Override
 	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
 
-		RenderObject renderObject = lightObjectRenderObjects.get(id.id);
+		RenderObject renderObject = lightObjectRenderObjects.get(id);
 
 		if (renderObject == null) {
-			System.out.println("RenderingProgrammFactory: lightObject with ID does not exist: " + id);
+			System.out.println("LightObjectManager - setPowerState(): lightObject with ID does not exist: " + id);
 			return;
 		}
 
 		if (renderObject.lightObject.getPowerState() == powerState) {
-			System.out.println("RenderingProgrammFactory: lightObject" + renderObject.lightObject.getId() + " already set to: "
+			System.out.println("LightObjectManager - setPowerState(): lightObject" + renderObject.lightObject.getId()
+					+ " already set to: "
 					+ powerState);
 			return;
 		}
@@ -316,6 +297,11 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 	 */
 	@Override
 	public Switchable getSwitchable(EntityId id) {
-		return config.lightObjects.get(id.id);
+		return config.lightObjects.get(id);
+	}
+
+
+	public Set<EntityId> getRenderables() {
+		return config.lightObjects.keySet();
 	}
 }

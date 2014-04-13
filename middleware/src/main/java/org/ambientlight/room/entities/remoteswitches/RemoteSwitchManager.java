@@ -57,9 +57,8 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java.
-	 * lang.String, org.ambientlight.room.entities.switches.SwitchType, boolean)
+	 * @see org.ambientlight.room.entities.SwitchablesHandler#setPowerState(java. lang.String,
+	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
 	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
@@ -96,6 +95,6 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 	 */
 	@Override
 	public Switchable getSwitchable(EntityId id) {
-		return config.remoteSwitches.get(id.id);
+		return config.remoteSwitches.get(id);
 	}
 }

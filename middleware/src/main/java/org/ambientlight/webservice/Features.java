@@ -91,7 +91,6 @@ public class Features {
 			@PathParam("id") String itemName) {
 
 		try {
-
 			return AmbientControl.getRoom(roomName).featureFacade.getSwitchable(new EntityId(domain, itemName));
 		} catch (Exception e) {
 			e.printStackTrace();

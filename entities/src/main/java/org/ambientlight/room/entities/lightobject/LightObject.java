@@ -25,7 +25,7 @@ public class LightObject implements Switchable, Renderable {
 
 	private boolean powerState;
 
-	private String id;
+	private EntityId id;
 
 	private RenderingProgramConfiguration renderingProgrammConfiguration;
 
@@ -37,7 +37,7 @@ public class LightObject implements Switchable, Renderable {
 	 */
 	@Override
 	public EntityId getId() {
-		return new EntityId(EntityId.DOMAIN_LIGHTOBJECT, this.id);
+		return this.id;
 	}
 
 
@@ -48,7 +48,7 @@ public class LightObject implements Switchable, Renderable {
 	 */
 	@Override
 	public void setId(EntityId name) {
-		this.id = name.id;
+		this.id = name;
 	}
 
 
