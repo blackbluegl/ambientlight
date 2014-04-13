@@ -72,6 +72,7 @@ public class RemoteSwitch implements Switchable, SwitchSensor {
 	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
 	 */
 	@Override
+	@JsonIgnore
 	public EntityId getSensorId() {
 		return id;
 	}

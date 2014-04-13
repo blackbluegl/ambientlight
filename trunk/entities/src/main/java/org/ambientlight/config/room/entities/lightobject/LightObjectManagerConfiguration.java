@@ -22,7 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.lightobject.LightObject;
+import org.ambientlight.ws.EntityIdDeserializer;
+import org.ambientlight.ws.EntityIdSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 /**
@@ -37,5 +43,8 @@ public class LightObjectManagerConfiguration implements Serializable {
 	public int height;
 
 	public List<DeviceConfiguration> devices = new ArrayList<DeviceConfiguration>();
-	public Map<String, LightObject> lightObjects = new HashMap<String, LightObject>();
+
+	@JsonSerialize(keyUsing = EntityIdSerializer.class)
+	@JsonDeserialize(keyUsing = EntityIdDeserializer.class)
+	public Map<EntityId, LightObject> lightObjects = new HashMap<EntityId, LightObject>();
 }

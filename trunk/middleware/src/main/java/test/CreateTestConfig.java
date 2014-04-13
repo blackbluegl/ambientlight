@@ -279,7 +279,7 @@ public class CreateTestConfig {
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.setRenderingProgrammConfiguration(this.createSimpleColor());
-		config.lightObjects.put(lo.getId().id, lo);
+		config.lightObjects.put(lo.getId(), lo);
 
 		LightObject background = new LightObject();
 		background.setPowerState(true);
@@ -291,7 +291,7 @@ public class CreateTestConfig {
 		background.yOffsetInRoom = 0;
 		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
 		background.setRenderingProgrammConfiguration(sunset);
-		config.lightObjects.put(background.getId().id, background);
+		config.lightObjects.put(background.getId(), background);
 	}
 
 
