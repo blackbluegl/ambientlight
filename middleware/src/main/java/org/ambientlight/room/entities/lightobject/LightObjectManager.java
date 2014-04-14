@@ -158,7 +158,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		System.out.println("LightObjectManager setRenderingConfiguration: setting renderingConfig: "
 				+ newConfig.getClass().getSimpleName() + " for id: " + id);
 
-		RenderObject renderObject = lightObjectRenderObjects.get(id.id);
+		RenderObject renderObject = lightObjectRenderObjects.get(id);
 
 		if (renderObject == null) {
 			System.out.println("LightObjectManager setRenderingConfiguration: unknown renderable Id: " + id);

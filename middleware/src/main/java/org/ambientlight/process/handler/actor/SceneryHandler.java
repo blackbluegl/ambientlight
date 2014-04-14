@@ -37,11 +37,13 @@ public class SceneryHandler extends AbstractActionHandler {
 	@Override
 	public void performAction(Token token) throws ActionHandlerException {
 		if (getConfig().useTokenValue) {
-			if (token.valueType != DataTypeValidation.SENSOR) {
+			if (token.valueType == DataTypeValidation.SENSOR) {
 				TokenSensorValue tokenValue = (TokenSensorValue) token.data;
+				System.out.println("ScenryHandler - performAction(): switching to Scenario from process token: " + tokenValue);
 				featureFacade.setCurrentScenery(tokenValue.value);
 			}
 		} else {
+			System.out.println("ScenryHandler - performAction(): switching to configured scenario: " + getConfig().sceneryName);
 			featureFacade.setCurrentScenery(getConfig().sceneryName);
 		}
 	}
