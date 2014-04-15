@@ -136,7 +136,7 @@ public class ProcessManager extends Manager {
 		}
 
 		runningProcess.suspend();
-		processes.remove(runningProcess);
+		processes.remove(processId);
 
 		persistence.beginTransaction();
 		processConfig.run = false;

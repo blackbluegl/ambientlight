@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.events.BroadcastEvent;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 import org.ambientlight.ws.process.validation.ValidationResult;
@@ -47,14 +46,14 @@ public class RestClient {
 
 
 	public static void startProcess(String roomName, String processId) {
-		StartProcessTask task = new StartProcessTask();
-		task.execute(roomName, processId);
+		StartStopProcessTask task = new StartStopProcessTask();
+		task.execute(roomName, processId, true);
 	}
 
 
 	public static void stopProcess(String roomName, String processId) {
-		StopProcessTask task = new StopProcessTask();
-		task.execute(roomName, processId);
+		StartStopProcessTask task = new StartStopProcessTask();
+		task.execute(roomName, processId, false);
 	}
 
 
@@ -101,12 +100,6 @@ public class RestClient {
 	public static void setRenderingConfiguration(String roomName, EntityId itemId, RenderingProgramConfiguration config) {
 		SetRenderingConfigurationTask task = new SetRenderingConfigurationTask();
 		task.execute(roomName, itemId, config);
-	}
-
-
-	public static void sendEvent(String roomName, BroadcastEvent event) {
-		SendEventTask task = new SendEventTask();
-		task.execute(roomName, event);
 	}
 
 
