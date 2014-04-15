@@ -52,6 +52,7 @@ public abstract class RoomServiceAwareFragment extends Fragment implements IRoom
 		super.onCreate(savedInstanceState);
 		((MainActivity) getActivity()).addServiceListener(this);
 		listenToServiceChange = false;
+
 	}
 
 
@@ -77,6 +78,13 @@ public abstract class RoomServiceAwareFragment extends Fragment implements IRoom
 			onResumeWithServiceConnected();
 		}
 		listenToServiceChange = true;
+	}
+
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		((MainActivity) getActivity()).removeServiceListener(this);
 	}
 
 }

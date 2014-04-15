@@ -17,8 +17,8 @@ package org.ambientlight.webservice;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -80,38 +80,24 @@ public class Process {
 	}
 
 
-	@GET
-	@Path("/{roomName}/start/{id}")
+	@PUT
+	@Path("/{roomName}/{id}/state")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object startProcess(@PathParam("roomName") String roomName, @PathParam(value = "id") String id) {
-		System.out.println("ProcessWS: starting Process " + id);
+	public Object startStopProcess(@PathParam("roomName") String roomName, @PathParam(value = "id") String id, Boolean state) {
 
 		try {
-			AmbientControl.getRoom(roomName).processManager.startProcess(id);
+			if (state) {
+				System.out.println("ProcessWS: starting Process " + id);
+				AmbientControl.getRoom(roomName).processManager.startProcess(id);
+			} else {
+				System.out.println("ProcessWS: stopping Process " + id);
+				AmbientControl.getRoom(roomName).processManager.stopProcess(id);
+			}
 			return Response.status(200).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
-	}
-
-
-	@GET
-	@Path("/{roomName}/stop/{id}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Object stopProcess(@PathParam("roomName") String roomName, @PathParam(value = "id") String id) {
-		System.out.println("ProcessWS: stopping Process " + id);
-
-		try {
-			AmbientControl.getRoom(roomName).processManager.stopProcess(id);
-
-			return Response.status(200).build();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.status(500).build();
-		}
-
 	}
 }

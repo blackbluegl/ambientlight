@@ -66,6 +66,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	};
 
+
 	private final BroadcastReceiver roomServiceUpdateReceiver = new BroadcastReceiver() {
 
 		@Override
@@ -270,5 +271,10 @@ public class MainActivity extends FragmentActivity {
 
 	public void addServiceListener(IRoomServiceCallbackListener listener) {
 		roomServiceListeners.add(listener);
+	}
+
+
+	public void removeServiceListener(RoomServiceAwareFragment listener) {
+		roomServiceListeners.remove(listener);
 	}
 }

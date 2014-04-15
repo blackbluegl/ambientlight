@@ -1,8 +1,9 @@
 package org.ambient.rest;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.ambientlight.ws.process.validation.ValidationResult;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
@@ -10,18 +11,17 @@ import android.os.AsyncTask;
 
 public class VerifyProcessTask extends AsyncTask<Object, Void, ValidationResult> {
 
-	private final String URL = "/process/validation/processes";
+	private final String URL = "/process/{room}/validation";
+
 
 	@Override
 	protected ValidationResult doInBackground(Object... params) {
 
-		String url = Rest.getUrl((String) params[0]) + URL;
+		String url = Rest.getUrl(URL);
+		Map<String, String> vars = Collections.singletonMap("room", params[0].toString());
+		RestTemplate restTemplate = Rest.getRestTemplate();
 
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
-
-		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
-		ValidationResult result = restTemplate.postForObject(url, params[1], ValidationResult.class);
+		ValidationResult result = restTemplate.postForObject(url, params[1], ValidationResult.class, vars);
 		return result;
 	}
 }

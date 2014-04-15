@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ambientlight.events.BroadcastEvent;
-
 
 public class EventManager {
 
@@ -42,11 +40,13 @@ public class EventManager {
 
 	public void onEvent(BroadcastEvent event) {
 
+		System.out.println("EventManager: onEvent called: " + event.toString());
+
 		List<EventListener> eventListeners = this.eventMap.get(event);
 		if (eventListeners != null) {
 			for (EventListener currentListener : eventListeners) {
-				System.out.println("EventManager: onEvent called: " + event.toString());
 				currentListener.handleEvent(event);
+				System.out.println("EventManager: triggered eventHandler: " + currentListener.getClass().getSimpleName());
 			}
 		}
 	}

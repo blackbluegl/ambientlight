@@ -19,6 +19,6 @@ public class Scenery implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Anwenderszenario mit Name: " + id;
+		return "Anwenderszenario: " + id;
 	}
 }
