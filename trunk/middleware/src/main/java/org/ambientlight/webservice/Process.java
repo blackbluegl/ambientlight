@@ -47,6 +47,8 @@ public class Process {
 			return AmbientControl.getRoom(roomName).processManager.validateProcess(process);
 
 		} catch (Exception e) {
+			System.out.println("Process - validateProcess(): could not validate processConfig!");
+			e.printStackTrace();
 			return Response.status(500).build();
 		}
 	}

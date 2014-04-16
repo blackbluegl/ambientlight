@@ -238,9 +238,16 @@ public class ProcessManager extends Manager {
 				}
 				HandlerDataTypeValidation nextNodeValidation = nextNode.actionHandler.getClass().getAnnotation(
 						HandlerDataTypeValidation.class);
+				if (nextNodeValidation == null) {
+					System.out.println("ProcessManager - validateProcess(): node with id: " + nextNodeId
+							+ " contains no dataTypeValidationInfo!");
+				}
 				boolean valide = DataTypeValidation.validate(nextNodeValidation.consumes(), currentNodeValidation.generates());
 				if (!valide) {
 					result.addEntry(nextNodeId, currentNode.id, currentNodeValidation.generates(), nextNodeValidation.consumes());
+					System.out.println("ProcessManager - validateProcess():validation failed between node: " + currentNode.id
+							+ "," + currentNode.actionHandler.getClass().getSimpleName() + " and node: " + nextNode.id + ","
+							+ nextNode.actionHandler.getClass().getSimpleName() + "!");
 				}
 			}
 		}
