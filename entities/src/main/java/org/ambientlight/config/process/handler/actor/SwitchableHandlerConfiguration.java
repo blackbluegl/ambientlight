@@ -19,13 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
+import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.room.entities.features.EntityId;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
+@HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA, DataTypeValidation.BOOLEAN }, generates = DataTypeValidation.CREATES_NO_DATA)
 public class SwitchableHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
 	private static final long serialVersionUID = 1L;

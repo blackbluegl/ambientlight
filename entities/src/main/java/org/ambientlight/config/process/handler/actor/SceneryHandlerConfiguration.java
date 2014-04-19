@@ -16,12 +16,15 @@
 package org.ambientlight.config.process.handler.actor;
 
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
+import org.ambientlight.config.process.handler.DataTypeValidation;
+import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
+@HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA, DataTypeValidation.SENSOR }, generates = DataTypeValidation.CREATES_NO_DATA)
 public class SceneryHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
 	/**
