@@ -45,7 +45,21 @@ import android.widget.ListView;
  * @author Florian Bornkessel
  * 
  */
-public class SimpleListField {
+public class SimpleListField extends FieldGenerator {
+
+	/**
+	 * @param roomConfig
+	 * @param config
+	 * @param field
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public SimpleListField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
+		super(roomConfig, config, field);
+	}
+
 
 	/**
 	 * @param config
@@ -54,10 +68,8 @@ public class SimpleListField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			final List<String> altValues, LinearLayout contentArea, final String selectedRoom,
-			final Room roomConfig)
-					throws IllegalAccessException {
+	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
+			throws IllegalAccessException {
 
 		final ListView listView = new ListView(contentArea.getContext());
 		contentArea.addView(listView);

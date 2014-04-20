@@ -23,6 +23,7 @@ import java.util.List;
 import org.ambient.control.R;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.util.GuiUtils;
+import org.ambientlight.ws.Room;
 
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,7 +38,21 @@ import android.widget.ListView;
  * @author Florian Bornkessel
  * 
  */
-public class SelectionListField {
+public class SelectionListField extends FieldGenerator {
+
+	/**
+	 * @param roomConfig
+	 * @param config
+	 * @param field
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public SelectionListField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
+		super(roomConfig, config, field);
+	}
+
 
 	/**
 	 * @param config
@@ -46,8 +61,7 @@ public class SelectionListField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(EditConfigHandlerFragment context, final Object config, final Field field,
-			List<String> altValues, LinearLayout contentArea) throws IllegalAccessException {
+	public void createView(EditConfigHandlerFragment context, LinearLayout contentArea) throws IllegalAccessException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

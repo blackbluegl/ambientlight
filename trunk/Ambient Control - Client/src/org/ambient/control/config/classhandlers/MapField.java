@@ -49,7 +49,21 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class MapField {
+public class MapField extends FieldGenerator {
+
+	/**
+	 * @param roomConfig
+	 * @param config
+	 * @param field
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public MapField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
+		super(roomConfig, config, field);
+	}
+
 
 	/**
 	 * @param config
@@ -59,9 +73,8 @@ public class MapField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
-			final String selectedRoom, final Room roomConfig) throws IllegalAccessException {
+	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
+			throws IllegalAccessException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);

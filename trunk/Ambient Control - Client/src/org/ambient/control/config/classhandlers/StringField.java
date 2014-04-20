@@ -16,15 +16,16 @@
 package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.ws.Room;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -36,7 +37,21 @@ import android.widget.Spinner;
  * @author Florian Bornkessel
  * 
  */
-public class StringField {
+public class StringField extends FieldGenerator {
+
+	/**
+	 * @param roomConfig
+	 * @param config
+	 * @param field
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public StringField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
+		super(roomConfig, config, field);
+	}
+
 
 	/**
 	 * @param config
@@ -47,9 +62,8 @@ public class StringField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(EditConfigHandlerFragment context, final Object config, LinearLayout container,
-			final Field field, final List<String> altValues, List<String> altValuesToDisplay, LinearLayout contentArea)
-					throws IllegalAccessException {
+	public void createView(EditConfigHandlerFragment context, LinearLayout container, LinearLayout contentArea)
+			throws IllegalAccessException {
 
 		if (field.getAnnotation(AlternativeValues.class) != null) {
 			// create spinner
@@ -62,8 +76,7 @@ public class StringField {
 			adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 			spinner.setAdapter(adapter);
 
-			String selection = (String) field.get(config);
-			int positionOfSelection = altValuesToDisplay.indexOf(selection);
+			int positionOfSelection = altValuesToDisplay.indexOf(field.get(config));
 			if (positionOfSelection < 0) {
 				positionOfSelection = 0;
 			}
@@ -83,7 +96,22 @@ public class StringField {
 
 
 				@Override
-				public void onNothingSelected(AdapterView<?> paramAdapterView) {
+				public void onNothingSelected(AdapterView<?> arg0) {
+
+				}
+			});
+
+			// update values directly before they will appear
+			spinner.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+					try {
+						StringField.this.createAltValues();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					adapter.notifyDataSetChanged();
 				}
 			});
 

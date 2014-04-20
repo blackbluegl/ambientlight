@@ -16,7 +16,6 @@
 package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.ambient.control.R;
 import org.ambient.control.config.ConfigBindingHelper;
@@ -39,7 +38,21 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class BeanField {
+public class BeanField extends FieldGenerator {
+
+	/**
+	 * @param roomConfig
+	 * @param config
+	 * @param field
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public BeanField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
+		super(roomConfig, config, field);
+	}
+
 
 	/**
 	 * @param config
@@ -49,9 +62,8 @@ public class BeanField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final EditConfigHandlerFragment context, final Object config, final Field field,
-			final List<String> altValues, final List<String> altValuesToDisplay, LinearLayout contentArea,
-			final String selectedRoom, final Room roomConfig) throws IllegalAccessException {
+	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
+			throws IllegalAccessException {
 
 		WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
 		whereToStore.fieldName = field.getName();
