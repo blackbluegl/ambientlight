@@ -262,8 +262,12 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			return true;
 
 		case R.id.menuEntryProcessAdd:
-			EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedRoom,
-					roomService.getRoomConfiguration(selectedRoom));
+			try {
+				EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedRoom,
+						roomService.getRoomConfiguration(selectedRoom));
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			return true;
 
 		case R.id.menuEntryProcessEdit:

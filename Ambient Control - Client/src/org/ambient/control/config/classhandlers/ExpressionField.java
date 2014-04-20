@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambientlight.ws.Room;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,7 +33,21 @@ import android.widget.MultiAutoCompleteTextView;
  * @author Florian Bornkessel
  * 
  */
-public class ExpressionField {
+public class ExpressionField extends FieldGenerator {
+
+	/**
+	 * @param roomConfig
+	 * @param config
+	 * @param field
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public ExpressionField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
+		super(roomConfig, config, field);
+	}
+
 
 	/**
 	 * @param config
@@ -42,8 +57,8 @@ public class ExpressionField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final EditConfigHandlerFragment context, final Object config, LinearLayout container,
-			final Field field, List<String> altValues, LinearLayout contentArea) throws IllegalAccessException {
+	public void createView(final EditConfigHandlerFragment context, LinearLayout container, LinearLayout contentArea)
+			throws IllegalAccessException {
 		// create textfield
 		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(container.getContext());
 		contentArea.addView(input);

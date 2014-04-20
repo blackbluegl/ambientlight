@@ -275,7 +275,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 
 	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout container, final Field field)
-			throws IllegalAccessException {
+			throws IllegalAccessException, ClassNotFoundException, java.lang.InstantiationException {
 
 		LinearLayout fieldView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_entry, null);
 		container.addView(fieldView);
@@ -302,43 +302,20 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			}
 		}
 
-		// a lot of fields have alternative values - spinners, lists and so on.
-		// they are bound in several ways
-		List<String> altValues = null;
-		// a mapping for the alternative values - (user friendly)
-		List<String> altValuesToDisplay = null;
-
-		if (field.getAnnotation(AlternativeValues.class) != null) {
-			// get the binding information from the field annotation first
-			altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class), config.getClass()
-					.getName(), roomConfig);
-			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class),
-					config.getClass().getName(), roomConfig);
-		} else if (field.getDeclaringClass().getAnnotation(AlternativeValues.class) != null) {
-			// if there is no information in the field, descend to the class
-			// that
-			// is held by the field and get the annotation from the class.
-			// Useful if a class is a subclass and needs special value binding
-			altValues = ConfigBindingHelper.getAlternativeValues(
-					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig);
-			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig);
-		}
-
 		// draw concrete ui elements for the field value
 		LinearLayout contentArea = (LinearLayout) fieldView.findViewById(R.id.linearLayoutConfigEntryContent);
 		TypeDef typedef = field.getAnnotation(TypeDef.class);
 
 		if (typedef.fieldType().equals(FieldType.EXPRESSION)) {
-			ExpressionField.createView(this, config, container, field, altValues, contentArea);
+			new ExpressionField(roomConfig, config, field).createView(this, container, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.BEAN)) {
-			BeanField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedRoom, roomConfig);
+			new BeanField(roomConfig, config, field).createView(this, contentArea, selectedRoom);
 		}
 
 		if (typedef.fieldType().equals(FieldType.STRING)) {
-			StringField.createView(this, config, container, field, altValues, altValuesToDisplay, contentArea);
+			new StringField(roomConfig, config, field).createView(this, container, contentArea);
 		}
 
 		if (typedef.fieldType().equals(FieldType.BOOLEAN)) {
@@ -354,14 +331,14 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		}
 
 		if (typedef.fieldType().equals(FieldType.MAP)) {
-			MapField.createView(this, config, field, altValues, altValuesToDisplay, contentArea, selectedRoom, roomConfig);
+			new MapField(roomConfig, config, field).createView(this, contentArea, selectedRoom);
 		}
 
 		if (typedef.fieldType().equals(FieldType.SELECTION_LIST)) {
-			SelectionListField.createView(this, config, field, altValues, contentArea);
+			new SelectionListField(roomConfig, config, field).createView(this, contentArea);
 		}
 		if (typedef.fieldType().equals(FieldType.SIMPLE_LIST)) {
-			SimpleListField.createView(this, config, field, altValues, contentArea, selectedRoom, roomConfig);
+			new SimpleListField(roomConfig, config, field).createView(this, contentArea, selectedRoom);
 		}
 	}
 
@@ -372,8 +349,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		case R.id.menuEntryFinishEditConfiguration:
 
 			if (this.getTargetFragment() != null) {
-				((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedRoom,
-						myConfigurationData);
+				((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedRoom, myConfigurationData);
 			}
 			getFragmentManager().popBackStack();
 			return true;
@@ -392,14 +368,11 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 
 	/*
-	 * We are listener to our own interface. so we can descent into subobjects
-	 * recursively. We store the value in a global variable. Later in lifecycle
-	 * onCreate will be called. There we call integrateConfiguration(). This is
-	 * needed because android does not guarantee that the instance would be kept
-	 * with all global values until now.
+	 * We are listener to our own interface. so we can descent into subobjects recursively. We store the value in a global
+	 * variable. Later in lifecycle onCreate will be called. There we call integrateConfiguration(). This is needed because
+	 * android does not guarantee that the instance would be kept with all global values until now.
 	 * 
-	 * @see org.ambient.control.processes.IntegrateObjectValueHandler#
-	 * integrateConfiguration(java.lang.Object)
+	 * @see org.ambient.control.processes.IntegrateObjectValueHandler# integrateConfiguration(java.lang.Object)
 	 */
 	@Override
 	public void onIntegrateConfiguration(String roomName, Object configuration) {
@@ -410,9 +383,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	/*
 	 * in that case we just do not copy the result into the config bean.
 	 * 
-	 * @see
-	 * org.ambient.control.config.EditConfigExitListener#onRevertConfiguration
-	 * (java.lang.String, java.lang.Object)
+	 * @see org.ambient.control.config.EditConfigExitListener#onRevertConfiguration (java.lang.String, java.lang.Object)
 	 */
 	@Override
 	public void onRevertConfiguration(String roomName, Object configuration) {
@@ -456,8 +427,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 
 	/**
-	 * helpermethod to start an fragment transaction and configure all values to
-	 * display the fragment in editmode
+	 * helpermethod to start an fragment transaction and configure all values to display the fragment in editmode
 	 * 
 	 * @param fragment
 	 *            targetfragment to
@@ -487,8 +457,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 
 	/**
-	 * helper method to edit a config bean if alternative values are already
-	 * knwon.
+	 * helper method to edit a config bean if alternative values are already knwon.
 	 * 
 	 * @param altValues
 	 * @param alternativeValuesForDisplay
@@ -534,14 +503,17 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param fragment
 	 * @param server
 	 * @param roomConfiguration
+	 * @throws IllegalAccessException
+	 * @throws java.lang.InstantiationException
+	 * @throws ClassNotFoundException
 	 */
 	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
-			final Room roomConfiguration) {
+			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(clazz.getAnnotation(AlternativeValues.class),
-				clazz.getName(), roomConfiguration);
+				clazz.getName(), roomConfiguration, null);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-				clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
+				clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, null);
 
 		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
 				roomConfiguration);

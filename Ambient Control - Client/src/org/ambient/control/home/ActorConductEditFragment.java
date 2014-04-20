@@ -110,12 +110,13 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 
 	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String roomName,
-			final Room roomConfiguration, final EntityId itemName) {
+			final Room roomConfiguration, final EntityId itemName, final Object entity) throws ClassNotFoundException,
+			java.lang.InstantiationException, IllegalAccessException {
 
 		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
-				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
+				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, entity);
 		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration);
+				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, entity);
 
 		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
 				roomConfiguration, itemName);

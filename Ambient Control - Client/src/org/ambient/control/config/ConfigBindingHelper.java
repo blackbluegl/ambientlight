@@ -48,15 +48,17 @@ public class ConfigBindingHelper {
 	}
 
 
-	public static List<String> getAlternativeValues(AlternativeValues annotation, String className, Object sourceBean) {
+	public static List<String> getAlternativeValues(AlternativeValues annotation, String className, Object sourceBean,
+			Object entity) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		Log.d(LOG, "finding binding for field with type: " + className + " in class: " + sourceBean.getClass().getName());
-		ValueBindingPath[] pathes = annotation.valueBinding();
-		if (pathes.length != 0) {
-			for (ValueBindingPath current : pathes) {
+		ValueBindingPath[] valueBinding = annotation.valueBinding();
+		if (valueBinding.length != 0) {
+			for (ValueBindingPath current : valueBinding) {
 				if (current.forSubClass().isEmpty() || current.forSubClass().equals(className))
 					return getByPathBinding(sourceBean, current.valueBinding());
 			}
-		} else {
+
+		} else if (annotation.values().length > 0) {
 			List<String> result = new ArrayList<String>();
 			for (Value current : annotation.values()) {
 				if (current.forSubClass().isEmpty() || current.forSubClass().equals(className)) {
@@ -64,12 +66,18 @@ public class ConfigBindingHelper {
 				}
 			}
 			return result;
+		} else if (annotation.valueProvider().isEmpty() == false) {
+			Class valueProvider = Class.forName(annotation.valueProvider());
+			AlterativeValueProvider provider = (AlterativeValueProvider) valueProvider.newInstance();
+			return provider.getValue(sourceBean, entity);
 		}
+
 		return null;
 	}
 
 
-	public static List<String> getAlternativeValuesForDisplay(AlternativeValues annotation, String className, Object sourceBean) {
+	public static List<String> getAlternativeValuesForDisplay(AlternativeValues annotation, String className, Object sourceBean,
+			Object entity) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		List<String> result = new ArrayList<String>();
 		for (Value current : annotation.values()) {
@@ -77,7 +85,7 @@ public class ConfigBindingHelper {
 		}
 
 		if (result.size() == 0)
-			return getAlternativeValues(annotation, className, sourceBean);
+			return getAlternativeValues(annotation, className, sourceBean, entity);
 
 		return result;
 	}
