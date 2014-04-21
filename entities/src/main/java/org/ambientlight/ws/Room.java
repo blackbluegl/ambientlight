@@ -50,4 +50,5 @@ public class Room implements Serializable {
 	public LightObjectManagerConfiguration lightObjectManager;
 
 	public List<Switchable> switchables = new ArrayList<Switchable>();
+
 }

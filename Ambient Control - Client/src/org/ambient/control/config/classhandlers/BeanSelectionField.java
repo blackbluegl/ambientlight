@@ -21,35 +21,37 @@ import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.ws.Room;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 
 /**
+ * creates an gui element with a spinner where a user can choose a bean from the altValues list. the chosen bean will be set to
+ * the given field of the given bean. you cannot create new beans with this gui element and you have to annotate alternative
+ * values to have a useful setting.
+ * 
  * @author Florian Bornkessel
  * 
  */
-public class StringField extends FieldGenerator {
+public class BeanSelectionField extends FieldGenerator {
 
 	/**
 	 * @param roomConfig
 	 * @param config
 	 * @param field
+	 * @param context
+	 * @param contentArea
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public StringField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
-		super(roomConfig, config, field);
+	public BeanSelectionField(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, config, field, context, contentArea);
 	}
 
 
@@ -62,13 +64,11 @@ public class StringField extends FieldGenerator {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public void createView(EditConfigHandlerFragment context, LinearLayout container, LinearLayout contentArea)
-			throws IllegalAccessException {
+	public void createView() throws IllegalAccessException {
 
 		if (field.getAnnotation(AlternativeValues.class) != null) {
 			// create spinner
-
-			Spinner spinner = new Spinner(container.getContext());
+			Spinner spinner = new Spinner(contentArea.getContext());
 			contentArea.addView(spinner);
 
 			final ArrayAdapter<String> adapter = new ArrayAdapter<String>(context.getActivity(),
@@ -76,19 +76,21 @@ public class StringField extends FieldGenerator {
 			adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 			spinner.setAdapter(adapter);
 
-			int positionOfSelection = altValuesToDisplay.indexOf(field.get(bean));
-			if (positionOfSelection < 0) {
-				positionOfSelection = 0;
+			int positionOfSelection = 0;
+			for (Object current : altValues) {
+				if (current.equals(field.get(bean))) {
+					positionOfSelection = altValues.indexOf(current);
+				}
 			}
+
 			spinner.setSelection(positionOfSelection);
 
 			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 				@Override
-				public void onItemSelected(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-					String valueToPaste = altValues.get(paramInt);
+				public void onItemSelected(AdapterView<?> paramAdapterView, View paramView, int position, long paramLong) {
 					try {
-						field.set(bean, valueToPaste);
+						field.set(bean, altValues.get(position));
 					} catch (Exception e) {
 						// should not happen
 					}
@@ -98,49 +100,6 @@ public class StringField extends FieldGenerator {
 				@Override
 				public void onNothingSelected(AdapterView<?> arg0) {
 
-				}
-			});
-
-			// update values directly before they will appear
-			spinner.setOnItemClickListener(new OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-					try {
-						StringField.this.createAltValues();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-					adapter.notifyDataSetChanged();
-				}
-			});
-
-		} else {
-
-			// create textfield
-			final EditText input = new EditText(container.getContext());
-			contentArea.addView(input);
-			input.setText((String) field.get(bean));
-
-			input.addTextChangedListener(new TextWatcher() {
-
-				@Override
-				public void onTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
-					try {
-						field.set(bean, input.getText().toString());
-					} catch (Exception e) {
-						// should not happen
-					}
-				}
-
-
-				@Override
-				public void beforeTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
-				}
-
-
-				@Override
-				public void afterTextChanged(Editable paramEditable) {
 				}
 			});
 		}

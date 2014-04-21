@@ -24,7 +24,11 @@ import java.lang.annotation.RetentionPolicy;
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AlternativeIds {
+public @interface ClassValue {
 
-	public Value[] values() default {};
+	public String displayValue() default "";
+
+
+	public String value() default "";
+
 }

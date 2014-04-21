@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ConfigBindingHelper;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
+import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
@@ -66,7 +66,7 @@ public class MapField extends FieldGenerator {
 
 
 	/**
-	 * @param config
+	 * @param bean
 	 * @param field
 	 * @param altValues
 	 * @param altValuesToDisplay
@@ -81,11 +81,11 @@ public class MapField extends FieldGenerator {
 		// list.setTag(containingClass);
 
 		@SuppressWarnings("unchecked")
-		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(config);
+		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(bean);
 		// show a list with all possible keys to user
 		final Map<String, Object> displayMap = new LinkedHashMap<String, Object>();
 
-		List<String> additionalIds = ConfigBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class), roomConfig);
+		List<String> additionalIds = ValueBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class), roomConfig);
 		for (String key : additionalIds) {
 			if (fieldValue.containsKey(key) == false) {
 				displayMap.put(key, null);
@@ -116,15 +116,15 @@ public class MapField extends FieldGenerator {
 
 					Object valueAtPosition = adapter.getItem(paramInt).getValue();
 
-					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+					WhereToMergeBean whereToStore = new WhereToMergeBean();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.MAP;
 					whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
-					context.whereToPutDataFromChild = whereToStore;
+					context.whereToMergeChildBean = whereToStore;
 
 					if (valueAtPosition == null && altValuesToDisplay.size() > 0) {
 						EditConfigHandlerFragment.createNewConfigBean(altValues,
-								ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
+								ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
 
 					} else if (valueAtPosition != null) {
 						String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();

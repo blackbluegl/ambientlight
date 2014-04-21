@@ -13,16 +13,26 @@
    limitations under the License.
  */
 
-package org.ambient.control.config;
+package org.ambient.control.config.classhandlers;
 
-import java.util.List;
+import java.io.Serializable;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface AlterativeValueProvider {
+public class WhereToMergeBean implements Serializable {
 
-	List<String> getValue(Object base, Object entity);
+	private static final long serialVersionUID = 1L;
+
+	public static enum WhereToPutType {
+		FIELD, MAP, LIST
+	}
+
+	public String fieldName;
+	public String keyInMap;
+	public int positionInList;
+	public WhereToPutType type;
+
 }
