@@ -18,7 +18,7 @@ package org.ambient.control.home;
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ConfigBindingHelper;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.rest.RestClient;
 import org.ambientlight.annotations.AlternativeValues;
@@ -113,12 +113,12 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 			final Room roomConfiguration, final EntityId itemName, final Object entity) throws ClassNotFoundException,
 			java.lang.InstantiationException, IllegalAccessException {
 
-		List<String> altValues = ConfigBindingHelper.getAlternativeValues(
+		List<String> altValues = ValueBindingHelper.getAlternativeValues(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, entity);
-		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
+		List<String> altValuesToDisplay = ValueBindingHelper.getAlternativeValuesForDisplay(
 				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, entity);
 
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
+		createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
 				roomConfiguration, itemName);
 	}
 

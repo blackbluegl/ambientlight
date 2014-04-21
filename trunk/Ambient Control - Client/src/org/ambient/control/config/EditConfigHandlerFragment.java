@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.ambient.control.R;
 import org.ambient.control.config.classhandlers.BeanField;
+import org.ambient.control.config.classhandlers.BeanSelectionField;
 import org.ambient.control.config.classhandlers.BooleanField;
 import org.ambient.control.config.classhandlers.ColorField;
 import org.ambient.control.config.classhandlers.ExpressionField;
@@ -32,10 +33,10 @@ import org.ambient.control.config.classhandlers.NumericField;
 import org.ambient.control.config.classhandlers.SelectionListField;
 import org.ambient.control.config.classhandlers.SimpleListField;
 import org.ambient.control.config.classhandlers.StringField;
-import org.ambient.control.config.classhandlers.WhereToPutConfigurationData;
-import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
+import org.ambient.control.config.classhandlers.WhereToMergeBean;
+import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
-import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.AlternativeClassValues;
 import org.ambientlight.annotations.ClassDescription;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Group;
@@ -88,7 +89,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 	protected boolean createMode = false;
 
-	public WhereToPutConfigurationData whereToPutDataFromChild = null;
+	public WhereToMergeBean whereToMergeChildBean = null;
 
 
 	@Override
@@ -100,7 +101,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
 		bundle.putSerializable(BUNDLE_OBJECT_VALUE, (Serializable) myConfigurationData);
-		bundle.putSerializable(BUNDLE_WHERE_TO_INTEGRATE, whereToPutDataFromChild);
+		bundle.putSerializable(BUNDLE_WHERE_TO_INTEGRATE, whereToMergeChildBean);
 		super.onSaveInstanceState(bundle);
 	}
 
@@ -122,7 +123,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 		if (savedInstanceState != null) {
 			myConfigurationData = savedInstanceState.getSerializable(BUNDLE_OBJECT_VALUE);
-			whereToPutDataFromChild = (WhereToPutConfigurationData) savedInstanceState.getSerializable(BUNDLE_WHERE_TO_INTEGRATE);
+			whereToMergeChildBean = (WhereToMergeBean) savedInstanceState.getSerializable(BUNDLE_WHERE_TO_INTEGRATE);
 		} else {
 			if (createMode) {
 				try {
@@ -311,7 +312,11 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		}
 
 		if (typedef.fieldType().equals(FieldType.BEAN)) {
-			new BeanField(roomConfig, config, field).createView(this, contentArea, selectedRoom);
+			new BeanField(roomConfig, config, field, this, contentArea).createView(this, contentArea, selectedRoom);
+		}
+
+		if (typedef.fieldType().equals(FieldType.CHOOSE_BEAN_FROM_LIST)) {
+			new BeanSelectionField(roomConfig, config, field, this, contentArea).createView();
 		}
 
 		if (typedef.fieldType().equals(FieldType.STRING)) {
@@ -395,26 +400,26 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	public void integrateConfiguration(Object configuration) {
 		try {
 			Class<? extends Object> parentClass = myConfigurationData.getClass();
-			Field myField = parentClass.getField(whereToPutDataFromChild.fieldName);
+			Field myField = parentClass.getField(whereToMergeChildBean.fieldName);
 
-			if (whereToPutDataFromChild.type.equals(WhereToPutType.FIELD)) {
+			if (whereToMergeChildBean.type.equals(WhereToPutType.FIELD)) {
 				myField.set(myConfigurationData, configuration);
 
-			} else if (whereToPutDataFromChild.type.equals(WhereToPutType.LIST)) {
+			} else if (whereToMergeChildBean.type.equals(WhereToPutType.LIST)) {
 				@SuppressWarnings("unchecked")
 				// checked in line above
 				List<Object> list = (List<Object>) myField.get(myConfigurationData);
-				if (whereToPutDataFromChild.positionInList != 0) {
-					list.set(whereToPutDataFromChild.positionInList, configuration);
+				if (whereToMergeChildBean.positionInList != 0) {
+					list.set(whereToMergeChildBean.positionInList, configuration);
 				} else {
 					list.add(configuration);
 				}
 
-			} else if (whereToPutDataFromChild.type.equals(WhereToPutType.MAP)) {
+			} else if (whereToMergeChildBean.type.equals(WhereToPutType.MAP)) {
 				@SuppressWarnings("unchecked")
 				// checked one line above
 				Map<String, Object> map = (Map<String, Object>) myField.get(myConfigurationData);
-				map.put(whereToPutDataFromChild.keyInMap, configuration);
+				map.put(whereToMergeChildBean.keyInMap, configuration);
 			}
 
 		} catch (Exception e) {
@@ -429,13 +434,13 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	/**
 	 * helpermethod to start an fragment transaction and configure all values to display the fragment in editmode
 	 * 
-	 * @param fragment
+	 * @param sourceFragment
 	 *            targetfragment to
 	 * @param configValueToEdit
 	 * @param selectedServer
 	 * @param roomConfig
 	 */
-	public static void editConfigBean(Fragment fragment, final Object configValueToEdit, final String selectedRoom,
+	public static void editConfigBean(Fragment sourceFragment, final Object configValueToEdit, final String selectedRoom,
 			final Room roomConfig) {
 
 		Bundle args = new Bundle();
@@ -446,9 +451,9 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 		EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
 		configHandler.setArguments(args);
-		configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
+		configHandler.setTargetFragment(sourceFragment, REQ_RETURN_OBJECT);
 
-		FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
+		FragmentTransaction ft = sourceFragment.getFragmentManager().beginTransaction();
 		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
 		ft.replace(R.id.LayoutMain, configHandler);
 		ft.addToBackStack(null);
@@ -457,7 +462,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 
 	/**
-	 * helper method to edit a config bean if alternative values are already knwon.
+	 * helper method to edit a config bean if alternative values are already known. E.g. Values are given by a referencing Field.
 	 * 
 	 * @param altValues
 	 * @param alternativeValuesForDisplay
@@ -465,7 +470,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param server
 	 * @param roomConfig
 	 */
-	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
+	public static void createNewConfigBean(final List<Object> altValues, final CharSequence[] alternativeValuesForDisplay,
 			final Fragment fragment, final String roomName, final Room roomConfig) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
@@ -474,7 +479,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				Bundle args = new Bundle();
-				args.putString(ARG_CLASS_NAME, altValues.get(which));
+				args.putString(ARG_CLASS_NAME, (String) altValues.get(which));
 				args.putString(ARG_SELECTED_ROOM, roomName);
 				args.putBoolean(ARG_CREATE_MODE, true);
 				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
@@ -497,26 +502,24 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 
 	/**
-	 * helpermethod to create a config bean from the scratch.
+	 * helpermethod to create a config bean from the scratch. The alternative values for concrete clases are guessed by classValue
+	 * annotation from the class itself.
 	 * 
 	 * @param clazz
 	 * @param fragment
-	 * @param server
+	 * @param roomName
 	 * @param roomConfiguration
-	 * @throws IllegalAccessException
-	 * @throws java.lang.InstantiationException
 	 * @throws ClassNotFoundException
+	 * @throws java.lang.InstantiationException
+	 * @throws IllegalAccessException
 	 */
 	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
 			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
-		List<String> altValues = ConfigBindingHelper.getAlternativeValues(clazz.getAnnotation(AlternativeValues.class),
-				clazz.getName(), roomConfiguration, null);
-		List<String> altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-				clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, null);
+		AlternativeValues alternatives = ValueBindingHelper.getValuesForClass(clazz.getAnnotation(AlternativeClassValues.class));
 
-		createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
-				roomConfiguration);
+		createNewConfigBean(alternatives.values, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues), fragment,
+				roomName, roomConfiguration);
 	}
 
 }

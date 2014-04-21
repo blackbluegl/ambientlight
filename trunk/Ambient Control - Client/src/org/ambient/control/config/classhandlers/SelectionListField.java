@@ -55,7 +55,7 @@ public class SelectionListField extends FieldGenerator {
 
 
 	/**
-	 * @param config
+	 * @param bean
 	 * @param field
 	 * @param altValues
 	 * @param contentArea
@@ -75,7 +75,7 @@ public class SelectionListField extends FieldGenerator {
 
 		@SuppressWarnings("unchecked")
 		// set by FieldType.SELECTION_LIST
-		final List<Object> listContent = (List<Object>) field.get(config);
+		final List<Object> listContent = (List<Object>) field.get(bean);
 
 		// show all values incl. potential values that the user may select or
 		// unselect

@@ -18,7 +18,7 @@ package org.ambient.control.processes.helper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.config.AlterativeValueProvider;
+import org.ambient.control.config.AlternativeValueProvider;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.ws.Room;
@@ -28,7 +28,7 @@ import org.ambientlight.ws.Room;
  * @author Florian Bornkessel
  * 
  */
-public class EntityIdProvider implements AlterativeValueProvider {
+public class EntityIdProvider implements AlternativeValueProvider {
 
 	/*
 	 * (non-Javadoc)

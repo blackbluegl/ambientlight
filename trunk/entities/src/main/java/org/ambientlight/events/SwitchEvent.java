@@ -13,7 +13,6 @@ public class SwitchEvent extends BroadcastEvent {
 	public boolean powerState;
 
 
-
 	public SwitchEvent() {
 		super();
 	}

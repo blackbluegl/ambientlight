@@ -19,14 +19,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 
-/**
- * @author Florian Bornkessel
- * 
- */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValueBindingPath {
+public @interface AlternativeClassValues {
 
-	public String forSubClass() default "";
-
-	public String valueBinding();
+	public ClassValue[] values() default {};
 }

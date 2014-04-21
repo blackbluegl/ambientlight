@@ -16,10 +16,10 @@ public abstract class BroadcastEvent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@TypeDef(fieldType = FieldType.STRING)
+	@TypeDef(fieldType = FieldType.BEAN)
 	@AlternativeValues(valueBinding = {
-			@ValueBindingPath(forSubClass = "org.ambientlight.process.events.SceneryEntryEventConfiguration", valueBinding = "getSceneryEventGenerator().keySet()"),
-			@ValueBindingPath(forSubClass = "org.ambientlight.process.events.SwitchEventConfiguration", valueBinding = "getSwitchGenerators().keySet()") })
+			@ValueBindingPath(forSubClass = "org.ambientlight.events.SceneryEntryEvent", valueBinding = "switchables.keySet()"),
+			@ValueBindingPath(forSubClass = "org.ambientlight.events.SwitchEvent", valueBinding = "switchables.keySet()") })
 	public EntityId sourceId;
 
 

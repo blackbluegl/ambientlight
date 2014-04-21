@@ -26,10 +26,14 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Value {
 
-	public String displayName();
+	public String displayValue() default "";
 
 
 	public String forSubClass() default "";
 
-	public String value();
+
+	public String value() default "";
+
+
+	public String valueProvider() default "";
 }

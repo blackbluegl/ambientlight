@@ -18,11 +18,12 @@ package org.ambient.control.config.classhandlers;
 import java.lang.reflect.Field;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ConfigBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
+import org.ambient.control.config.ValueBindingHelper;
+import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambientlight.ws.Room;
 
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,53 +33,59 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
+ * creates an gui element with an clickable text. By clicking on the text the user may inspect underlying bean. if the field value
+ * is null, the user can instantiate a new bean from the altValue list. By long clicking the user may decide to set the field to
+ * null or to walk into the beans values. You have to annotate alternative values to have a useful setting.
+ * 
  * @author Florian Bornkessel
  * 
  */
 public class BeanField extends FieldGenerator {
 
+	private static final String LOG = "BeanField";
+
+
 	/**
 	 * @param roomConfig
 	 * @param config
 	 * @param field
+	 * @param context
+	 * @param contentArea
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public BeanField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
-		super(roomConfig, config, field);
+	public BeanField(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, config, field, context, contentArea);
 	}
 
 
 	/**
-	 * @param config
-	 * @param field
-	 * @param altValues
-	 * @param altValuesToDisplay
-	 * @param contentArea
+	 * 
+	 * @param selectedRoom
 	 * @throws IllegalAccessException
 	 */
-	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
-			throws IllegalAccessException {
+	public void createView(final String selectedRoom) throws IllegalAccessException {
 
-		WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+		WhereToMergeBean whereToStore = new WhereToMergeBean();
 		whereToStore.fieldName = field.getName();
 		whereToStore.type = WhereToPutType.FIELD;
-		context.whereToPutDataFromChild = whereToStore;
+		context.whereToMergeChildBean = whereToStore;
 
 		final TextView beanView = new TextView(contentArea.getContext());
 		contentArea.addView(beanView);
 
-		final Object fieldValue = field.get(config);
+		final Object fieldValue = field.get(bean);
 
 		if (fieldValue != null) {
 			beanView.setText(fieldValue.getClass().getName());
 		} else {
-			beanView.setText("kein Objekt");
+			beanView.setText("-");
 		}
 
 		beanView.setOnClickListener(new OnClickListener() {
@@ -88,7 +95,10 @@ public class BeanField extends FieldGenerator {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
 					EditConfigHandlerFragment.createNewConfigBean(altValues,
-							ConfigBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
+							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
+				} else if (fieldValue == null && altValuesToDisplay.size() == 0) {
+					Log.e(LOG, "error, no alternative Values have been annotated to class.");
+					Toast.makeText(contentArea.getContext(), "no alternative Values annotated", Toast.LENGTH_SHORT).show();
 				} else if (fieldValue != null) {
 					EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedRoom, roomConfig);
 				}
@@ -115,18 +125,14 @@ public class BeanField extends FieldGenerator {
 
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+
+						// menu with edit and remove button
 						MenuInflater inflater = mode.getMenuInflater();
 						inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
 						MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
-						try {
-							if (fieldValue != null) {
-								editItem.setVisible(true);
-							} else {
-								editItem.setVisible(false);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+
+						editItem.setVisible(fieldValue != null ? true : false);
+
 						return true;
 					}
 
@@ -139,11 +145,13 @@ public class BeanField extends FieldGenerator {
 						case R.id.menuEntryRemoveConfigurationClass:
 
 							try {
-								field.set(config, null);
+								field.set(bean, null);
 							} catch (Exception e) {
-								// should not happen
+								Log.e(LOG, "error, could not remove bean from field!", e);
+								Toast.makeText(contentArea.getContext(), "could not remove bean!", Toast.LENGTH_SHORT).show();
 							}
-							beanView.setText("kein Objekt");
+
+							beanView.setText("-");
 
 							break;
 
@@ -155,12 +163,14 @@ public class BeanField extends FieldGenerator {
 
 						}
 
+						// if no item could handle let parent handle request
 						return false;
 					}
 				});
+
+				// signal that we handled the long click
 				return true;
 			}
 		});
 	}
-
 }

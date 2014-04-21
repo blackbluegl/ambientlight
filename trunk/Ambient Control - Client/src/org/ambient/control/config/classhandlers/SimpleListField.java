@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ConfigBindingHelper;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.config.classhandlers.WhereToPutConfigurationData.WhereToPutType;
+import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
 
@@ -62,7 +62,7 @@ public class SimpleListField extends FieldGenerator {
 
 
 	/**
-	 * @param config
+	 * @param bean
 	 * @param field
 	 * @param altValues
 	 * @param contentArea
@@ -77,7 +77,7 @@ public class SimpleListField extends FieldGenerator {
 
 		@SuppressWarnings({ "unchecked" })
 		// set by FieldType.SIMPLE_LIST
-		final List<Object> listContent = (List<Object>) field.get(config);
+		final List<Object> listContent = (List<Object>) field.get(bean);
 
 		// create a + button for an empty list so the user can put in his first
 		// object
@@ -94,13 +94,13 @@ public class SimpleListField extends FieldGenerator {
 			@Override
 			public void onClick(View v) {
 
-				WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+				WhereToMergeBean whereToStore = new WhereToMergeBean();
 				whereToStore.fieldName = field.getName();
 				whereToStore.type = WhereToPutType.LIST;
 				whereToStore.positionInList = 0;
-				context.whereToPutDataFromChild = whereToStore;
+				context.whereToMergeChildBean = whereToStore;
 
-				EditConfigHandlerFragment.createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValues),
+				EditConfigHandlerFragment.createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValues),
 						context, selectedRoom, roomConfig);
 			}
 		});
@@ -157,13 +157,13 @@ public class SimpleListField extends FieldGenerator {
 
 				case R.id.menuEntryAddConfigurationClass:
 
-					WhereToPutConfigurationData whereToStore = new WhereToPutConfigurationData();
+					WhereToMergeBean whereToStore = new WhereToMergeBean();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.LIST;
 					whereToStore.positionInList = 0;
-					context.whereToPutDataFromChild = whereToStore;
+					context.whereToMergeChildBean = whereToStore;
 
-					EditConfigHandlerFragment.createNewConfigBean(altValues, ConfigBindingHelper.toCharSequenceArray(altValues),
+					EditConfigHandlerFragment.createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValues),
 							context, selectedRoom, roomConfig);
 
 					mode.finish();

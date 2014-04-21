@@ -21,9 +21,5 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AlternativeValues {
-
 	public Value[] values() default {};
-
-
-	public ValueBindingPath[] valueBinding() default {};
 }

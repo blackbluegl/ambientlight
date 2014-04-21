@@ -15,15 +15,30 @@
 
 package org.ambient.control.config;
 
-
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public interface EditConfigOnExitListener {
 
+	/**
+	 * notify listener that the edited object is finished editing and ready to work with. Important! some fragments need the
+	 * information. and it is not possible to securely store this value within its lifecycle. So we will give it to the listener
+	 * here.
+	 * 
+	 * @param roomName
+	 * 
+	 * @param configuration
+	 */
 	public void onIntegrateConfiguration(String roomName, Object configuration);
 
 
+	/**
+	 * notify listener that the edited object should be reverted. Important! some fragments need the information. and it is not
+	 * possible to securely store this value within its lifecycle. So we will give it to the listener here.
+	 * 
+	 * @param roomName
+	 * @param configuration
+	 */
 	public void onRevertConfiguration(String roomName, Object configuration);
 }

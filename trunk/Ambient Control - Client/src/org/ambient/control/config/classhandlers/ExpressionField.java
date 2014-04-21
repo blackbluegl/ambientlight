@@ -50,7 +50,7 @@ public class ExpressionField extends FieldGenerator {
 
 
 	/**
-	 * @param config
+	 * @param bean
 	 * @param container
 	 * @param field
 	 * @param altValues
@@ -63,7 +63,7 @@ public class ExpressionField extends FieldGenerator {
 		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(container.getContext());
 		contentArea.addView(input);
 
-		input.setText((String) field.get(config));
+		input.setText((String) field.get(bean));
 
 		List<String> variablesEnrichedValues = new ArrayList<String>();
 		variablesEnrichedValues.add("#{tokenValue}");
@@ -82,7 +82,7 @@ public class ExpressionField extends FieldGenerator {
 			@Override
 			public void onTextChanged(CharSequence paramCharSequence, int paramInt1, int paramInt2, int paramInt3) {
 				try {
-					field.set(config, input.getText().toString());
+					field.set(bean, input.getText().toString());
 					input.showDropDown();
 				} catch (Exception e) {
 					// should not happen

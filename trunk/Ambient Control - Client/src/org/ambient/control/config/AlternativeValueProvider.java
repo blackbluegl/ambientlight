@@ -13,26 +13,15 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
-import java.io.Serializable;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class WhereToPutConfigurationData implements Serializable {
+public interface AlternativeValueProvider {
 
-	private static final long serialVersionUID = 1L;
-
-	public static enum WhereToPutType {
-		FIELD, MAP, LIST
-	}
-
-	public String fieldName;
-	public String keyInMap;
-	public int positionInList;
-	public WhereToPutType type;
-
+	AlternativeValues getValue(Object base, Object entity);
 }

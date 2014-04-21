@@ -17,7 +17,9 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 
+import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.views.ColorPickerView;
+import org.ambientlight.ws.Room;
 
 import android.widget.LinearLayout;
 
@@ -26,16 +28,31 @@ import android.widget.LinearLayout;
  * @author Florian Bornkessel
  * 
  */
-public class ColorField {
+public class ColorField extends FieldGenerator {
 
 	/**
+	 * @param roomConfig
 	 * @param config
+	 * @param field
+	 * @param context
+	 * @param contentArea
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public ColorField(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, config, field, context, contentArea);
+	}
+
+	/**
+	 * @param bean
 	 * @param container
 	 * @param field
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final Object config, LinearLayout container, final Field field, LinearLayout contentArea)
+	public void createView()
 			throws IllegalAccessException {
 
 		ColorPickerView.OnColorChangedListener listener = new ColorPickerView.OnColorChangedListener() {
@@ -43,14 +60,14 @@ public class ColorField {
 			@Override
 			public void colorChanged(int color) {
 				try {
-					field.setInt(config, color);
+					field.setInt(bean, color);
 				} catch (Exception e) {
 					// this should not happen
 				}
 			}
 		};
 
-		ColorPickerView colorPickerView = new ColorPickerView(container.getContext(), listener, field.getInt(config));
+		ColorPickerView colorPickerView = new ColorPickerView(contentArea.getContext(), listener, field.getInt(bean));
 		contentArea.addView(colorPickerView);
 	}
 

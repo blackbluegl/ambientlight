@@ -18,9 +18,12 @@ package org.ambient.control.config.classhandlers;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.ambient.control.config.ConfigBindingHelper;
+import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.ws.Room;
+
+import android.widget.LinearLayout;
 
 
 /**
@@ -29,23 +32,25 @@ import org.ambientlight.ws.Room;
  */
 public abstract class FieldGenerator {
 
-	// a lot of fields have alternative values - spinners, lists and so on.
-	// they are bound in several ways
-	protected List<String> altValues = null;
-	// a mapping for the alternative values - (user friendly)
+	protected List<Object> altValues = null;
+
 	protected List<String> altValuesToDisplay = null;
 
 	protected Room roomConfig = null;
-	protected Object config = null;
+	protected Object bean = null;
 	protected Field field = null;
+	protected EditConfigHandlerFragment context;
+	protected LinearLayout contentArea;
 
 
-	public FieldGenerator(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
+	public FieldGenerator(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super();
 		this.roomConfig = roomConfig;
-		this.config = config;
+		this.bean = config;
 		this.field = field;
+		this.context = context;
+		this.contentArea = contentArea;
 
 		createAltValues();
 	}
@@ -53,24 +58,17 @@ public abstract class FieldGenerator {
 
 	protected void createAltValues() throws IllegalAccessException, ClassNotFoundException, java.lang.InstantiationException {
 
-		if (field.getAnnotation(AlternativeValues.class) != null) {
-			// get the binding information from the field annotation first
-			altValues = ConfigBindingHelper.getAlternativeValues(field.getAnnotation(AlternativeValues.class), config.getClass()
-					.getName(), roomConfig, config);
-			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(field.getAnnotation(AlternativeValues.class),
-					config.getClass().getName(), roomConfig, config);
-		} else if (field.getDeclaringClass().getAnnotation(AlternativeValues.class) != null) {
-			// if there is no information in the field, descend to the class
-			// that
-			// is held by the field and get the annotation from the class.
-			// Useful if a class is a subclass and needs special value binding
-			altValues = ConfigBindingHelper.getAlternativeValues(
-					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig,
-					config);
-			altValuesToDisplay = ConfigBindingHelper.getAlternativeValuesForDisplay(
-					field.getDeclaringClass().getAnnotation(AlternativeValues.class), config.getClass().getName(), roomConfig,
-					config);
+		AlternativeValues annotation = field.getAnnotation(AlternativeValues.class);
+
+		if (annotation == null) {
+			annotation = field.getDeclaringClass().getAnnotation(AlternativeValues.class);
 		}
+
+		org.ambient.control.config.AlternativeValues result = ValueBindingHelper.getValuesForField(annotation.values(), bean,
+				roomConfig);
+
+		altValues = result.values;
+		altValuesToDisplay = result.displayValues;
 	}
 
 }
