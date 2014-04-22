@@ -24,57 +24,76 @@ import org.ambientlight.ws.Room;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.MultiAutoCompleteTextView;
+import android.widget.Toast;
 
 
 /**
+ * creates an expression gui element with auto spelling feature that displays variable names and the user may add these variables
+ * to the expression. The result may be bound to a String field. The alternative values have to be String values. They actually
+ * represent sensors that can be read by the process engine.
+ * 
  * @author Florian Bornkessel
  * 
  */
 public class ExpressionField extends FieldGenerator {
 
+	public static final String LOG = "ExpressionField";
+
+
 	/**
 	 * @param roomConfig
-	 * @param config
+	 * @param bean
 	 * @param field
+	 * @param contextFragment
+	 * @param contentArea
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public ExpressionField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
-		super(roomConfig, config, field);
+	public ExpressionField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
 
 
-	/**
-	 * @param bean
-	 * @param container
-	 * @param field
-	 * @param altValues
-	 * @param contentArea
-	 * @throws IllegalAccessException
-	 */
-	public void createView(final EditConfigHandlerFragment context, LinearLayout container, LinearLayout contentArea)
-			throws IllegalAccessException {
+	public void createView() throws IllegalAccessException {
+
 		// create textfield
-		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(container.getContext());
+		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(contentArea.getContext());
 		contentArea.addView(input);
 
 		input.setText((String) field.get(bean));
 
+		// display list with sensor variable names
 		List<String> variablesEnrichedValues = new ArrayList<String>();
+		// hardcode tokenvalue to signal that data from token shall be used in the actionhandler of the process
 		variablesEnrichedValues.add("#{tokenValue}");
-		for (String current : altValues) {
+		// build list by the altValues annotation
+		for (Object current : altValues) {
+			if (current instanceof String == false) {
+				Log.e(LOG, "AltValue is no String and not usefull as sensor variable.");
+				Toast.makeText(contentArea.getContext(), "AltValue is no String and not usefull as sensor variable.",
+						Toast.LENGTH_SHORT).show();
+				continue;
+			}
 			variablesEnrichedValues.add("#{" + current + "}");
 		}
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context.getActivity(),
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(contextFragment.getActivity(),
 				android.R.layout.simple_dropdown_item_1line, variablesEnrichedValues);
 		input.setAdapter(adapter);
+
+		// display alternative sensors to user when the editor comes up
 		input.showDropDown();
+
+		// shortest threshold for autocorrecture feature. in this case an '#' shows the sensors to the user
 		input.setThreshold(1);
+
+		// multi autocomplete with whitespaces instead of comma
 		input.setTokenizer(new SpaceTokenizer());
 
 		input.addTextChangedListener(new TextWatcher() {
@@ -85,7 +104,8 @@ public class ExpressionField extends FieldGenerator {
 					field.set(bean, input.getText().toString());
 					input.showDropDown();
 				} catch (Exception e) {
-					// should not happen
+					Log.e(LOG, "Could not set value to field!", e);
+					Toast.makeText(contentArea.getContext(), "Could not set value to field!", Toast.LENGTH_SHORT).show();
 				}
 			}
 

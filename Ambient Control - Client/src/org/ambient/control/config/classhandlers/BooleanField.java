@@ -17,17 +17,45 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 
+import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambientlight.ws.Room;
+
+import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 
 /**
+ * creates an gui element with a checkbox where a user can switch a boolean field. You cannot annotate alternative values. This
+ * does not make sense here.
+ * 
  * @author Florian Bornkessel
- *
+ * 
  */
-public class BooleanField {
+public class BooleanField extends FieldGenerator {
+
+	public static final String LOG = "BooleanField";
+
+
+	/**
+	 * @param roomConfig
+	 * @param bean
+	 * @param field
+	 * @param contextFragment
+	 * @param contentArea
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public BooleanField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, bean, field, contextFragment, contentArea);
+		// TODO Auto-generated constructor stub
+	}
+
 
 	/**
 	 * @param config
@@ -36,33 +64,26 @@ public class BooleanField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final Object config, LinearLayout container, final Field field, LinearLayout contentArea)
-			throws IllegalAccessException {
+	public void createView() throws IllegalAccessException {
 
-		final CheckBox checkbox = new CheckBox(container.getContext());
+		final CheckBox checkbox = new CheckBox(contentArea.getContext());
 		contentArea.addView(checkbox);
 
-		checkbox.setChecked(field.getBoolean(config));
-		if (checkbox.isChecked()) {
-			checkbox.setText("aktiviert");
-		} else {
-			checkbox.setText("deaktiviert");
-		}
+		boolean isChecked = checkbox.isChecked();
+		checkbox.setText(isChecked ? "aktiviert" : "deaktiviert");
 
 		checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
-			public void onCheckedChanged(CompoundButton paramCompoundButton, boolean paramBoolean) {
+			public void onCheckedChanged(CompoundButton paramCompoundButton, boolean isChecked) {
 				try {
-					field.setBoolean(config, paramBoolean);
-					if (paramBoolean) {
-						checkbox.setText("aktiviert");
-					} else {
-						checkbox.setText("deaktiviert");
-					}
+					field.setBoolean(bean, isChecked);
+
+					checkbox.setText(isChecked ? "aktiviert" : "deaktiviert");
 
 				} catch (Exception e) {
-					// this should not happen
+					Log.e(LOG, "Could not set value to field!", e);
+					Toast.makeText(contentArea.getContext(), "Could not set value to field!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});

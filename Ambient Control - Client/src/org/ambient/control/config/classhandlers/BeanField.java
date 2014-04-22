@@ -51,7 +51,7 @@ public class BeanField extends FieldGenerator {
 
 	/**
 	 * @param roomConfig
-	 * @param config
+	 * @param bean
 	 * @param field
 	 * @param context
 	 * @param contentArea
@@ -59,9 +59,9 @@ public class BeanField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public BeanField(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+	public BeanField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-		super(roomConfig, config, field, context, contentArea);
+		super(roomConfig, bean, field, context, contentArea);
 	}
 
 
@@ -75,7 +75,7 @@ public class BeanField extends FieldGenerator {
 		WhereToMergeBean whereToStore = new WhereToMergeBean();
 		whereToStore.fieldName = field.getName();
 		whereToStore.type = WhereToPutType.FIELD;
-		context.whereToMergeChildBean = whereToStore;
+		contextFragment.whereToMergeChildBean = whereToStore;
 
 		final TextView beanView = new TextView(contentArea.getContext());
 		contentArea.addView(beanView);
@@ -95,12 +95,12 @@ public class BeanField extends FieldGenerator {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
 					EditConfigHandlerFragment.createNewConfigBean(altValues,
-							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
+							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
 				} else if (fieldValue == null && altValuesToDisplay.size() == 0) {
-					Log.e(LOG, "error, no alternative Values have been annotated to class.");
-					Toast.makeText(contentArea.getContext(), "no alternative Values annotated", Toast.LENGTH_SHORT).show();
+					Log.e(LOG, "No alternative Values have been annotated to class.");
+					Toast.makeText(contentArea.getContext(), "No alternative Values annotated", Toast.LENGTH_SHORT).show();
 				} else if (fieldValue != null) {
-					EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedRoom, roomConfig);
+					EditConfigHandlerFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
 				}
 			}
 		});
@@ -109,7 +109,7 @@ public class BeanField extends FieldGenerator {
 
 			@Override
 			public boolean onLongClick(View v) {
-				context.getActivity().startActionMode(new ActionMode.Callback() {
+				contextFragment.getActivity().startActionMode(new ActionMode.Callback() {
 
 					@Override
 					public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -157,7 +157,7 @@ public class BeanField extends FieldGenerator {
 
 						case R.id.menuEntryEditConfigurationClass:
 
-							EditConfigHandlerFragment.editConfigBean(context, fieldValue, selectedRoom, roomConfig);
+							EditConfigHandlerFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
 
 							break;
 

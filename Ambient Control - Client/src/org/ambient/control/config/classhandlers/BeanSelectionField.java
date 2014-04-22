@@ -21,12 +21,14 @@ import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.ws.Room;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 
 /**
@@ -38,6 +40,9 @@ import android.widget.Spinner;
  * 
  */
 public class BeanSelectionField extends FieldGenerator {
+
+	private static final String LOG = "BeanSelectionField";
+
 
 	/**
 	 * @param roomConfig
@@ -71,7 +76,7 @@ public class BeanSelectionField extends FieldGenerator {
 			Spinner spinner = new Spinner(contentArea.getContext());
 			contentArea.addView(spinner);
 
-			final ArrayAdapter<String> adapter = new ArrayAdapter<String>(context.getActivity(),
+			final ArrayAdapter<String> adapter = new ArrayAdapter<String>(contextFragment.getActivity(),
 					android.R.layout.simple_spinner_item, altValuesToDisplay);
 			adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 			spinner.setAdapter(adapter);
@@ -92,7 +97,8 @@ public class BeanSelectionField extends FieldGenerator {
 					try {
 						field.set(bean, altValues.get(position));
 					} catch (Exception e) {
-						// should not happen
+						Log.e(LOG, "Could not set bean to field!", e);
+						Toast.makeText(contentArea.getContext(), "Could not set bean to field!", Toast.LENGTH_SHORT).show();
 					}
 				}
 

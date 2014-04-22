@@ -33,6 +33,20 @@ public class ValueBindingHelper {
 	private static final String LOG = "ConfigBindingHelper";
 
 
+	/**
+	 * resolve "Value" annotation and generate alternative values as objects and user friendly to display. Either hardcoded values
+	 * can be given or value provider may generate the list. In the case that the field is bound to a parent class the annotation
+	 * may contain a "forSubClass" property that defines for which concrete class the annotation is valid. If no display value is
+	 * given a fallback to the object value is used. You may implement a Valueprovider for more complex cases.
+	 * 
+	 * @param valuesAnnotation
+	 * @param bean
+	 * @param dataModell
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	public static org.ambient.control.config.AlternativeValues getValuesForField(Value[] valuesAnnotation, Object bean,
 			Object dataModell) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		org.ambient.control.config.AlternativeValues result = new org.ambient.control.config.AlternativeValues();
@@ -54,6 +68,9 @@ public class ValueBindingHelper {
 
 		for (Value currentValueAnnotation : valuesAnnotation) {
 
+			// either the annotation is bound to a field of a concrete class or its bound to a parent class and there are
+			// different
+			// annotations for each subclass given.
 			if (currentValueAnnotation.forSubClass().isEmpty()
 					|| currentValueAnnotation.forSubClass().equals(bean.getClass().getName())) {
 				Log.d(LOG, "value matches for class: " + bean.getClass().getName());
@@ -65,7 +82,7 @@ public class ValueBindingHelper {
 			if (currentValueAnnotation.value().isEmpty() == false) {
 				result.values.add(currentValueAnnotation.value());
 				result.displayValues.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation.displayValue()
-						: "");
+						: currentValueAnnotation.value());
 			}
 
 			// value provider
@@ -82,6 +99,16 @@ public class ValueBindingHelper {
 	}
 
 
+	/**
+	 * Classes may be annotated with alternative values. These annotations are used when a new concrete bean shall be initialized.
+	 * The alternatives define a className and a display name.
+	 * 
+	 * @param annotation
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	public static org.ambient.control.config.AlternativeValues getValuesForClass(AlternativeClassValues annotation)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
@@ -100,13 +127,13 @@ public class ValueBindingHelper {
 		}
 
 		for (ClassValue currentValueAnnotation : valuesAnnotation) {
-
 			if (currentValueAnnotation.value().isEmpty() == false) {
 				result.values.add(currentValueAnnotation.value());
 				result.displayValues.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation.displayValue()
-						: "");
+						: currentValueAnnotation.value());
 			}
 		}
+
 		return result;
 	}
 
