@@ -39,17 +39,17 @@ public abstract class FieldGenerator {
 	protected Room roomConfig = null;
 	protected Object bean = null;
 	protected Field field = null;
-	protected EditConfigHandlerFragment context;
+	protected EditConfigHandlerFragment contextFragment;
 	protected LinearLayout contentArea;
 
 
-	public FieldGenerator(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super();
 		this.roomConfig = roomConfig;
-		this.bean = config;
+		this.bean = bean;
 		this.field = field;
-		this.context = context;
+		this.contextFragment = contextFragment;
 		this.contentArea = contentArea;
 
 		createAltValues();
@@ -58,8 +58,10 @@ public abstract class FieldGenerator {
 
 	protected void createAltValues() throws IllegalAccessException, ClassNotFoundException, java.lang.InstantiationException {
 
+		// try to find annotation from field
 		AlternativeValues annotation = field.getAnnotation(AlternativeValues.class);
 
+		// if no annotation is found in this concrete class try to find it from parent class
 		if (annotation == null) {
 			annotation = field.getDeclaringClass().getAnnotation(AlternativeValues.class);
 		}

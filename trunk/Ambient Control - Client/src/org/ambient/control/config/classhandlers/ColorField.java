@@ -21,14 +21,22 @@ import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.views.ColorPickerView;
 import org.ambientlight.ws.Room;
 
+import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 
 /**
+ * creates an gui element with a color picker where a user can set the color as integer to the bound field. You cannot annotate
+ * alternative values. This does not make sense here.
+ * 
  * @author Florian Bornkessel
  * 
  */
 public class ColorField extends FieldGenerator {
+
+	public static final String LOG = "BooleanField";
+
 
 	/**
 	 * @param roomConfig
@@ -45,6 +53,7 @@ public class ColorField extends FieldGenerator {
 		super(roomConfig, config, field, context, contentArea);
 	}
 
+
 	/**
 	 * @param bean
 	 * @param container
@@ -52,8 +61,7 @@ public class ColorField extends FieldGenerator {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public void createView()
-			throws IllegalAccessException {
+	public void createView() throws IllegalAccessException {
 
 		ColorPickerView.OnColorChangedListener listener = new ColorPickerView.OnColorChangedListener() {
 
@@ -62,7 +70,8 @@ public class ColorField extends FieldGenerator {
 				try {
 					field.setInt(bean, color);
 				} catch (Exception e) {
-					// this should not happen
+					Log.e(LOG, "Could not set value to field!", e);
+					Toast.makeText(contentArea.getContext(), "Could not set value to field!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		};
