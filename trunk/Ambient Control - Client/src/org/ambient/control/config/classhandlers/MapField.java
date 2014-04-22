@@ -24,11 +24,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
-import org.ambient.views.adapter.EditConfigMapAdapter;
 import org.ambientlight.annotations.AlternativeIds;
 import org.ambientlight.ws.Room;
 
@@ -46,6 +45,10 @@ import android.widget.TextView;
 
 
 /**
+ * creates an gui element for hashmap values. the map is presented as a list. The alternative ids represent the amount of entries
+ * that will be displayed. the user may link values to each displayed key. Note: if the field value has got keys which are not in
+ * the amount of alternative ids, the key value pair will be ignored and wiped out.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -53,15 +56,18 @@ public class MapField extends FieldGenerator {
 
 	/**
 	 * @param roomConfig
-	 * @param config
+	 * @param bean
 	 * @param field
+	 * @param contextFragment
+	 * @param contentArea
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public MapField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
-		super(roomConfig, config, field);
+	public MapField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, bean, field, contextFragment, contentArea);
+		// TODO Auto-generated constructor stub
 	}
 
 
@@ -72,35 +78,50 @@ public class MapField extends FieldGenerator {
 	 * @param altValuesToDisplay
 	 * @param contentArea
 	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
 	 */
 	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
-			throws IllegalAccessException {
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);
-		// list.setTag(containingClass);
 
+		// have an instance of the field value
 		@SuppressWarnings("unchecked")
 		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(bean);
-		// show a list with all possible keys to user
-		final Map<String, Object> displayMap = new LinkedHashMap<String, Object>();
 
-		List<String> additionalIds = ValueBindingHelper.getAlternativeIds(field.getAnnotation(AlternativeIds.class), roomConfig);
-		for (String key : additionalIds) {
-			if (fieldValue.containsKey(key) == false) {
-				displayMap.put(key, null);
-			} else {
-				displayMap.put(key, fieldValue.get(key));
-			}
-		}
-
+		// class type of the values elements
 		ParameterizedType pt = (ParameterizedType) field.getGenericType();
 		final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
 
-		final EditConfigMapAdapter adapter = new EditConfigMapAdapter(context.getFragmentManager(), context.getActivity(),
-				displayMap, fieldValue, containingClass);
+		// find alternative id's from annotation and prepare a mapping with user friendly keys
+		org.ambient.control.config.AlternativeValues alternativeIds = ValueBindingHelper.getValuesForField(
+				field.getAnnotation(AlternativeIds.class).values(), bean, roomConfig);
+
+		final Map<Object, String> keyDisplayKeyMapping = new LinkedHashMap<Object, String>();
+		for (String currentDisplayKey : alternativeIds.displayValues) {
+			keyDisplayKeyMapping.put(alternativeIds.values.get(alternativeIds.displayValues.indexOf(currentDisplayKey)),
+					currentDisplayKey);
+		}
+
+		// // create data model with all keys from the alternative id's and fill values according to the keys
+		// final Map<Object, Object> dataModell = new HashMap<Object, Object>();
+		//
+		// for (Object key : alternativeIds.values) {
+		// if (fieldValue.containsKey(key)) {
+		// dataModell.put(key, fieldValue.get(key));
+		// } else {
+		// dataModell.put(key, null);
+		// }
+		// }
+
+		// set custom adapter to show user friendly keys in row 1 and a representation of the value in row 2
+		final MapAdapter adapter = new MapAdapter(context.getFragmentManager(), context.getActivity(), keyDisplayKeyMapping,
+				fieldValue, containingClass);
 		list.setAdapter(adapter);
 
+		// the listview is embedded in a scrollable view so no scrolling is wanted in this view.
 		GuiUtils.setListViewHeightBasedOnChildren(list);
 
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

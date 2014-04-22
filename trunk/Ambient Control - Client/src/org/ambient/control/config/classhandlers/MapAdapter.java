@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambient.views.adapter;
+package org.ambient.control.config.classhandlers;
 
 import java.util.Map;
 
@@ -35,81 +35,85 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class EditConfigMapAdapter extends ArrayAdapter<Map.Entry<String, Object>> {
+public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 
 	private final Context context;
-	private final Map<String, Object> arrayMap;
-	private final Map values;
+	private final Map<Object, String> keyMapping;
+	private final Map<Object, Object> dataModell;
 	private final String valueClassType;
 
 
-	public EditConfigMapAdapter(FragmentManager fm, Context context, Map<String, Object> arrayMap, Map values,
+	public MapAdapter(FragmentManager fm, Context context, Map<Object, String> keyMapping, Map<Object, Object> dataModell,
 			String valueClassType) {
+
 		super(context, R.layout.layout_map_list_entry);
 		this.context = context;
-		this.values = values;
-		this.arrayMap = arrayMap;
-		for (Map.Entry<String, Object> currentEntry : arrayMap.entrySet()) {
+		this.keyMapping = keyMapping;
+		this.valueClassType = valueClassType;
+		this.dataModell = dataModell;
+
+		for (Map.Entry<Object, Object> currentEntry : dataModell.entrySet()) {
 			super.add(currentEntry);
 		}
-		this.valueClassType = valueClassType;
-	}
-
-
-	public void removeAt(int position) {
-		Map.Entry<String, Object> entry = super.getItem(position);
-		super.remove(entry);
-		arrayMap.remove(entry.getKey());
 	}
 
 
 	@Override
-	public void remove(Map.Entry<String, Object> value) {
+	public void remove(Map.Entry<Object, Object> value) {
 		super.remove(value);
-		arrayMap.remove(value.getKey());
 	}
 
 
 	@Override
-	public void add(Map.Entry<String, Object> value) {
+	public void add(Map.Entry<Object, Object> value) {
 		super.add(value);
-		arrayMap.put(value.getKey(), value.getValue());
 	}
 
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final String currentKeyValue = super.getItem(position).getKey();
+
+		final Map.Entry<Object, Object> item = super.getItem(position);
+
+		final String keyToDisplay = keyMapping.get(item.getKey());
+
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = null;
+
+		// handle booleans directly with special view and and control
 		if (valueClassType.equals(Boolean.class.getName())) {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry_boolean, parent, false);
 			final TextView textIsSet = (TextView) rowView.findViewById(R.id.textViewType);
 			CheckBox checkbox = (CheckBox) rowView.findViewById(R.id.checkBoxMapListEntry);
+
+			if (item.getValue() != null) {
+				textIsSet.setText("anwenden");
+				checkbox.setChecked((Boolean) item.getValue());
+			} else {
+				textIsSet.setText("");
+			}
+
 			checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					arrayMap.put(currentKeyValue, isChecked);
-					values.put(currentKeyValue, isChecked);
+					dataModell.put(item.getKey(), isChecked);
 					textIsSet.setText("anwenden");
 				}
 			});
-			if (arrayMap.get(currentKeyValue) != null) {
-				textIsSet.setText("anwenden");
-				checkbox.setChecked((Boolean) arrayMap.get(currentKeyValue));
-			} else {
-				textIsSet.setText("");
-			}
-		} else {
+
+		}
+		// display value with simple string representation
+		else {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
-			if (arrayMap.get(currentKeyValue) != null) {
+			if (keyMapping.get(keyToDisplay) != null) {
 				TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-				textViewType.setText(arrayMap.get(currentKeyValue).getClass().getSimpleName());
+				textViewType.setText(item.getValue().getClass().getSimpleName());
 			}
 		}
+
 		TextView textViewKey = (TextView) rowView.findViewById(R.id.textViewName);
-		textViewKey.setText(currentKeyValue);
+		textViewKey.setText(keyToDisplay);
 		return rowView;
 	}
 }
