@@ -31,7 +31,7 @@ public class WhereToMergeBean implements Serializable {
 	}
 
 	public String fieldName;
-	public String keyInMap;
+	public Object keyInMap;
 	public int positionInList;
 	public WhereToPutType type;
 
