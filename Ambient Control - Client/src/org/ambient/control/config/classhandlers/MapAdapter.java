@@ -103,6 +103,7 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 			});
 
 		}
+
 		// display value with simple string representation
 		else {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);

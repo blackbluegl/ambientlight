@@ -45,9 +45,10 @@ import android.widget.TextView;
 
 
 /**
- * creates an gui element for hashmap values. the map is presented as a list. The alternative ids represent the amount of entries
- * that will be displayed. the user may link values to each displayed key. Note: if the field value has got keys which are not in
- * the amount of alternative ids, the key value pair will be ignored and wiped out.
+ * creates an gui element for hashmap fields. the map is presented as a listView. The alternative ids represent the amount of all
+ * entries that will be displayed in the list. The user may create,delete or edit beans that are bound to the key. Note: This
+ * element needs the alternative Id annotation. if the field value has got keys which are not in the amount of alternative ids,
+ * the key value pair will be ignored and wiped out. Alternative Values are not used for this element.
  * 
  * @author Florian Bornkessel
  * 
@@ -105,17 +106,6 @@ public class MapField extends FieldGenerator {
 					currentDisplayKey);
 		}
 
-		// // create data model with all keys from the alternative id's and fill values according to the keys
-		// final Map<Object, Object> dataModell = new HashMap<Object, Object>();
-		//
-		// for (Object key : alternativeIds.values) {
-		// if (fieldValue.containsKey(key)) {
-		// dataModell.put(key, fieldValue.get(key));
-		// } else {
-		// dataModell.put(key, null);
-		// }
-		// }
-
 		// set custom adapter to show user friendly keys in row 1 and a representation of the value in row 2
 		final MapAdapter adapter = new MapAdapter(context.getFragmentManager(), context.getActivity(), keyDisplayKeyMapping,
 				fieldValue, containingClass);
@@ -126,21 +116,20 @@ public class MapField extends FieldGenerator {
 
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
-		// we skip this if the values are simple and can be handled directly
-		// in the adapter, like booleans
+		// we skip this if the values are simple and can be handled directly in the adapter, like booleans
 		if (containingClass.equals(Boolean.class.getName()) == false) {
 
 			list.setOnItemClickListener(new OnItemClickListener() {
 
 				@Override
-				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
+				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int position, long paramLong) {
 
-					Object valueAtPosition = adapter.getItem(paramInt).getValue();
+					Object valueAtPosition = adapter.getItem(position).getValue();
 
 					WhereToMergeBean whereToStore = new WhereToMergeBean();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.MAP;
-					whereToStore.keyInMap = adapter.getItem(paramInt).getKey();
+					whereToStore.keyInMap = adapter.getItem(position).getKey();
 					context.whereToMergeChildBean = whereToStore;
 
 					if (valueAtPosition == null && altValuesToDisplay.size() > 0) {
@@ -167,12 +156,12 @@ public class MapField extends FieldGenerator {
 
 				case R.id.menuEntryRemoveConfigurationClass:
 
-					List<Entry<String, Object>> remove = new ArrayList<Entry<String, Object>>();
+					List<Entry<Object, Object>> remove = new ArrayList<Entry<Object, Object>>();
 					for (Integer position : checkedItems) {
 						remove.add(adapter.getItem(position));
 					}
 
-					for (Entry<String, Object> current : remove) {
+					for (Entry<Object, Object> current : remove) {
 						current.setValue(null);
 						fieldValue.remove(current.getKey());
 					}
