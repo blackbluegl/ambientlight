@@ -41,7 +41,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 
 /**
@@ -82,8 +81,8 @@ public class MapField extends FieldGenerator {
 	 * @throws InstantiationException
 	 * @throws ClassNotFoundException
 	 */
-	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
-			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+	public void createView(final String selectedRoom) throws IllegalAccessException, ClassNotFoundException,
+	InstantiationException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);
@@ -107,8 +106,8 @@ public class MapField extends FieldGenerator {
 		}
 
 		// set custom adapter to show user friendly keys in row 1 and a representation of the value in row 2
-		final MapAdapter adapter = new MapAdapter(context.getFragmentManager(), context.getActivity(), keyDisplayKeyMapping,
-				fieldValue, containingClass);
+		final MapAdapter adapter = new MapAdapter(contextFragment.getFragmentManager(), contextFragment.getActivity(),
+				keyDisplayKeyMapping, fieldValue, containingClass);
 		list.setAdapter(adapter);
 
 		// the listview is embedded in a scrollable view so no scrolling is wanted in this view.
@@ -119,6 +118,7 @@ public class MapField extends FieldGenerator {
 		// we skip this if the values are simple and can be handled directly in the adapter, like booleans
 		if (containingClass.equals(Boolean.class.getName()) == false) {
 
+			// a simple click creates a fragment transition to edit the value in a new fragment
 			list.setOnItemClickListener(new OnItemClickListener() {
 
 				@Override
@@ -126,36 +126,44 @@ public class MapField extends FieldGenerator {
 
 					Object valueAtPosition = adapter.getItem(position).getValue();
 
+					// store position where to merge the edited value
 					WhereToMergeBean whereToStore = new WhereToMergeBean();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.MAP;
 					whereToStore.keyInMap = adapter.getItem(position).getKey();
-					context.whereToMergeChildBean = whereToStore;
+					contextFragment.whereToMergeChildBean = whereToStore;
 
-					if (valueAtPosition == null && altValuesToDisplay.size() > 0) {
+					// create
+					if (valueAtPosition == null) {
 						EditConfigHandlerFragment.createNewConfigBean(altValues,
-								ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), context, selectedRoom, roomConfig);
+								ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom,
+								roomConfig);
 
-					} else if (valueAtPosition != null) {
-						String currentText = (String) ((TextView) paramView.findViewById(R.id.textViewName)).getText();
-						EditConfigHandlerFragment.editConfigBean(context, fieldValue.get(currentText), selectedRoom, roomConfig);
+					}
+					// edit
+					else {
+						EditConfigHandlerFragment.editConfigBean(contextFragment,
+								fieldValue.get(adapter.getItem(position).getKey()), selectedRoom, roomConfig);
 					}
 				}
 			});
 		}
 
+		// handle long press events
 		list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
 			List<Integer> checkedItems = new ArrayList<Integer>();
-
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 
 				switch (item.getItemId()) {
 
+				// user clicked on the delete button
 				case R.id.menuEntryRemoveConfigurationClass:
 
+					// use keyDisplayKeyMapping to get the real key. and do not forget to clean all lists here. and maybe use
+					// iterator.
 					List<Entry<Object, Object>> remove = new ArrayList<Entry<Object, Object>>();
 					for (Integer position : checkedItems) {
 						remove.add(adapter.getItem(position));
@@ -171,7 +179,7 @@ public class MapField extends FieldGenerator {
 
 				case R.id.menuEntryEditConfigurationClass:
 
-					EditConfigHandlerFragment.editConfigBean(context, adapter.getItem(checkedItems.get(0)).getValue(),
+					EditConfigHandlerFragment.editConfigBean(contextFragment, adapter.getItem(checkedItems.get(0)).getValue(),
 							selectedRoom, roomConfig);
 					break;
 
