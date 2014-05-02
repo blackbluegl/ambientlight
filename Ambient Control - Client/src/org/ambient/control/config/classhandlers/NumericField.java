@@ -17,18 +17,44 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 
+import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambientlight.annotations.TypeDef;
+import org.ambientlight.ws.Room;
 
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Toast;
 
 
 /**
+ * creates a simple slider that binds to a double value. The borders for the values are given by a typedef object in the
+ * createView method.
+ * 
  * @author Florian Bornkessel
  * 
  */
-public class NumericField {
+public class NumericField extends FieldGenerator {
+
+	public static final String LOG = "NumericField";
+
+
+	/**
+	 * @param roomConfig
+	 * @param bean
+	 * @param field
+	 * @param contextFragment
+	 * @param contentArea
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	public NumericField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, bean, field, contextFragment, contentArea);
+	}
+
 
 	/**
 	 * @param config
@@ -38,15 +64,20 @@ public class NumericField {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public static void createView(final Object config, LinearLayout container, final Field field, TypeDef typedef,
-			LinearLayout contentArea) throws IllegalAccessException {
+	public void createView(TypeDef typedef) throws IllegalAccessException {
+
+		// borders
 		final double min = Double.parseDouble(typedef.min());
 		final double difference = Double.parseDouble(typedef.max()) - min;
 
-		SeekBar seekBar = new SeekBar(container.getContext());
+		// view with max 256 steps
+		SeekBar seekBar = new SeekBar(contentArea.getContext());
 		contentArea.addView(seekBar);
 		seekBar.setMax(256);
-		double doubleValue = ((((Number) field.get(config)).doubleValue()) - min) / difference;
+
+		// normalize to minimal value and set into relation of the possible difference
+		double doubleValue = ((((Number) field.get(bean)).doubleValue()) - min) / difference;
+		// bind to seekbar
 		seekBar.setProgress((int) (doubleValue * 256.0));
 
 		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -64,23 +95,21 @@ public class NumericField {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
+				// extract field value from slider
 				double result = (progress / 256.0) * difference + min;
-
-				if (field.getType().equals(Double.TYPE)) {
-					try {
-						field.setDouble(config, result);
-					} catch (Exception e) {
-						// this should not happen
+				find a way to convert the double value to the field value
+				try {
+					if (field.getType().equals(Double.TYPE)) {
+						field.setDouble(bean, result);
 					}
+					if (field.getType().equals(Integer.TYPE)) {
+						field.setInt(bean, (int) result);
+					}
+				} catch (Exception e) {
+					Log.e(LOG, "Could not set value to field!", e);
+					Toast.makeText(contentArea.getContext(), "Could not set value to field!", Toast.LENGTH_SHORT).show();
 				}
 
-				if (field.getType().equals(Integer.TYPE)) {
-					try {
-						field.setInt(config, (int) result);
-					} catch (Exception e) {
-						// this should not happen
-					}
-				}
 			}
 		});
 	}

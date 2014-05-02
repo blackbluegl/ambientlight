@@ -32,17 +32,33 @@ import android.widget.TextView;
 
 
 /**
+ * ArrayAdapter to for the MapField. It creates a dual row layout for the key and value. Boolean values have a separate layout and
+ * a simple action handler to set boolean values directly to the data model.
+ * 
  * @author Florian Bornkessel
  * 
  */
 public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 
 	private final Context context;
+
+	/** key is the map key, value is the value to display */
 	private final Map<Object, String> keyMapping;
-	private final Map<Object, Object> dataModell;
+
+	/** class type of the value. the map adapter can handle some simple value types by itself and shows specialized views */
 	private final String valueClassType;
 
 
+	/**
+	 * 
+	 * @param fm
+	 * @param context
+	 * @param keyMapping
+	 *            key to displayString map
+	 * @param dataModell
+	 * @param valueClassType
+	 *            class type of value
+	 */
 	public MapAdapter(FragmentManager fm, Context context, Map<Object, String> keyMapping, Map<Object, Object> dataModell,
 			String valueClassType) {
 
@@ -50,31 +66,30 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 		this.context = context;
 		this.keyMapping = keyMapping;
 		this.valueClassType = valueClassType;
-		this.dataModell = dataModell;
 
+		// convert hashmap to arrayList for parent class
 		for (Map.Entry<Object, Object> currentEntry : dataModell.entrySet()) {
 			super.add(currentEntry);
 		}
 	}
 
 
-	@Override
-	public void remove(Map.Entry<Object, Object> value) {
-		super.remove(value);
-	}
-
-
-	@Override
-	public void add(Map.Entry<Object, Object> value) {
-		super.add(value);
-	}
-
+	//
+	// @Override
+	// public void remove(Map.Entry<Object, Object> value) {
+	// super.remove(value);
+	// }
+	//
+	//
+	// @Override
+	// public void add(Map.Entry<Object, Object> value) {
+	// super.add(value);
+	// }
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		final Map.Entry<Object, Object> item = super.getItem(position);
-
+		final Map.Entry<Object, Object> item = getItem(position);
 		final String keyToDisplay = keyMapping.get(item.getKey());
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -87,34 +102,36 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 			CheckBox checkbox = (CheckBox) rowView.findViewById(R.id.checkBoxMapListEntry);
 
 			if (item.getValue() != null) {
+				// check box and show text
 				textIsSet.setText("anwenden");
 				checkbox.setChecked((Boolean) item.getValue());
 			} else {
 				textIsSet.setText("");
 			}
 
+			// handle clicks by itself.
 			checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					dataModell.put(item.getKey(), isChecked);
+					item.setValue(isChecked);
 					textIsSet.setText("anwenden");
 				}
 			});
 
 		}
 
-		// display value with simple string representation
+		// display other values with simple toString representation
 		else {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
-			if (keyMapping.get(keyToDisplay) != null) {
-				TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-				textViewType.setText(item.getValue().getClass().getSimpleName());
-			}
+			TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
+			textViewType.setText(item.getValue().getClass().getSimpleName());
 		}
 
+		// always display key as simple text
 		TextView textViewKey = (TextView) rowView.findViewById(R.id.textViewName);
 		textViewKey.setText(keyToDisplay);
+
 		return rowView;
 	}
 }
