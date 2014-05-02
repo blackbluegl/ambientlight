@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.ambient.control.R;
 import org.ambient.control.config.EditConfigHandlerFragment;
@@ -45,9 +44,9 @@ import android.widget.ListView;
 
 /**
  * creates an gui element for hashmap fields. the map is presented as a listView. The alternative ids represent the amount of all
- * entries that will be displayed in the list. The user may create,delete or edit beans that are bound to the key. Note: This
+ * entries that will be displayed in the list. The user may create, delete or edit beans that are bound to the key. Note: This
  * element needs the alternative Id annotation. if the field value has got keys which are not in the amount of alternative ids,
- * the key value pair will be ignored and wiped out. Alternative Values are not used for this element.
+ * the key value pair will be ignored and wiped out. Alternative Values are not supported for this element for now.
  * 
  * @author Florian Bornkessel
  * 
@@ -67,7 +66,6 @@ public class MapField extends FieldGenerator {
 	public MapField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -152,7 +150,32 @@ public class MapField extends FieldGenerator {
 		// handle long press events
 		list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
-			List<Integer> checkedItems = new ArrayList<Integer>();
+			// data model for the context menu
+			List<Map.Entry<Object, Object>> checkedItems = new ArrayList<Map.Entry<Object, Object>>();
+
+
+			@Override
+			public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+				// reflect changes to datamodell
+				if (checked) {
+					checkedItems.add(adapter.getItem(position));
+				} else {
+					checkedItems.remove(adapter.getItem(position));
+				}
+
+				mode.setTitle(checkedItems.size() + " ausgewählt");
+
+				// edit menu button shows up if exactly 1 item is selected in list
+				MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
+				if (checkedItems.size() == 1) {
+					// && adapter.getItem(checkedItems.get(0)).getValue() != null
+					editItem.setVisible(true);
+				} else {
+					editItem.setVisible(false);
+				}
+			}
+
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -162,27 +185,20 @@ public class MapField extends FieldGenerator {
 				// user clicked on the delete button
 				case R.id.menuEntryRemoveConfigurationClass:
 
-					// use keyDisplayKeyMapping to get the real key. and do not forget to clean all lists here. and maybe use
-					// iterator.
-					List<Entry<Object, Object>> remove = new ArrayList<Entry<Object, Object>>();
-					for (Integer position : checkedItems) {
-						remove.add(adapter.getItem(position));
+					// remove from reflecting bean and from map adapter
+					for (Map.Entry<Object, Object> current : checkedItems) {
+						fieldValue.remove(current);
+						adapter.remove(current);
 					}
 
-					for (Entry<Object, Object> current : remove) {
-						current.setValue(null);
-						fieldValue.remove(current.getKey());
-					}
-
-					adapter.notifyDataSetChanged();
+					// adapter.notifyDataSetChanged();
 					break;
 
 				case R.id.menuEntryEditConfigurationClass:
-
-					EditConfigHandlerFragment.editConfigBean(contextFragment, adapter.getItem(checkedItems.get(0)).getValue(),
-							selectedRoom, roomConfig);
+					// create fragment transition to edit the value of the map entry
+					EditConfigHandlerFragment.editConfigBean(contextFragment, checkedItems.get(0).getValue(), selectedRoom,
+							roomConfig);
 					break;
-
 				}
 
 				return false;
@@ -206,26 +222,6 @@ public class MapField extends FieldGenerator {
 			@Override
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 				return false;
-			}
-
-
-			@Override
-			public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
-				if (checked) {
-					checkedItems.add(position);
-				} else {
-					checkedItems.remove(Integer.valueOf(position));
-				}
-
-				mode.setTitle(checkedItems.size() + " ausgewählt");
-
-				MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
-				if (checkedItems.size() == 1 && adapter.getItem(checkedItems.get(0)).getValue() != null) {
-					editItem.setVisible(true);
-				} else {
-					editItem.setVisible(false);
-				}
 			}
 		});
 	}

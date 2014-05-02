@@ -435,7 +435,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * helpermethod to start an fragment transaction and configure all values to display the fragment in editmode
 	 * 
 	 * @param sourceFragment
-	 *            targetfragment to
+	 *            fragment to return to after editing is finished
 	 * @param configValueToEdit
 	 * @param selectedServer
 	 * @param roomConfig
