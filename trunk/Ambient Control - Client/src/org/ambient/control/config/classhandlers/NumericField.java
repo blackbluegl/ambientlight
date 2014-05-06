@@ -97,13 +97,17 @@ public class NumericField extends FieldGenerator {
 
 				// extract field value from slider
 				double result = (progress / 256.0) * difference + min;
-				find a way to convert the double value to the field value
+
 				try {
+					// copy result to fieldvalue
 					if (field.getType().equals(Double.TYPE)) {
 						field.setDouble(bean, result);
 					}
 					if (field.getType().equals(Integer.TYPE)) {
 						field.setInt(bean, (int) result);
+					}
+					if (field.getType().equals(Float.TYPE)) {
+						field.setFloat(bean, (float) result);
 					}
 				} catch (Exception e) {
 					Log.e(LOG, "Could not set value to field!", e);
