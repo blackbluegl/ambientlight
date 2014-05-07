@@ -17,7 +17,6 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.ambient.control.R;
@@ -35,6 +34,11 @@ import android.widget.ListView;
 
 
 /**
+ * creates an gui element to manage ArrayLists with a clickable list. The list is populated by altValues annotation whereby the
+ * displayValues will be shown to the user. The user may click on an item to put it into the bound ArrayList. Note: values in the
+ * ArrayList that have no representation in the altValues annotation will not be changeable and stay untouched in the list. If the
+ * list is null, an empty list will be created. The altValues and the values in the list need to be comparable to each other.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -42,15 +46,17 @@ public class SelectionListField extends FieldGenerator {
 
 	/**
 	 * @param roomConfig
-	 * @param config
+	 * @param bean
 	 * @param field
+	 * @param contextFragment
+	 * @param contentArea
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public SelectionListField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
-		super(roomConfig, config, field);
+	public SelectionListField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
 
 
@@ -61,65 +67,68 @@ public class SelectionListField extends FieldGenerator {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public void createView(EditConfigHandlerFragment context, LinearLayout contentArea) throws IllegalAccessException {
+	@SuppressWarnings("rawtypes")
+	public void createView() throws IllegalAccessException {
 
+		// create view
 		final ListView list = new ListView(contentArea.getContext());
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
 		contentArea.addView(list);
 
-		// ParameterizedType pt = (ParameterizedType) field.getGenericType();
-		// final String containingClass =
-		// pt.getActualTypeArguments()[0].toString().substring(6);
-		// list.setTag(containingClass);
-
-		@SuppressWarnings("unchecked")
-		// set by FieldType.SELECTION_LIST
-		final List<Object> listContent = (List<Object>) field.get(bean);
-
-		// show all values incl. potential values that the user may select or
-		// unselect
-		HashMap<Object, Boolean> displayContentMap = new HashMap<Object, Boolean>();
-		for (Object currentObject : listContent) {
-			displayContentMap.put(currentObject, true);
+		// bind list or create it
+		if (field.get(bean) == null) {
+			field.set(bean, new ArrayList());
 		}
-		for (Object key : altValues) {
-			if (displayContentMap.containsKey(key) == false) {
-				displayContentMap.put(key, false);
-			}
-		}
+		final List listContent = (List) field.get(bean);
 
-		List<Object> displayContent = new ArrayList<Object>(displayContentMap.keySet());
-		final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(context.getActivity(), R.layout.layout_checkable_list_item,
-				displayContent);
+		// bind list to view model
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(contextFragment.getActivity(),
+				R.layout.layout_checkable_list_item, altValuesToDisplay);
 		list.setAdapter(adapter);
 
+		// adapt height to listsize (we do not want local scrolling in list)
 		GuiUtils.setListViewHeightBasedOnChildren(list);
 
-		// set checked the values that where stored in listcontent
-		for (Object currentKey : displayContent) {
-			if (displayContentMap.get(currentKey) == true) {
-				LinearLayout rowView = (LinearLayout) adapter.getView(adapter.getPosition(currentKey), null, list);
+		// set checked the values that where stored in the field value
+		for (String currentDisplayValue : altValuesToDisplay) {
+
+			Object altValue = altValues.get(altValuesToDisplay.indexOf(currentDisplayValue));
+
+			// try to find equal object in field list
+			Object valueInField = null;
+			for (Object currentValueInField : listContent) {
+				if (altValue.equals(currentValueInField)) {
+					valueInField = currentValueInField;
+					break;
+				}
+			}
+
+			// set checkbox if found and use instance of the field value in the altValue list for better handling
+			if (valueInField != null) {
+				altValues.set(altValuesToDisplay.indexOf(currentDisplayValue), valueInField);
+				LinearLayout rowView = (LinearLayout) adapter.getView(adapter.getPosition(currentDisplayValue), null, list);
 				CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkBox1);
 				checkBox.setChecked(true);
 			}
 		}
 
+		// add and remove to field value by clicking on an item
 		list.setOnItemClickListener(new OnItemClickListener() {
 
+			@SuppressWarnings("unchecked")
 			@Override
-			public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-				CheckBox checkbox = (CheckBox) paramView.findViewById(R.id.checkBox1);
+			public void onItemClick(AdapterView<?> paramAdapterView, View view, int position, long paramLong) {
+				CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
 				checkbox.setChecked(!checkbox.isChecked());
-				Object valueAtPosition = adapter.getItem(paramInt);
+				Object altValueAtPosition = altValues.get(position);
+
 				// sync view with field content
 				if (checkbox.isChecked()) {
-					listContent.add(valueAtPosition);
+					listContent.add(altValueAtPosition);
 				} else {
-					listContent.remove(valueAtPosition);
+					listContent.remove(altValueAtPosition);
 				}
 			}
 		});
 	}
-
 }

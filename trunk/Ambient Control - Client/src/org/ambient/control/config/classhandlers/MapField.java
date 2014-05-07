@@ -18,6 +18,7 @@ package org.ambient.control.config.classhandlers;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,8 @@ import android.widget.ListView;
  * creates an gui element for hashmap fields. the map is presented as a listView. The alternative ids represent the amount of all
  * entries that will be displayed in the list. The user may create, delete or edit beans that are bound to the key. Note: This
  * element needs the alternative Id annotation. if the field value has got keys which are not in the amount of alternative ids,
- * the key value pair will be ignored and wiped out. Alternative Values are not supported for this element for now.
+ * the key value pair will be ignored and wiped out. Alternative Values are not supported for this element for now. If the hashmap
+ * is empty a new one will be created.
  * 
  * @author Florian Bornkessel
  * 
@@ -79,11 +81,17 @@ public class MapField extends FieldGenerator {
 	 * @throws InstantiationException
 	 * @throws ClassNotFoundException
 	 */
+	@SuppressWarnings("rawtypes")
 	public void createView(final String selectedRoom) throws IllegalAccessException, ClassNotFoundException,
 	InstantiationException {
 
 		final ListView list = new ListView(contentArea.getContext());
 		contentArea.addView(list);
+
+		// create an empty hashmap if it is null.
+		if (field.get(bean) == null) {
+			field.set(bean, new HashMap());
+		}
 
 		// have an instance of the field value
 		@SuppressWarnings("unchecked")
