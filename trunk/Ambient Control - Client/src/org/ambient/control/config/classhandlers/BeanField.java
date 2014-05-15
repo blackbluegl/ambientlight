@@ -38,8 +38,8 @@ import android.widget.Toast;
 
 /**
  * creates an gui element with an clickable text. By clicking on the text the user may inspect underlying bean. if the field value
- * is null, the user can instantiate a new bean from the altValue list. By long clicking the user may decide to set the field to
- * null or to walk into the beans values. You have to annotate alternative values to have a useful setting.
+ * is null, the user can instantiate a new bean from the altClassValues list. By long clicking the user may decide to set the
+ * field to null or to walk into the beans values. You have to annotate alternative values to have a useful setting.
  * 
  * @author Florian Bornkessel
  * 
@@ -94,7 +94,7 @@ public class BeanField extends FieldGenerator {
 			public void onClick(View v) {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
-					EditConfigHandlerFragment.createNewConfigBean(altValues,
+					EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
 							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
 				} else if (fieldValue == null && altValuesToDisplay.size() == 0) {
 					Log.e(LOG, "No alternative Values have been annotated to class.");

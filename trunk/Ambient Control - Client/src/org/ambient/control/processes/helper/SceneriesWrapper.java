@@ -40,6 +40,6 @@ public class SceneriesWrapper implements Serializable {
 
 	@TypeDef(fieldType = FieldType.SIMPLE_LIST)
 	@Presentation(name = "Szenarien verwalten", position = 0, groupPosition = 1)
-	@AlternativeValues(values = { @Value(displayName = "Anwenderszenario", value = "org.ambientlight.scenery.UserSceneryConfiguration") })
+	@AlternativeValues(values = { @Value(displayValue = "Anwenderszenario", value = "org.ambientlight.room.entities.Scenery") })
 	public List<Scenery> sceneries = new ArrayList<Scenery>();
 }

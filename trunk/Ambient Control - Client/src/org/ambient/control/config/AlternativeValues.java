@@ -27,4 +27,5 @@ public class AlternativeValues {
 
 	public List<String> displayValues = new ArrayList<String>();
 	public List<Object> values = new ArrayList<Object>();
+	public List<String> classNames = new ArrayList<String>();
 }

@@ -36,6 +36,8 @@ public abstract class FieldGenerator {
 
 	protected List<String> altValuesToDisplay = null;
 
+	protected List<String> altClassInstanceValues = null;
+
 	protected Room roomConfig = null;
 	protected Object bean = null;
 	protected Field field = null;
@@ -71,6 +73,7 @@ public abstract class FieldGenerator {
 
 		altValues = result.values;
 		altValuesToDisplay = result.displayValues;
+		altClassInstanceValues = result.classNames;
 	}
 
 }

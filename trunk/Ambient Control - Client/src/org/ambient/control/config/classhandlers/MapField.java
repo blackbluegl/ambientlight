@@ -141,7 +141,7 @@ public class MapField extends FieldGenerator {
 
 					// create
 					if (valueAtPosition == null) {
-						EditConfigHandlerFragment.createNewConfigBean(altValues,
+						EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
 								ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom,
 								roomConfig);
 

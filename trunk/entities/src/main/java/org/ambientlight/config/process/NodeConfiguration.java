@@ -25,14 +25,14 @@ public class NodeConfiguration implements Serializable {
 	@Presentation(description = "Aktion auswählen", position = 1)
 	@TypeDef(fieldType = FieldType.BEAN)
 	@AlternativeValues(values = {
-			@Value(displayName = "RGB-LED Konfiguration ändern", value = "org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration"),
-			@Value(displayName = "Powerstate ändern (erweitert)", value = "org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration"),
-			@Value(displayName = "Powerstate ändern (einfach)", value = "org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration"),
-			@Value(displayName = "Event auslesen", value = "org.ambientlight.process.handler.event.EventGeneratorSensorAdapterConfiguration"),
-			@Value(displayName = "Event in Boolschen Ausdruck wandeln", value = "org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration"),
-			@Value(displayName = "Event auslösen", value = "org.ambientlight.process.handler.event.FireEventHandlerConfiguration"),
-			@Value(displayName = "Mathematische Funktion", value = "org.ambientlight.process.handler.expression.ExpressionConfiguration"),
-			@Value(displayName = "Verzweigung", value = "org.ambientlight.process.handler.expression.DecisionHandlerConfiguration") })
+			@Value(displayValue = "RGB-LED Konfiguration ändern", newClassInstanceType = "org.ambientlight.process.handler.actor.ConfigurationChangeHandlerConfiguration"),
+			@Value(displayValue = "Powerstate ändern (erweitert)", newClassInstanceType = "org.ambientlight.process.handler.actor.PowerstateHandlerConfiguration"),
+			@Value(displayValue = "Powerstate ändern (einfach)", newClassInstanceType = "org.ambientlight.process.handler.actor.SimplePowerStateHandlerConfiguration"),
+			@Value(displayValue = "Event auslesen", newClassInstanceType = "org.ambientlight.process.handler.event.EventGeneratorSensorAdapterConfiguration"),
+			@Value(displayValue = "Event in Boolschen Ausdruck wandeln", newClassInstanceType = "org.ambientlight.process.handler.event.EventToBooleanHandlerConfiguration"),
+			@Value(displayValue = "Event auslösen", newClassInstanceType = "org.ambientlight.process.handler.event.FireEventHandlerConfiguration"),
+			@Value(displayValue = "Mathematische Funktion", newClassInstanceType = "org.ambientlight.process.handler.expression.ExpressionConfiguration"),
+			@Value(displayValue = "Verzweigung", newClassInstanceType = "org.ambientlight.process.handler.expression.DecisionHandlerConfiguration") })
 	public AbstractActionHandlerConfiguration actionHandler;
 
 	public List<Integer> nextNodeIds = new ArrayList<Integer>();

@@ -17,12 +17,6 @@ package org.ambientlight.room.entities.features;
 
 import java.io.Serializable;
 
-import org.ambientlight.annotations.AlternativeValues;
-import org.ambientlight.annotations.FieldType;
-import org.ambientlight.annotations.Presentation;
-import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.annotations.Value;
-
 
 /**
  * @author Florian Bornkessel
@@ -49,15 +43,8 @@ public class EntityId implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(values = { @Value(displayName = "Virtueller Schalter", value = DOMAIN_SWITCH_VIRTUAL),
-			@Value(displayName = "Virtueller HauptSchalter", value = DOMAIN_SWITCH_VIRTUAL_MAIN),
-			@Value(displayName = "Lichtobjekt", value = DOMAIN_LIGHTOBJECT) })
-	@Presentation(name = "Typ", position = 0, description = "Kategorie auswählen in der sich das Element befindet")
 	public String domain;
 
-	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueProvider = "org.ambient.control.processes.helper.EntityIdProvider")
 	public String id;
 
 
