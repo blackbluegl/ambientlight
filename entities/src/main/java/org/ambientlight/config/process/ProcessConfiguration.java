@@ -19,11 +19,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.AlternativeClassValues;
+import org.ambientlight.annotations.ClassValue;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.annotations.Value;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @author Florian Bornkessel
  *
  */
-@AlternativeValues(values = { @Value(displayName = "Eventgesteuerter Prozess", value = "org.ambientlight.process.EventProcessConfiguration") })
+@AlternativeClassValues(values = { @ClassValue(displayValue = "Eventgesteuerter Prozess", newClassInstanceType = "org.ambientlight.config.process.EventProcessConfiguration") })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class ProcessConfiguration implements Serializable {
 

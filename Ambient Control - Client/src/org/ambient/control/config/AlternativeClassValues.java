@@ -13,21 +13,18 @@
    limitations under the License.
  */
 
-package org.ambientlight.annotations;
+package org.ambient.control.config;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author Florian Bornkessel
+ * 
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ClassValue {
+public class AlternativeClassValues {
 
-	public String displayValue() default "";
-
-
-	public String newClassInstanceType() default "";
-
+	public List<String> displayValues = new ArrayList<String>();
+	public List<String> classNames = new ArrayList<String>();
 }

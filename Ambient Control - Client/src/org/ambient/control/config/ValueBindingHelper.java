@@ -81,8 +81,9 @@ public class ValueBindingHelper {
 			// hardcoded case
 			if (currentValueAnnotation.value().isEmpty() == false) {
 				result.values.add(currentValueAnnotation.value());
-				result.displayValues.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation.displayValue()
-						: currentValueAnnotation.value());
+				result.displayValues.add(currentValueAnnotation.displayValue().isEmpty() == false ? currentValueAnnotation
+						.displayValue() : currentValueAnnotation.value());
+				result.classNames.add(currentValueAnnotation.newClassInstanceType());
 			}
 
 			// value provider
@@ -109,10 +110,10 @@ public class ValueBindingHelper {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static org.ambient.control.config.AlternativeValues getValuesForClass(AlternativeClassValues annotation)
+	public static org.ambient.control.config.AlternativeClassValues getValuesForClass(AlternativeClassValues annotation)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-		org.ambient.control.config.AlternativeValues result = new org.ambient.control.config.AlternativeValues();
+		org.ambient.control.config.AlternativeClassValues result = new org.ambient.control.config.AlternativeClassValues();
 
 		if (annotation == null) {
 			Log.d(LOG, "annotation is empty!");
@@ -127,10 +128,10 @@ public class ValueBindingHelper {
 		}
 
 		for (ClassValue currentValueAnnotation : valuesAnnotation) {
-			if (currentValueAnnotation.value().isEmpty() == false) {
-				result.values.add(currentValueAnnotation.value());
+			if (currentValueAnnotation.newClassInstanceType().isEmpty() == false) {
+				result.classNames.add(currentValueAnnotation.newClassInstanceType());
 				result.displayValues.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation.displayValue()
-						: currentValueAnnotation.value());
+						: currentValueAnnotation.newClassInstanceType());
 			}
 		}
 

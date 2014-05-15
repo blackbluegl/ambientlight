@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
@@ -48,16 +48,22 @@ import android.widget.ListView;
 public class SimpleListField extends FieldGenerator {
 
 	/**
+	 * manages a list of objects and gives the user an ability to instantiate and add new beans from the altClassInstanceValue
+	 * annotation. If the ArrayList is null a new instance will be created. If the list is empty an "+" button will be shown. The
+	 * user may select elements and
+	 * 
 	 * @param roomConfig
-	 * @param config
+	 * @param bean
 	 * @param field
+	 * @param contextFragment
+	 * @param contentArea
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public SimpleListField(Room roomConfig, Object config, Field field) throws IllegalAccessException, ClassNotFoundException,
-	InstantiationException {
-		super(roomConfig, config, field);
+	public SimpleListField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
 
 
@@ -68,63 +74,68 @@ public class SimpleListField extends FieldGenerator {
 	 * @param contentArea
 	 * @throws IllegalAccessException
 	 */
-	public void createView(final EditConfigHandlerFragment context, LinearLayout contentArea, final String selectedRoom)
-			throws IllegalAccessException {
+	public void createView(final String selectedRoom) throws IllegalAccessException {
 
 		final ListView listView = new ListView(contentArea.getContext());
 		contentArea.addView(listView);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
+		// create an empty list if it is null.
+		if (field.get(bean) == null) {
+			field.set(bean, new ArrayList<Object>());
+		}
 		@SuppressWarnings({ "unchecked" })
-		// set by FieldType.SIMPLE_LIST
 		final List<Object> listContent = (List<Object>) field.get(bean);
 
-		// create a + button for an empty list so the user can put in his first
-		// object
-		final ImageView createNew = new ImageView(context.getActivity());
+		// bind field value to list model
+		final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(contextFragment.getActivity(),
+				android.R.layout.simple_list_item_1, listContent);
+		listView.setAdapter(adapter);
+
+		// resize to list size. we do not want to have local scrolling here.
+		GuiUtils.setListViewHeightBasedOnChildren(listView);
+
+		// create a '+' button for an empty list so the user can put in his first object
+		final ImageView createNew = new ImageView(contextFragment.getActivity());
 		contentArea.addView(createNew);
 		createNew.setImageResource(R.drawable.content_new);
-
+		// show it, but only if the list is empty
 		if (listContent.size() > 0) {
 			createNew.setVisibility(View.GONE);
 		}
-
+		// handle on click and create a new bean in a child fragment
 		createNew.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-
+				// remember where to store
 				WhereToMergeBean whereToStore = new WhereToMergeBean();
 				whereToStore.fieldName = field.getName();
 				whereToStore.type = WhereToPutType.LIST;
 				whereToStore.positionInList = 0;
-				context.whereToMergeChildBean = whereToStore;
+				contextFragment.whereToMergeChildBean = whereToStore;
 
-				EditConfigHandlerFragment.createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValues),
-						context, selectedRoom, roomConfig);
+				// create transition with new editfragment
+				EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
+						ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
 			}
 		});
 
-		final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(context.getActivity(), android.R.layout.simple_list_item_1,
-				listContent);
-		listView.setAdapter(adapter);
-
-		GuiUtils.setListViewHeightBasedOnChildren(listView);
-
+		// handle clicks in the list for edit
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-
+				// edit bean in new fragment if it was clicked
 				Object valueAtPosition = adapter.getItem(paramInt);
-
-				EditConfigHandlerFragment.editConfigBean(context, valueAtPosition, selectedRoom, roomConfig);
+				EditConfigHandlerFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
 			}
 		});
 
+		// handle long clicks with context menu
 		listView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
-			List<Integer> checkedItems = new ArrayList<Integer>();
+			List<Object> checkedItems = new ArrayList<Object>();
 
 
 			@Override
@@ -134,43 +145,39 @@ public class SimpleListField extends FieldGenerator {
 
 				case R.id.menuEntryRemoveConfigurationClass:
 
-					List<Object> remove = new ArrayList<Object>();
-					for (Integer position : checkedItems) {
-						remove.add(adapter.getItem(position));
-					}
-
-					for (Object current : remove) {
+					for (Object current : checkedItems) {
 						listContent.remove(current);
 					}
-
 					adapter.notifyDataSetChanged();
+					checkedItems.clear();
 
+					// display create new button if list is empty
 					if (adapter.isEmpty()) {
 						createNew.setVisibility(View.VISIBLE);
 					}
 
+					// resize list to new size
 					GuiUtils.setListViewHeightBasedOnChildren(listView);
-
-					mode.finish();
 
 					break;
 
 				case R.id.menuEntryAddConfigurationClass:
 
+					// replace object at position with a new one. therefore remember position in list
 					WhereToMergeBean whereToStore = new WhereToMergeBean();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.LIST;
-					whereToStore.positionInList = 0;
-					context.whereToMergeChildBean = whereToStore;
+					whereToStore.positionInList = listContent.indexOf(checkedItems.get(0));
+					contextFragment.whereToMergeChildBean = whereToStore;
 
-					EditConfigHandlerFragment.createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValues),
-							context, selectedRoom, roomConfig);
-
-					mode.finish();
+					// create new transaction and edit new bean
+					EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
+							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
 
 					break;
 				}
 
+				mode.finish();
 				return false;
 			}
 
@@ -198,13 +205,21 @@ public class SimpleListField extends FieldGenerator {
 
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
+				// sync checked items to selections in the list
 				if (checked) {
-					checkedItems.add(position);
+					checkedItems.add(listContent.get(position));
 				} else {
-					checkedItems.remove(Integer.valueOf(position));
+					checkedItems.remove(position);
 				}
 				mode.setTitle(checkedItems.size() + " ausgewählt");
+
+				// display "create new" only if there is one item clicked in the list
+				MenuItem createItem = mode.getMenu().findItem(R.id.menuEntryAddConfigurationClass);
+				if (checkedItems.size() == 1) {
+					createItem.setVisible(true);
+				} else {
+					createItem.setVisible(false);
+				}
 
 			}
 		});

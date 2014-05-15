@@ -308,11 +308,11 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		TypeDef typedef = field.getAnnotation(TypeDef.class);
 
 		if (typedef.fieldType().equals(FieldType.EXPRESSION)) {
-			new ExpressionField(roomConfig, config, field).createView(this, container, contentArea);
+			new ExpressionField(roomConfig, config, field, this, contentArea).createView();
 		}
 
 		if (typedef.fieldType().equals(FieldType.BEAN)) {
-			new BeanField(roomConfig, config, field, this, contentArea).createView(this, contentArea, selectedRoom);
+			new BeanField(roomConfig, config, field, this, contentArea).createView(selectedRoom);
 		}
 
 		if (typedef.fieldType().equals(FieldType.CHOOSE_BEAN_FROM_LIST)) {
@@ -320,30 +320,31 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		}
 
 		if (typedef.fieldType().equals(FieldType.STRING)) {
-			new StringField(roomConfig, config, field).createView(this, container, contentArea);
+			new StringField(roomConfig, config, field, this, contentArea).createView();
 		}
 
 		if (typedef.fieldType().equals(FieldType.BOOLEAN)) {
-			BooleanField.createView(config, container, field, contentArea);
+			new BooleanField(roomConfig, config, field, this, contentArea).createView();
 		}
 
 		if (typedef.fieldType().equals(FieldType.COLOR)) {
-			ColorField.createView(config, container, field, contentArea);
+			new ColorField(roomConfig, config, field, this, contentArea).createView();
 		}
 
 		if (typedef.fieldType().equals(FieldType.NUMERIC)) {
-			NumericField.createView(config, container, field, typedef, contentArea);
+			new NumericField(roomConfig, config, field, this, contentArea).createView(typedef);
 		}
 
 		if (typedef.fieldType().equals(FieldType.MAP)) {
-			new MapField(roomConfig, config, field).createView(this, contentArea, selectedRoom);
+			new MapField(roomConfig, config, field, this, contentArea).createView(selectedRoom);
 		}
 
 		if (typedef.fieldType().equals(FieldType.SELECTION_LIST)) {
-			new SelectionListField(roomConfig, config, field).createView(this, contentArea);
+			new SelectionListField(roomConfig, config, field, this, contentArea).createView();
 		}
+
 		if (typedef.fieldType().equals(FieldType.SIMPLE_LIST)) {
-			new SimpleListField(roomConfig, config, field).createView(this, contentArea, selectedRoom);
+			new SimpleListField(roomConfig, config, field, this, contentArea).createView(selectedRoom);
 		}
 	}
 
@@ -418,7 +419,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			} else if (whereToMergeChildBean.type.equals(WhereToPutType.MAP)) {
 				@SuppressWarnings("unchecked")
 				// checked one line above
-				Map<String, Object> map = (Map<String, Object>) myField.get(myConfigurationData);
+				Map<Object, Object> map = (Map<Object, Object>) myField.get(myConfigurationData);
 				map.put(whereToMergeChildBean.keyInMap, configuration);
 			}
 
@@ -470,7 +471,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param server
 	 * @param roomConfig
 	 */
-	public static void createNewConfigBean(final List<Object> altValues, final CharSequence[] alternativeValuesForDisplay,
+	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
 			final Fragment fragment, final String roomName, final Room roomConfig) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
@@ -479,12 +480,12 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				Bundle args = new Bundle();
-				args.putString(ARG_CLASS_NAME, (String) altValues.get(which));
+				args.putString(ARG_CLASS_NAME, altValues.get(which));
 				args.putString(ARG_SELECTED_ROOM, roomName);
 				args.putBoolean(ARG_CREATE_MODE, true);
 				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
 
-				EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+				EditConfigHandlerFragment configHandler = createInstance();
 				configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
 
 				configHandler.setArguments(args);
@@ -516,10 +517,15 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
 			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
-		AlternativeValues alternatives = ValueBindingHelper.getValuesForClass(clazz.getAnnotation(AlternativeClassValues.class));
+		org.ambient.control.config.AlternativeClassValues alternatives = ValueBindingHelper.getValuesForClass(clazz
+				.getAnnotation(AlternativeClassValues.class));
 
-		createNewConfigBean(alternatives.values, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues), fragment,
-				roomName, roomConfiguration);
+		createNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues),
+				fragment, roomName, roomConfiguration);
 	}
 
+
+	protected static EditConfigHandlerFragment createInstance() {
+		return new EditConfigHandlerFragment();
+	}
 }

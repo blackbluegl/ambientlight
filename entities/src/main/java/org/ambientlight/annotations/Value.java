@@ -35,5 +35,8 @@ public @interface Value {
 	public String value() default "";
 
 
+	public String newClassInstanceType() default "";
+
+
 	public String valueProvider() default "";
 }

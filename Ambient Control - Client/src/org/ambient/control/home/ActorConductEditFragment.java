@@ -18,8 +18,8 @@ package org.ambient.control.home;
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.rest.RestClient;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
@@ -67,8 +67,7 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				RestClient.setRenderingConfiguration(selectedRoom, itemId,
-						(RenderingProgramConfiguration) myConfigurationData);
+				RestClient.setRenderingConfiguration(selectedRoom, itemId, (RenderingProgramConfiguration) myConfigurationData);
 				return true;
 			}
 		});
@@ -120,6 +119,11 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 
 		createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
 				roomConfiguration, itemName);
+	}
+
+
+	protected static EditConfigHandlerFragment createInstance() {
+		return new ActorConductEditFragment();
 	}
 
 }
