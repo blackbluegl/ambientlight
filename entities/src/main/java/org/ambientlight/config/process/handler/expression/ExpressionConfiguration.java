@@ -2,11 +2,9 @@ package org.ambientlight.config.process.handler.expression;
 
 import java.io.Serializable;
 
-import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.annotations.ValueBindingPath;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 
@@ -19,7 +17,6 @@ public class ExpressionConfiguration implements Serializable {
 			+ "Sensoren möglich. Variablen beginnen mit \'#{\'. Um auf Prozessdaten des Vorgängerkontens zuzugreifen kann"
 			+ " #{tokenValue} verwendet werden.\n\nBolsche Ausdrücke werden in JEVAL mit "
 			+ "1.0 als wahr und mit 0.0 als falsch bezeichnet.")
-	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "eventGeneratorConfigurations.keySet()") })
 	@HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA, DataTypeValidation.SENSOR }, generates = DataTypeValidation.NUMERIC)
 	public String expression = "";
 }

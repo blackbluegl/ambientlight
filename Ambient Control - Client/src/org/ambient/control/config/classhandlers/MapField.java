@@ -29,6 +29,7 @@ import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.annotations.AlternativeIds;
+import org.ambientlight.annotations.valueprovider.AlternativeValues;
 import org.ambientlight.ws.Room;
 
 import android.view.ActionMode;
@@ -102,12 +103,12 @@ public class MapField extends FieldGenerator {
 		final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
 
 		// find alternative id's from annotation and prepare a mapping with user friendly keys
-		org.ambient.control.config.AlternativeValues alternativeIds = ValueBindingHelper.getValuesForField(
+		AlternativeValues alternativeIds = ValueBindingHelper.getValuesForField(
 				field.getAnnotation(AlternativeIds.class).values(), bean, roomConfig);
 
 		final Map<Object, String> keyDisplayKeyMapping = new LinkedHashMap<Object, String>();
 		for (String currentDisplayKey : alternativeIds.displayValues) {
-			keyDisplayKeyMapping.put(alternativeIds.values.get(alternativeIds.displayValues.indexOf(currentDisplayKey)),
+			keyDisplayKeyMapping.put(alternativeIds.keys.get(alternativeIds.displayValues.indexOf(currentDisplayKey)),
 					currentDisplayKey);
 		}
 

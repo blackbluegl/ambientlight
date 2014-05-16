@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambient.control.config;
+package org.ambientlight.annotations.valueprovider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,5 +27,6 @@ public class AlternativeValues {
 
 	public List<String> displayValues = new ArrayList<String>();
 	public List<Object> values = new ArrayList<Object>();
+	public List<Object> keys = new ArrayList<Object>();
 	public List<String> classNames = new ArrayList<String>();
 }

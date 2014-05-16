@@ -450,7 +450,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
 		args.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE, (Serializable) configValueToEdit);
 
-		EditConfigHandlerFragment configHandler = new EditConfigHandlerFragment();
+		EditConfigHandlerFragment configHandler = createInstance();
 		configHandler.setArguments(args);
 		configHandler.setTargetFragment(sourceFragment, REQ_RETURN_OBJECT);
 
@@ -471,15 +471,18 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @param server
 	 * @param roomConfig
 	 */
-	public static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
+	public static Bundle createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
 			final Fragment fragment, final String roomName, final Room roomConfig) {
+		// As we cannot use a custom constructor, the bundle will be returned to add additional values from caller. E.g. for
+		// subclasses.
+		final Bundle args = new Bundle();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
 		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				Bundle args = new Bundle();
+
 				args.putString(ARG_CLASS_NAME, altValues.get(which));
 				args.putString(ARG_SELECTED_ROOM, roomName);
 				args.putBoolean(ARG_CREATE_MODE, true);
@@ -499,6 +502,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 		});
 
 		builder.create().show();
+		return args;
 	}
 
 
@@ -514,13 +518,13 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	 * @throws java.lang.InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static <T> void createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
+	public static <T> Bundle createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
 			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
 		org.ambient.control.config.AlternativeClassValues alternatives = ValueBindingHelper.getValuesForClass(clazz
 				.getAnnotation(AlternativeClassValues.class));
 
-		createNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues),
+		return createNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues),
 				fragment, roomName, roomConfiguration);
 	}
 

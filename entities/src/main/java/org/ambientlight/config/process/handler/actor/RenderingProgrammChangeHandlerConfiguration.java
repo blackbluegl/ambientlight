@@ -25,10 +25,11 @@ public class RenderingProgrammChangeHandlerConfiguration extends AbstractActionH
 
 	private static final long serialVersionUID = 1L;
 	@TypeDef(fieldType = FieldType.MAP)
-	@AlternativeIds(idBinding = "actorConfigurations.keySet()")
+	@AlternativeIds(values = @Value(valueProvider = "org.ambientlight.annotations.valueprovider.RenderableIdsProvider"))
 	@AlternativeValues(values = {
-			@Value(displayName = "Farbe auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.SimpleColorRenderingProgramConfiguration"),
-			@Value(displayName = "Tron auswählen", value = "org.ambientlight.scenery.actor.renderingprogram.TronRenderingProgrammConfiguration") })
+			@Value(displayValue = "Farbe auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration"),
+			@Value(displayValue = "Tron auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration"),
+			@Value(displayValue = "Sonnenuntergang auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration") })
 	@JsonSerialize(keyUsing = EntityIdSerializer.class)
 	@JsonDeserialize(keyUsing = EntityIdDeserializer.class)
 	public Map<EntityId, RenderingProgramConfiguration> renderConfig = new HashMap<EntityId, RenderingProgramConfiguration>();

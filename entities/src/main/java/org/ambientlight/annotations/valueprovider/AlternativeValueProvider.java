@@ -13,9 +13,9 @@
    limitations under the License.
  */
 
-package org.ambient.control.config;
+package org.ambientlight.annotations.valueprovider;
 
-import org.ambientlight.annotations.valueprovider.AlternativeValues;
+import org.ambientlight.ws.Room;
 
 
 /**
@@ -24,5 +24,5 @@ import org.ambientlight.annotations.valueprovider.AlternativeValues;
  */
 public interface AlternativeValueProvider {
 
-	AlternativeValues getValue(Object base, Object entity);
+	AlternativeValues getValue(Room base, Object entity);
 }

@@ -13,16 +13,25 @@
    limitations under the License.
  */
 
-package org.ambient.control.config;
+package org.ambientlight.annotations.valueprovider;
 
-import org.ambientlight.annotations.valueprovider.AlternativeValues;
+import org.ambientlight.ws.Room;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface AlternativeValueProvider {
+public class SensorIdsProvider implements AlternativeValueProvider {
 
-	AlternativeValues getValue(Object base, Object entity);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambient.control.config.AlternativeValueProvider#getValue(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public AlternativeValues getValue(Room config, Object entity) {
+		return null;
+	}
+
 }
