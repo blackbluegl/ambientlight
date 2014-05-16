@@ -15,22 +15,15 @@
 
 package org.ambient.control.home;
 
-import java.util.List;
-
 import org.ambient.control.R;
 import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.rest.RestClient;
-import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,51 +67,13 @@ public class ActorConductEditFragment extends EditConfigHandlerFragment {
 	}
 
 
-	/**
-	 * @param altValuesForListener
-	 * @param alternativeValuesForDisplay
-	 * @param myself
-	 */
-	private static void createNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final Fragment fragment, final String roomName, final Room roomConfig, final EntityId itemName) {
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
-		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Bundle args = new Bundle();
-				args.putString(ARG_CLASS_NAME, altValues.get(which));
-				args.putString(ARG_SELECTED_ROOM, roomName);
-				args.putBoolean(ARG_CREATE_MODE, true);
-				args.putSerializable(ITEM_ID, itemName);
-				args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
-				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
-				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-				ActorConductEditFragment configHandler = new ActorConductEditFragment();
-				configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
-				ft.replace(R.id.LayoutMain, configHandler);
-				ft.addToBackStack(null);
-				configHandler.setArguments(args);
-				configHandler.setTargetFragment(fragment, REQ_RETURN_OBJECT);
-				ft.commit();
-			}
-		});
-		builder.create().show();
-	}
-
-
-	public static void createNewConfigBean(Class clazz, final Fragment fragment, final String roomName,
-			final Room roomConfiguration, final EntityId itemName, final Object entity) throws ClassNotFoundException,
+	public static <T> Bundle createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
+			final Room roomConfiguration, final EntityId itemName) throws ClassNotFoundException,
 			java.lang.InstantiationException, IllegalAccessException {
 
-		List<String> altValues = ValueBindingHelper.getAlternativeValues(
-				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, entity);
-		List<String> altValuesToDisplay = ValueBindingHelper.getAlternativeValuesForDisplay(
-				(AlternativeValues) clazz.getAnnotation(AlternativeValues.class), clazz.getName(), roomConfiguration, entity);
-
-		createNewConfigBean(altValues, ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), fragment, roomName,
-				roomConfiguration, itemName);
+		Bundle args = EditConfigHandlerFragment.createNewConfigBean(clazz, fragment, roomName, roomConfiguration);
+		args.putSerializable(ITEM_ID, itemName);
+		return args;
 	}
 
 

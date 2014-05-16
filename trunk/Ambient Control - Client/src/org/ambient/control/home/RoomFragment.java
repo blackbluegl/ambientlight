@@ -462,7 +462,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 							try {
 								ActorConductEditFragment.createNewConfigBean(RenderingProgramConfiguration.class,
 										RoomFragment.this, currentRoom, roomService.getRoomConfiguration(currentRoom),
-										currentConfig.getId(), currentConfig);
+										currentConfig.getId());
 							} catch (Exception e) {
 								e.printStackTrace();
 							}

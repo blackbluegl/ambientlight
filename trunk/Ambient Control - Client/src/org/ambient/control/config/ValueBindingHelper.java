@@ -20,6 +20,8 @@ import java.util.List;
 import org.ambientlight.annotations.AlternativeClassValues;
 import org.ambientlight.annotations.ClassValue;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.valueprovider.AlternativeValues;
+import org.ambientlight.ws.Room;
 
 import android.util.Log;
 
@@ -47,9 +49,9 @@ public class ValueBindingHelper {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static org.ambient.control.config.AlternativeValues getValuesForField(Value[] valuesAnnotation, Object bean,
-			Object dataModell) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		org.ambient.control.config.AlternativeValues result = new org.ambient.control.config.AlternativeValues();
+	public static AlternativeValues getValuesForField(Value[] valuesAnnotation, Object bean, Room dataModell)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		AlternativeValues result = new AlternativeValues();
 
 		if (valuesAnnotation == null || valuesAnnotation.length == 0) {
 			Log.d(LOG, "annotation is empty!");
@@ -90,7 +92,7 @@ public class ValueBindingHelper {
 			if (currentValueAnnotation.valueProvider().isEmpty() == false) {
 				Class<?> valueProvider = Class.forName(currentValueAnnotation.valueProvider());
 				AlternativeValueProvider provider = (AlternativeValueProvider) valueProvider.newInstance();
-				org.ambient.control.config.AlternativeValues providerResult = provider.getValue(dataModell, bean);
+				AlternativeValues providerResult = provider.getValue(dataModell, bean);
 				result.displayValues.addAll(providerResult.displayValues);
 				result.values.addAll(providerResult.values);
 			}
