@@ -3,14 +3,11 @@ package org.ambientlight.events;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.annotations.ValueBindingPath;
+import org.ambientlight.annotations.Value;
 import org.ambientlight.room.entities.features.EntityId;
 
 
 public class SceneryEntryEvent extends BroadcastEvent {
-
-
-
 
 	public SceneryEntryEvent() {
 		super();
@@ -27,7 +24,7 @@ public class SceneryEntryEvent extends BroadcastEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 	@TypeDef(fieldType = FieldType.STRING)
-	@AlternativeValues(valueBinding = { @ValueBindingPath(valueBinding = "getSceneries().id") })
+	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SceneryNamesProvider") })
 	public String sceneryName;
 
 

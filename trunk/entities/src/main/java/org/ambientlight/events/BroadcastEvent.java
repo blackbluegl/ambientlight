@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
-import org.ambientlight.annotations.ValueBindingPath;
+import org.ambientlight.annotations.Value;
 import org.ambientlight.room.entities.features.EntityId;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -17,9 +17,9 @@ public abstract class BroadcastEvent implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@TypeDef(fieldType = FieldType.BEAN)
-	@AlternativeValues(valueBinding = {
-			@ValueBindingPath(forSubClass = "org.ambientlight.events.SceneryEntryEvent", valueBinding = "switchables.keySet()"),
-			@ValueBindingPath(forSubClass = "org.ambientlight.events.SwitchEvent", valueBinding = "switchables.keySet()") })
+	@AlternativeValues(values = {
+			@Value(forSubClass = "org.ambientlight.events.SceneryEntryEvent", valueProvider = "org.ambientlight.annotations.valueprovider.SceneryEventIdProvider"),
+			@Value(forSubClass = "org.ambientlight.events.SwitchEvent", valueProvider = "org.ambientlight.annotations.valueprovider.SwitchesIdsProvider") })
 	public EntityId sourceId;
 
 

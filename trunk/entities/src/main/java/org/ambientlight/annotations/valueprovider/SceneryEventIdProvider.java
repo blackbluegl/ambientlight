@@ -16,7 +16,6 @@
 package org.ambientlight.annotations.valueprovider;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
 import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
@@ -27,21 +26,25 @@ import org.ambientlight.ws.Room;
 /**
  * @author Florian Bornkessel
  */
-public class RenderableIdsProvider implements AlternativeValueProvider {
+public class SceneryEventIdProvider implements AlternativeValueProvider {
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambient.control.config.AlternativeValueProvider#getValue(java.lang.Object, java.lang.Object)
+	 * @see org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider#getValue(org.ambientlight.ws.Room,
+	 * java.lang.Object)
 	 */
 	@Override
 	public AlternativeValues getValue(Room config, Object entity) {
 		AlternativeValues result = new AlternativeValues();
 
-		if (config.lightObjectManager != null && config.lightObjectManager.lightObjects != null) {
-			Set<EntityId> keys = config.lightObjectManager.lightObjects.keySet();
-			result.keys = new ArrayList<Object>(keys);
-		}
+		EntityId id = new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER);
+		result.values = new ArrayList<Object>();
+		result.values.add(id);
+
+		result.displayValues = new ArrayList<String>();
+		result.displayValues.add("SceneryManager");
+
 		return result;
 	}
 

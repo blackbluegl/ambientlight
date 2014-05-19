@@ -29,7 +29,7 @@ import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.annotations.AlternativeIds;
-import org.ambientlight.annotations.valueprovider.AlternativeValues;
+import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 import org.ambientlight.ws.Room;
 
 import android.view.ActionMode;

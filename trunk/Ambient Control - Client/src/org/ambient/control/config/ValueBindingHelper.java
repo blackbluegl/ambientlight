@@ -20,7 +20,7 @@ import java.util.List;
 import org.ambientlight.annotations.AlternativeClassValues;
 import org.ambientlight.annotations.ClassValue;
 import org.ambientlight.annotations.Value;
-import org.ambientlight.annotations.valueprovider.AlternativeValues;
+import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 import org.ambientlight.ws.Room;
 
 import android.util.Log;

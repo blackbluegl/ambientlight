@@ -68,7 +68,7 @@ public abstract class FieldGenerator {
 			annotation = field.getDeclaringClass().getAnnotation(AlternativeValues.class);
 		}
 
-		org.ambientlight.annotations.valueprovider.AlternativeValues result = ValueBindingHelper.getValuesForField(
+		org.ambientlight.annotations.valueprovider.api.AlternativeValues result = ValueBindingHelper.getValuesForField(
 				annotation.values(), bean,
 				roomConfig);
 
