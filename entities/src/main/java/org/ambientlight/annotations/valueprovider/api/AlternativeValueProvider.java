@@ -13,20 +13,16 @@
    limitations under the License.
  */
 
-package org.ambientlight.annotations.valueprovider;
+package org.ambientlight.annotations.valueprovider.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.ambientlight.ws.Room;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class AlternativeValues {
+public interface AlternativeValueProvider {
 
-	public List<String> displayValues = new ArrayList<String>();
-	public List<Object> values = new ArrayList<Object>();
-	public List<Object> keys = new ArrayList<Object>();
-	public List<String> classNames = new ArrayList<String>();
+	AlternativeValues getValue(Room base, Object entity);
 }

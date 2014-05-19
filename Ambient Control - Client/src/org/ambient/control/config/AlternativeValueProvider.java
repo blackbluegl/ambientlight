@@ -15,7 +15,7 @@
 
 package org.ambient.control.config;
 
-import org.ambientlight.annotations.valueprovider.AlternativeValues;
+import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 
 
 /**

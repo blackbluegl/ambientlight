@@ -16,33 +16,37 @@
 package org.ambientlight.annotations.valueprovider;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
 import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
-import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 
 
 /**
  * @author Florian Bornkessel
+ * 
  */
-public class RenderableIdsProvider implements AlternativeValueProvider {
+public class SwitchesIdsProvider implements AlternativeValueProvider {
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambient.control.config.AlternativeValueProvider#getValue(java.lang.Object, java.lang.Object)
+	 * @see org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider#getValue(org.ambientlight.ws.Room,
+	 * java.lang.Object)
 	 */
 	@Override
 	public AlternativeValues getValue(Room config, Object entity) {
-		AlternativeValues result = new AlternativeValues();
 
-		if (config.lightObjectManager != null && config.lightObjectManager.lightObjects != null) {
-			Set<EntityId> keys = config.lightObjectManager.lightObjects.keySet();
-			result.keys = new ArrayList<Object>(keys);
+		AlternativeValues result = new AlternativeValues();
+		result.values = new ArrayList<Object>();
+
+		if (config.switchesManager != null && config.switchesManager.switches != null) {
+			result.values.addAll(config.switchesManager.switches.keySet());
 		}
+		if (config.remoteSwitchesManager != null && config.remoteSwitchesManager.remoteSwitches != null) {
+			result.values.addAll(config.remoteSwitchesManager.remoteSwitches.keySet());
+		}
+
 		return result;
 	}
-
 }

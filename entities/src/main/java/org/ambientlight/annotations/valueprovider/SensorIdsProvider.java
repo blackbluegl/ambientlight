@@ -15,6 +15,8 @@
 
 package org.ambientlight.annotations.valueprovider;
 
+import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
+import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 import org.ambientlight.ws.Room;
 
 
