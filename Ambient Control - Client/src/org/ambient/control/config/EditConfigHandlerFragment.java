@@ -315,7 +315,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			new BeanField(roomConfig, config, field, this, contentArea).createView(selectedRoom);
 		}
 
-		if (typedef.fieldType().equals(FieldType.CHOOSE_BEAN_FROM_LIST)) {
+		if (typedef.fieldType().equals(FieldType.BEAN_SELECTION)) {
 			new BeanSelectionField(roomConfig, config, field, this, contentArea).createView();
 		}
 
@@ -521,7 +521,8 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 	public static <T> Bundle createNewConfigBean(Class<T> clazz, final Fragment fragment, final String roomName,
 			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
-		org.ambient.control.config.AlternativeClassValues alternatives = ValueBindingHelper.getValuesForClass(clazz
+		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues alternatives = ValueBindingHelper
+				.getValuesForClass(clazz
 				.getAnnotation(AlternativeClassValues.class));
 
 		return createNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues),

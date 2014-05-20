@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambient.control.config;
+package org.ambientlight.annotations.valueprovider.api;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -92,9 +92,6 @@ public class SimpleListField extends FieldGenerator {
 				android.R.layout.simple_list_item_1, listContent);
 		listView.setAdapter(adapter);
 
-		// resize to list size. we do not want to have local scrolling here.
-		GuiUtils.setListViewHeightBasedOnChildren(listView);
-
 		// create a '+' button for an empty list so the user can put in his first object
 		final ImageView createNew = new ImageView(contextFragment.getActivity());
 		contentArea.addView(createNew);
@@ -223,5 +220,8 @@ public class SimpleListField extends FieldGenerator {
 
 			}
 		});
+
+		// resize to list size. we do not want to have local scrolling here.
+		GuiUtils.setListViewHeightBasedOnChildren(listView);
 	}
 }
