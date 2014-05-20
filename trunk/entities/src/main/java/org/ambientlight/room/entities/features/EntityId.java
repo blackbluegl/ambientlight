@@ -63,7 +63,7 @@ public class EntityId implements Serializable {
 
 	@Override
 	public String toString() {
-		return "EntityId: " + domain + "." + id;
+		return domain + ": " + id;
 	}
 
 

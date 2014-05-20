@@ -400,8 +400,8 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 	public void integrateConfiguration(Object configuration) {
 		try {
-			Class<? extends Object> parentClass = myConfigurationData.getClass();
-			Field myField = parentClass.getField(whereToMergeChildBean.fieldName);
+			Class<? extends Object> myConfigurationClass = myConfigurationData.getClass();
+			Field myField = myConfigurationClass.getField(whereToMergeChildBean.fieldName);
 
 			if (whereToMergeChildBean.type.equals(WhereToPutType.FIELD)) {
 				myField.set(myConfigurationData, configuration);
@@ -410,7 +410,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 				@SuppressWarnings("unchecked")
 				// checked in line above
 				List<Object> list = (List<Object>) myField.get(myConfigurationData);
-				if (whereToMergeChildBean.positionInList != 0) {
+				if (whereToMergeChildBean.positionInList != null) {
 					list.set(whereToMergeChildBean.positionInList, configuration);
 				} else {
 					list.add(configuration);
@@ -523,7 +523,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues alternatives = ValueBindingHelper
 				.getValuesForClass(clazz
-				.getAnnotation(AlternativeClassValues.class));
+						.getAnnotation(AlternativeClassValues.class));
 
 		return createNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues),
 				fragment, roomName, roomConfiguration);

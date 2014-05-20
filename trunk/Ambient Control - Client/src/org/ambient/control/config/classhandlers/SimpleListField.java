@@ -109,7 +109,7 @@ public class SimpleListField extends FieldGenerator {
 				WhereToMergeBean whereToStore = new WhereToMergeBean();
 				whereToStore.fieldName = field.getName();
 				whereToStore.type = WhereToPutType.LIST;
-				whereToStore.positionInList = 0;
+				whereToStore.positionInList = null;
 				contextFragment.whereToMergeChildBean = whereToStore;
 
 				// create transition with new editfragment
@@ -121,10 +121,18 @@ public class SimpleListField extends FieldGenerator {
 		// handle clicks in the list for edit
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
+			// edit bean in new fragment if it was clicked
 			@Override
-			public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-				// edit bean in new fragment if it was clicked
-				Object valueAtPosition = adapter.getItem(paramInt);
+			public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int position, long paramLong) {
+
+				// remember position
+				WhereToMergeBean whereToStore = new WhereToMergeBean();
+				whereToStore.fieldName = field.getName();
+				whereToStore.type = WhereToPutType.LIST;
+				whereToStore.positionInList = position;
+				contextFragment.whereToMergeChildBean = whereToStore;
+
+				Object valueAtPosition = adapter.getItem(position);
 				EditConfigHandlerFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
 			}
 		});

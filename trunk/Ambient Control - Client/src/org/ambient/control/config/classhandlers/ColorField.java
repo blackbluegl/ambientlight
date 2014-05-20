@@ -48,9 +48,9 @@ public class ColorField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public ColorField(Room roomConfig, Object config, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+	public ColorField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-		super(roomConfig, config, field, context, contentArea);
+		super(roomConfig, bean, field, context, contentArea);
 	}
 
 
