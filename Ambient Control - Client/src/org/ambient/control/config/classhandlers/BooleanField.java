@@ -66,11 +66,19 @@ public class BooleanField extends FieldGenerator {
 	 */
 	public void createView() throws IllegalAccessException {
 
+		// init if is a null value
+		if (field.get(bean) == null) {
+			field.setBoolean(bean, false);
+		}
+
+		// create view
 		final CheckBox checkbox = new CheckBox(contentArea.getContext());
 		contentArea.addView(checkbox);
 
-		boolean isChecked = checkbox.isChecked();
+		// databinding
+		boolean isChecked = field.getBoolean(bean);
 		checkbox.setText(isChecked ? "aktiviert" : "deaktiviert");
+		checkbox.setChecked(isChecked);
 
 		checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
