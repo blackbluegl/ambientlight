@@ -16,7 +16,7 @@ public abstract class BroadcastEvent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@TypeDef(fieldType = FieldType.BEAN)
+	@TypeDef(fieldType = FieldType.BEAN_SELECTION)
 	@AlternativeValues(values = {
 			@Value(forSubClass = "org.ambientlight.events.SceneryEntryEvent", valueProvider = "org.ambientlight.annotations.valueprovider.SceneryEventIdProvider"),
 			@Value(forSubClass = "org.ambientlight.events.SwitchEvent", valueProvider = "org.ambientlight.annotations.valueprovider.SwitchesIdsProvider") })

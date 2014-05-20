@@ -20,6 +20,7 @@ import java.util.List;
 import org.ambientlight.annotations.AlternativeClassValues;
 import org.ambientlight.annotations.ClassValue;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
 import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 import org.ambientlight.ws.Room;
 
@@ -80,23 +81,29 @@ public class ValueBindingHelper {
 				continue;
 			}
 
-			// hardcoded case
-			if (currentValueAnnotation.value().isEmpty() == false) {
-				result.values.add(currentValueAnnotation.value());
-				result.displayValues.add(currentValueAnnotation.displayValue().isEmpty() == false ? currentValueAnnotation
-						.displayValue() : currentValueAnnotation.value());
+			// hardcoded case for new classes
+			if (currentValueAnnotation.newClassInstanceType().isEmpty() == false) {
 				result.classNames.add(currentValueAnnotation.newClassInstanceType());
+				// set display value - if no display value given use class name
+				result.displayValues.add(currentValueAnnotation.displayValue().isEmpty() == false ? currentValueAnnotation
+						.displayValue() : currentValueAnnotation.newClassInstanceType());
 			}
 
-			// value provider
+			// value provider for beans that already exist
 			if (currentValueAnnotation.valueProvider().isEmpty() == false) {
-				Class<?> valueProvider = Class.forName(currentValueAnnotation.valueProvider());
-				AlternativeValueProvider provider = (AlternativeValueProvider) valueProvider.newInstance();
+				AlternativeValueProvider provider = (AlternativeValueProvider) Class.forName(
+						currentValueAnnotation.valueProvider()).newInstance();
 				AlternativeValues providerResult = provider.getValue(dataModell, bean);
 				result.displayValues.addAll(providerResult.displayValues);
 				result.values.addAll(providerResult.values);
-			}
 
+				// if provider did not set the display values add toString from Values
+				if (result.displayValues == null || result.displayValues.isEmpty()) {
+					for (Object current : result.values) {
+						result.displayValues.add(current.toString());
+					}
+				}
+			}
 		}
 		return result;
 	}
@@ -112,10 +119,10 @@ public class ValueBindingHelper {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static org.ambient.control.config.AlternativeClassValues getValuesForClass(AlternativeClassValues annotation)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public static org.ambientlight.annotations.valueprovider.api.AlternativeClassValues getValuesForClass(
+			AlternativeClassValues annotation) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-		org.ambient.control.config.AlternativeClassValues result = new org.ambient.control.config.AlternativeClassValues();
+		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues result = new org.ambientlight.annotations.valueprovider.api.AlternativeClassValues();
 
 		if (annotation == null) {
 			Log.d(LOG, "annotation is empty!");
@@ -132,6 +139,7 @@ public class ValueBindingHelper {
 		for (ClassValue currentValueAnnotation : valuesAnnotation) {
 			if (currentValueAnnotation.newClassInstanceType().isEmpty() == false) {
 				result.classNames.add(currentValueAnnotation.newClassInstanceType());
+				// add display values, if not present add classNames
 				result.displayValues.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation.displayValue()
 						: currentValueAnnotation.newClassInstanceType());
 			}
@@ -141,6 +149,12 @@ public class ValueBindingHelper {
 	}
 
 
+	/**
+	 * helper method to convert Lists of String to Charsequence Array
+	 * 
+	 * @param input
+	 * @return
+	 */
 	public static CharSequence[] toCharSequenceArray(List<String> input) {
 		CharSequence[] result = new CharSequence[input.size()];
 		for (int i = 0; i < result.length; i++) {

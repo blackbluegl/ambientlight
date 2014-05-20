@@ -69,8 +69,8 @@ public class EntityId implements Serializable {
 
 	public static EntityId fromString(String string) {
 		int delim = string.lastIndexOf(".");
-		String domain = string.substring(0, delim - 1);
-		String id = string.substring(delim, string.length());
+		String domain = string.substring(0, delim);
+		String id = string.substring(delim + 1, string.length());
 		return new EntityId(domain, id);
 	}
 

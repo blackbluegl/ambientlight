@@ -16,6 +16,7 @@
 package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ambient.control.config.EditConfigHandlerFragment;
@@ -32,11 +33,11 @@ import android.widget.LinearLayout;
  */
 public abstract class FieldGenerator {
 
-	protected List<Object> altValues = null;
+	protected List<Object> altValues = new ArrayList<Object>();
 
-	protected List<String> altValuesToDisplay = null;
+	protected List<String> altValuesToDisplay = new ArrayList<String>();
 
-	protected List<String> altClassInstanceValues = null;
+	protected List<String> altClassInstanceValues = new ArrayList<String>();
 
 	protected Room roomConfig = null;
 	protected Object bean = null;
@@ -67,6 +68,10 @@ public abstract class FieldGenerator {
 		if (annotation == null) {
 			annotation = field.getDeclaringClass().getAnnotation(AlternativeValues.class);
 		}
+
+		// if still no annotations are found there is no one.
+		if (annotation == null)
+			return;
 
 		org.ambientlight.annotations.valueprovider.api.AlternativeValues result = ValueBindingHelper.getValuesForField(
 				annotation.values(), bean,

@@ -32,9 +32,6 @@ public @interface Value {
 	public String forSubClass() default "";
 
 
-	public String value() default "";
-
-
 	public String newClassInstanceType() default "";
 
 

@@ -30,7 +30,7 @@ public class SceneryEntryEvent extends BroadcastEvent {
 
 	@Override
 	public String toString() {
-		return "Szenario: " + sceneryName;
+		return "Szenario Event: " + sceneryName;
 	}
 
 
