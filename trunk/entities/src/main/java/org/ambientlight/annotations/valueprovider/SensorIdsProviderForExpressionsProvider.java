@@ -13,32 +13,30 @@
    limitations under the License.
  */
 
-package org.ambientlight.ws;
+package org.ambientlight.annotations.valueprovider;
 
-import java.io.IOException;
+import java.util.List;
 
+import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 import org.ambientlight.room.entities.features.EntityId;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
+import org.ambientlight.ws.Room;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class EntityIdDeserializer extends KeyDeserializer {
+public class SensorIdsProviderForExpressionsProvider extends SensorIdsProvider {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.fasterxml.jackson.databind.KeyDeserializer#deserializeKey(java.lang .String,
-	 * com.fasterxml.jackson.databind.DeserializationContext)
-	 */
 	@Override
-	public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		return EntityId.deserialize(key);
-	}
+	public AlternativeValues getValue(Room config, Object entity) {
+		List<EntityId> sensors = getSensors(config);
 
+		AlternativeValues result = new AlternativeValues();
+		for (EntityId currentSensor : sensors) {
+			result.values.add(currentSensor.serialize());
+		}
+
+		return result;
+	}
 }

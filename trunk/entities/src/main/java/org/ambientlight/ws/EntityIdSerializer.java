@@ -34,6 +34,6 @@ public class EntityIdSerializer extends JsonSerializer<EntityId> {
 	@Override
 	public void serialize(EntityId data, JsonGenerator json, SerializerProvider provider) throws IOException,
 	JsonGenerationException {
-		json.writeFieldName(data.domain + "." + data.id);
+		json.writeFieldName(data.serialize());
 	}
 }

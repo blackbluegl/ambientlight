@@ -54,7 +54,7 @@ public class DecissionActionHandler extends ExpressionActionHandler {
 			if (dataproviderName.equals("tokenValue")) {
 				evaluator.putVariable("tokenValue", tokenValue);
 			} else {
-				Sensor sensor = featureFacade.getSensor(EntityId.fromString(dataproviderName));
+				Sensor sensor = featureFacade.getSensor(EntityId.deserialize(dataproviderName));
 				evaluator.putVariable(dataproviderName, util.getDataFromSensor(sensor));
 			}
 		}

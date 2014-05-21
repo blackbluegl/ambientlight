@@ -52,6 +52,7 @@ public class ValueBindingHelper {
 	 */
 	public static AlternativeValues getValuesForField(Value[] valuesAnnotation, Object bean, Room dataModell)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
 		AlternativeValues result = new AlternativeValues();
 
 		if (valuesAnnotation == null || valuesAnnotation.length == 0) {
@@ -65,19 +66,19 @@ public class ValueBindingHelper {
 		}
 
 		if (dataModell == null) {
-			Log.d(LOG, "dataModel is empty!");
+			Log.d(LOG, "Room is null!");
 			return result;
 		}
 
 		for (Value currentValueAnnotation : valuesAnnotation) {
 
-			// either the annotation is bound to a field of a concrete class or its bound to a parent class and there are
-			// different
-			// annotations for each subclass given.
+			// either the annotation is valid for the concrete class and all children or its bound to a parent class and there are
+			// different annotations for each subclass given.
 			if (currentValueAnnotation.forSubClass().isEmpty()
 					|| currentValueAnnotation.forSubClass().equals(bean.getClass().getName())) {
 				Log.d(LOG, "value matches for class: " + bean.getClass().getName());
 			} else {
+				// does not match for this calls and will be ignored
 				continue;
 			}
 
@@ -91,13 +92,20 @@ public class ValueBindingHelper {
 
 			// value provider for beans that already exist
 			if (currentValueAnnotation.valueProvider().isEmpty() == false) {
+				// get generated values from provider
 				AlternativeValueProvider provider = (AlternativeValueProvider) Class.forName(
 						currentValueAnnotation.valueProvider()).newInstance();
 				AlternativeValues providerResult = provider.getValue(dataModell, bean);
+
+				// if the provider did not generate any usefull result continue with next annotation
+				if (providerResult == null || providerResult.values == null) {
+					continue;
+				}
+
 				result.displayValues.addAll(providerResult.displayValues);
 				result.values.addAll(providerResult.values);
 
-				// if provider did not set the display values add toString from Values
+				// if provider did not set the display values add via toString() from Values
 				if (result.displayValues == null || result.displayValues.isEmpty()) {
 					for (Object current : result.values) {
 						result.displayValues.add(current.toString());
