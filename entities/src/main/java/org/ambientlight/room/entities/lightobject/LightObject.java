@@ -4,12 +4,14 @@ import org.ambientlight.config.room.entities.lightobject.renderingprogram.Render
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.lightobject.Renderable;
+import org.ambientlight.room.entities.features.sensor.SwitchSensor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("lightObject")
-public class LightObject implements Switchable, Renderable {
+public class LightObject implements Switchable, Renderable, SwitchSensor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -94,5 +96,29 @@ public class LightObject implements Switchable, Renderable {
 	@Override
 	public void setRenderingProgrammConfiguration(RenderingProgramConfiguration config) {
 		this.renderingProgrammConfiguration = config;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
+	 */
+	@Override
+	@JsonIgnore
+	public EntityId getSensorId() {
+		return id;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorValue()
+	 */
+	@Override
+	@JsonIgnore
+	public Object getSensorValue() {
+		return powerState;
 	}
 }

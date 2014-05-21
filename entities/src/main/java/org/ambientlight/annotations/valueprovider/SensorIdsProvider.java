@@ -15,8 +15,12 @@
 
 package org.ambientlight.annotations.valueprovider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
 import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 
 
@@ -33,7 +37,33 @@ public class SensorIdsProvider implements AlternativeValueProvider {
 	 */
 	@Override
 	public AlternativeValues getValue(Room config, Object entity) {
-		return null;
+		AlternativeValues result = new AlternativeValues();
+		result.values.addAll(this.getSensors(config));
+		return result;
+	}
+
+
+	protected List<EntityId> getSensors(Room config) {
+
+		List<EntityId> result = new ArrayList<EntityId>();
+		// Scenery Sensor
+		result.add(new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER));
+
+		// Switches
+		if (config.switchesManager != null && config.switchesManager.switches != null) {
+			result.addAll(config.switchesManager.switches.keySet());
+		}
+
+		// Remote Switches
+		if (config.remoteSwitchesManager != null && config.remoteSwitchesManager.remoteSwitches != null) {
+			result.addAll(config.remoteSwitchesManager.remoteSwitches.keySet());
+		}
+
+		// Light Objects
+		if (config.lightObjectManager != null && config.lightObjectManager.lightObjects != null) {
+			result.addAll(config.lightObjectManager.lightObjects.keySet());
+		}
+		return result;
 	}
 
 }

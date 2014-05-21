@@ -34,8 +34,8 @@ import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 public class SensorToTokenConfiguration extends AbstractActionHandlerConfiguration {
 
 	private static final long serialVersionUID = 1L;
-	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SensorIdProvider") })
-	@TypeDef(fieldType = FieldType.STRING)
+	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SensorIdsProvider") })
+	@TypeDef(fieldType = FieldType.BEAN_SELECTION)
 	@Presentation(name = "Event auslesen und weitergeben", position = 0)
 	public EntityId sensorId;
 }

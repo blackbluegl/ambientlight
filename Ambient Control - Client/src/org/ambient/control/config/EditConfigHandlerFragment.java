@@ -269,7 +269,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			return result;
 
 		} catch (Exception e) {
-			Log.e(LOG, "could not create View for config", e);
+			Log.e(LOG, "could not create View for bean: " + myConfigurationData.getClass().getName(), e);
 			return null;
 		}
 	}
@@ -522,8 +522,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
 		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues alternatives = ValueBindingHelper
-				.getValuesForClass(clazz
-						.getAnnotation(AlternativeClassValues.class));
+				.getValuesForClass(clazz.getAnnotation(AlternativeClassValues.class));
 
 		return createNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues),
 				fragment, roomName, roomConfiguration);

@@ -51,7 +51,7 @@ public class ExpressionActionHandler extends AbstractActionHandler {
 		evaluator.putVariable("tokenValue", token.data.toString());
 		Util util = new Util();
 		for (String dataproviderName : this.extractDataProvider(getConfig().expressionConfiguration.expression)) {
-			Sensor sensor = featureFacade.getSensor(EntityId.fromString(dataproviderName));
+			Sensor sensor = featureFacade.getSensor(EntityId.deserialize(dataproviderName));
 			evaluator.putVariable(dataproviderName, util.getDataFromSensor(sensor));
 		}
 		try {
