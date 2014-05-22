@@ -31,29 +31,32 @@ import android.widget.TextView;
 
 
 /**
+ * simple adapter to handle checkable lists.
+ * 
  * @author Florian Bornkessel
  * 
  */
 public class CheckableListAdapter extends ArrayAdapter<ViewModel> {
 
-	private final List<ViewModel> display;
-	private final List<Object> data;
+	private final List<ViewModel> viewModelList;
+	private final List<Object> backingList;
 	private final Activity context;
 
 
-	public CheckableListAdapter(Activity context, List<ViewModel> display, List<Object> data) {
-		super(context, R.layout.layout_checkable_list_item, display);
+	public CheckableListAdapter(Activity context, List<ViewModel> viewModelList, List<Object> data) {
+		super(context, R.layout.layout_checkable_list_item, viewModelList);
 
-		this.display = display;
+		this.viewModelList = viewModelList;
 		this.context = context;
-		this.data = data;
+		this.backingList = data;
 	}
 
 
 	@Override
 	public View getView(int pos, View convertView, ViewGroup parentView) {
-		final ViewModel viewModel = display.get(pos);
+		final ViewModel viewModel = viewModelList.get(pos);
 
+		// create or recycle container
 		View view = null;
 		if (convertView == null) {
 			LayoutInflater inflator = context.getLayoutInflater();
@@ -61,38 +64,30 @@ public class CheckableListAdapter extends ArrayAdapter<ViewModel> {
 		} else {
 			view = convertView;
 		}
+
+		// these views will be handled
 		TextView text = (TextView) view.findViewById(R.id.textCheckableListItem);
 		final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBoxCheckableListItem);
 
+		// bind view model
 		text.setText(viewModel.displayName);
 		checkbox.setChecked(viewModel.isChecked);
 
 		view.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
+				// invert selection
 				viewModel.isChecked = !viewModel.isChecked;
 				checkbox.setChecked(viewModel.isChecked);
+
+				// add or remove from backingList
 				if (viewModel.isChecked) {
-					data.add(viewModel.altValue);
+					backingList.add(viewModel.altValue);
 				} else {
-					data.remove(viewModel.altValue);
+					backingList.remove(viewModel.altValue);
 				}
 			}
 		});
-
-		// checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-		//
-		// @Override
-		// public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		// viewModel.isChecked = isChecked;
-		// if (isChecked) {
-		// data.add(viewModel.altValue);
-		// } else {
-		// data.remove(viewModel.altValue);
-		// }
-		// }
-		// });
 
 		return view;
 	}

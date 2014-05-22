@@ -28,8 +28,6 @@ import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
-import org.ambientlight.annotations.AlternativeIds;
-import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
 import org.ambientlight.ws.Room;
 
 import android.view.ActionMode;
@@ -103,12 +101,9 @@ public class MapField extends FieldGenerator {
 		final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
 
 		// find alternative id's from annotation and prepare a mapping with user friendly keys
-		AlternativeValues alternativeIds = ValueBindingHelper.getValuesForField(
-				field.getAnnotation(AlternativeIds.class).values(), bean, roomConfig);
-
 		final Map<Object, String> keyDisplayKeyMapping = new LinkedHashMap<Object, String>();
-		for (String currentDisplayKey : alternativeIds.displayValues) {
-			keyDisplayKeyMapping.put(alternativeIds.keys.get(alternativeIds.displayValues.indexOf(currentDisplayKey)),
+		for (String currentDisplayKey : altKeysToDisplay) {
+			keyDisplayKeyMapping.put(altKeys.get(altKeysToDisplay.indexOf(currentDisplayKey)),
 					currentDisplayKey);
 		}
 
@@ -143,7 +138,8 @@ public class MapField extends FieldGenerator {
 					// create
 					if (valueAtPosition == null) {
 						EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
-								ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom,
+								ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment,
+								selectedRoom,
 								roomConfig);
 
 					}
@@ -178,7 +174,6 @@ public class MapField extends FieldGenerator {
 				// edit menu button shows up if exactly 1 item is selected in list
 				MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
 				if (checkedItems.size() == 1) {
-					// && adapter.getItem(checkedItems.get(0)).getValue() != null
 					editItem.setVisible(true);
 				} else {
 					editItem.setVisible(false);

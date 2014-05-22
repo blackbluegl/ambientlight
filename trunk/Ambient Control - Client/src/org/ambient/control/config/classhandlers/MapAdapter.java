@@ -125,7 +125,11 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 		else {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
 			TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-			textViewType.setText(item.getValue().getClass().getSimpleName());
+			if (item.getValue() != null) {
+				textViewType.setText(item.getValue().getClass().getSimpleName());
+			} else {
+				textViewType.setText("");
+			}
 		}
 
 		// always display key as simple text

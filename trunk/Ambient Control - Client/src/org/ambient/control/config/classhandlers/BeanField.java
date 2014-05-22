@@ -95,7 +95,8 @@ public class BeanField extends FieldGenerator {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
 					EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
-							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
+							ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
+							roomConfig);
 				} else if (fieldValue == null && altValuesToDisplay.size() == 0) {
 					Log.e(LOG, "No alternative Values have been annotated to class.");
 					Toast.makeText(contentArea.getContext(), "No alternative Values annotated", Toast.LENGTH_SHORT).show();

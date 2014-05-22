@@ -19,8 +19,8 @@ public class EventProcessConfiguration extends ProcessConfiguration implements S
 	@TypeDef(fieldType = FieldType.SIMPLE_LIST)
 	@Presentation(name = "EventTrigger", position = 1)
 	@AlternativeValues(values = {
-			@Value(displayValue = "Schalter Ereignis", newClassInstanceType = "org.ambientlight.events.SwitchEvent"),
-			@Value(displayValue = "Szenerie Ereignis", newClassInstanceType = "org.ambientlight.events.SceneryEntryEvent") })
+			@Value(displayNewClassInstance = "Schalter Ereignis", newClassInstanceType = "org.ambientlight.events.SwitchEvent"),
+			@Value(displayNewClassInstance = "Szenerie Ereignis", newClassInstanceType = "org.ambientlight.events.SceneryEntryEvent") })
 	public List<BroadcastEvent> eventTriggerConfigurations = new ArrayList<BroadcastEvent>();
 
 };

@@ -91,22 +91,18 @@ public class SelectionListField extends FieldGenerator {
 
 		for (String currentDisplayValue : altValuesToDisplay) {
 
-			Object altValue = altValues.get(altValuesToDisplay.indexOf(currentDisplayValue));
+			Object currentAltValue = altValues.get(altValuesToDisplay.indexOf(currentDisplayValue));
+			Object inDataList = findInDataList(currentAltValue, listContent);
 
+			// prepare view model for each entry in the altValues list
 			ViewModel entry = new ViewModel();
 			displayValues.add(entry);
 			entry.displayName = currentDisplayValue;
-			entry.altValue = altValue;
-			todo extract to method and comment arrayadapter!
-			// try to find out if current value is present in fieldvalues list
-			for (Object currentValueInField : listContent) {
-				// if it is, set viewModel checked and use original instance. we may use standard arraylist features in the
-				// arrayadapter later
-				if (altValue.equals(currentValueInField)) {
-					entry.altValue = currentValueInField;
-					entry.isChecked = true;
-					break;
-				}
+			entry.altValue = currentAltValue;
+			if (inDataList != null) {
+				// use original object reference. this makes the handling easier in the adapter later.
+				entry.altValue = inDataList;
+				entry.isChecked = true;
 			}
 		}
 
@@ -136,5 +132,21 @@ public class SelectionListField extends FieldGenerator {
 				}
 			}
 		});
+	}
+
+
+	/**
+	 * check if the given alternative value equals an entry in the fields list
+	 * 
+	 * @param altValue
+	 * @param listContent
+	 * @return
+	 */
+	public Object findInDataList(Object altValue, List<Object> listContent) {
+		for (Object currentValueInField : listContent) {
+			if (altValue.equals(currentValueInField))
+				return currentValueInField;
+		}
+		return null;
 	}
 }

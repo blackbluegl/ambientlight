@@ -25,8 +25,12 @@ import java.util.List;
  */
 public class AlternativeValues {
 
-	public List<String> displayValues = new ArrayList<String>();
 	public List<Object> values = new ArrayList<Object>();
+	public List<String> displayValues = new ArrayList<String>();
+
 	public List<Object> keys = new ArrayList<Object>();
+	public List<String> displayKeys = new ArrayList<String>();
+
 	public List<String> classNames = new ArrayList<String>();
+	public List<String> displayClassNames = new ArrayList<String>();
 }
