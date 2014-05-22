@@ -46,6 +46,9 @@ public class SwitchesIdsProvider implements AlternativeValueProvider {
 		if (config.remoteSwitchesManager != null && config.remoteSwitchesManager.remoteSwitches != null) {
 			result.values.addAll(config.remoteSwitchesManager.remoteSwitches.keySet());
 		}
+		if (config.lightObjectManager != null && config.lightObjectManager.lightObjects.keySet() != null) {
+			result.values.addAll(config.lightObjectManager.lightObjects.keySet());
+		}
 
 		return result;
 	}
