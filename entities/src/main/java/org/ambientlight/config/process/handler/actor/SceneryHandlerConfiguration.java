@@ -15,6 +15,11 @@
 
 package org.ambientlight.config.process.handler.actor;
 
+import org.ambientlight.annotations.AlternativeValues;
+import org.ambientlight.annotations.FieldType;
+import org.ambientlight.annotations.Presentation;
+import org.ambientlight.annotations.TypeDef;
+import org.ambientlight.annotations.Value;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
@@ -27,12 +32,14 @@ import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
 @HandlerDataTypeValidation(consumes = { DataTypeValidation.CONSUMES_NO_DATA, DataTypeValidation.SENSOR }, generates = DataTypeValidation.CREATES_NO_DATA)
 public class SceneryHandlerConfiguration extends AbstractActionHandlerConfiguration {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	@Presentation(name = "Name Szenerie", position = 1)
+	@TypeDef(fieldType = FieldType.BEAN_SELECTION)
+	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SceneryNamesProvider") })
 	public String sceneryName;
 
+	@Presentation(name = "Name aus Vorgängerknoten", position = 0, description = "Soll der Name der Szenerie nicht selbst festgelegt werden sondern dynamisch aus einem Vorgängerknoten im Prozess ermittelt werden?")
+	@TypeDef(fieldType = FieldType.BOOLEAN)
 	public boolean useTokenValue;
 }

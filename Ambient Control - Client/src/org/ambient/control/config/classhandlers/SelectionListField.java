@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.R;
 import org.ambient.control.config.EditConfigHandlerFragment;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
@@ -27,8 +26,6 @@ import org.ambientlight.ws.Room;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -43,6 +40,14 @@ import android.widget.ListView;
  * 
  */
 public class SelectionListField extends FieldGenerator {
+
+	static class ViewModel {
+
+		public String displayName;
+		public boolean isChecked;
+		public Object altValue;
+	}
+
 
 	/**
 	 * @param roomConfig
@@ -72,45 +77,46 @@ public class SelectionListField extends FieldGenerator {
 
 		// create view
 		final ListView list = new ListView(contentArea.getContext());
-		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
 		contentArea.addView(list);
 
-		// bind list or create it
+		// get list or create it
 		if (field.get(bean) == null) {
 			field.set(bean, new ArrayList());
 		}
 		final List listContent = (List) field.get(bean);
 
-		// bind list to view model
-		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(contextFragment.getActivity(),
-				R.layout.layout_checkable_list_item, altValuesToDisplay);
-		list.setAdapter(adapter);
+		// build view model
+		final List<ViewModel> displayValues = new ArrayList<ViewModel>();
 
-		// adapt height to listsize (we do not want local scrolling in list)
-		GuiUtils.setListViewHeightBasedOnChildren(list);
-
-		// set checked the values that where stored in the field value
 		for (String currentDisplayValue : altValuesToDisplay) {
 
 			Object altValue = altValues.get(altValuesToDisplay.indexOf(currentDisplayValue));
 
-			// try to find equal object in field list
-			Object valueInField = null;
+			ViewModel entry = new ViewModel();
+			displayValues.add(entry);
+			entry.displayName = currentDisplayValue;
+			entry.altValue = altValue;
+			todo extract to method and comment arrayadapter!
+			// try to find out if current value is present in fieldvalues list
 			for (Object currentValueInField : listContent) {
+				// if it is, set viewModel checked and use original instance. we may use standard arraylist features in the
+				// arrayadapter later
 				if (altValue.equals(currentValueInField)) {
-					valueInField = currentValueInField;
+					entry.altValue = currentValueInField;
+					entry.isChecked = true;
 					break;
 				}
 			}
-
-			// set checkbox if found and use instance of the field value in the altValue list for better handling
-			if (valueInField != null) {
-				altValues.set(altValuesToDisplay.indexOf(currentDisplayValue), valueInField);
-				LinearLayout rowView = (LinearLayout) adapter.getView(adapter.getPosition(currentDisplayValue), null, list);
-				CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkBox1);
-				checkBox.setChecked(true);
-			}
 		}
+
+		// bind list to view model
+		final CheckableListAdapter adapter = new CheckableListAdapter(contextFragment.getActivity(), displayValues, listContent);
+		list.setAdapter(adapter);
+		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+		// adapt height to listsize (we do not want local scrolling in list)
+		GuiUtils.setListViewHeightBasedOnChildren(list);
 
 		// add and remove to field value by clicking on an item
 		list.setOnItemClickListener(new OnItemClickListener() {
@@ -118,12 +124,12 @@ public class SelectionListField extends FieldGenerator {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onItemClick(AdapterView<?> paramAdapterView, View view, int position, long paramLong) {
-				CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
-				checkbox.setChecked(!checkbox.isChecked());
+
+				displayValues.get(position).isChecked = !displayValues.get(position).isChecked;
 				Object altValueAtPosition = altValues.get(position);
 
 				// sync view with field content
-				if (checkbox.isChecked()) {
+				if (displayValues.get(position).isChecked) {
 					listContent.add(altValueAtPosition);
 				} else {
 					listContent.remove(altValueAtPosition);
