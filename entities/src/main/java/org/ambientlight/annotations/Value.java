@@ -26,14 +26,26 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Value {
 
-	public String displayValue() default "";
-
-
+	/*
+	 * used if childclasses should have seperate implementations for this annotation
+	 */
 	public String forSubClass() default "";
 
 
+	/*
+	 * give hint for an abstract class what kind of concrete class type can be used for new instances.
+	 */
 	public String newClassInstanceType() default "";
 
 
+	/*
+	 * display name for new class instance.
+	 */
+	public String displayNewClassInstance() default "";
+
+
+	/*
+	 * provides keys for maps and values for maps or list.
+	 */
 	public String valueProvider() default "";
 }

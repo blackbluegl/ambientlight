@@ -3,7 +3,6 @@ package org.ambientlight.config.process.handler.actor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ambientlight.annotations.AlternativeIds;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
@@ -25,11 +24,7 @@ public class RenderingProgrammChangeHandlerConfiguration extends AbstractActionH
 
 	private static final long serialVersionUID = 1L;
 	@TypeDef(fieldType = FieldType.MAP)
-	@AlternativeIds(values = @Value(valueProvider = "org.ambientlight.annotations.valueprovider.RenderableIdsProvider"))
-	@AlternativeValues(values = {
-			@Value(displayValue = "Farbe auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration"),
-			@Value(displayValue = "Tron auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration"),
-			@Value(displayValue = "Sonnenuntergang auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration") })
+	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.RenderingProgramValueProvider") })
 	@JsonSerialize(keyUsing = EntityIdSerializer.class)
 	@JsonDeserialize(keyUsing = EntityIdDeserializer.class)
 	public Map<EntityId, RenderingProgramConfiguration> renderConfig = new HashMap<EntityId, RenderingProgramConfiguration>();

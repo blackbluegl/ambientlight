@@ -28,6 +28,9 @@ import android.widget.LinearLayout;
 
 
 /**
+ * set the envirenment and handles the annotation to alternative value binding here. E.g. new class Instances, or alternative
+ * values for lists. or alternative keys for hashmaps.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -39,6 +42,12 @@ public abstract class FieldGenerator {
 
 	protected List<String> altClassInstanceValues = new ArrayList<String>();
 
+	protected List<String> altClassInstancesToDisplay = new ArrayList<String>();
+
+	protected List<Object> altKeys = new ArrayList<Object>();
+
+	protected List<String> altKeysToDisplay = new ArrayList<String>();
+
 	protected Room roomConfig = null;
 	protected Object bean = null;
 	protected Field field = null;
@@ -46,8 +55,8 @@ public abstract class FieldGenerator {
 	protected LinearLayout contentArea;
 
 
-	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment, LinearLayout contentArea)
-			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super();
 		this.roomConfig = roomConfig;
 		this.bean = bean;
@@ -69,17 +78,20 @@ public abstract class FieldGenerator {
 			annotation = field.getDeclaringClass().getAnnotation(AlternativeValues.class);
 		}
 
-		// if still no annotations are found there is no one.
+		// if still no annotations are found there is no one and stop
 		if (annotation == null)
 			return;
 
+		// bind result for child classes to handle
 		org.ambientlight.annotations.valueprovider.api.AlternativeValues result = ValueBindingHelper.getValuesForField(
-				annotation.values(), bean,
-				roomConfig);
+				annotation.values(), bean, roomConfig);
 
 		altValues = result.values;
 		altValuesToDisplay = result.displayValues;
 		altClassInstanceValues = result.classNames;
+		altClassInstancesToDisplay = result.displayClassNames;
+		altKeys = result.keys;
+		altKeysToDisplay = result.displayKeys;
 	}
 
 }

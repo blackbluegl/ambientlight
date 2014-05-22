@@ -82,15 +82,16 @@ public class ValueBindingHelper {
 				continue;
 			}
 
-			// hardcoded case for new classes
+			// hard coded case for new classes
 			if (currentValueAnnotation.newClassInstanceType().isEmpty() == false) {
 				result.classNames.add(currentValueAnnotation.newClassInstanceType());
 				// set display value - if no display value given use class name
-				result.displayValues.add(currentValueAnnotation.displayValue().isEmpty() == false ? currentValueAnnotation
-						.displayValue() : currentValueAnnotation.newClassInstanceType());
+				result.displayClassNames
+				.add(currentValueAnnotation.displayNewClassInstance().isEmpty() == false ? currentValueAnnotation
+						.displayNewClassInstance() : currentValueAnnotation.newClassInstanceType());
 			}
 
-			// value provider for beans that already exist
+			// value provider for keys, values and new class instances
 			if (currentValueAnnotation.valueProvider().isEmpty() == false) {
 				// get generated values from provider
 				AlternativeValueProvider provider = (AlternativeValueProvider) Class.forName(
@@ -102,13 +103,33 @@ public class ValueBindingHelper {
 					continue;
 				}
 
-				result.displayValues.addAll(providerResult.displayValues);
+				// add values
 				result.values.addAll(providerResult.values);
-
+				result.displayValues.addAll(providerResult.displayValues);
 				// if provider did not set the display values add via toString() from Values
 				if (result.displayValues == null || result.displayValues.isEmpty()) {
 					for (Object current : result.values) {
 						result.displayValues.add(current.toString());
+					}
+				}
+
+				// add new class instances
+				result.classNames.addAll(providerResult.classNames);
+				result.displayClassNames.addAll(providerResult.displayClassNames);
+				// if provider did not set the display values add via toString() from Values
+				if (result.displayClassNames == null || result.displayClassNames.isEmpty()) {
+					for (String current : result.classNames) {
+						result.displayClassNames.add(current);
+					}
+				}
+
+				// add keys
+				result.keys.addAll(providerResult.keys);
+				result.displayKeys.addAll(providerResult.displayKeys);
+				// if provider did not set the display values add via toString() from Values
+				if (result.displayKeys == null || result.displayKeys.isEmpty()) {
+					for (Object current : result.keys) {
+						result.displayKeys.add(current.toString());
 					}
 				}
 			}

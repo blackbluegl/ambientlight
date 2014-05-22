@@ -114,7 +114,8 @@ public class SimpleListField extends FieldGenerator {
 
 				// create transition with new editfragment
 				EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
-						ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
+						ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
+						roomConfig);
 			}
 		});
 
@@ -177,7 +178,8 @@ public class SimpleListField extends FieldGenerator {
 
 					// create new transaction and edit new bean
 					EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
-							ValueBindingHelper.toCharSequenceArray(altValuesToDisplay), contextFragment, selectedRoom, roomConfig);
+							ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
+							roomConfig);
 
 					break;
 				}

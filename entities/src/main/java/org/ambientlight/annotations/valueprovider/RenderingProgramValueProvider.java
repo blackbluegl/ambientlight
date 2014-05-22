@@ -20,14 +20,20 @@ import java.util.Set;
 
 import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
 import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
+import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 
 
 /**
+ * This provider helps to use the map for rendering configurations and renderable ids as keys. Creates a valid list of Keys and
+ * provides a list for renderingProgramm configurations.
+ * 
  * @author Florian Bornkessel
  */
-public class RenderableIdsProvider implements AlternativeValueProvider {
+public class RenderingProgramValueProvider implements AlternativeValueProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -37,12 +43,19 @@ public class RenderableIdsProvider implements AlternativeValueProvider {
 	@Override
 	public AlternativeValues getValue(Room config, Object entity) {
 		AlternativeValues result = new AlternativeValues();
-
+		// create keys
 		if (config.lightObjectManager != null && config.lightObjectManager.lightObjects != null) {
 			Set<EntityId> keys = config.lightObjectManager.lightObjects.keySet();
 			result.keys = new ArrayList<Object>(keys);
 		}
+
+		// create new class instances
+		result.classNames.add(SimpleColorRenderingProgramConfiguration.class.getName());
+		result.displayValues.add("Farbe auswählen");
+		result.classNames.add(TronRenderingProgrammConfiguration.class.getName());
+		result.displayValues.add("Tron auswählen");
+		result.classNames.add(SunSetRenderingProgrammConfiguration.class.getName());
+		result.displayValues.add("Sonnenuntergang auswählen");
 		return result;
 	}
-
 }
