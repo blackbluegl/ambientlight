@@ -15,9 +15,11 @@
 
 package org.ambient.control.config.classhandlers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.ambient.control.R;
+import org.ambient.control.config.classhandlers.MapField.ViewModel;
 
 import android.content.Context;
 import android.support.v4.app.FragmentManager;
@@ -38,18 +40,17 @@ import android.widget.TextView;
  * @author Florian Bornkessel
  * 
  */
-public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
+public class MapAdapter extends ArrayAdapter<MapField.ViewModel> {
 
 	private final Context context;
 
-	/** key is the map key, value is the value to display */
-	private final Map<Object, String> keyMapping;
+	private Map<Object, Object> dataModell;
 
 	/** class type of the value. the map adapter can handle some simple value types by itself and shows specialized views */
 	private final String valueClassType;
 
 
-	/**
+	/**displayValues
 	 * 
 	 * @param fm
 	 * @param context
@@ -59,38 +60,28 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 	 * @param valueClassType
 	 *            class type of value
 	 */
-	public MapAdapter(FragmentManager fm, Context context, Map<Object, String> keyMapping, Map<Object, Object> dataModell,
+	public MapAdapter(FragmentManager fm, Context context, List<MapField.ViewModel> modell, Map<Object, Object> dataModell,
 			String valueClassType) {
 
-		super(context, R.layout.layout_map_list_entry);
+		super(context, R.layout.layout_map_list_entry, modell);
 		this.context = context;
-		this.keyMapping = keyMapping;
+		this.dataModell = dataModell;
 		this.valueClassType = valueClassType;
-
-		// convert hashmap to arrayList for parent class
-		for (Map.Entry<Object, Object> currentEntry : dataModell.entrySet()) {
-			super.add(currentEntry);
-		}
 	}
 
 
-	//
-	// @Override
-	// public void remove(Map.Entry<Object, Object> value) {
-	// super.remove(value);
-	// }
-	//
-	//
-	// @Override
-	// public void add(Map.Entry<Object, Object> value) {
-	// super.add(value);
-	// }
+	@Override
+	public void remove(ViewModel entry) {
+		entry.value = null;
+		dataModell.remove(entry.key);
+		notifyDataSetChanged();
+	}
+
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		final Map.Entry<Object, Object> item = getItem(position);
-		final String keyToDisplay = keyMapping.get(item.getKey());
+		final MapField.ViewModel item = getItem(position);
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = null;
@@ -101,10 +92,10 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 			final TextView textIsSet = (TextView) rowView.findViewById(R.id.textViewType);
 			CheckBox checkbox = (CheckBox) rowView.findViewById(R.id.checkBoxMapListEntry);
 
-			if (item.getValue() != null) {
+			if (item.value != null) {
 				// check box and show text
 				textIsSet.setText("anwenden");
-				checkbox.setChecked((Boolean) item.getValue());
+				checkbox.setChecked((Boolean) item.value);
 			} else {
 				textIsSet.setText("");
 			}
@@ -114,7 +105,7 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					item.setValue(isChecked);
+					item.value = isChecked;
 					textIsSet.setText("anwenden");
 				}
 			});
@@ -125,8 +116,8 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 		else {
 			rowView = inflater.inflate(R.layout.layout_map_list_entry, parent, false);
 			TextView textViewType = (TextView) rowView.findViewById(R.id.textViewType);
-			if (item.getValue() != null) {
-				textViewType.setText(item.getValue().getClass().getSimpleName());
+			if (item.value != null) {
+				textViewType.setText(item.value.getClass().getSimpleName());
 			} else {
 				textViewType.setText("");
 			}
@@ -134,7 +125,7 @@ public class MapAdapter extends ArrayAdapter<Map.Entry<Object, Object>> {
 
 		// always display key as simple text
 		TextView textViewKey = (TextView) rowView.findViewById(R.id.textViewName);
-		textViewKey.setText(keyToDisplay);
+		textViewKey.setText(item.displayKey);
 
 		return rowView;
 	}
