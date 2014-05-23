@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +52,14 @@ import android.widget.ListView;
  * 
  */
 public class MapField extends FieldGenerator {
+
+	public static class ViewModel {
+
+		String displayKey;
+		Object key;
+		Object value;
+	}
+
 
 	/**
 	 * @param roomConfig
@@ -92,24 +99,34 @@ public class MapField extends FieldGenerator {
 			field.set(bean, new HashMap());
 		}
 
-		// have an instance of the field value
-		@SuppressWarnings("unchecked")
-		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(bean);
-
 		// class type of the values elements
 		ParameterizedType pt = (ParameterizedType) field.getGenericType();
 		final String containingClass = pt.getActualTypeArguments()[1].toString().substring(6);
 
-		// find alternative id's from annotation and prepare a mapping with user friendly keys
-		final Map<Object, String> keyDisplayKeyMapping = new LinkedHashMap<Object, String>();
-		for (String currentDisplayKey : altKeysToDisplay) {
-			keyDisplayKeyMapping.put(altKeys.get(altKeysToDisplay.indexOf(currentDisplayKey)),
-					currentDisplayKey);
+		// have an instance of the field value
+		@SuppressWarnings("unchecked")
+		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(bean);
+
+		// build view model for adapter
+		final List<ViewModel> viewModell = new ArrayList<MapField.ViewModel>();
+
+		for (String currentAltKeyToDisplay : altKeysToDisplay) {
+
+			// find equal key in fieldvalue and use this one with its values if possible to have easier handling in arrayadapter
+			Object key = altKeys.get(altKeysToDisplay.indexOf(currentAltKeyToDisplay));
+			Object origKey = getKey(key, fieldValue);
+
+			// create view Modell Entry
+			ViewModel currentEntry = new ViewModel();
+			currentEntry.key = origKey != null ? origKey : key;
+			currentEntry.value = fieldValue.get(currentEntry.key);
+			currentEntry.displayKey = currentAltKeyToDisplay;
+			viewModell.add(currentEntry);
 		}
 
 		// set custom adapter to show user friendly keys in row 1 and a representation of the value in row 2
 		final MapAdapter adapter = new MapAdapter(contextFragment.getFragmentManager(), contextFragment.getActivity(),
-				keyDisplayKeyMapping, fieldValue, containingClass);
+				viewModell, fieldValue, containingClass);
 		list.setAdapter(adapter);
 
 		// the listview is embedded in a scrollable view so no scrolling is wanted in this view.
@@ -126,27 +143,25 @@ public class MapField extends FieldGenerator {
 				@Override
 				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int position, long paramLong) {
 
-					Object valueAtPosition = adapter.getItem(position).getValue();
+					Object valueAtPosition = adapter.getItem(position).value;
 
 					// store position where to merge the edited value
 					WhereToMergeBean whereToStore = new WhereToMergeBean();
 					whereToStore.fieldName = field.getName();
 					whereToStore.type = WhereToPutType.MAP;
-					whereToStore.keyInMap = adapter.getItem(position).getKey();
+					whereToStore.keyInMap = adapter.getItem(position).key;
 					contextFragment.whereToMergeChildBean = whereToStore;
 
 					// create
 					if (valueAtPosition == null) {
 						EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
 								ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment,
-								selectedRoom,
-								roomConfig);
+								selectedRoom, roomConfig);
 
 					}
 					// edit
 					else {
-						EditConfigHandlerFragment.editConfigBean(contextFragment,
-								fieldValue.get(adapter.getItem(position).getKey()), selectedRoom, roomConfig);
+						EditConfigHandlerFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
 					}
 				}
 			});
@@ -156,7 +171,7 @@ public class MapField extends FieldGenerator {
 		list.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
 			// data model for the context menu
-			List<Map.Entry<Object, Object>> checkedItems = new ArrayList<Map.Entry<Object, Object>>();
+			List<ViewModel> checkedItems = new ArrayList<ViewModel>();
 
 
 			@Override
@@ -190,19 +205,19 @@ public class MapField extends FieldGenerator {
 				case R.id.menuEntryRemoveConfigurationClass:
 
 					// remove from reflecting bean and from map adapter
-					for (Map.Entry<Object, Object> current : checkedItems) {
-						fieldValue.remove(current);
+					for (ViewModel current : checkedItems) {
 						adapter.remove(current);
 					}
 
-					// adapter.notifyDataSetChanged();
-					break;
+					mode.finish();
+					return true;
 
 				case R.id.menuEntryEditConfigurationClass:
 					// create fragment transition to edit the value of the map entry
-					EditConfigHandlerFragment.editConfigBean(contextFragment, checkedItems.get(0).getValue(), selectedRoom,
-							roomConfig);
-					break;
+					EditConfigHandlerFragment.editConfigBean(contextFragment, checkedItems.get(0).value, selectedRoom, roomConfig);
+
+					mode.finish();
+					return true;
 				}
 
 				return false;
@@ -228,5 +243,19 @@ public class MapField extends FieldGenerator {
 				return false;
 			}
 		});
+	}
+
+
+	/**
+	 * @param key
+	 * @param fieldValue
+	 * @return
+	 */
+	private Object getKey(Object key, Map<Object, Object> fieldValue) {
+		for (Object currentKey : fieldValue.keySet()) {
+			if (key.equals(currentKey))
+				return currentKey;
+		}
+		return null;
 	}
 }

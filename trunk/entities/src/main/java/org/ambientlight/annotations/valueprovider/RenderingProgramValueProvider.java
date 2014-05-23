@@ -51,11 +51,11 @@ public class RenderingProgramValueProvider implements AlternativeValueProvider {
 
 		// create new class instances
 		result.classNames.add(SimpleColorRenderingProgramConfiguration.class.getName());
-		result.displayValues.add("Farbe auswählen");
+		result.displayClassNames.add("Farbe auswählen");
 		result.classNames.add(TronRenderingProgrammConfiguration.class.getName());
-		result.displayValues.add("Tron auswählen");
+		result.displayClassNames.add("Tron auswählen");
 		result.classNames.add(SunSetRenderingProgrammConfiguration.class.getName());
-		result.displayValues.add("Sonnenuntergang auswählen");
+		result.displayClassNames.add("Sonnenuntergang auswählen");
 		return result;
 	}
 }
