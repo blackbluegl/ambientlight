@@ -4,4 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <org.ambient.views.TemperatureModeView
+        android:id="@+id/temperatureModeView1"
+        android:layout_width="66dp"
+        android:layout_height="285dp" />
+
 </LinearLayout>

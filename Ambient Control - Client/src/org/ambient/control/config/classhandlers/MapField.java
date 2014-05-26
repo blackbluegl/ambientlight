@@ -109,7 +109,6 @@ public class MapField extends FieldGenerator {
 
 		// build view model for adapter
 		final List<ViewModel> viewModell = new ArrayList<MapField.ViewModel>();
-
 		for (String currentAltKeyToDisplay : altKeysToDisplay) {
 
 			// find equal key in fieldvalue and use this one with its values if possible to have easier handling in arrayadapter
