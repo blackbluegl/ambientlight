@@ -15,17 +15,45 @@
                 android:id="@+id/imageViewLightObject"
                 android:layout_width="85dp"
                 android:layout_height="85dp"
-                android:src="@drawable/ic_power_disabled" />
+                android:src="@drawable/ic_heating_active" />
 
-            <ImageView
-                android:id="@+id/imageViewLightObjectSceneryDecoupled"
-                android:layout_width="20dp"
-                android:visibility="invisible"
-                android:layout_height="25dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:contentDescription="bypass Scenery"
-                android:src="@drawable/ic_bp_scenery" />
+            <EditText
+                android:id="@+id/editTextMode"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerInParent="false"
+                android:layout_centerVertical="true"
+                android:gravity="left|start"
+                android:shadowColor="@color/RoomWall"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="20.5"
+                android:textColor="@color/RoomWall"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:typeface="sans" >
+
+                <requestFocus />
+            </EditText>
+
+            <EditText
+                android:id="@+id/editTextTemp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:gravity="right"
+                android:shadowColor="@color/RoomFloor"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="M"
+                android:textColor="@color/RoomWall"
+                android:textStyle="bold"
+                android:typeface="sans" />
 
         </RelativeLayout>
 
@@ -36,6 +64,6 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:scrollHorizontally="false"
-            android:text="Unknown" />
+            android:text="Klima" />
 
     </LinearLayout>
