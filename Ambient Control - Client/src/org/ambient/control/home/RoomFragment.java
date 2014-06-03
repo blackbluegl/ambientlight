@@ -33,6 +33,7 @@ import org.ambient.control.home.mapper.TronLightItemViewMapper;
 import org.ambient.rest.RestClient;
 import org.ambient.util.GuiUtils;
 import org.ambient.views.ImageViewWithContextMenuInfo;
+import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
@@ -377,6 +378,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 * @param amountPerRow
 	 */
 	private void createRoomItems(String currentRoom, Room roomConfig, TableLayout roomContent) {
+
+		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
 		int amountPerRow = getLightObjectAmountPerRow();
 		TableRow row = new TableRow(roomContent.getContext());
 		row.setGravity(Gravity.CENTER);
@@ -395,12 +399,29 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 				row.setGravity(Gravity.CENTER);
 				roomContent.addView(row);
 			}
-			LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View lightObject = inflater.inflate(R.layout.layout_room_item, null);
 			createRoomItem(currentRoom, iterator.next(), lightObject);
 
 			row.addView(lightObject);
 		}
+		if (roomConfig.climateManager != null) {
+			row = new TableRow(roomContent.getContext());
+			row.setGravity(Gravity.CENTER);
+			roomContent.addView(row);
+			View heating = inflater.inflate(R.layout.layout_room_heating, null);
+			createHeatingItem(currentRoom, roomConfig.climateManager, heating);
+		}
+	}
+
+
+	/**
+	 * @param currentRoom
+	 * @param climateManager
+	 * @param heating
+	 */
+	private void createHeatingItem(String currentRoom, ClimateManagerConfiguration climateManager, View heating) {
+		// TODO Auto-generated method stub
+
 	}
 
 
