@@ -15,11 +15,42 @@
 
 package org.ambient.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ambientlight.room.entities.climate.ClimateImpl;
+import org.ambientlight.room.entities.features.Entity;
+import org.ambientlight.room.entities.features.climate.TemperaturMode;
+import org.ambientlight.ws.Room;
+
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class RoomUtil {
 
+	public static List<Entity> getEntities(final Room room) {
+
+		ArrayList<Entity> result = new ArrayList<Entity>();
+
+		if (room.lightObjectManager != null) {
+			result.addAll(room.lightObjectManager.lightObjects.values());
+		}
+
+		if (room.switchesManager != null) {
+			result.addAll(room.switchesManager.switches.values());
+		}
+
+		if (room.remoteSwitchesManager != null) {
+			result.addAll(room.remoteSwitchesManager.remoteSwitches.values());
+		}
+
+		if (room.climateManager != null) {
+			result.add(new ClimateImpl(new TemperaturMode(room.climateManager.temperature,
+					room.climateManager.temporaryUntilDate, room.climateManager.mode)));
+		}
+
+		return result;
+	}
 }

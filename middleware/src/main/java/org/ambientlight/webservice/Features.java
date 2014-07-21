@@ -14,34 +14,33 @@ import javax.ws.rs.core.Response;
 import org.ambientlight.AmbientControl;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
+import org.ambientlight.room.entities.features.climate.TemperaturMode;
 
 
 @Path("/features")
 public class Features {
-
-	@PUT
-	@Path("/{roomName}/renderables/{domain}/{id}/program")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public synchronized Response createOrUpdateLightObjectConfiguration(@PathParam("roomName") String roomName,
-			@PathParam("domain") String domain, @PathParam("id") String itemName, RenderingProgramConfiguration itemConfiguration) {
-
-		try {
-			AmbientControl.getRoom(roomName).featureFacade.setRenderingConfiguration(itemConfiguration, new EntityId(domain,
-					itemName));
-			return Response.status(500).build();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.status(200).build();
-		}
-	}
-
 
 	@GET
 	@Path("/{roomName}/switchables")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Set<EntityId> getSwitchables(@PathParam("roomName") String roomName) {
 		return AmbientControl.getRoom(roomName).featureFacade.getSwitchableIds();
+	}
+
+
+	@GET
+	@Path("/{roomName}/switchables/{domain}/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object getSwitchable(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
+			@PathParam("id") String itemName) {
+
+		try {
+			return AmbientControl.getRoom(roomName).featureFacade.getSwitchable(new EntityId(domain, itemName));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
 	}
 
 
@@ -58,6 +57,21 @@ public class Features {
 					true);
 			return Response.status(200).build();
 
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
+	}
+
+
+	@GET
+	@Path("/{roomName}/renderables/{domain}/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object getRenderable(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
+			@PathParam("id") String itemName) {
+
+		try {
+			return AmbientControl.getRoom(roomName).lightObjectManager.getRenderable(new EntityId(domain, itemName));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
@@ -83,18 +97,14 @@ public class Features {
 	}
 
 
-	@GET
-	@Path("/{roomName}/switchables/{domain}/{id}")
+	@PUT
+	@Path("/{roomName}/climate/mode")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getSwitchable(@PathParam("roomName") String roomName, @PathParam("domain") String domain,
-			@PathParam("id") String itemName) {
+	public Response setMode(@PathParam("roomName") String roomName, TemperaturMode mode) {
 
-		try {
-			return AmbientControl.getRoom(roomName).featureFacade.getSwitchable(new EntityId(domain, itemName));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.status(500).build();
-		}
+		AmbientControl.getRoom(roomName).featureFacade.setClimate(mode);
+		return Response.status(200).build();
 	}
+
 }

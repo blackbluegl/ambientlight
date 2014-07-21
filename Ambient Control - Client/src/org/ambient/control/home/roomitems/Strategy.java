@@ -13,20 +13,27 @@
    limitations under the License.
  */
 
-package org.ambientlight.ws.climate;
+package org.ambient.control.home.roomitems;
 
-import java.util.Date;
+import org.ambient.control.home.RoomFragment;
+import org.ambientlight.room.entities.features.Entity;
+import org.ambientlight.ws.Room;
 
-import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
+import android.support.v4.app.Fragment;
+import android.view.View;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class TemperaturMode {
+public interface Strategy {
 
-	public float temp;
-	public Date until;
-	public MaxThermostateMode mode;
+	public View onCreateView(Fragment context, Entity entity);
+
+
+	public void onClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity);
+
+
+	public void onLongClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity);
 }

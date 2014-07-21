@@ -9,8 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.ambientlight.AmbientControl;
-import org.ambientlight.room.entities.features.EntityId;
-import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.ws.Room;
 
 
@@ -50,10 +48,6 @@ public class Rooms {
 		room.switchesManager = AmbientControl.getRoom(roomName).config.switchesManager;
 		room.lightObjectManager = AmbientControl.getRoom(roomName).config.lightObjectManager;
 
-		for (EntityId currentId : AmbientControl.getRoom(roomName).featureFacade.getSwitchableIds()) {
-			Switchable currentSwitch = AmbientControl.getRoom(roomName).featureFacade.getSwitchable(currentId);
-			room.switchables.add(currentSwitch);
-		}
 		return room;
 	}
 }

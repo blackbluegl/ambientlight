@@ -13,32 +13,19 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.alarm;
+package org.ambientlight.room.entities.features.climate;
 
-import org.ambientlight.room.entities.features.EntityId;
-
+import org.ambientlight.room.entities.features.Entity;
 
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public class DailyAlarm extends Alarm {
+public interface Climate extends Entity {
 
-	private static final long serialVersionUID = 1L;
-
-	public int hour;
-	public int minute;
+	public TemperaturMode getClimate();
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.Entity#getId()
-	 */
-	@Override
-	public EntityId getId() {
-		return new EntityId(EntityId.DOMAIN_ALARM_DAILY, id);
-	}
-
+	public void setClimate(TemperaturMode climate);
 }

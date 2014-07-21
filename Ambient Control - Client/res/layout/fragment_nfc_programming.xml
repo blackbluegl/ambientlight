@@ -52,7 +52,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
-        android:id="@+id/buttonProgramNFC"
+        android:id="@+id/linearLayoutItemContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

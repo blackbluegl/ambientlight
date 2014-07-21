@@ -13,50 +13,53 @@
    limitations under the License.
  */
 
-package org.ambient.control.home.mapper;
+package org.ambientlight.config.room.entities.alarm;
 
-import org.ambient.control.R;
 import org.ambientlight.room.entities.features.EntityId;
-
-import android.view.View;
+import org.ambientlight.room.entities.features.actor.Switchable;
 
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
-public class ClimateItemViewMapper extends AbstractRoomItemViewMapper {
+public abstract class Alarm implements Switchable {
 
-	/**
-	 * @param itemView
-	 * @param entityId
-	 * @param resourceId
-	 * @param powerState
+	private static final long serialVersionUID = 1L;
+
+	protected String id;
+	protected boolean active;
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.config.features.actor.Switchable#getPowerState()
 	 */
-	public ClimateItemViewMapper(View itemView, EntityId entityId, int resourceId, boolean powerState) {
-		super(itemView, entityId, resourceId, powerState);
+	@Override
+	public boolean getPowerState() {
+		return active;
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambient.control.home.mapper.AbstractRoomItemViewMapper#getActiveIcon()
+	 * @see org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
 	 */
 	@Override
-	protected int getActiveIcon() {
-		return R.drawable.ic_heating_active;
+	public void setPowerState(boolean powerState) {
+		this.active = powerState;
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambient.control.home.mapper.AbstractRoomItemViewMapper#getDisabledIcon()
+	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
 	 */
 	@Override
-	protected int getDisabledIcon() {
-		return R.drawable.ic_heating_disabled;
+	public void setId(EntityId id) {
+		this.id = id.id;
 	}
-
 }

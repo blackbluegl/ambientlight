@@ -26,6 +26,7 @@ import org.ambientlight.Manager;
 import org.ambientlight.Persistence;
 import org.ambientlight.callback.CallBackManager;
 import org.ambientlight.config.room.entities.alarm.AlarmManagerConfiguration;
+import org.ambientlight.config.room.entities.alarm.DailyAlarm;
 import org.ambientlight.events.DailyAlarmEvent;
 import org.ambientlight.events.EventManager;
 import org.ambientlight.room.entities.FeatureFacade;

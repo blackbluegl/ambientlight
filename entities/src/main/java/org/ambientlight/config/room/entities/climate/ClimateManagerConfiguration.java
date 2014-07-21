@@ -31,6 +31,7 @@ import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 public class ClimateManagerConfiguration {
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
+	public MaxThermostateMode modeBeforeBoost = MaxThermostateMode.AUTO;
 	public float temperature = 22.0f;
 	public Date temporaryUntilDate;
 	public String currentWeekProfile = "default";
