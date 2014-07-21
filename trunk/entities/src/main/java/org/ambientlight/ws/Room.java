@@ -16,8 +16,6 @@
 package org.ambientlight.ws;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.ambientlight.config.messages.QeueManagerConfiguration;
 import org.ambientlight.config.process.ProcessManagerConfiguration;
@@ -27,7 +25,6 @@ import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfi
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
-import org.ambientlight.room.entities.features.actor.Switchable;
 
 
 /**
@@ -48,7 +45,4 @@ public class Room implements Serializable {
 	public SceneryManagerConfiguration sceneriesManager;
 	public ProcessManagerConfiguration processManager;
 	public LightObjectManagerConfiguration lightObjectManager;
-
-	public List<Switchable> switchables = new ArrayList<Switchable>();
-
 }

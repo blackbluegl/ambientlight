@@ -13,53 +13,32 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.alarm;
+package org.ambientlight.config.room.entities.alarm;
 
 import org.ambientlight.room.entities.features.EntityId;
-import org.ambientlight.room.entities.features.actor.Switchable;
+
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public abstract class Alarm implements Switchable {
+public class DailyAlarm extends Alarm {
 
 	private static final long serialVersionUID = 1L;
 
-	protected String id;
-	protected boolean active;
+	public int hour;
+	public int minute;
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.ambientlight.config.features.actor.Switchable#getPowerState()
+	 * @see org.ambientlight.room.entities.features.Entity#getId()
 	 */
 	@Override
-	public boolean getPowerState() {
-		return active;
+	public EntityId getId() {
+		return new EntityId(EntityId.DOMAIN_ALARM_DAILY, id);
 	}
 
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.features.actor.Switchable#setPowerState(boolean)
-	 */
-	@Override
-	public void setPowerState(boolean powerState) {
-		this.active = powerState;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
-	 */
-	@Override
-	public void setId(EntityId id) {
-		this.id = id.id;
-	}
 }

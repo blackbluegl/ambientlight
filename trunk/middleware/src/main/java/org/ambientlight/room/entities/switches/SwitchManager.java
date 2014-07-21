@@ -28,8 +28,7 @@ import org.ambientlight.room.entities.features.actor.Switchable;
 
 
 /**
- * @author Florian Bornkessel
- * 
+ * @author Florian Bornkessel switchables
  */
 public class SwitchManager extends Manager implements SwitchablesHandler {
 

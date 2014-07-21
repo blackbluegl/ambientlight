@@ -6,6 +6,8 @@ import java.util.Map;
 import org.ambient.control.R;
 import org.ambient.rest.RestClient;
 import org.ambient.roomservice.RoomConfigService;
+import org.ambient.util.RoomUtil;
+import org.ambientlight.room.entities.features.Entity;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.ws.Room;
@@ -162,8 +164,8 @@ public class UpdateWidgetService extends Service {
 			for (String room : config.keySet()) {
 				Room roomConfig = config.get(room);
 				boolean switchOn = false;
-				for (Switchable current : roomConfig.switchables) {
-					if (current.getPowerState() == true) {
+				for (Entity current : RoomUtil.getEntities(roomConfig)) {
+					if (current instanceof Switchable && ((Switchable) current).getPowerState() == true) {
 						switchOn = true;
 						break;
 					}
@@ -202,9 +204,9 @@ public class UpdateWidgetService extends Service {
 
 		try {
 			Switchable mainSwitch = null;
-			for (Switchable current : roomService.getRoomConfiguration(serverName).switchables) {
-				if (current.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN)) {
-					mainSwitch = current;
+			for (Entity current : RoomUtil.getEntities(roomService.getRoomConfiguration(serverName))) {
+				if (current instanceof Switchable && current.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN)) {
+					mainSwitch = (Switchable) current;
 					break;
 				}
 			}

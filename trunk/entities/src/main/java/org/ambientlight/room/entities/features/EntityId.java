@@ -25,7 +25,7 @@ import java.io.Serializable;
 public class EntityId implements Serializable {
 
 	public static final String DOMAIN_TEMP_MAX_THERMOSTATE = "temperature.max.thermostate";
-	public static final String DOMAIN_TEMP_MAX_ROOM = "temperature.max.room";
+	public static final String DOMAIN_TEMP_MAX = "temperature.max";
 	public static final String ID_CLIMATE_MANAGER = "climateManager";
 	public static final String DOMAIN_SCENRERY = "scenery";
 	public static final String ID_SCENERY_MANAGER = "scenerymanager";

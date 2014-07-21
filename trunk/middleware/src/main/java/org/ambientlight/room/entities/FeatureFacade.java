@@ -20,8 +20,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
+import org.ambientlight.room.entities.climate.ClimateImpl;
+import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.climate.Climate;
+import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.sceneries.SceneryManager;
@@ -33,11 +37,18 @@ import org.ambientlight.room.entities.sceneries.SceneryManager;
  */
 public class FeatureFacade {
 
+	private ClimateManager climateManager;
+
 	private LightObjectManager lightObjectManager;
 	private SceneryManager sceneryManager;
 
 	Map<EntityId, SwitchablesHandler> switchableMap = new HashMap<EntityId, SwitchablesHandler>();
 	Map<EntityId, Sensor> sensors = new HashMap<EntityId, Sensor>();
+
+
+	public void registerClimateManager(ClimateManager manager) {
+		climateManager = manager;
+	}
 
 
 	public void registerSceneryManager(SceneryManager manager) {
@@ -102,5 +113,15 @@ public class FeatureFacade {
 
 	public void setRenderingConfiguration(RenderingProgramConfiguration config, EntityId id) {
 		lightObjectManager.setRenderingConfiguration(config, id);
+	}
+
+
+	public Climate getClimate(){
+		return new ClimateImpl(climateManager.getMode());
+	}
+
+
+	public void setClimate(TemperaturMode mode) {
+		climateManager.setMode(mode.temp, mode.mode, mode.until);
 	}
 }

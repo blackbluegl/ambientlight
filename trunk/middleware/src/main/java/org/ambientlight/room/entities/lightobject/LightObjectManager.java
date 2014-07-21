@@ -28,6 +28,7 @@ import org.ambientlight.room.entities.FeatureFacade;
 import org.ambientlight.room.entities.SwitchablesHandler;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
+import org.ambientlight.room.entities.features.lightobject.Renderable;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffect;
 import org.ambientlight.room.entities.lightobject.effects.RenderingEffectFactory;
 import org.ambientlight.room.entities.lightobject.effects.transitions.FadeInTransition;
@@ -303,5 +304,10 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 	public Set<EntityId> getRenderables() {
 		return config.lightObjects.keySet();
+	}
+
+
+	public Renderable getRenderable(EntityId id) {
+		return config.lightObjects.get(id);
 	}
 }

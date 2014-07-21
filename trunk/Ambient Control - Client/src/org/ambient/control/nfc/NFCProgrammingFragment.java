@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.ws.Room;
 
 import android.annotation.SuppressLint;
@@ -90,7 +89,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 		writeTagFilters = new IntentFilter[] { tagDetected, tagNDEFDetected };
 
 		content = inflater.inflate(R.layout.fragment_nfc_programming, null);
-		Button button = (Button) content.findViewById(R.id.buttonProgramNFC);
+		Button button = (Button) content.findViewById(R.id.linearLayoutItemContent);
 		button.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -156,9 +155,10 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 
 
 				List<String> switchNames = new ArrayList<String>();
-				for (Switchable currentSwitch : roomConfig.switchables) {
-					switchNames.add(currentSwitch.getId().id);
-				}
+				// TODO broken for now. please create an nfc switch manager
+				// for (Switchable currentSwitch : roomConfig.) {
+				// switchNames.add(currentSwitch.getId().id);
+				// }
 
 				ArrayAdapter<String> switchesAdapter = new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_dropdown_item_1line, switchNames);

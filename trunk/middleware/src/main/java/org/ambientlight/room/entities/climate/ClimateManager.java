@@ -55,6 +55,7 @@ import org.ambientlight.room.entities.climate.handlers.RemoveThermostatHandler;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.features.EntityId;
+import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
 
@@ -63,8 +64,6 @@ import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
  * 
  */
 public class ClimateManager extends Manager implements MessageListener, TemperatureSensor {
-
-
 
 	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 90;
 
@@ -107,6 +106,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		// register sensors
 		featureFacade.registerSensor(this);
+		featureFacade.registerClimateManager(this);
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
@@ -278,6 +278,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		persistence.beginTransaction();
 
+		if (message.getMode() == MaxThermostateMode.BOOST) {
+			config.modeBeforeBoost = config.mode;
+		}
+
 		config.mode = message.getMode();
 		config.temperature = message.getTemp();
 		config.temporaryUntilDate = message.getTemporaryUntil();
@@ -393,6 +397,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		thermostat.setTemperature(message.getActualTemp());
 
+		if (message.getMode() == MaxThermostateMode.BOOST) {
+			config.modeBeforeBoost = config.mode;
+		}
+
 		config.mode = message.getMode();
 		config.temporaryUntilDate = message.getTemporaryUntil();
 		config.temperature = message.getSetTemp();
@@ -456,55 +464,6 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		callBackMananger.roomConfigurationChanged();
 
-	}
-
-
-	public void setMode(float temp, MaxThermostateMode mode, Date until) {
-		persistence.beginTransaction();
-
-		if (until != null && config.mode != MaxThermostateMode.TEMPORARY)
-			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
-
-		config.mode = mode;
-		config.temperature = temp;
-		config.temporaryUntilDate = until;
-
-		List<Message> messages = new ArrayList<Message>();
-
-		for (MaxComponent current : config.devices.values()) {
-			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.adress);
-				messages.add(outMessage);
-			}
-		}
-
-		queueManager.putOutMessages(messages);
-
-		if (config.mode == MaxThermostateMode.AUTO) {
-			Calendar now = GregorianCalendar.getInstance();
-			MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
-			List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
-			int nowInMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60;
-			nowInMinutesOfDay += now.get(Calendar.MINUTE);
-			int latestPossibleMins = 24 * 60;
-
-			if (nowInMinutesOfDay == latestPossibleMins) {
-				nowInMinutesOfDay = 0;
-			}
-
-			DayEntry nextDayEntry = null;
-			for (DayEntry current : entries) {
-				int currentMinutes = current.getHour() * 60 + current.getMin();
-				if (currentMinutes > nowInMinutesOfDay && currentMinutes <= latestPossibleMins) {
-					latestPossibleMins = currentMinutes;
-					nextDayEntry = current;
-				}
-			}
-			config.temperature = nextDayEntry.getTemp();
-		}
-
-		persistence.commitTransaction();
-		callBackMananger.roomConfigurationChanged();
 	}
 
 
@@ -605,7 +564,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 */
 	@Override
 	public EntityId getSensorId() {
-		return new EntityId(EntityId.DOMAIN_TEMP_MAX_ROOM, EntityId.ID_CLIMATE_MANAGER);
+		return new EntityId(EntityId.DOMAIN_TEMP_MAX, EntityId.ID_CLIMATE_MANAGER);
 	}
 
 
@@ -618,4 +577,64 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	public Object getSensorValue() {
 		return this.config.temperature;
 	}
+
+
+	public TemperaturMode getMode() {
+		return new TemperaturMode(config.temperature, config.temporaryUntilDate, config.mode);
+	}
+
+
+	public void setMode(float temp, MaxThermostateMode mode, Date until) {
+		persistence.beginTransaction();
+
+		if (until != null && config.mode == MaxThermostateMode.TEMPORARY)
+			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
+
+		// save state for restore
+		if (mode == MaxThermostateMode.BOOST) {
+			config.modeBeforeBoost = config.mode;
+		}
+
+		config.mode = mode;
+		config.temperature = temp;
+		config.temporaryUntilDate = until;
+
+		List<Message> messages = new ArrayList<Message>();
+
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.adress);
+				messages.add(outMessage);
+			}
+		}
+
+		queueManager.putOutMessages(messages);
+
+		if (config.mode == MaxThermostateMode.AUTO) {
+			Calendar now = GregorianCalendar.getInstance();
+			MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
+			List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
+			int nowInMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60;
+			nowInMinutesOfDay += now.get(Calendar.MINUTE);
+			int latestPossibleMins = 24 * 60;
+
+			if (nowInMinutesOfDay == latestPossibleMins) {
+				nowInMinutesOfDay = 0;
+			}
+
+			DayEntry nextDayEntry = null;
+			for (DayEntry current : entries) {
+				int currentMinutes = current.getHour() * 60 + current.getMin();
+				if (currentMinutes > nowInMinutesOfDay && currentMinutes <= latestPossibleMins) {
+					latestPossibleMins = currentMinutes;
+					nextDayEntry = current;
+				}
+			}
+			config.temperature = nextDayEntry.getTemp();
+		}
+
+		persistence.commitTransaction();
+		callBackMananger.roomConfigurationChanged();
+	}
+
 }

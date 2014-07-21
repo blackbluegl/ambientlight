@@ -17,7 +17,6 @@ package org.ambientlight.webservice;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -26,27 +25,14 @@ import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControl;
 import org.ambientlight.room.entities.climate.ClimateManager;
-import org.ambientlight.ws.climate.TemperaturMode;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-@Path("/climate")
+@Path("/config/climate")
 public class Climate {
-
-	@POST
-	@Path("/{roomName}/mode")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response setMode(@PathParam("roomName") String roomName, TemperaturMode mode) {
-		ClimateManager manager = (AmbientControl.getRoom(roomName).climateManager);
-
-		manager.setMode(mode.temp, mode.mode, mode.until);
-
-		return Response.status(200).build();
-	}
 
 
 	@GET

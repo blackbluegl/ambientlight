@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
 @XStreamAlias("lightObject")
+
 public class LightObject implements Switchable, Renderable, SwitchSensor {
 
 	private static final long serialVersionUID = 1L;
