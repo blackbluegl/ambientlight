@@ -2,7 +2,7 @@
 <resources>
 
     <dimen name="defaultmargin">20dp</dimen>
-    <dimen name="roomItemTextSize">10dp</dimen>
+    <dimen name="roomItemTextSize">16dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 

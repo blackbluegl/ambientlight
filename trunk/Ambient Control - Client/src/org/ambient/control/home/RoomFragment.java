@@ -80,7 +80,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		handleExitEditConductResult(savedInstanceState);
 
 		// create the home container
-		View myRoomView = inflater.inflate(R.layout.fragment_room, null);
+		myRoomView = inflater.inflate(R.layout.fragment_home_room, null);
 
 		return myRoomView;
 	}
@@ -185,6 +185,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		for (Entity currentSwitch : RoomUtil.getEntities(roomConfig)) {
 			if (currentSwitch.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN)) {
 				createSwitch((Switchable) currentSwitch);
+				break;
 			}
 		}
 
@@ -241,14 +242,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		RelativeLayout roomBackground = (RelativeLayout) myRoomView.findViewById(R.id.roomBackground);
 		Room roomConfig = roomService.getRoomConfiguration(roomName);
 
-		// get powerstate of main switch
-		for (Entity currentSwitch : RoomUtil.getEntities(roomConfig)) {
-			if (currentSwitch instanceof Switchable && ((Switchable) currentSwitch).getPowerState() == true) {
-				roomBackground.setBackgroundResource(R.drawable.bg_room_active);
-				return;
-			}
+		if (RoomUtil.anySwitchTurnedOn(roomConfig)) {
+			roomBackground.setBackgroundResource(R.drawable.bg_room_active);
+		} else {
+			roomBackground.setBackgroundResource(R.drawable.bg_room_disabled);
 		}
-		roomBackground.setBackgroundResource(R.drawable.bg_room_disabled);
 	}
 
 
@@ -295,7 +293,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		GridView roomContent = (GridView) myRoomView.findViewById(R.id.roomContent);
 		roomContent.setVisibility(GridView.INVISIBLE);
 
-		LinearLayout bottomBar = (LinearLayout) roomContent.findViewById(R.id.roomBottomBar);
+		LinearLayout bottomBar = (LinearLayout) myRoomView.findViewById(R.id.roomBottomBar);
 		bottomBar.setVisibility(View.GONE);
 	}
 
@@ -307,7 +305,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		GridView roomContent = (GridView) myRoomView.findViewById(R.id.roomContent);
 		roomContent.setVisibility(TableLayout.VISIBLE);
 
-		LinearLayout bottomBar = (LinearLayout) roomContent.findViewById(R.id.roomBottomBar);
+		LinearLayout bottomBar = (LinearLayout) myRoomView.findViewById(R.id.roomBottomBar);
 		bottomBar.setVisibility(View.VISIBLE);
 	}
 

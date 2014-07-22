@@ -15,6 +15,7 @@
 
 package org.ambient.control;
 
+import org.ambient.control.home.HomeActivity;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.ws.Room;
 
@@ -50,7 +51,7 @@ public abstract class RoomServiceAwareFragment extends Fragment implements IRoom
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		((MainActivity) getActivity()).addServiceListener(this);
+		((HomeActivity) getActivity()).addServiceListener(this);
 		listenToServiceChange = false;
 
 	}
@@ -84,7 +85,7 @@ public abstract class RoomServiceAwareFragment extends Fragment implements IRoom
 	@Override
 	public void onStop() {
 		super.onStop();
-		((MainActivity) getActivity()).removeServiceListener(this);
+		((HomeActivity) getActivity()).removeServiceListener(this);
 	}
 
 }

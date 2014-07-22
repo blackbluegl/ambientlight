@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 
 /**
@@ -49,11 +50,11 @@ public abstract class LightObjectStrategy implements Strategy {
 	public View onCreateView(Fragment context, Entity entity) {
 
 		LayoutInflater inflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		ImageView itemContent = (ImageView) inflater.inflate(R.layout.layout_room_item_lightobject_content, null);
-
+		RelativeLayout container = (RelativeLayout) inflater.inflate(R.layout.layout_room_item_lightobject_content, null);
+		ImageView itemContent = (ImageView) container.findViewById(R.id.imageViewItemIcon);
 		updateIcon(((Switchable) entity).getPowerState(), itemContent);
 
-		return itemContent;
+		return container;
 	}
 
 
@@ -92,7 +93,7 @@ public abstract class LightObjectStrategy implements Strategy {
 	@Override
 	public void onLongClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity) {
 
-		final RenderingProgramConfiguration itemConfig = ((Renderable)entity).getRenderingProgrammConfiguration();
+		final RenderingProgramConfiguration itemConfig = ((Renderable) entity).getRenderingProgrammConfiguration();
 
 		// get a deep cloned copy and safe it into the fragment to restore it if nescessary
 		roomFragment.actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) GuiUtils
@@ -119,7 +120,7 @@ public abstract class LightObjectStrategy implements Strategy {
 					fragEdit.setArguments(arguments);
 
 					FragmentTransaction ft2 = roomFragment.getFragmentManager().beginTransaction();
-					ft2.replace(R.id.LayoutMain, fragEdit);
+					ft2.replace(R.id.homeMainLinearLayout, fragEdit);
 					ft2.addToBackStack(null);
 					ft2.commit();
 					break;

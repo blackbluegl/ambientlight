@@ -38,7 +38,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -99,7 +98,6 @@ public class ItemAdapter extends BaseAdapter {
 	 */
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return items.size();
 	}
 
@@ -140,8 +138,6 @@ public class ItemAdapter extends BaseAdapter {
 		LayoutInflater inflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		LinearLayout itemView = (LinearLayout) inflater.inflate(R.layout.layout_room_item, null);
-
-		itemView.setLayoutParams(new GridView.LayoutParams(85, 85));
 
 		context.registerForContextMenu(itemView);
 
