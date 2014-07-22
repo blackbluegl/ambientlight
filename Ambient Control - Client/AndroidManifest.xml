@@ -28,7 +28,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.ambient.control.MainActivity"
+            android:name="org.ambient.control.home.HomeActivity"
             android:label="@string/title_activity_main"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>

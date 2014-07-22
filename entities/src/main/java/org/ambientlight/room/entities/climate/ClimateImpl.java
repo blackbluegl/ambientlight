@@ -15,6 +15,7 @@
 
 package org.ambientlight.room.entities.climate;
 
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.climate.Climate;
 import org.ambientlight.room.entities.features.climate.TemperaturMode;
@@ -30,15 +31,18 @@ public class ClimateImpl implements Climate {
 
 	TemperaturMode mode;
 
+	MaxThermostateMode thermostateModeBeforeBoost;
+
 
 	public ClimateImpl() {
 		super();
 	}
 
 
-	public ClimateImpl(TemperaturMode mode) {
+	public ClimateImpl(TemperaturMode mode, MaxThermostateMode modeBeforeBoost) {
 		super();
 		this.mode = mode;
+		this.thermostateModeBeforeBoost = modeBeforeBoost;
 		this.setId(new EntityId(EntityId.DOMAIN_TEMP_MAX, EntityId.ID_CLIMATE_MANAGER));
 	}
 
@@ -85,6 +89,18 @@ public class ClimateImpl implements Climate {
 	public void setClimate(TemperaturMode climate) {
 		mode = climate;
 
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.room.entities.features.climate.Climate#getThermostateModeBeforeBoost()
+	 */
+	@Override
+	public MaxThermostateMode getThermostateModeBeforeBoost() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

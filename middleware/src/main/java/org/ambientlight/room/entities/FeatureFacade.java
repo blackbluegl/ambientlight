@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
-import org.ambientlight.room.entities.climate.ClimateImpl;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
@@ -117,11 +116,11 @@ public class FeatureFacade {
 
 
 	public Climate getClimate(){
-		return new ClimateImpl(climateManager.getMode());
+		return climateManager.getClimate();
 	}
 
 
 	public void setClimate(TemperaturMode mode) {
-		climateManager.setMode(mode.temp, mode.mode, mode.until);
+		climateManager.setClimate(mode.temp, mode.mode, mode.until);
 	}
 }

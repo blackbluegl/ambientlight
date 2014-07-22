@@ -13,7 +13,7 @@ public class GetRoomTask extends AsyncTask<String, Void, Room> {
 
 	private static final String LOG = "GetRoomTask";
 
-	private final String URL = "/rooms/{room}/config";
+	private final String URL = "/rooms/config/{room}";
 
 
 	@Override

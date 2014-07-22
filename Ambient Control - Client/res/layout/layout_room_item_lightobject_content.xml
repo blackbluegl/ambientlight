@@ -1,11 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="85dp"
-    android:layout_height="85dp"
-    android:layout_marginTop="5dp" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <org.ambient.views.ImageViewWithContextMenuInfo
-        android:id="@+id/imageViewHeatingIcon"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
+        android:id="@+id/imageViewItemIcon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_heating_active" />
+
 </RelativeLayout>

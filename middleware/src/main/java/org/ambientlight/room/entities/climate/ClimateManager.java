@@ -55,6 +55,7 @@ import org.ambientlight.room.entities.climate.handlers.RemoveThermostatHandler;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.features.EntityId;
+import org.ambientlight.room.entities.features.climate.Climate;
 import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
@@ -141,7 +142,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 			this.sendTimeInfoToThermostates();
 
-			this.setMode(config.temperature, config.mode, config.temporaryUntilDate);
+			this.setClimate(config.temperature, config.mode, config.temporaryUntilDate);
 		}
 	}
 
@@ -579,12 +580,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	}
 
 
-	public TemperaturMode getMode() {
-		return new TemperaturMode(config.temperature, config.temporaryUntilDate, config.mode);
+	public Climate getClimate() {
+		TemperaturMode mode = new TemperaturMode(config.temperature, config.temporaryUntilDate, config.mode);
+		return new ClimateImpl(mode, config.modeBeforeBoost);
 	}
 
 
-	public void setMode(float temp, MaxThermostateMode mode, Date until) {
+	public void setClimate(float temp, MaxThermostateMode mode, Date until) {
 		persistence.beginTransaction();
 
 		if (until != null && config.mode == MaxThermostateMode.TEMPORARY)

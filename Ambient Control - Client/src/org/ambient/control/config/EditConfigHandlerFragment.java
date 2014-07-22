@@ -456,7 +456,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 		FragmentTransaction ft = sourceFragment.getFragmentManager().beginTransaction();
 		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-		ft.replace(R.id.LayoutMain, configHandler);
+		ft.replace(R.id.homeMainLinearLayout, configHandler);
 		ft.addToBackStack(null);
 		ft.commit();
 	}
@@ -495,7 +495,7 @@ public class EditConfigHandlerFragment extends Fragment implements EditConfigOnE
 
 				FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
 				ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-				ft.replace(R.id.LayoutMain, configHandler);
+				ft.replace(R.id.homeMainLinearLayout, configHandler);
 				ft.addToBackStack(null);
 				ft.commit();
 			}

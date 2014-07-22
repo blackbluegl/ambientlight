@@ -58,7 +58,6 @@ public class ClimateStrategy implements Strategy {
 		return itemContent;
 	}
 
-
 	private void updateIcon(RelativeLayout itemContent, TemperaturMode mode) {
 		ImageView icon = (ImageView) itemContent.findViewById(R.id.imageViewHeatingIcon);
 
@@ -97,15 +96,17 @@ public class ClimateStrategy implements Strategy {
 	@Override
 	public void onClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity) {
 
-		MaxThermostateMode maxThermostatemode = null;
-		if (room.climateManager.mode == MaxThermostateMode.BOOST) {
-			maxThermostatemode = room.climateManager.modeBeforeBoost;
+		Climate climate = ((Climate) entity);
+
+		MaxThermostateMode newMode = null;
+
+		if (climate.getClimate().mode == MaxThermostateMode.BOOST) {
+			newMode = climate.getThermostateModeBeforeBoost();
 		} else {
-			maxThermostatemode = MaxThermostateMode.BOOST;
+			newMode = MaxThermostateMode.BOOST;
 		}
 
-		TemperaturMode mode = new TemperaturMode(room.climateManager.temperature, room.climateManager.temporaryUntilDate,
-				maxThermostatemode);
+		TemperaturMode mode = new TemperaturMode(climate.getClimate().temp, climate.getClimate().until, newMode);
 
 		// update icon first and quick
 		updateIcon((RelativeLayout) view, mode);
@@ -116,11 +117,6 @@ public class ClimateStrategy implements Strategy {
 		}
 
 	}
-
-
-
-
-
 
 
 	/*
