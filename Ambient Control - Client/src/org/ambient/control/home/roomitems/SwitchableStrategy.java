@@ -11,6 +11,13 @@ import android.view.View;
 import android.widget.ImageView;
 
 
+/**
+ * 
+ * for all switches. turn switches off and on by clicking. LongClick is not used.
+ * 
+ * @author Florian Bornkessel
+ * 
+ */
 public class SwitchableStrategy extends LightObjectStrategy {
 
 	@Override

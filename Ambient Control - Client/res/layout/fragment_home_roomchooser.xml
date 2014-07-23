@@ -3,7 +3,7 @@
     android:id="@+id/roomChooserLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:background="@color/roomChooserUnChoosen"
-    android:gravity="center"
+    android:background="@drawable/home_roomchooser_background"
+    android:gravity="left"
     android:orientation="horizontal" >
 </LinearLayout>

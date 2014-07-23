@@ -45,6 +45,8 @@ import android.widget.TableLayout;
 
 
 /**
+ * fragment to display the clickable entities, a main switch and a scenery spinner.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -70,7 +72,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.roomName = getArguments().getString(BUNDLE_ROOM_NAME);
+		if (savedInstanceState != null) {
+			this.roomName = getArguments().getString(BUNDLE_ROOM_NAME);
+		}
 	}
 
 
@@ -87,12 +91,18 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 
 	/*
-	 * fill values into the rooms after they have been created and tRoomhe service is available.
+	 * fill values into the rooms after they have been created and the room service is available.
 	 * 
 	 * @see org.ambient.control.RoomServiceAwareFragment# initViewValuesAfterServiceConnection()
 	 */
 	@Override
 	protected void onResumeWithServiceConnected() {
+		System.out.println("onResume called!");
+		// get roomname from activity if it is not set in the fragment
+		if (roomName == null) {
+			roomName = ((HomeActivity) getActivity()).getSelecterRoom();
+		}
+
 		updateRoomContent();
 	}
 
@@ -101,13 +111,13 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	public void onSaveInstanceState(Bundle bundle) {
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id, this.actorConductConfigurationAfterEditItemId);
+		bundle.putString(BUNDLE_ROOM_NAME, roomName);
 		super.onSaveInstanceState(bundle);
 	}
 
 
 	/*
 	 * get shure that the oldConfig will be overwritten. onCreateView will now save the new configuration
-	 * 
 	 * 
 	 * @see org.ambient.control.config.EditConfigExitListener#onIntegrateConfiguration (java.lang.String, java.lang.Object)
 	 */
@@ -139,8 +149,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	public void onRoomConfigurationChange(String serverName, Room config) {
 
 		// prevent updating the ui if the fragment is not visible
-		if (isVisible() == false)
+		if (isVisible() == false || serverName.equals(roomName) == false)
 			return;
+
 		if (config != null) {
 			updateRoomContent();
 			enableEventListener();
@@ -173,7 +184,10 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	private void updateRoomContent() {
+	/**
+	 * updates the content by creating dynamically all entity items that a user may click on.
+	 */
+	public void updateRoomContent() {
 
 		Room roomConfig = roomService.getRoomConfiguration(roomName);
 		if (roomConfig == null) {
@@ -251,6 +265,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 
 	/**
+	 * get room items by the available strategies for each entity.
+	 * 
 	 * @param currentServer
 	 * @param roomConfig
 	 * @param roomContent

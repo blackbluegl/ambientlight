@@ -35,6 +35,8 @@ import android.widget.TextView;
 
 
 /**
+ * displays climate icon. onClick will lead into a Boost. onLongClicking will show a dialog with an temperature widget.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -57,6 +59,7 @@ public class ClimateStrategy implements Strategy {
 		updateIcon(itemContent, climate.getClimate());
 		return itemContent;
 	}
+
 
 	private void updateIcon(RelativeLayout itemContent, TemperaturMode mode) {
 		ImageView icon = (ImageView) itemContent.findViewById(R.id.imageViewHeatingIcon);

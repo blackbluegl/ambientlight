@@ -1,10 +1,7 @@
 package org.ambient.control.home;
 
-import java.util.ArrayList;
-
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareActivity;
-import org.ambient.rest.RestClient;
 
 import android.app.ActionBar;
 import android.os.Bundle;
@@ -24,7 +21,7 @@ public class HomeActivity extends RoomServiceAwareActivity {
 	RoomChooserFragment roomChooserFragment;
 
 	public static final String BUNDLE_SELECTED_ROOM = "selectedRoom";
-	String selectedRoom;
+	private String selectedRoom;
 
 	LinearLayout content;
 
@@ -35,8 +32,6 @@ public class HomeActivity extends RoomServiceAwareActivity {
 
 		if (savedInstanceState != null) {
 			selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM);
-		} else {
-			selectedRoom = getAllRoomNames().get(0);
 		}
 
 		setContentView(R.layout.activity_main);
@@ -51,19 +46,12 @@ public class HomeActivity extends RoomServiceAwareActivity {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 		roomChooserFragment = new RoomChooserFragment();
-		Bundle argsRoomChooser = new Bundle();
-		argsRoomChooser.putString(RoomChooserFragment.BUNDLE_SELECTED_ROOM_NAME, selectedRoom);
-		roomChooserFragment.setArguments(argsRoomChooser);
-		ft.add(roomChooserFragment, null);
+		ft.add(content.getId(), roomChooserFragment);
 
 		roomFragment = new RoomFragment();
-		Bundle argsRoom = new Bundle();
-		argsRoom.putString(RoomFragment.BUNDLE_ROOM_NAME, selectedRoom);
-		roomFragment.setArguments(argsRoom);
 		ft.add(content.getId(), roomFragment);
 
 		ft.commit();
-
 	}
 
 
@@ -105,22 +93,38 @@ public class HomeActivity extends RoomServiceAwareActivity {
 	}
 
 
-	public ArrayList<String> getAllRoomNames() {
-		try {
-			if (roomService != null)
-				return new ArrayList<String>(roomService.getAllRoomNames());
-			return new ArrayList<String>(RestClient.getRoomNames());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public String getSelecterRoom() {
+		return selectedRoom;
 	}
 
 
 	/**
 	 * @param current
 	 */
-	public void setRoomActive(String current) {
+	public void setCurrentRoomByUser(String current) {
 		this.selectedRoom = current;
+		roomFragment.roomName = current;
+		roomFragment.updateRoomContent();
 	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambient.control.RoomServiceAwareActivity#onRoomServiceConnected()
+	 */
+	@Override
+	protected void onRoomServiceConnected() {
+		// at first start we have no room set. we use the first room that we find
+		if (selectedRoom == null) {
+			selectedRoom = roomService.getAllRoomNames().iterator().next();
+		}
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putString(BUNDLE_SELECTED_ROOM, selectedRoom);
+	}
+
 }

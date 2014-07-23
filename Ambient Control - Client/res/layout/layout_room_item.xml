@@ -19,7 +19,7 @@
         android:gravity="top|center"
         android:scrollHorizontally="false"
         android:text="Unkown"
-        android:textColor="@color/roomChooserChoosen"
+        android:textColor="@color/textColorWhite"
         android:textSize="@dimen/roomItemTextSize" />
 
 </LinearLayout>
