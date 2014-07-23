@@ -41,6 +41,9 @@ import android.widget.RelativeLayout;
 
 
 /**
+ * item strategy to handle lightobjects. clicks will turn off/on the light objects. LongClicks will change the
+ * renderingConfiguration.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -80,7 +83,7 @@ public abstract class LightObjectStrategy implements Strategy {
 		try {
 			// update the icon directly and do not wait for response cycle - we prevent that the user experiences a gap (request
 			// to server, response to callback)
-			updateIcon(!((Switchable) entity).getPowerState(), (ImageView) view);
+			updateIcon(!((Switchable) entity).getPowerState(), (ImageView) view.findViewById(R.id.imageViewItemIcon));
 
 			RestClient.setSwitchablePowerState(roomFragment.roomName, entity.getId(), !((Switchable) entity).getPowerState());
 		} catch (Exception e) {

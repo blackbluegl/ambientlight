@@ -26,11 +26,13 @@ import org.ambientlight.config.room.entities.lightobject.renderingprogram.Simple
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.room.entities.features.Entity;
+import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.climate.Climate;
 import org.ambientlight.room.entities.features.lightobject.Renderable;
 import org.ambientlight.ws.Room;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,17 +45,19 @@ import android.widget.TextView;
 
 
 /**
+ * Adapter to hold all clickable items in the room fragment. Each item can be clicked and long clicked. The behavior and the view
+ * representation are hold in strategy classes in the same package.
+ * 
  * @author Florian Bornkessel
  * 
  */
+@SuppressLint("UseSparseArrays")
 public class ItemAdapter extends BaseAdapter {
 
 	Map<Integer, Entity> itemPositions = new HashMap<Integer, Entity>();
 	Map<Entity, Strategy> items = new HashMap<Entity, Strategy>();
 
 	Room room;
-
-	public boolean eventListenerDisabled;
 
 	private final RoomFragment context;
 
@@ -82,7 +86,9 @@ public class ItemAdapter extends BaseAdapter {
 					items.put(entity, new SunsetLightObjectStrategy());
 				}
 			} else if (entity instanceof Switchable) {
-				items.put(entity, new SwitchableStrategy());
+				if (entity.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN) == false) {
+					items.put(entity, new SwitchableStrategy());
+				}
 
 			} else if (entity instanceof Climate) {
 				items.put(entity, new ClimateStrategy());
@@ -125,7 +131,8 @@ public class ItemAdapter extends BaseAdapter {
 
 
 	/*
-	 * (non-Javadoc)
+	 * create views from layout_room_item.xml. Each strategy holds the concrete view to render and will be put into the
+	 * "linearLayoutItemContent" view. The id part of the entity will be set as name below the displayed content.
 	 * 
 	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
 	 */
@@ -151,7 +158,7 @@ public class ItemAdapter extends BaseAdapter {
 
 			@Override
 			public void onClick(View v) {
-				strategy.onClick(itemContent, room, context, entity);
+				strategy.onClick(itemContent.getChildAt(0), room, context, entity);
 			}
 		});
 
@@ -159,7 +166,7 @@ public class ItemAdapter extends BaseAdapter {
 
 			@Override
 			public boolean onLongClick(View v) {
-				strategy.onLongClick(itemContent, room, context, entity);
+				strategy.onLongClick(itemContent.getChildAt(0), room, context, entity);
 				return true;
 			}
 		});

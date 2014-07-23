@@ -32,6 +32,8 @@ import android.widget.TextView;
 
 
 /**
+ * display tab with rooms and higlight selected room.
+ * 
  * @author Florian Bornkessel
  * 
  */
@@ -46,7 +48,9 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.selectedRoom = getArguments().getString(BUNDLE_SELECTED_ROOM_NAME);
+		if (savedInstanceState != null) {
+			this.selectedRoom = getArguments().getString(BUNDLE_SELECTED_ROOM_NAME);
+		}
 	}
 
 
@@ -60,12 +64,18 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 
 
 	/*
-	 * (non-Javadoc)
+	 * this is the entry point to get the selected room name the first time the application starts because the data layer comes up
+	 * after onCreateView() is called.
 	 * 
 	 * @see org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected()
 	 */
 	@Override
 	protected void onResumeWithServiceConnected() {
+		// get roomname from activity if it is not set in the fragment
+		if (selectedRoom == null) {
+			selectedRoom = ((HomeActivity) getActivity()).getSelecterRoom();
+		}
+
 		updateRoomContent();
 	}
 
@@ -84,14 +94,17 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 
 
 	/**
-	 * 
+	 * updates the content by creating dynamically all room items that a user may click on.
 	 */
 	private void updateRoomContent() {
 		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+		// clear all and build new on update
 		myContent.removeAllViews();
+
 		for (final String current : roomService.getAllRoomNames()) {
-			final LinearLayout item = (LinearLayout) inflater.inflate(R.layout.layout_home_roomchooser_item, myContent);
+			final LinearLayout item = (LinearLayout) inflater.inflate(R.layout.layout_home_roomchooser_item, null);
+			myContent.addView(item);
 			item.setTag("item_" + current);
 
 			TextView name = (TextView) item.findViewById(R.id.roomChooserItemTextView);
@@ -105,18 +118,12 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 				icon.setImageResource(R.drawable.ic_window_off);
 			}
 
-			if (current.equals(selectedRoom)) {
-				item.setBackgroundResource(R.color.roomChooserChoosen);
-			} else {
-				item.setBackgroundResource(R.color.roomChooserUnChoosen);
-			}
-
 			// create EventListener
 			icon.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-					((HomeActivity) getActivity()).setRoomActive(current);
+					((HomeActivity) getActivity()).setCurrentRoomByUser(current);
 					setCurrentRoom(current);
 				}
 			});
@@ -127,12 +134,22 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 
 
 	private void setCurrentRoom(String roomName) {
+
 		for (int i = 0; i < myContent.getChildCount(); i++) {
 			LinearLayout current = (LinearLayout) myContent.getChildAt(i);
-			current.setBackgroundResource(R.color.roomChooserUnChoosen);
+			if (("item_" + roomName).equals(current.getTag())) {
+				current.setBackgroundResource(R.color.roomChooserChoosen);
+			} else {
+				current.setBackgroundResource(R.color.roomChooserUnChoosen);
+			}
 		}
+	}
 
-		myContent.findViewWithTag("item_" + roomName).setBackgroundResource(R.color.roomChooserChoosen);
+
+	@Override
+	public void onSaveInstanceState(Bundle bundle) {
+		bundle.putString(BUNDLE_SELECTED_ROOM_NAME, selectedRoom);
+		super.onSaveInstanceState(bundle);
 	}
 
 }

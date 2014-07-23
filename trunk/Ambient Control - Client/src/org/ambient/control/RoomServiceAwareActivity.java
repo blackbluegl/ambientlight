@@ -37,7 +37,7 @@ import android.util.Log;
  * @author Florian Bornkessel
  * 
  */
-public class RoomServiceAwareActivity extends FragmentActivity {
+public abstract class RoomServiceAwareActivity extends FragmentActivity {
 
 	public static final String LOG = "RoomServiceAwareActivity";
 
@@ -50,6 +50,7 @@ public class RoomServiceAwareActivity extends FragmentActivity {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			roomService = ((RoomConfigService.MyBinder) binder).getService();
+			onRoomServiceConnected();
 			for (IRoomServiceCallbackListener listener : roomServiceListeners) {
 				listener.onRoomServiceConnected(roomService);
 			}
@@ -109,6 +110,11 @@ public class RoomServiceAwareActivity extends FragmentActivity {
 		super.onDestroy();
 		unbindService(roomServiceConnection);
 		unregisterReceiver(roomServiceUpdateReceiver);
+	}
+
+
+	protected void onRoomServiceConnected() {
+
 	}
 
 }

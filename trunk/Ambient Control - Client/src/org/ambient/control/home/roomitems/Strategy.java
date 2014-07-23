@@ -29,11 +29,34 @@ import android.view.View;
  */
 public interface Strategy {
 
+	/**
+	 * will be called from ItemAdapter to get the visible and clickable content.
+	 * 
+	 * @param context
+	 * @param entity
+	 * @return
+	 */
 	public View onCreateView(Fragment context, Entity entity);
 
 
+	/**
+	 * handle onClick events for the given entity.
+	 * 
+	 * @param view
+	 * @param room
+	 * @param roomFragment
+	 * @param entity
+	 */
 	public void onClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity);
 
 
+	/**
+	 * handle onLongClick events for the given entity.
+	 * 
+	 * @param view
+	 * @param room
+	 * @param roomFragment
+	 * @param entity
+	 */
 	public void onLongClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity);
 }
