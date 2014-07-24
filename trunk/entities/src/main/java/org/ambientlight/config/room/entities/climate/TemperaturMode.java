@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.features.climate;
+package org.ambientlight.config.room.entities.climate;
 
 import java.util.Date;
 
@@ -30,10 +30,10 @@ public class TemperaturMode {
 		super();
 		this.temp = temp;
 		this.until = until;
-		this.mode = mode;
+		this.thermostateMode = mode;
 	}
 
 	public float temp;
 	public Date until;
-	public MaxThermostateMode mode;
+	public MaxThermostateMode thermostateMode;
 }

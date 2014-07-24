@@ -53,12 +53,6 @@ public abstract class Alarm implements Switchable {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
-	 */
-	@Override
 	public void setId(EntityId id) {
 		this.id = id.id;
 	}

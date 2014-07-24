@@ -15,10 +15,10 @@
 
 package org.ambientlight.room.entities.climate;
 
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.climate.Climate;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 
 
 /**
@@ -31,8 +31,6 @@ public class ClimateImpl implements Climate {
 
 	TemperaturMode mode;
 
-	MaxThermostateMode thermostateModeBeforeBoost;
-
 
 	public ClimateImpl() {
 		super();
@@ -42,8 +40,6 @@ public class ClimateImpl implements Climate {
 	public ClimateImpl(TemperaturMode mode, MaxThermostateMode modeBeforeBoost) {
 		super();
 		this.mode = mode;
-		this.thermostateModeBeforeBoost = modeBeforeBoost;
-		this.setId(new EntityId(EntityId.DOMAIN_TEMP_MAX, EntityId.ID_CLIMATE_MANAGER));
 	}
 
 
@@ -54,17 +50,7 @@ public class ClimateImpl implements Climate {
 	 */
 	@Override
 	public EntityId getId() {
-		return new EntityId(EntityId.DOMAIN_TEMP_MAX, EntityId.ID_CLIMATE_MANAGER);
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.Entity#setId(org.ambientlight.room.entities.features.EntityId)
-	 */
-	@Override
-	public void setId(EntityId name) {
+		return new EntityId(EntityId.DOMAIN_TEMP_MAX_CLIMATE_MANAGER, EntityId.ID_CLIMATE_MANAGER);
 	}
 
 
@@ -74,33 +60,7 @@ public class ClimateImpl implements Climate {
 	 * @see org.ambientlight.room.entities.features.climate.Climate#getClimate()
 	 */
 	@Override
-	public TemperaturMode getClimate() {
+	public TemperaturMode getTemperatureMode() {
 		return mode;
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.climate.Climate#setClimate(org.ambientlight.room.entities.features.climate.
-	 * TemperaturMode)
-	 */
-	@Override
-	public void setClimate(TemperaturMode climate) {
-		mode = climate;
-
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.room.entities.features.climate.Climate#getThermostateModeBeforeBoost()
-	 */
-	@Override
-	public MaxThermostateMode getThermostateModeBeforeBoost() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

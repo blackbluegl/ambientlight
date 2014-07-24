@@ -24,10 +24,5 @@ import java.io.Serializable;
  */
 public interface Entity extends Serializable {
 
-
 	public EntityId getId();
-
-
-	public void setId(EntityId name);
-
 }

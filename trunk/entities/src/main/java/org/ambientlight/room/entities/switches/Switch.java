@@ -67,12 +67,6 @@ public class Switch implements Switchable, SwitchSensor {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.room.SwitchableActor#setName(java.lang.String)
-	 */
-	@Override
 	public void setId(EntityId id) {
 		this.id = id;
 	}

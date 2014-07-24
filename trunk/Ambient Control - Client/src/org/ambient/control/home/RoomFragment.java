@@ -73,7 +73,7 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
-			this.roomName = getArguments().getString(BUNDLE_ROOM_NAME);
+			this.roomName = savedInstanceState.getString(BUNDLE_ROOM_NAME);
 		}
 	}
 
@@ -109,10 +109,10 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
+		super.onSaveInstanceState(bundle);
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
 		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id, this.actorConductConfigurationAfterEditItemId);
 		bundle.putString(BUNDLE_ROOM_NAME, roomName);
-		super.onSaveInstanceState(bundle);
 	}
 
 

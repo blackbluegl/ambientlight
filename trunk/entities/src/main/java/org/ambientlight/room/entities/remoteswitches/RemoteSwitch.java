@@ -33,12 +33,6 @@ public class RemoteSwitch implements Switchable, SwitchSensor {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambientlight.config.features.Entity#setName(java.lang.String)
-	 */
-	@Override
 	public void setId(EntityId name) {
 		this.id = name;
 	}

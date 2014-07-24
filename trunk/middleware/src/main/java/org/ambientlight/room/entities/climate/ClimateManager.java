@@ -31,6 +31,7 @@ import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.DayEntry;
 import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.messages.Message;
 import org.ambientlight.messages.MessageListener;
 import org.ambientlight.messages.QeueManager;
@@ -56,7 +57,6 @@ import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.climate.Climate;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
 
@@ -114,6 +114,14 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				featureFacade.registerSensor((TemperatureSensor) current);
 			}
 		}
+
+		// reset boost mode if boost was finished before climate manager started up
+		if (config.mode == MaxThermostateMode.BOOST) {
+			if (config.boostUntil.before(new Date(System.currentTimeMillis()))) {
+				config.mode = config.modeBeforeBoost;
+			}
+		}
+
 	}
 
 
@@ -142,7 +150,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 			this.sendTimeInfoToThermostates();
 
-			this.setClimate(config.temperature, config.mode, config.temporaryUntilDate);
+			this.setClimate(config.temperature, config.mode, config.temporaryUntil);
 		}
 	}
 
@@ -285,7 +293,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		config.mode = message.getMode();
 		config.temperature = message.getTemp();
-		config.temporaryUntilDate = message.getTemporaryUntil();
+		config.temporaryUntil = message.getTemporaryUntil();
 
 		persistence.commitTransaction();
 		callBackMananger.roomConfigurationChanged();
@@ -398,13 +406,12 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		thermostat.setTemperature(message.getActualTemp());
 
+		config.mode = message.getMode();
+		config.temporaryUntil = message.getTemporaryUntil();
+		config.temperature = message.getSetTemp();
 		if (message.getMode() == MaxThermostateMode.BOOST) {
 			config.modeBeforeBoost = config.mode;
 		}
-
-		config.mode = message.getMode();
-		config.temporaryUntilDate = message.getTemporaryUntil();
-		config.temperature = message.getSetTemp();
 
 		persistence.commitTransaction();
 
@@ -581,8 +588,17 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	public Climate getClimate() {
-		TemperaturMode mode = new TemperaturMode(config.temperature, config.temporaryUntilDate, config.mode);
+		TemperaturMode mode = new TemperaturMode(config.temperature, config.temporaryUntil, config.mode);
 		return new ClimateImpl(mode, config.modeBeforeBoost);
+	}
+
+
+	public void setBoostMode(boolean boost) {
+		if (boost) {
+			setClimate(config.temperature, MaxThermostateMode.BOOST, config.temporaryUntil);
+		} else {
+			setClimate(config.temperature, config.modeBeforeBoost, config.temporaryUntil);
+		}
 	}
 
 
@@ -595,11 +611,14 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		// save state for restore
 		if (mode == MaxThermostateMode.BOOST) {
 			config.modeBeforeBoost = config.mode;
+			Calendar boostUntil = GregorianCalendar.getInstance();
+			boostUntil.add(Calendar.MINUTE, config.boostDurationMins);
+			config.boostUntil = boostUntil.getTime();
 		}
 
 		config.mode = mode;
 		config.temperature = temp;
-		config.temporaryUntilDate = until;
+		config.temporaryUntil = until;
 
 		List<Message> messages = new ArrayList<Message>();
 

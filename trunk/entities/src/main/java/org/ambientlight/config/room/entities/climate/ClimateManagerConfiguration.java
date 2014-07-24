@@ -32,8 +32,10 @@ public class ClimateManagerConfiguration {
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public MaxThermostateMode modeBeforeBoost = MaxThermostateMode.AUTO;
+
 	public float temperature = 22.0f;
-	public Date temporaryUntilDate;
+	public Date temporaryUntil;
+	public Date boostUntil;
 	public String currentWeekProfile = "default";
 
 	public int vCubeAdress = 1;

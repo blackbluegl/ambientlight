@@ -51,9 +51,8 @@ public abstract class RoomServiceAwareFragment extends Fragment implements IRoom
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		((HomeActivity) getActivity()).addServiceListener(this);
+		((RoomServiceAwareActivity) getActivity()).addServiceListener(this);
 		listenToServiceChange = false;
-
 	}
 
 

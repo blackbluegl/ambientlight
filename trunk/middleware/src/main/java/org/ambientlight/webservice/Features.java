@@ -12,9 +12,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ambientlight.AmbientControl;
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 
 
 @Path("/features")
@@ -94,6 +94,17 @@ public class Features {
 			e.printStackTrace();
 			return Response.status(500).build();
 		}
+	}
+
+
+	@PUT
+	@Path("/{roomName}/climate/mode/boost")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setBoostMode(@PathParam("roomName") String roomName, boolean enable) {
+
+		AmbientControl.getRoom(roomName).featureFacade.setClimateBoostMode(enable);
+		return Response.status(200).build();
 	}
 
 

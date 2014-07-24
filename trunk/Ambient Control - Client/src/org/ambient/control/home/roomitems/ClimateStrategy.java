@@ -18,11 +18,11 @@ package org.ambient.control.home.roomitems;
 import org.ambient.control.R;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.rest.RestClient;
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 import org.ambientlight.room.entities.features.Entity;
 import org.ambientlight.room.entities.features.climate.Climate;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.ws.Room;
 
 import android.content.Context;
@@ -56,7 +56,7 @@ public class ClimateStrategy implements Strategy {
 		LayoutInflater inflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		RelativeLayout itemContent = (RelativeLayout) inflater.inflate(R.layout.layout_room_item_heating_content, null);
 
-		updateIcon(itemContent, climate.getClimate());
+		updateIcon(itemContent, climate.getTemperatureMode());
 		return itemContent;
 	}
 
@@ -66,28 +66,29 @@ public class ClimateStrategy implements Strategy {
 
 		boolean disabled = mode.temp <= MaxUtil.MIN_TEMPERATURE;
 
-		if (mode.mode == MaxThermostateMode.AUTO || mode.mode == MaxThermostateMode.MANUAL
-				|| mode.mode == MaxThermostateMode.TEMPORARY) {
+		if (mode.thermostateMode == null) {
+			icon.setImageResource(R.drawable.ic_heating_active);
+		} else if (mode.thermostateMode == MaxThermostateMode.AUTO || mode.thermostateMode == MaxThermostateMode.MANUAL
+				|| mode.thermostateMode == MaxThermostateMode.TEMPORARY) {
 			if (disabled) {
 				icon.setImageResource(R.drawable.ic_heating_disabled);
 			} else {
 				icon.setImageResource(R.drawable.ic_heating_active);
 			}
-		} else if (mode.mode == MaxThermostateMode.BOOST) {
+		} else if (mode.thermostateMode == MaxThermostateMode.BOOST) {
 			icon.setImageResource(R.drawable.ic_heating_boost);
 		}
 
 		TextView modeText = (TextView) itemContent.findViewById(R.id.textViewTempMode);
-		if (mode.mode == MaxThermostateMode.AUTO) {
+		if (mode.thermostateMode == null) {
+			modeText.setText("");
+		} else if (mode.thermostateMode == MaxThermostateMode.AUTO) {
 			modeText.setText("A");
-		}
-		if (mode.mode == MaxThermostateMode.BOOST) {
+		} else if (mode.thermostateMode == MaxThermostateMode.BOOST) {
 			modeText.setText("B");
-		}
-		if (mode.mode == MaxThermostateMode.MANUAL) {
+		} else if (mode.thermostateMode == MaxThermostateMode.MANUAL) {
 			modeText.setText("M");
-		}
-		if (mode.mode == MaxThermostateMode.TEMPORARY) {
+		} else if (mode.thermostateMode == MaxThermostateMode.TEMPORARY) {
 			modeText.setText("T");
 		}
 
@@ -101,24 +102,22 @@ public class ClimateStrategy implements Strategy {
 
 		Climate climate = ((Climate) entity);
 
-		MaxThermostateMode newMode = null;
+		TemperaturMode mode = new TemperaturMode(climate.getTemperatureMode().temp, climate.getTemperatureMode().until, null);
 
-		if (climate.getClimate().mode == MaxThermostateMode.BOOST) {
-			newMode = climate.getThermostateModeBeforeBoost();
-		} else {
-			newMode = MaxThermostateMode.BOOST;
-		}
-
-		TemperaturMode mode = new TemperaturMode(climate.getClimate().temp, climate.getClimate().until, newMode);
-
-		// update icon first and quick
-		updateIcon((RelativeLayout) view, mode);
 		try {
-			RestClient.setTemperatureMode(roomFragment.roomName, mode);
+			if (climate.getTemperatureMode().thermostateMode == MaxThermostateMode.BOOST) {
+				mode.thermostateMode = MaxThermostateMode.BOOST;
+				updateIcon((RelativeLayout) view, mode);
+				RestClient.setClimateBoostMode(roomFragment.roomName, true);
+			} else {
+				mode.thermostateMode = null;
+				updateIcon((RelativeLayout) view, mode);
+				RestClient.setClimateBoostMode(roomFragment.roomName, true);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 

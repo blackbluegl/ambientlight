@@ -15,7 +15,7 @@
 
 package org.ambientlight.room.entities.features.climate;
 
-import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.room.entities.features.Entity;
 
 
@@ -25,11 +25,6 @@ import org.ambientlight.room.entities.features.Entity;
  */
 public interface Climate extends Entity {
 
-	public MaxThermostateMode getThermostateModeBeforeBoost();
+	public TemperaturMode getTemperatureMode();
 
-
-	public TemperaturMode getClimate();
-
-
-	public void setClimate(TemperaturMode climate);
 }

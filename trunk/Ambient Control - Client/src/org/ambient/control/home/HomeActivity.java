@@ -17,45 +17,41 @@ import android.widget.ListView;
 
 public class HomeActivity extends RoomServiceAwareActivity {
 
-	RoomFragment roomFragment;
-	RoomChooserFragment roomChooserFragment;
-
 	public static final String BUNDLE_SELECTED_ROOM = "selectedRoom";
 	private String selectedRoom;
-
-	LinearLayout content;
 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (savedInstanceState != null) {
-			selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM);
-		}
-
 		setContentView(R.layout.activity_main);
-
-		content = (LinearLayout) findViewById(R.id.homeMainLinearLayout);
-
-		createNavigationDrawer();
 
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
 
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (savedInstanceState != null) {
+			selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM);
+		} else {
+			LinearLayout content = (LinearLayout) findViewById(R.id.homeMainLinearLayout);
+			createNavigationDrawer();
 
-		roomChooserFragment = new RoomChooserFragment();
-		ft.add(content.getId(), roomChooserFragment);
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-		roomFragment = new RoomFragment();
-		ft.add(content.getId(), roomFragment);
+			RoomChooserFragment roomChooserFragment = new RoomChooserFragment();
+			ft.add(content.getId(), roomChooserFragment);
 
-		ft.commit();
+			RoomFragment roomFragment = new RoomFragment();
+			ft.add(content.getId(), roomFragment, "roomFragment");
+			ft.addToBackStack(null);
+
+			ft.commit();
+		}
+
 	}
 
 
-	public void createNavigationDrawer() {
+	private void createNavigationDrawer() {
 		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
@@ -103,6 +99,7 @@ public class HomeActivity extends RoomServiceAwareActivity {
 	 */
 	public void setCurrentRoomByUser(String current) {
 		this.selectedRoom = current;
+		RoomFragment roomFragment = (RoomFragment) getSupportFragmentManager().findFragmentByTag("roomFragment");
 		roomFragment.roomName = current;
 		roomFragment.updateRoomContent();
 	}
@@ -124,7 +121,7 @@ public class HomeActivity extends RoomServiceAwareActivity {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
 		outState.putString(BUNDLE_SELECTED_ROOM, selectedRoom);
 	}
-
 }

@@ -245,6 +245,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		persistence.beginTransaction();
 		renderObject.lightObject.setPowerState(powerState);
 		persistence.commitTransaction();
+		callBackMananger.roomConfigurationChanged();
 
 		if (powerState == false) {
 			// set fadeout effect

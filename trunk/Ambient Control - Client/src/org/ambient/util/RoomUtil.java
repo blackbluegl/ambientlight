@@ -18,10 +18,10 @@ package org.ambient.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.room.entities.climate.ClimateImpl;
 import org.ambientlight.room.entities.features.Entity;
 import org.ambientlight.room.entities.features.actor.Switchable;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.ws.Room;
 
 
@@ -59,7 +59,7 @@ public class RoomUtil {
 
 		if (room.climateManager != null) {
 			result.add(new ClimateImpl(new TemperaturMode(room.climateManager.temperature,
-					room.climateManager.temporaryUntilDate, room.climateManager.mode), room.climateManager.modeBeforeBoost));
+					room.climateManager.temporaryUntil, room.climateManager.mode), room.climateManager.modeBeforeBoost));
 		}
 
 		return result;
