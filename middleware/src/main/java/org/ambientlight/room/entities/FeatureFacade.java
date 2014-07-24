@@ -19,12 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.climate.ClimateManager;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
 import org.ambientlight.room.entities.features.climate.Climate;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.room.entities.features.sensor.Sensor;
 import org.ambientlight.room.entities.lightobject.LightObjectManager;
 import org.ambientlight.room.entities.sceneries.SceneryManager;
@@ -121,6 +121,15 @@ public class FeatureFacade {
 
 
 	public void setClimate(TemperaturMode mode) {
-		climateManager.setClimate(mode.temp, mode.mode, mode.until);
+		climateManager.setClimate(mode.temp, mode.thermostateMode, mode.until);
+	}
+
+
+	/**
+	 * @param enable
+	 */
+	public void setClimateBoostMode(boolean enable) {
+		climateManager.setBoostMode(enable);
+
 	}
 }

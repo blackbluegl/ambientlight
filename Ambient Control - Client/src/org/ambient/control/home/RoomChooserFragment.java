@@ -49,15 +49,13 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
-			this.selectedRoom = getArguments().getString(BUNDLE_SELECTED_ROOM_NAME);
+			this.selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM_NAME);
 		}
 	}
 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-		// create the home container
 		myContent = (LinearLayout) inflater.inflate(R.layout.fragment_home_roomchooser, null);
 		return myContent;
 	}
@@ -148,8 +146,8 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
-		bundle.putString(BUNDLE_SELECTED_ROOM_NAME, selectedRoom);
 		super.onSaveInstanceState(bundle);
+		bundle.putString(BUNDLE_SELECTED_ROOM_NAME, selectedRoom);
 	}
 
 }

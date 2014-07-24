@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.ambientlight.config.process.ProcessConfiguration;
+import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
-import org.ambientlight.room.entities.features.climate.TemperaturMode;
 import org.ambientlight.ws.Room;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
@@ -113,5 +113,11 @@ public class RestClient {
 	public static void setTemperatureMode(String roomName, TemperaturMode mode) throws Exception {
 		SetCurrentClimateModeTask task = new SetCurrentClimateModeTask();
 		task.execute(roomName, mode);
+	}
+
+
+	public static void setClimateBoostMode(String roomName, boolean enable) throws Exception {
+		SetClimateBoostModeTask task = new SetClimateBoostModeTask();
+		task.execute(roomName, enable);
 	}
 }

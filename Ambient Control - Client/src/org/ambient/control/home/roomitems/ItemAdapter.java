@@ -68,30 +68,30 @@ public class ItemAdapter extends BaseAdapter {
 		this.context = context;
 
 		for (Entity entity : entities) {
-			itemPositions.put(entities.indexOf(entity), entity);
 
 			if (entity instanceof Renderable && entity instanceof Switchable) {
 
 				RenderingProgramConfiguration sceneryConfig = ((Renderable) entity).getRenderingProgrammConfiguration();
 
 				if (sceneryConfig instanceof SimpleColorRenderingProgramConfiguration) {
-					items.put(entity, new SimpleColorLightObjectStrategy());
+					this.addItem(entity, new SimpleColorLightObjectStrategy());
 				}
 
 				if (sceneryConfig instanceof TronRenderingProgrammConfiguration) {
-					items.put(entity, new TronLightIObjectStrategy());
+					this.addItem(entity, new TronLightIObjectStrategy());
 				}
 
 				if (sceneryConfig instanceof SunSetRenderingProgrammConfiguration) {
-					items.put(entity, new SunsetLightObjectStrategy());
+					this.addItem(entity, new SunsetLightObjectStrategy());
 				}
+
 			} else if (entity instanceof Switchable) {
 				if (entity.getId().domain.equals(EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN) == false) {
-					items.put(entity, new SwitchableStrategy());
+					this.addItem(entity, new SwitchableStrategy());
 				}
 
 			} else if (entity instanceof Climate) {
-				items.put(entity, new ClimateStrategy());
+				this.addItem(entity, new ClimateStrategy());
 			}
 		}
 	}
@@ -174,4 +174,9 @@ public class ItemAdapter extends BaseAdapter {
 		return itemView;
 	}
 
+
+	private void addItem(Entity entity, Strategy strategy) {
+		itemPositions.put(items.size(), entity);
+		items.put(entity, strategy);
+	}
 }

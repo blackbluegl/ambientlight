@@ -27,7 +27,7 @@ public class SwitchableStrategy extends LightObjectStrategy {
 
 		// update the icon - we prevent that user experiences a
 		// gap (request to server, response to callback)
-		updateIcon(!entityAsSwitch.getPowerState(), (ImageView) view);
+		updateIcon(!entityAsSwitch.getPowerState(), (ImageView) view.findViewById(R.id.imageViewItemIcon));
 
 		try {
 			RestClient.setSwitchablePowerState(roomFragment.roomName, entityAsSwitch.getId(), !entityAsSwitch.getPowerState());

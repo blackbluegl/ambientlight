@@ -64,7 +64,7 @@ public class MaxMessageCreator {
 		} else {
 			outMessage.setTemp(0.0f);
 		}
-		outMessage.setTemporaryUntil(config.temporaryUntilDate);
+		outMessage.setTemporaryUntil(config.temporaryUntil);
 		outMessage.setMode(config.mode);
 		outMessage.setSequenceNumber(getNewSequnceNumber());
 		outMessage.setToAdress(adress);

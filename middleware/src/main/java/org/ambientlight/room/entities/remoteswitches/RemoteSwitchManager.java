@@ -64,7 +64,7 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
 		RemoteSwitch remoteSwitch = config.remoteSwitches.get(id);
 
-		if (config.remoteSwitches.containsKey(id.id) == false) {
+		if (config.remoteSwitches.containsKey(id) == false) {
 			System.out.println("RemoteSwitchManager handleSwitchChange(): got request for unknown device: =" + id);
 			return;
 		}
