@@ -21,13 +21,21 @@ import org.ambientlight.ws.Room;
 
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public interface IRoomServiceCallbackListener {
 
 	public void onRoomServiceConnected(RoomConfigService service);
 
 
+	/**
+	 * will be called when any configuration changes on the server have been done by this client, a different user or by the
+	 * server itself. The service holds an actual configuration already when this method is called and passes a reference into the
+	 * fragment here if you want to use it to update the views datamodels.
+	 * 
+	 * @param roomName
+	 * @param roomConfiguration
+	 */
 	public void onRoomConfigurationChange(String roomName, Room roomConfiguration);
 
 

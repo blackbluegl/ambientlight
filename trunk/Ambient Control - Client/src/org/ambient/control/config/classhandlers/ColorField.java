@@ -17,7 +17,7 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.views.ColorPickerView;
 import org.ambientlight.ws.Room;
 
@@ -48,7 +48,7 @@ public class ColorField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public ColorField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+	public ColorField(Room roomConfig, Object bean, Field field, EditConfigFragment context, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, context, contentArea);
 	}

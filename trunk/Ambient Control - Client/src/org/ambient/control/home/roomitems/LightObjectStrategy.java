@@ -16,11 +16,9 @@
 package org.ambient.control.home.roomitems;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigHandlerFragment;
-import org.ambient.control.home.ActorConductEditFragment;
+import org.ambient.control.home.EditRenderingConfigActivity;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.rest.RestClient;
-import org.ambient.util.GuiUtils;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.Entity;
 import org.ambientlight.room.entities.features.actor.Switchable;
@@ -28,9 +26,7 @@ import org.ambientlight.room.entities.features.lightobject.Renderable;
 import org.ambientlight.ws.Room;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,7 +41,6 @@ import android.widget.RelativeLayout;
  * renderingConfiguration.
  * 
  * @author Florian Bornkessel
- * 
  */
 public abstract class LightObjectStrategy implements Strategy {
 
@@ -89,19 +84,16 @@ public abstract class LightObjectStrategy implements Strategy {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 
+	/**
+	 * edit the renderingconfiguration of the light object. preview, and save actions are handled in the editActivity.
+	 */
 	@Override
 	public void onLongClick(View view, final Room room, final RoomFragment roomFragment, final Entity entity) {
 
 		final RenderingProgramConfiguration itemConfig = ((Renderable) entity).getRenderingProgrammConfiguration();
-
-		// get a deep cloned copy and safe it into the fragment to restore it if nescessary
-		roomFragment.actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) GuiUtils
-				.deepCloneSerializeable(itemConfig);
-		roomFragment.actorConductConfigurationAfterEditItemId = entity.getId();
 
 		roomFragment.getActivity().startActionMode(new ActionMode.Callback() {
 
@@ -111,33 +103,15 @@ public abstract class LightObjectStrategy implements Strategy {
 				switch (item.getItemId()) {
 
 				case R.id.menuEntryEditActorConduct:
-					ActorConductEditFragment fragEdit = new ActorConductEditFragment();
-					fragEdit.setTargetFragment(roomFragment, EditConfigHandlerFragment.REQ_RETURN_OBJECT);
-					Bundle arguments = new Bundle();
-					arguments.putSerializable(EditConfigHandlerFragment.BUNDLE_OBJECT_VALUE,
-							(RenderingProgramConfiguration) GuiUtils.deepCloneSerializeable(itemConfig));
-					arguments.putBoolean(EditConfigHandlerFragment.ARG_CREATE_MODE, false);
-					arguments.putString(EditConfigHandlerFragment.ARG_SELECTED_ROOM, roomFragment.roomName);
-					arguments.putSerializable(ActorConductEditFragment.ITEM_ID, entity.getId());
 
-					fragEdit.setArguments(arguments);
-
-					FragmentTransaction ft2 = roomFragment.getFragmentManager().beginTransaction();
-					ft2.replace(R.id.homeMainLinearLayout, fragEdit);
-					ft2.addToBackStack(null);
-					ft2.commit();
+					EditRenderingConfigActivity.createInstanceForEditObject(roomFragment.getActivity(), itemConfig,
+							entity.getId(), room.roomName, room);
 					break;
 
 				case R.id.menuEntryAddActorConduct:
-					try {
-						ActorConductEditFragment.createNewConfigBean(RenderingProgramConfiguration.class, roomFragment,
-								roomFragment.roomName, room, entity.getId());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					break;
 
-				default:
+					EditRenderingConfigActivity.createInstanceForNewObject(roomFragment.getActivity(), itemConfig,
+							entity.getId(), room.roomName, room);
 					break;
 
 				}

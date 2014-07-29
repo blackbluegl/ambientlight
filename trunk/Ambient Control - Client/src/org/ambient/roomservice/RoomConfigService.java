@@ -44,6 +44,11 @@ import android.os.IBinder;
 import android.util.Log;
 
 
+//registering callback service does not work properly
+//check register when server is there
+//check register on resume when servier is there
+//check register onResume when server was not there
+
 /**
  * @author Florian Bornkessel
  * 
@@ -70,8 +75,8 @@ public class RoomConfigService extends Service {
 	}
 
 	/**
-	 * the receiver is used to start and stop the socketServer and register a
-	 * callback on the server based on the state of the screen.
+	 * the receiver is used to start and stop the socketServer and register a callback on the server based on the state of the
+	 * screen.
 	 */
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -82,8 +87,8 @@ public class RoomConfigService extends Service {
 
 			if (action.equals(Intent.ACTION_SCREEN_ON) && isConnectedToWifi(context)) {
 				Log.i(LOG, " startCallBackServer and reload roomConfigurations because of ACTION_SCREEN_ON");
-				startCallBackServer();
 				initAllRoomConfigurations(true);
+				startCallBackServer(roomConfiguration.keySet());
 
 			} else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
 				Log.i(LOG, " stopCallBackServer because of ACTION_SCREEN_OFF");
@@ -98,7 +103,7 @@ public class RoomConfigService extends Service {
 				// wlan on, wlan reset,fm on
 				Log.i(LOG, "updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
 				initAllRoomConfigurations(true);
-				startCallBackServer();
+				startCallBackServer(roomConfiguration.keySet());
 
 			} else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !isConnectedToWifi(context)) {
 
@@ -119,8 +124,9 @@ public class RoomConfigService extends Service {
 		return roomConfiguration.keySet();
 	}
 
+
 	// update request from server
-	public synchronized void updateRoomConfigForRoomName(String roomName) {
+	public void updateRoomConfigForRoomName(String roomName) {
 		try {
 			Room roomConfig = RestClient.getRoom(roomName);
 			// update Model
@@ -183,8 +189,8 @@ public class RoomConfigService extends Service {
 
 		// initially load all RoomConfigurations
 		initAllRoomConfigurations(false);
-
-		startCallBackServer();
+		// init callbackServer which depends on the presence of the roomConfigurations
+		startCallBackServer(roomConfiguration.keySet());
 	}
 
 
@@ -194,7 +200,13 @@ public class RoomConfigService extends Service {
 		try {
 			roomNames = RestClient.getRoomNames();
 		} catch (Exception e) {
-			Log.e(LOG, "error could not retreive roomNames. Resetting!", e);
+			Log.e(LOG, "caught exception whilee trying to async call RestClient. Resetting!", e);
+			roomConfiguration = new HashMap<String, Room>();
+			return;
+		}
+
+		if (roomNames == null) {
+			Log.e(LOG, "error could not retreive roomNames. Resetting!");
 			roomConfiguration = new HashMap<String, Room>();
 			return;
 		}
@@ -220,7 +232,7 @@ public class RoomConfigService extends Service {
 	}
 
 
-	private synchronized void startCallBackServer() {
+	private synchronized void startCallBackServer(Set<String> roomNames) {
 
 		// start socketServer
 		if (callbackSocketServer == null) {
@@ -228,7 +240,7 @@ public class RoomConfigService extends Service {
 			new Thread(callbackSocketServer).start();
 
 			String hostname = getIpAdress() + ":4321";
-			for (String currentRoom : roomConfiguration.keySet()) {
+			for (String currentRoom : roomNames) {
 				try {
 					if (RestClient.registerCallback(currentRoom, hostname) == false) {
 						roomConfiguration.put(currentRoom, null);

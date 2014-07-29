@@ -17,7 +17,7 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambientlight.ws.Room;
 
 import android.util.Log;
@@ -50,7 +50,7 @@ public class BooleanField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public BooleanField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+	public BooleanField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
 			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 		// TODO Auto-generated constructor stub

@@ -74,11 +74,13 @@ public abstract class RoomServiceAwareActivity extends FragmentActivity {
 				String roomName = intent.getExtras().getString(RoomConfigService.EXTRA_ROOM_NAME);
 				Room config = (Room) intent.getExtras().getSerializable(RoomConfigService.EXTRA_ROOMCONFIG);
 				Log.i(LOG, "got update for Room");
+				onRoomConfigurationChange(roomName, config);
 				for (IRoomServiceCallbackListener listener : roomServiceListeners) {
 					listener.onRoomConfigurationChange(roomName, config);
 				}
 			}
 		}
+
 	};
 
 
@@ -113,7 +115,23 @@ public abstract class RoomServiceAwareActivity extends FragmentActivity {
 	}
 
 
+	/**
+	 * overwrite if you want to react on the event that the service has been connected. Normally this will be after onResume() in
+	 * Android lifecycle.
+	 */
 	protected void onRoomServiceConnected() {
+
+	}
+
+
+	/**
+	 * overwrite if you want to react to changes that where committed from the server while the activity is running and waiting in
+	 * foreground.
+	 * 
+	 * @param roomName
+	 * @param config
+	 */
+	protected void onRoomConfigurationChange(String roomName, Room config) {
 
 	}
 

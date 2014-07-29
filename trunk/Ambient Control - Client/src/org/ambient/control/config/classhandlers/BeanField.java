@@ -18,7 +18,7 @@ package org.ambient.control.config.classhandlers;
 import java.lang.reflect.Field;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambientlight.ws.Room;
@@ -59,7 +59,7 @@ public class BeanField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public BeanField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment context, LinearLayout contentArea)
+	public BeanField(Room roomConfig, Object bean, Field field, EditConfigFragment context, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, context, contentArea);
 	}
@@ -94,14 +94,14 @@ public class BeanField extends FieldGenerator {
 			public void onClick(View v) {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
-					EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
+					EditConfigFragment.editNewConfigBean(altClassInstanceValues,
 							ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
 							roomConfig);
 				} else if (fieldValue == null && altValuesToDisplay.size() == 0) {
 					Log.e(LOG, "No alternative Values have been annotated to class.");
 					Toast.makeText(contentArea.getContext(), "No alternative Values annotated", Toast.LENGTH_SHORT).show();
 				} else if (fieldValue != null) {
-					EditConfigHandlerFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
+					EditConfigFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
 				}
 			}
 		});
@@ -158,7 +158,7 @@ public class BeanField extends FieldGenerator {
 
 						case R.id.menuEntryEditConfigurationClass:
 
-							EditConfigHandlerFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
+							EditConfigFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
 
 							break;
 

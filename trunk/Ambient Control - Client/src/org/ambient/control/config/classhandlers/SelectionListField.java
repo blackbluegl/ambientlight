@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
 
@@ -59,7 +59,7 @@ public class SelectionListField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public SelectionListField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+	public SelectionListField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
 			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 	}

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
@@ -61,7 +61,7 @@ public class SimpleListField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public SimpleListField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+	public SimpleListField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
 			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
@@ -113,7 +113,7 @@ public class SimpleListField extends FieldGenerator {
 				contextFragment.whereToMergeChildBean = whereToStore;
 
 				// create transition with new editfragment
-				EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
+				EditConfigFragment.editNewConfigBean(altClassInstanceValues,
 						ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
 						roomConfig);
 			}
@@ -134,7 +134,7 @@ public class SimpleListField extends FieldGenerator {
 				contextFragment.whereToMergeChildBean = whereToStore;
 
 				Object valueAtPosition = adapter.getItem(position);
-				EditConfigHandlerFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
+				EditConfigFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
 			}
 		});
 
@@ -177,7 +177,7 @@ public class SimpleListField extends FieldGenerator {
 					contextFragment.whereToMergeChildBean = whereToStore;
 
 					// create new transaction and edit new bean
-					EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
+					EditConfigFragment.editNewConfigBean(altClassInstanceValues,
 							ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
 							roomConfig);
 
