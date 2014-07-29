@@ -68,7 +68,7 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 	 * @see org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected()
 	 */
 	@Override
-	protected void onResumeWithServiceConnected() {
+	protected void onResumeWithService() {
 		// get roomname from activity if it is not set in the fragment
 		if (selectedRoom == null) {
 			selectedRoom = ((HomeActivity) getActivity()).getSelecterRoom();
@@ -99,6 +99,10 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 
 		// clear all and build new on update
 		myContent.removeAllViews();
+
+		// if no room is available. stop here with an empty screen.
+		if (selectedRoom == null)
+			return;
 
 		for (final String current : roomService.getAllRoomNames()) {
 			final LinearLayout item = (LinearLayout) inflater.inflate(R.layout.layout_home_roomchooser_item, null);

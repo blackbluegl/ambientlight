@@ -19,7 +19,7 @@ public class Rooms {
 	@Path("/version")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getInfo() {
-		return "Version:0.16.0";
+		return "Version:0.16.0-SNAPSHOT";
 	}
 
 

@@ -49,7 +49,7 @@ public class ClimateFragment extends RoomServiceAwareFragment {
 	 * ()
 	 */
 	@Override
-	protected void onResumeWithServiceConnected() {
+	protected void onResumeWithService() {
 		// TODO Auto-generated method stub
 
 	}

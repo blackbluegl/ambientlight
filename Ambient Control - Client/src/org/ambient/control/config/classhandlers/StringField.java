@@ -17,7 +17,7 @@ package org.ambient.control.config.classhandlers;
 
 import java.lang.reflect.Field;
 
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.ws.Room;
 
@@ -58,7 +58,7 @@ public class StringField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public StringField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+	public StringField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
 			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 	}

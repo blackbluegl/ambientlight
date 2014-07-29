@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.control.config.ValueBindingHelper;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.ws.Room;
@@ -51,11 +51,11 @@ public abstract class FieldGenerator {
 	protected Room roomConfig = null;
 	protected Object bean = null;
 	protected Field field = null;
-	protected EditConfigHandlerFragment contextFragment;
+	protected EditConfigFragment contextFragment;
 	protected LinearLayout contentArea;
 
 
-	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment,
+	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
 			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super();
 		this.roomConfig = roomConfig;

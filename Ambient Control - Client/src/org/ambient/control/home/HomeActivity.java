@@ -2,6 +2,7 @@ package org.ambient.control.home;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareActivity;
+import org.ambientlight.ws.Room;
 
 import android.app.ActionBar;
 import android.os.Bundle;
@@ -15,14 +16,22 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 
+/**
+ * handles home screen with rooms and items in the rooms.
+ * 
+ * @author Florian Bornkessel
+ * 
+ */
 public class HomeActivity extends RoomServiceAwareActivity {
 
+	// holds a reference to decide which room will be displayed by the RoomFragment
 	public static final String BUNDLE_SELECTED_ROOM = "selectedRoom";
 	private String selectedRoom;
 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
@@ -32,8 +41,10 @@ public class HomeActivity extends RoomServiceAwareActivity {
 
 		if (savedInstanceState != null) {
 			selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM);
+
 		} else {
 			LinearLayout content = (LinearLayout) findViewById(R.id.homeMainLinearLayout);
+
 			createNavigationDrawer();
 
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -52,19 +63,19 @@ public class HomeActivity extends RoomServiceAwareActivity {
 
 
 	private void createNavigationDrawer() {
-		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+		DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
 		String[] values = new String[] { "Mein Ambiente", "Mein Klima", "Meine Prozesse", "NFC-Tag anlernen" };
-		ListView mDrawerList = (ListView) findViewById(R.id.homeLeftDrawer);
-		// Set the adapter for the list view
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values));
+		ListView drawerListView = (ListView) findViewById(R.id.homeLeftDrawer);
+
+		drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values));
 		// // Set the list's click listener
-		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-				final String item = (String) parent.getItemAtPosition(position);
+				final String navigation = (String) parent.getItemAtPosition(position);
 				//
 				// if (item.equals("Mein Ambiente")) {
 				// currentFragment = createHomeFragment(content);
@@ -89,12 +100,24 @@ public class HomeActivity extends RoomServiceAwareActivity {
 	}
 
 
+	@Override
+	protected void onRoomConfigurationChange(String roomName, Room config) {
+		// if ambientcontrol started without server connection and now reaches the server again, check if a roomname was set
+		// earlier. If not, use the first name that is available.
+		if (selectedRoom == null && roomService.getAllRoomNames().isEmpty() == false) {
+			selectedRoom = roomService.getAllRoomNames().iterator().next();
+		}
+	}
+
+
 	public String getSelecterRoom() {
 		return selectedRoom;
 	}
 
 
 	/**
+	 * method for the RoomChooserFragment to reflect the chosen rooms by user.
+	 * 
 	 * @param current
 	 */
 	public void setCurrentRoomByUser(String current) {
@@ -113,7 +136,7 @@ public class HomeActivity extends RoomServiceAwareActivity {
 	@Override
 	protected void onRoomServiceConnected() {
 		// at first start we have no room set. we use the first room that we find
-		if (selectedRoom == null) {
+		if (selectedRoom == null && roomService.getAllRoomNames().isEmpty() == false) {
 			selectedRoom = roomService.getAllRoomNames().iterator().next();
 		}
 	}

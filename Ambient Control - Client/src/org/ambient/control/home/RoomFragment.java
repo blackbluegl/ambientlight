@@ -17,11 +17,9 @@ package org.ambient.control.home;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.home.roomitems.ItemAdapter;
 import org.ambient.rest.RestClient;
 import org.ambient.util.RoomUtil;
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.room.entities.features.Entity;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.actor.Switchable;
@@ -50,18 +48,9 @@ import android.widget.TableLayout;
  * @author Florian Bornkessel
  * 
  */
-public class RoomFragment extends RoomServiceAwareFragment implements EditConfigOnExitListener {
+public class RoomFragment extends RoomServiceAwareFragment {
 
 	public static final String LOG = "RoomFragment";
-
-	// for EditConfigExitListener - handles the preview save action for the led configuration dialog
-	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM = "actorConductConfigurationAfterEditItem";
-	public RenderingProgramConfiguration actorConductConfigurationAfterEditItem;
-
-	public static final String BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id = "actorConductConfigurationAfterEditItemId";
-	public EntityId actorConductConfigurationAfterEditItemId;
-
-	private String actorConductConfigurationAfterEditItemRoomName;
 
 	public static final String BUNDLE_ROOM_NAME = "roomNames";
 	public String roomName;
@@ -80,8 +69,6 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// maybe restore the configuration for the last edited lightObject
-		handleExitEditConductResult(savedInstanceState);
 
 		// create the home container
 		myRoomView = inflater.inflate(R.layout.fragment_home_room, null);
@@ -96,13 +83,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	 * @see org.ambient.control.RoomServiceAwareFragment# initViewValuesAfterServiceConnection()
 	 */
 	@Override
-	protected void onResumeWithServiceConnected() {
-		System.out.println("onResume called!");
-		// get roomname from activity if it is not set in the fragment
+	protected void onResumeWithService() {
+		// get roomname from activity if it is not set
 		if (roomName == null) {
 			roomName = ((HomeActivity) getActivity()).getSelecterRoom();
 		}
-
 		updateRoomContent();
 	}
 
@@ -110,41 +95,15 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
 		super.onSaveInstanceState(bundle);
-		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM, this.actorConductConfigurationAfterEditItem);
-		bundle.putSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id, this.actorConductConfigurationAfterEditItemId);
 		bundle.putString(BUNDLE_ROOM_NAME, roomName);
 	}
 
 
-	/*
-	 * get shure that the oldConfig will be overwritten. onCreateView will now save the new configuration
-	 * 
-	 * @see org.ambient.control.config.EditConfigExitListener#onIntegrateConfiguration (java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void onIntegrateConfiguration(String roomName, Object configuration) {
-		this.actorConductConfigurationAfterEditItemRoomName = roomName;
-		this.actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) configuration;
-	}
-
-
-	/*
-	 * get sure that the oldConfig will not be overwritten. onCreateView will now save the old configuration
-	 * 
-	 * @see org.ambient.control.config.EditConfigExitListener#onRevertConfiguration (java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void onRevertConfiguration(String roomName, Object configuration) {
-		this.actorConductConfigurationAfterEditItemRoomName = roomName;
-	}
-
-
-	/*
-	 * (non-Javadoc)
+	/**
+	 * update components if visible when configuration on server changes
 	 * 
 	 * @see org.ambient.control.RoomConfigAdapter.RoomUpdateListener #onRoomChange(java.lang.String, org.ambientlight.room.Room)
 	 */
-
 	@Override
 	public void onRoomConfigurationChange(String serverName, Room config) {
 
@@ -162,37 +121,17 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 
 
 	/**
-	 * @param savedInstanceState
-	 */
-	private void handleExitEditConductResult(Bundle savedInstanceState) {
-
-		// if this fragment was restored. restore the values from the bundle
-		if (savedInstanceState != null) {
-			actorConductConfigurationAfterEditItemId = (EntityId) savedInstanceState
-					.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM_Id);
-			actorConductConfigurationAfterEditItem = (RenderingProgramConfiguration) savedInstanceState
-					.getSerializable(BUNDLE_ACTOR_CONDUCT_AFTER_EDIT_ITEM);
-		}
-
-		// write an edited item to server. weather it was modified to persist new state or not to revert to the old state due
-		// inconsistent values on server because of preview actions
-		if (actorConductConfigurationAfterEditItem != null) {
-			RestClient.setRenderingConfiguration(this.actorConductConfigurationAfterEditItemRoomName,
-					this.actorConductConfigurationAfterEditItemId, this.actorConductConfigurationAfterEditItem);
-			actorConductConfigurationAfterEditItem = null;
-		}
-	}
-
-
-	/**
 	 * updates the content by creating dynamically all entity items that a user may click on.
 	 */
 	public void updateRoomContent() {
 
 		Room roomConfig = roomService.getRoomConfiguration(roomName);
+
 		if (roomConfig == null) {
 			disableEventListener(false);
 			return;
+		} else {
+			enableEventListener();
 		}
 
 		// init room power switch
@@ -207,7 +146,8 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 		this.updateScenerySpinner();
 
 		// init dynamically the clickable entity icons
-		createRoomItems(roomConfig);
+		GridView contentView = (GridView) myRoomView.findViewById(R.id.roomContent);
+		contentView.setAdapter(new ItemAdapter(RoomUtil.getEntities(roomConfig), roomConfig, this));
 
 		// init roomBackground
 		this.updateRoomBackground();
@@ -264,21 +204,6 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
-	/**
-	 * get room items by the available strategies for each entity.
-	 * 
-	 * @param currentServer
-	 * @param roomConfig
-	 * @param roomContent
-	 * @param amountPerRow
-	 */
-	private void createRoomItems(Room roomConfig) {
-
-		GridView contentView = (GridView) myRoomView.findViewById(R.id.roomContent);
-		contentView.setAdapter(new ItemAdapter(RoomUtil.getEntities(roomConfig), roomConfig, this));
-	}
-
-
 	private void createSwitch(final Switchable currentSwitch) {
 
 		final Switch mainSwitch = (Switch) myRoomView.findViewById(R.id.mainSwitch);
@@ -301,6 +226,11 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
+	/*
+	 * disable clickhandlers on all views.
+	 * 
+	 * @param showWaitScreen show rotating wait circle instead of the empty screen
+	 */
 	private void disableEventListener(boolean showWaitScreen) {
 		if (showWaitScreen) {
 			ProgressBar bar = (ProgressBar) myRoomView.findViewById(R.id.progressBar);
@@ -314,6 +244,9 @@ public class RoomFragment extends RoomServiceAwareFragment implements EditConfig
 	}
 
 
+	/*
+	 * enable clickhandlers on all views.
+	 */
 	private void enableEventListener() {
 		ProgressBar bar = (ProgressBar) myRoomView.findViewById(R.id.progressBar);
 		bar.setVisibility(ProgressBar.INVISIBLE);

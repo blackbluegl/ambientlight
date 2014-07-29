@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.control.config.EditConfigOnExitListener;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.rest.RestClient;
@@ -108,7 +108,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	 * @see org.ambient.control.RoomServiceAwareFragment#onResumeWithServiceConnected ()
 	 */
 	@Override
-	protected void onResumeWithServiceConnected() {
+	protected void onResumeWithService() {
 		spinnerRoom.setOnItemSelectedListener(null);
 		selectedRoom = initRoomArrays(selectedRoom);
 		drawer.setProcess(selectedProcess);
@@ -263,7 +263,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 		case R.id.menuEntryProcessAdd:
 			try {
-				EditConfigHandlerFragment.createNewConfigBean(ProcessConfiguration.class, this, selectedRoom,
+				EditConfigFragment.editNewConfigBean(ProcessConfiguration.class, this, selectedRoom,
 						roomService.getRoomConfiguration(selectedRoom));
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -271,7 +271,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			return true;
 
 		case R.id.menuEntryProcessEdit:
-			EditConfigHandlerFragment.editConfigBean(this, this.selectedProcess, this.selectedRoom,
+			EditConfigFragment.editConfigBean(this, this.selectedProcess, this.selectedRoom,
 					this.roomService.getRoomConfiguration(selectedRoom));
 			return true;
 
@@ -330,7 +330,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					roomService.getRoomConfiguration(selectedRoom).sceneriesManager.sceneries.values());
 			sceneriesWrapper.sceneries = sceneries;
 
-			EditConfigHandlerFragment.editConfigBean(this, sceneriesWrapper, selectedRoom,
+			EditConfigFragment.editConfigBean(this, sceneriesWrapper, selectedRoom,
 					roomService.getRoomConfiguration(selectedRoom));
 
 			return true;
@@ -435,7 +435,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					break;
 
 				case R.id.menuEntryProcessEditNode:
-					EditConfigHandlerFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedRoom,
+					EditConfigFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedRoom,
 							roomService.getRoomConfiguration(selectedRoom));
 					break;
 

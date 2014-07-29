@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigHandlerFragment;
+import org.ambient.control.config.EditConfigFragment;
 import org.ambient.control.config.ValueBindingHelper;
 import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
@@ -71,7 +71,7 @@ public class MapField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public MapField(Room roomConfig, Object bean, Field field, EditConfigHandlerFragment contextFragment, LinearLayout contentArea)
+	public MapField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment, LinearLayout contentArea)
 			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
@@ -153,14 +153,14 @@ public class MapField extends FieldGenerator {
 
 					// create
 					if (valueAtPosition == null) {
-						EditConfigHandlerFragment.createNewConfigBean(altClassInstanceValues,
+						EditConfigFragment.editNewConfigBean(altClassInstanceValues,
 								ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment,
 								selectedRoom, roomConfig);
 
 					}
 					// edit
 					else {
-						EditConfigHandlerFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
+						EditConfigFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
 					}
 				}
 			});
@@ -213,7 +213,7 @@ public class MapField extends FieldGenerator {
 
 				case R.id.menuEntryEditConfigurationClass:
 					// create fragment transition to edit the value of the map entry
-					EditConfigHandlerFragment.editConfigBean(contextFragment, checkedItems.get(0).value, selectedRoom, roomConfig);
+					EditConfigFragment.editConfigBean(contextFragment, checkedItems.get(0).value, selectedRoom, roomConfig);
 
 					mode.finish();
 					return true;

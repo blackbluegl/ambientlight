@@ -132,7 +132,7 @@ public class NFCProgrammingFragment extends RoomServiceAwareFragment {
 	 * ()
 	 */
 	@Override
-	protected void onResumeWithServiceConnected() {
+	protected void onResumeWithService() {
 
 		for (String currentRoomName : roomService.getAllRoomNames()) {
 			this.roomNames.add(currentRoomName);

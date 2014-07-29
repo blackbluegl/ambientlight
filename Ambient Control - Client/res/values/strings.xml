@@ -7,6 +7,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Ambient Control</string>
+    <string name="title_activity_edit_rendering_config">Program bearbeiten</string>
     <string name="title_activity_sceneries">Szenerien</string>
     <string name="button_new">Neu</string>
     <string name="button_edit">Bearbeiten</string>
@@ -31,5 +32,6 @@
     <string name="chose_switch">Schalter:</string>
     <string name="button_nfc_program">Anlernen</string>
     <string name="title_activity_nfcswitch_handler">NFC Schalter</string>
+    <string name="title_activity_edit_config_activity2">EditConfigActivity2</string>
 
 </resources>

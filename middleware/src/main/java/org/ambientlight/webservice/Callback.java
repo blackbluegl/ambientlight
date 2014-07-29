@@ -28,8 +28,7 @@ import org.ambientlight.AmbientControl;
 
 
 /**
- * register clients that listen to status changes in the room. see callback
- * package for details of the comunication.
+ * register clients that listen to status changes in the room. see callback package for details of the comunication.
  * 
  * @author Florian Bornkessel
  */
