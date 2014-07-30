@@ -13,14 +13,13 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigFragment;
-import org.ambient.control.config.ValueBindingHelper;
-import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
+import org.ambient.control.config.WhereToMergeBean.WhereToPutType;
 import org.ambientlight.ws.Room;
 
 import android.util.Log;
@@ -80,7 +79,7 @@ public class BeanField extends FieldGenerator {
 		final TextView beanView = new TextView(contentArea.getContext());
 		contentArea.addView(beanView);
 
-		final Object fieldValue = field.get(bean);
+		final Serializable fieldValue = (Serializable) field.get(bean);
 
 		if (fieldValue != null) {
 			beanView.setText(fieldValue.getClass().getName());
@@ -94,6 +93,7 @@ public class BeanField extends FieldGenerator {
 			public void onClick(View v) {
 
 				if (fieldValue == null && altValuesToDisplay.size() > 0) {
+
 					EditConfigFragment.editNewConfigBean(altClassInstanceValues,
 							ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
 							roomConfig);

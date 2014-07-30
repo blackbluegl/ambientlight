@@ -13,12 +13,12 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.classhandlers.SelectionListField.ViewModel;
+import org.ambient.control.config.SelectionListField.ViewModel;
 
 import android.app.Activity;
 import android.view.LayoutInflater;

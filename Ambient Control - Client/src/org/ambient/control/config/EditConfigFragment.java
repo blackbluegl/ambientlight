@@ -23,18 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.ambient.control.R;
-import org.ambient.control.config.classhandlers.BeanField;
-import org.ambient.control.config.classhandlers.BeanSelectionField;
-import org.ambient.control.config.classhandlers.BooleanField;
-import org.ambient.control.config.classhandlers.ColorField;
-import org.ambient.control.config.classhandlers.ExpressionField;
-import org.ambient.control.config.classhandlers.MapField;
-import org.ambient.control.config.classhandlers.NumericField;
-import org.ambient.control.config.classhandlers.SelectionListField;
-import org.ambient.control.config.classhandlers.SimpleListField;
-import org.ambient.control.config.classhandlers.StringField;
-import org.ambient.control.config.classhandlers.WhereToMergeBean;
-import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
+import org.ambient.control.config.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.annotations.AlternativeClassValues;
 import org.ambientlight.annotations.ClassDescription;
@@ -70,7 +59,6 @@ import android.widget.TextView;
  */
 public class EditConfigFragment extends Fragment implements EditConfigOnExitListener {
 
-	public static final String ARG_CREATE_MODE = "creationMode";
 	public static final String ARG_CLASS_NAME = "className";
 	public static final String BUNDLE_OBJECT_VALUE = "objectValue";
 	public static final String ARG_SELECTED_ROOM = "selectedRoom";
@@ -82,7 +70,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 	public static int REQ_RETURN_OBJECT = 0;
 
-	protected Object myConfigurationData;
+	protected Object beanToEdit;
 
 	protected Object valueToIntegrate = null;
 
@@ -90,9 +78,122 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 	protected String selectedRoom = null;
 
-	protected boolean createMode = false;
-
 	public WhereToMergeBean whereToMergeChildBean = null;
+
+
+	/**
+	 * wrappermethod to create a bean from the scratch just by annotations from a class definition of the bean.
+	 * 
+	 * @param clazz
+	 * @param source
+	 * @param roomName
+	 * @param roomConfiguration
+	 * @throws ClassNotFoundException
+	 * @throws java.lang.InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	protected static <T> void editNewConfigBean(Class<T> clazz, final EditConfigOnExitListener source, final String roomName,
+			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
+
+		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues alternatives = ValueBindingHelper
+				.getValuesForClass(clazz.getAnnotation(AlternativeClassValues.class));
+
+		editNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues), source,
+				roomName, roomConfiguration);
+	}
+
+
+	/**
+	 * wrappermethod to create a bean if alternative values are already known. E.g. Values are given by a calling parent fragment.
+	 * 
+	 * @param altValues
+	 * @param alternativeValuesForDisplay
+	 * @param fragment
+	 * @param server
+	 * @param roomConfig
+	 */
+	protected static void editNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
+			final EditConfigOnExitListener source, final String roomName, final Room roomConfig) {
+
+		Activity activity = (Activity) (source instanceof Activity ? source : ((Fragment) source).getActivity());
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+				try {
+					Serializable newBean = (Serializable) Class.forName(altValues.get(which)).newInstance();
+					createNewChildFragent(source, newBean, roomName, roomConfig);
+				} catch (Exception e) {
+					Log.e(LOG, "could not create Object in createmode", e);
+				}
+
+			}
+		});
+
+		builder.create().show();
+	}
+
+
+	/**
+	 * wrappermethod to edit a given bean.
+	 * 
+	 * @param fragment
+	 *            to return to after editing is finished
+	 * @param beanToEdit
+	 * @param selectedServer
+	 * @param roomConfig
+	 */
+	protected static void editConfigBean(EditConfigOnExitListener source, final Serializable beanToEdit,
+			final String selectedRoom, final Room roomConfig) {
+
+		Bundle args = new Bundle();
+		args.putSerializable(EditConfigFragment.BUNDLE_OBJECT_VALUE, beanToEdit);
+		createNewChildFragent(source, beanToEdit, selectedRoom, roomConfig);
+	}
+
+
+	/**
+	 * starts a fragment transaction to create and configure an EditConfigFragment
+	 * 
+	 * @param source
+	 *            calling fragment or activity where the edited bean will be given back
+	 * @param selectedRoom
+	 *            represents the room to that the bean is associated
+	 * @param roomConfig
+	 *            will be used to calculate alternative values for some of the input handlers
+	 * @return
+	 */
+	private static void createNewChildFragent(EditConfigOnExitListener source, Serializable beanToEdit, String selectedRoom,
+			Room roomConfig) {
+
+		Bundle args = new Bundle();
+		args.putString(ARG_SELECTED_ROOM, selectedRoom);
+		args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
+		args.putSerializable(BUNDLE_OBJECT_VALUE, beanToEdit);
+
+		EditConfigFragment configHandler = new EditConfigFragment();
+
+		configHandler.setArguments(args);
+
+		// caller may be another fragment or the beginning an activity
+		FragmentTransaction ft;
+		if (source instanceof EditConfigFragment) {
+			configHandler.setTargetFragment((EditConfigFragment) source, REQ_RETURN_OBJECT);
+			ft = ((EditConfigFragment) source).getFragmentManager().beginTransaction();
+		} else {
+			ft = ((FragmentActivity) source).getSupportFragmentManager().beginTransaction();
+		}
+
+		// fading in from right to center
+		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+		ft.replace(R.id.editConfigContainerLinearLayout, configHandler, FRAGMENT_TAG);
+		// handle back action by the fragmentmanager
+		ft.addToBackStack(null);
+		ft.commit();
+	}
 
 
 	@Override
@@ -103,7 +204,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
-		bundle.putSerializable(BUNDLE_OBJECT_VALUE, (Serializable) myConfigurationData);
+		bundle.putSerializable(BUNDLE_OBJECT_VALUE, (Serializable) beanToEdit);
 		bundle.putSerializable(BUNDLE_WHERE_TO_INTEGRATE, whereToMergeChildBean);
 		super.onSaveInstanceState(bundle);
 	}
@@ -115,27 +216,14 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 		setHasOptionsMenu(true);
 
-		if (getArguments().isEmpty() == false) {
-			createMode = getArguments().getBoolean(ARG_CREATE_MODE);
-			selectedRoom = getArguments().getString(ARG_SELECTED_ROOM);
-			this.roomConfig = (Room) getArguments().getSerializable(ARG_ROOM_CONFIG);
-		}
+		selectedRoom = getArguments().getString(ARG_SELECTED_ROOM);
+		this.roomConfig = (Room) getArguments().getSerializable(ARG_ROOM_CONFIG);
 
 		if (savedInstanceState != null) {
-			myConfigurationData = savedInstanceState.getSerializable(BUNDLE_OBJECT_VALUE);
+			beanToEdit = savedInstanceState.getSerializable(BUNDLE_OBJECT_VALUE);
 			whereToMergeChildBean = (WhereToMergeBean) savedInstanceState.getSerializable(BUNDLE_WHERE_TO_INTEGRATE);
 		} else {
-			if (createMode) {
-				try {
-					if (myConfigurationData == null) {
-						myConfigurationData = Class.forName(getArguments().getString(ARG_CLASS_NAME)).newInstance();
-					}
-				} catch (Exception e) {
-					Log.e(LOG, "could not create Object in createmode", e);
-				}
-			} else {
-				myConfigurationData = GuiUtils.deepCloneSerializeable(getArguments().getSerializable(BUNDLE_OBJECT_VALUE));
-			}
+			beanToEdit = GuiUtils.deepCloneSerializeable(getArguments().getSerializable(BUNDLE_OBJECT_VALUE));
 		}
 
 		// integrate object into existing configuration after child fragment
@@ -173,7 +261,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 			List<Field> unsortedList = new ArrayList<Field>();
 
 			// create groups if class description is present and defines some
-			ClassDescription description = myConfigurationData.getClass().getAnnotation(ClassDescription.class);
+			ClassDescription description = beanToEdit.getClass().getAnnotation(ClassDescription.class);
 			if (description != null) {
 				for (Group currentGroup : description.groups()) {
 					Map<Integer, Field> category = new TreeMap<Integer, Field>();
@@ -185,7 +273,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 			}
 
 			// sort fields that are annotated in groups
-			for (final Field field : myConfigurationData.getClass().getFields()) {
+			for (final Field field : beanToEdit.getClass().getFields()) {
 				// only use field with typedef annotation. the rest of the
 				// fields will be ignored
 				if (field.isAnnotationPresent(TypeDef.class)) {
@@ -244,7 +332,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 				// draw all handlers for the fields in this category
 				Map<Integer, Field> values = sortedMap.get(currentCategoryId);
 				for (Field field : values.values()) {
-					addFieldToView(inflater, myConfigurationData, content, field);
+					addFieldToView(inflater, beanToEdit, content, field);
 
 					// we are shure that the default or a special category have
 					// been used. if there are unsorted values put them into an
@@ -266,7 +354,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 			// draw the handlers
 			for (Field currentField : unsortedList) {
-				addFieldToView(inflater, myConfigurationData, content, currentField);
+				addFieldToView(inflater, beanToEdit, content, currentField);
 			}
 
 			// default text if no fields are annotated
@@ -279,17 +367,17 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 			return result;
 
 		} catch (Exception e) {
-			Log.e(LOG, "could not create View for bean: " + myConfigurationData.getClass().getName(), e);
+			Log.e(LOG, "could not create View for bean: " + beanToEdit.getClass().getName(), e);
 			return null;
 		}
 	}
 
 
-	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout container, final Field field)
+	private void addFieldToView(LayoutInflater inflater, final Object config, LinearLayout content, final Field field)
 			throws IllegalAccessException, ClassNotFoundException, java.lang.InstantiationException {
 
 		LinearLayout fieldView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_entry, null);
-		container.addView(fieldView);
+		content.addView(fieldView);
 
 		TextView title = (TextView) fieldView.findViewById(R.id.textViewTitleOfMap);
 		title.setText(field.getName());
@@ -363,16 +451,27 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+
 		case R.id.menuEntryFinishEditConfiguration:
 			callParentOnIntegrate();
 			return true;
 
 		case android.R.id.home:
-			callParentOnIntegrate();
+			callParentOnRevert();
 			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+
+	private void callParentOnRevert() {
+		if (this.getTargetFragment() != null) {
+			getFragmentManager().popBackStack();
+			((EditConfigOnExitListener) this.getTargetFragment()).onRevertConfiguration(selectedRoom, beanToEdit);
+		} else {
+			((EditConfigOnExitListener) getActivity()).onRevertConfiguration(selectedRoom, beanToEdit);
 		}
 	}
 
@@ -384,9 +483,9 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 	private void callParentOnIntegrate() {
 		if (this.getTargetFragment() != null) {
 			getFragmentManager().popBackStack();
-			((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedRoom, myConfigurationData);
+			((EditConfigOnExitListener) this.getTargetFragment()).onIntegrateConfiguration(selectedRoom, beanToEdit);
 		} else {
-			((EditConfigOnExitListener) getActivity()).onIntegrateConfiguration(selectedRoom, myConfigurationData);
+			((EditConfigOnExitListener) getActivity()).onIntegrateConfiguration(selectedRoom, beanToEdit);
 		}
 	}
 
@@ -421,16 +520,16 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 	 */
 	private void integrateConfiguration(Object configuration) {
 		try {
-			Class<? extends Object> myConfigurationClass = myConfigurationData.getClass();
+			Class<? extends Object> myConfigurationClass = beanToEdit.getClass();
 			Field myField = myConfigurationClass.getField(whereToMergeChildBean.fieldName);
 
 			if (whereToMergeChildBean.type.equals(WhereToPutType.FIELD)) {
-				myField.set(myConfigurationData, configuration);
+				myField.set(beanToEdit, configuration);
 
 			} else if (whereToMergeChildBean.type.equals(WhereToPutType.LIST)) {
 				@SuppressWarnings("unchecked")
 				// checked in line above
-				List<Object> list = (List<Object>) myField.get(myConfigurationData);
+				List<Object> list = (List<Object>) myField.get(beanToEdit);
 				if (whereToMergeChildBean.positionInList != null) {
 					list.set(whereToMergeChildBean.positionInList, configuration);
 				} else {
@@ -440,7 +539,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 			} else if (whereToMergeChildBean.type.equals(WhereToPutType.MAP)) {
 				@SuppressWarnings("unchecked")
 				// checked one line above
-				Map<Object, Object> map = (Map<Object, Object>) myField.get(myConfigurationData);
+				Map<Object, Object> map = (Map<Object, Object>) myField.get(beanToEdit);
 				map.put(whereToMergeChildBean.keyInMap, configuration);
 			}
 
@@ -452,103 +551,4 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 		this.valueToIntegrate = null;
 	}
 
-
-	/**
-	 * helper method to edit a config bean if alternative values are already known. E.g. Values are given by a referencing Field.
-	 * 
-	 * @param altValues
-	 * @param alternativeValuesForDisplay
-	 * @param fragment
-	 * @param server
-	 * @param roomConfig
-	 */
-	public static void editNewConfigBean(final List<String> altValues, final CharSequence[] alternativeValuesForDisplay,
-			final EditConfigOnExitListener source, final String roomName, final Room roomConfig) {
-
-		Activity activity = (Activity) (source instanceof Activity ? source : ((Fragment) source).getActivity());
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setTitle("Bitte auswählen").setItems(alternativeValuesForDisplay, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				final Bundle args = new Bundle();
-				args.putString(ARG_CLASS_NAME, altValues.get(which));
-				createNewChildFragent(source, args, roomName, false, roomConfig);
-			}
-		});
-
-		builder.create().show();
-	}
-
-
-	/**
-	 * helpermethod to create a config bean from the scratch. The alternative values for concrete clases are guessed by classValue
-	 * annotation from the class itself.
-	 * 
-	 * @param clazz
-	 * @param source
-	 * @param roomName
-	 * @param roomConfiguration
-	 * @throws ClassNotFoundException
-	 * @throws java.lang.InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	public static <T> void editNewConfigBean(Class<T> clazz, final EditConfigOnExitListener source, final String roomName,
-			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
-
-		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues alternatives = ValueBindingHelper
-				.getValuesForClass(clazz.getAnnotation(AlternativeClassValues.class));
-
-		editNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues), source,
-				roomName, roomConfiguration);
-	}
-
-
-	/**
-	 * helpermethod to start an fragment transaction and configure all values to display the fragment in editmode
-	 * 
-	 * @param fragment
-	 *            to return to after editing is finished
-	 * @param configValueToEdit
-	 * @param selectedServer
-	 * @param roomConfig
-	 */
-	public static void editConfigBean(EditConfigOnExitListener source, final Object configValueToEdit, final String selectedRoom,
-			final Room roomConfig) {
-
-		Bundle args = new Bundle();
-		args.putSerializable(EditConfigFragment.BUNDLE_OBJECT_VALUE, (Serializable) configValueToEdit);
-		createNewChildFragent(source, args, selectedRoom, false, roomConfig);
-	}
-
-
-	/**
-	 * @param source
-	 * @param configHandler
-	 * @return
-	 */
-	private static void createNewChildFragent(EditConfigOnExitListener source, Bundle args, String selectedRoom,
-			boolean createMode, Room roomConfig) {
-
-		args.putString(ARG_SELECTED_ROOM, selectedRoom);
-		args.putBoolean(ARG_CREATE_MODE, createMode);
-		args.putSerializable(ARG_ROOM_CONFIG, roomConfig);
-
-		EditConfigFragment configHandler = new EditConfigFragment();
-
-		FragmentTransaction ft;
-		if (source instanceof EditConfigFragment) {
-			configHandler.setTargetFragment((EditConfigFragment) source, REQ_RETURN_OBJECT);
-			ft = configHandler.getFragmentManager().beginTransaction();
-		} else {
-			ft = ((FragmentActivity) source).getSupportFragmentManager().beginTransaction();
-		}
-
-		configHandler.setArguments(args);
-		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-		ft.replace(R.id.editConfigContainerLinearLayout, configHandler, FRAGMENT_TAG);
-		ft.addToBackStack(null);
-		ft.commit();
-	}
 }

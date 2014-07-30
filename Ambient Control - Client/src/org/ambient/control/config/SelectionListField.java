@@ -13,13 +13,12 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambient.control.config.EditConfigFragment;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
 

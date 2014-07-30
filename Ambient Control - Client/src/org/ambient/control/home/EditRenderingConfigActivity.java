@@ -54,7 +54,7 @@ public class EditRenderingConfigActivity extends EditConfigActivity {
 		bundle.putSerializable(EXTRA_ORIGINAL_CONFIG,
 				(Serializable) GuiUtils.deepCloneSerializeable(renderingProgrammConfigClassNameToEdit));
 
-		createInstance(EditRenderingConfigActivity.class, bundle, caller, true, RenderingProgramConfiguration.class.getName(),
+		createInstance(EditRenderingConfigActivity.class, bundle, caller, true, RenderingProgramConfiguration.class,
 				null, roomName, room);
 	}
 

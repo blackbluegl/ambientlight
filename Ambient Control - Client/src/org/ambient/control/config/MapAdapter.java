@@ -13,13 +13,14 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import org.ambient.control.R;
-import org.ambient.control.config.classhandlers.MapField.ViewModel;
+import org.ambient.control.config.MapField.ViewModel;
 
 import android.content.Context;
 import android.support.v4.app.FragmentManager;
@@ -44,7 +45,7 @@ public class MapAdapter extends ArrayAdapter<MapField.ViewModel> {
 
 	private final Context context;
 
-	private Map<Object, Object> dataModell;
+	private Map<Object, Serializable> dataModell;
 
 	/** class type of the value. the map adapter can handle some simple value types by itself and shows specialized views */
 	private final String valueClassType;
@@ -60,7 +61,7 @@ public class MapAdapter extends ArrayAdapter<MapField.ViewModel> {
 	 * @param valueClassType
 	 *            class type of value
 	 */
-	public MapAdapter(FragmentManager fm, Context context, List<MapField.ViewModel> modell, Map<Object, Object> dataModell,
+	public MapAdapter(FragmentManager fm, Context context, List<MapField.ViewModel> modell, Map<Object, Serializable> dataModell,
 			String valueClassType) {
 
 		super(context, R.layout.layout_map_list_entry, modell);

@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
 import android.text.SpannableString;
 import android.text.Spanned;
