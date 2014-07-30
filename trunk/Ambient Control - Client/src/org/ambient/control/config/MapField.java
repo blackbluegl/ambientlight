@@ -13,8 +13,9 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -23,9 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigFragment;
-import org.ambient.control.config.ValueBindingHelper;
-import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
+import org.ambient.control.config.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
 
@@ -57,7 +56,7 @@ public class MapField extends FieldGenerator {
 
 		String displayKey;
 		Object key;
-		Object value;
+		Serializable value;
 	}
 
 
@@ -105,7 +104,7 @@ public class MapField extends FieldGenerator {
 
 		// have an instance of the field value
 		@SuppressWarnings("unchecked")
-		final Map<Object, Object> fieldValue = (Map<Object, Object>) field.get(bean);
+		final Map<Object, Serializable> fieldValue = (Map<Object, Serializable>) field.get(bean);
 
 		// build view model for adapter
 		final List<ViewModel> viewModell = new ArrayList<MapField.ViewModel>();
@@ -142,7 +141,7 @@ public class MapField extends FieldGenerator {
 				@Override
 				public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int position, long paramLong) {
 
-					Object valueAtPosition = adapter.getItem(position).value;
+					Serializable valueAtPosition = adapter.getItem(position).value;
 
 					// store position where to merge the edited value
 					WhereToMergeBean whereToStore = new WhereToMergeBean();
@@ -250,7 +249,7 @@ public class MapField extends FieldGenerator {
 	 * @param fieldValue
 	 * @return
 	 */
-	private Object getKey(Object key, Map<Object, Object> fieldValue) {
+	private Object getKey(Object key, Map<Object, Serializable> fieldValue) {
 		for (Object currentKey : fieldValue.keySet()) {
 			if (key.equals(currentKey))
 				return currentKey;

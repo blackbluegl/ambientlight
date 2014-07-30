@@ -13,16 +13,15 @@
    limitations under the License.
  */
 
-package org.ambient.control.config.classhandlers;
+package org.ambient.control.config;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.ambient.control.R;
-import org.ambient.control.config.EditConfigFragment;
-import org.ambient.control.config.ValueBindingHelper;
-import org.ambient.control.config.classhandlers.WhereToMergeBean.WhereToPutType;
+import org.ambient.control.config.WhereToMergeBean.WhereToPutType;
 import org.ambient.util.GuiUtils;
 import org.ambientlight.ws.Room;
 
@@ -85,10 +84,10 @@ public class SimpleListField extends FieldGenerator {
 			field.set(bean, new ArrayList<Object>());
 		}
 		@SuppressWarnings({ "unchecked" })
-		final List<Object> listContent = (List<Object>) field.get(bean);
+		final List<Serializable> listContent = (List<Serializable>) field.get(bean);
 
 		// bind field value to list model
-		final ArrayAdapter<Object> adapter = new ArrayAdapter<Object>(contextFragment.getActivity(),
+		final ArrayAdapter<Serializable> adapter = new ArrayAdapter<Serializable>(contextFragment.getActivity(),
 				android.R.layout.simple_list_item_1, listContent);
 		listView.setAdapter(adapter);
 
@@ -133,7 +132,7 @@ public class SimpleListField extends FieldGenerator {
 				whereToStore.positionInList = position;
 				contextFragment.whereToMergeChildBean = whereToStore;
 
-				Object valueAtPosition = adapter.getItem(position);
+				Serializable valueAtPosition = adapter.getItem(position);
 				EditConfigFragment.editConfigBean(contextFragment, valueAtPosition, selectedRoom, roomConfig);
 			}
 		});

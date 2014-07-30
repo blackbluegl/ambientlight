@@ -49,6 +49,11 @@
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         <activity
+            android:name="org.ambient.control.processes.ProcessCardActivity"
+            android:label="@string/title_activity_process_card_activity"
+            android:uiOptions="splitActionBarWhenNarrow" >
+        </activity>
+        <activity
             android:name="org.ambient.control.nfc.NFCSwitchHandlerActivity"
             android:label="@string/title_activity_nfcswitch_handler"
             android:launchMode="singleTop"
@@ -61,6 +66,10 @@
 
                 <data android:mimeType="application/org.ambientcontrol" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="org.ambient.control.config.EditConfigActivity"
+            android:label="@string/title_activity_edit_config_activity" >
         </activity>
 
         <receiver
@@ -91,11 +100,6 @@
                 <action android:name="android.intent.action.SCREEN_ON" />
             </intent-filter>
         </receiver>
-
-        <activity
-            android:name="org.ambient.control.config.EditConfigActivity"
-            android:label="@string/title_activity_edit_config_activity2" >
-        </activity>
     </application>
 
 </manifest>

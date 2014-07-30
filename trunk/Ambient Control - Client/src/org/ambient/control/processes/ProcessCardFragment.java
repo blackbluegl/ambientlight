@@ -20,8 +20,7 @@ import java.util.List;
 
 import org.ambient.control.R;
 import org.ambient.control.RoomServiceAwareFragment;
-import org.ambient.control.config.EditConfigFragment;
-import org.ambient.control.config.EditConfigOnExitListener;
+import org.ambient.control.config.EditConfigActivity;
 import org.ambient.control.processes.helper.SceneriesWrapper;
 import org.ambient.rest.RestClient;
 import org.ambient.util.GuiUtils;
@@ -57,7 +56,7 @@ import android.widget.Spinner;
  * @author Florian Bornkessel
  * 
  */
-public class ProcessCardFragment extends RoomServiceAwareFragment implements EditConfigOnExitListener {
+public class ProcessCardFragment extends RoomServiceAwareFragment {
 
 	private static final String BUNDLE_SELECTED_PROCESS = "bundleSelectedProcess";
 	private static final String BUNDLE_SELECTED_ROOM = "bundleSelectedRoom";
@@ -66,7 +65,6 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 
 	private ActionMode mode = null;
 
-	// int positionServer = 0;
 	String selectedRoom = null;
 	ProcessConfiguration selectedProcess = null;
 	private boolean editMode = false;
@@ -262,16 +260,12 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 			return true;
 
 		case R.id.menuEntryProcessAdd:
-			try {
-				EditConfigFragment.editNewConfigBean(ProcessConfiguration.class, this, selectedRoom,
-						roomService.getRoomConfiguration(selectedRoom));
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
+			EditConfigActivity.createInstanceForNewObject(getActivity(), ProcessConfiguration.class, selectedRoom,
+					roomService.getRoomConfiguration(selectedRoom));
 			return true;
 
 		case R.id.menuEntryProcessEdit:
-			EditConfigFragment.editConfigBean(this, this.selectedProcess, this.selectedRoom,
+			EditConfigActivity.createInstanceForEditObject(getActivity(), this.selectedProcess, this.selectedRoom,
 					this.roomService.getRoomConfiguration(selectedRoom));
 			return true;
 
@@ -330,7 +324,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					roomService.getRoomConfiguration(selectedRoom).sceneriesManager.sceneries.values());
 			sceneriesWrapper.sceneries = sceneries;
 
-			EditConfigFragment.editConfigBean(this, sceneriesWrapper, selectedRoom,
+			EditConfigActivity.createInstanceForEditObject(getActivity(), sceneriesWrapper, selectedRoom,
 					roomService.getRoomConfiguration(selectedRoom));
 
 			return true;
@@ -435,7 +429,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 					break;
 
 				case R.id.menuEntryProcessEditNode:
-					EditConfigFragment.editConfigBean(ProcessCardFragment.this, drawer.getSelectedNode(), selectedRoom,
+					EditConfigActivity.createInstanceForEditObject(getActivity(), drawer.getSelectedNode(), selectedRoom,
 							roomService.getRoomConfiguration(selectedRoom));
 					break;
 
@@ -542,12 +536,6 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 	}
 
 
-	/*
-	 * callback method is called everytime a configuration is edited.
-	 * 
-	 * @see org.ambient.control.processes.IntegrateObjectValueHandler# integrateConfiguration(java.lang.Object)
-	 */
-	@Override
 	public void onIntegrateConfiguration(String roomName, Object configuration) {
 
 		if (configuration instanceof ProcessConfiguration) {
@@ -603,17 +591,6 @@ public class ProcessCardFragment extends RoomServiceAwareFragment implements Edi
 		this.editMode = false;
 		spinnerRoom.setVisibility(View.VISIBLE);
 		spinnerProcess.setVisibility(View.VISIBLE);
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ambient.control.config.EditConfigExitListener#onRevertConfiguration (java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void onRevertConfiguration(String roomName, Object configuration) {
-
 	}
 
 

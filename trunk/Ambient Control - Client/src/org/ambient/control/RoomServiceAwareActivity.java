@@ -21,6 +21,7 @@ import java.util.List;
 import org.ambient.roomservice.RoomConfigService;
 import org.ambientlight.ws.Room;
 
+import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -87,6 +88,9 @@ public abstract class RoomServiceAwareActivity extends FragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		ActionBar actionBar = getActionBar();
+		actionBar.show();
 
 		// create a handle to the service that we never close. so the service
 		// will stay alive even on recreate of this activity
