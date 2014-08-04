@@ -54,8 +54,8 @@ public class EditRenderingConfigActivity extends EditConfigActivity {
 		bundle.putSerializable(EXTRA_ORIGINAL_CONFIG,
 				(Serializable) GuiUtils.deepCloneSerializeable(renderingProgrammConfigClassNameToEdit));
 
-		createInstance(EditRenderingConfigActivity.class, bundle, caller, true, RenderingProgramConfiguration.class,
-				null, roomName, room);
+		createInstance(EditRenderingConfigActivity.class, bundle, caller, true, RenderingProgramConfiguration.class, null,
+				roomName, room);
 	}
 
 
@@ -85,7 +85,8 @@ public class EditRenderingConfigActivity extends EditConfigActivity {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				writeConfig((RenderingProgramConfiguration) getValueToEdit());
+				String roomName = getIntent().getStringExtra(EXTRA_ROOM_NAME);
+				writeConfig(roomName, (RenderingProgramConfiguration) getValueToEdit());
 				return true;
 			}
 		});
@@ -102,7 +103,7 @@ public class EditRenderingConfigActivity extends EditConfigActivity {
 	@Override
 	public void onIntegrateConfiguration(String roomName, Object configuration) {
 
-		writeConfig((RenderingProgramConfiguration) getIntent().getSerializableExtra(EXTRA_EDIT_VALUE));
+		writeConfig(roomName, (RenderingProgramConfiguration) configuration);
 
 		setResult(Activity.RESULT_OK);
 		finish();
@@ -117,15 +118,18 @@ public class EditRenderingConfigActivity extends EditConfigActivity {
 	@Override
 	public void onRevertConfiguration(String roomName, Object configuration) {
 
-		writeConfig((RenderingProgramConfiguration) getValueToEdit());
+		// use the original not that one that was returned by child
+		RenderingProgramConfiguration original = (RenderingProgramConfiguration) getIntent().getExtras().getSerializable(
+				EXTRA_ORIGINAL_CONFIG);
+
+		writeConfig(roomName, original);
 
 		setResult(Activity.RESULT_CANCELED);
 		finish();
 	}
 
 
-	private void writeConfig(RenderingProgramConfiguration config) {
-		String roomName = getIntent().getStringExtra(EXTRA_ROOM_NAME);
+	private void writeConfig(String roomName, RenderingProgramConfiguration config) {
 		EntityId id = (EntityId) getIntent().getExtras().getSerializable(EXTRA_ENTITY_ID);
 
 		RestClient.setRenderingConfiguration(roomName, id, config);

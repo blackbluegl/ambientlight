@@ -23,6 +23,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.valueprovider.SwitchesIdsProvider;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.room.entities.features.EntityId;
@@ -52,7 +53,7 @@ public class SwitchableHandlerConfiguration extends AbstractActionHandlerConfigu
 
 	@Presentation(name = "Schalter auswählen", position = 3)
 	@TypeDef(fieldType = FieldType.SELECTION_LIST)
-	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SwitchesIdsProvider") })
+	@AlternativeValues(values = { @Value(valueProvider = SwitchesIdsProvider.class) })
 	public List<EntityId> switcheables = new ArrayList<EntityId>();
 
 	@Presentation(name = "Event feuern", position = 4, description = "Schalter können mitteilen das sie geschaltet wurden. Andere Entitäten können auf dieses Ereignis reagieren. Achtung: ungeschickt angewandt sind Deadlocks möglich!")

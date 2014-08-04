@@ -15,10 +15,14 @@
 
 package org.ambient.control.config;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.ambientlight.annotations.AlternativeClassValues;
 import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.ws.Room;
 
@@ -26,8 +30,8 @@ import android.widget.LinearLayout;
 
 
 /**
- * set the envirenment and handles the annotation to alternative value binding here. E.g. new class Instances, or alternative
- * values for lists. or alternative keys for hashmaps.
+ * Visual representation of fields. Sets the environment and handles the annotation to alternative value binding here. E.g. Lists
+ * for new classInstances, lists with alternative values and so on.
  * 
  * @author Florian Bornkessel
  * 
@@ -53,8 +57,8 @@ public abstract class FieldGenerator {
 	protected LinearLayout contentArea;
 
 
-	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
-			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+	public FieldGenerator(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super();
 		this.roomConfig = roomConfig;
 		this.bean = bean;
@@ -67,29 +71,68 @@ public abstract class FieldGenerator {
 
 
 	protected void createAltValues() throws IllegalAccessException, ClassNotFoundException, java.lang.InstantiationException {
+		org.ambientlight.annotations.valueprovider.api.AlternativeValues result = new org.ambientlight.annotations.valueprovider.api.AlternativeValues();
 
 		// try to find annotation from field
 		AlternativeValues annotation = field.getAnnotation(AlternativeValues.class);
+		if (annotation != null) {
 
-		// if no annotation is found in this concrete class try to find it from parent class
-		if (annotation == null) {
-			annotation = field.getDeclaringClass().getAnnotation(AlternativeValues.class);
+			// bind result for child classes to handle
+			result = ValueBindingHelper.getValuesForField(annotation.values(), bean, roomConfig);
+
+			altValues = result.values;
+			altValuesToDisplay = result.displayValues;
+			altClassInstanceValues = result.classNames;
+			altClassInstancesToDisplay = result.displayClassNames;
+			altKeys = result.keys;
+			altKeysToDisplay = result.displayKeys;
 		}
 
-		// if still no annotations are found there is no one and stop
-		if (annotation == null)
-			return;
+		// if no annotation or no classInstanceValues where found from the field annotation, try to find it from the declaring
+		// class
+		if (result.classNames.isEmpty()) {
+			AlternativeClassValues classAnnotation = null;
 
-		// bind result for child classes to handle
-		org.ambientlight.annotations.valueprovider.api.AlternativeValues result = ValueBindingHelper.getValuesForField(
-				annotation.values(), bean, roomConfig);
+			// try to get the value annotation from a map if object is a map
+			Object fieldObject = field.get(bean);
+			if (fieldObject != null && fieldObject instanceof Map) {
+				ParameterizedType pt = (ParameterizedType) field.getGenericType();
+				Class<?> clazz = (Class<?>) pt.getActualTypeArguments()[1];
 
-		altValues = result.values;
-		altValuesToDisplay = result.displayValues;
-		altClassInstanceValues = result.classNames;
-		altClassInstancesToDisplay = result.displayClassNames;
-		altKeys = result.keys;
-		altKeysToDisplay = result.displayKeys;
+				classAnnotation = clazz.getAnnotation(AlternativeClassValues.class);
+			}
+			// object is not a map. get it directly from the class
+			else {
+				classAnnotation = field.getType().getAnnotation(AlternativeClassValues.class);
+			}
+
+			// if no classAnnotation are found do not continue
+			if (classAnnotation == null)
+				return;
+
+			// bind result for child classes to handle
+			result = ValueBindingHelper.getValuesForClass(classAnnotation);
+			altClassInstanceValues = result.classNames;
+			altClassInstancesToDisplay = result.displayClassNames;
+		}
 	}
 
+
+	/**
+	 * Get sure that you use this method in the ListenerCallback Definition of your subclasses to gain access to the values
+	 * reference. If you create a local variable in the callbacks and modify the reference it does not have an effect to the beans
+	 * field.
+	 * 
+	 * @return
+	 */
+	protected Serializable getFieldValue() {
+
+		try {
+			return (Serializable) field.get(bean);
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+			return null;
+		}
+	}
 }

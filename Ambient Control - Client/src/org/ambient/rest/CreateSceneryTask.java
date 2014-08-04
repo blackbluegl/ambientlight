@@ -1,26 +1,32 @@
 package org.ambient.rest;
 
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
-public class CreateSceneryTask extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/sceneries/new";
+public class CreateSceneryTask extends AsyncTask<String, Void, Void> {
+
+	private static final String LOG = CreateSceneryTask.class.getName();
+
+	private final String URL = "/sceneries/{roomName}/new";
+
 
 	@Override
-	protected Void doInBackground(Object... params) {
+	protected Void doInBackground(String... params) {
 
-		String url = Rest.getUrl((String) params[0]) + URL + (String) params[1];
+		try {
+			Map<String, String> vars = new HashMap<String, String>();
+			vars.put("roomName", params[0]);
 
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
+			Rest.getRestTemplate().put(Rest.getUrl(URL), params[1], vars);
+			return null;
+		} catch (Exception e) {
+			Log.e(LOG, e.getMessage());
+			return null;
+		}
 
-		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
-
-		restTemplate.put(url, params[1]);
-		return null;
 	}
 }

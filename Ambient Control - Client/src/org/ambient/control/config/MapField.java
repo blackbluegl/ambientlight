@@ -94,7 +94,7 @@ public class MapField extends FieldGenerator {
 		contentArea.addView(list);
 
 		// create an empty hashmap if it is null.
-		if (field.get(bean) == null) {
+		if (getFieldValue() == null) {
 			field.set(bean, new HashMap());
 		}
 
@@ -104,7 +104,7 @@ public class MapField extends FieldGenerator {
 
 		// have an instance of the field value
 		@SuppressWarnings("unchecked")
-		final Map<Object, Serializable> fieldValue = (Map<Object, Serializable>) field.get(bean);
+		final Map<Object, Serializable> fieldValue = (Map<Object, Serializable>) getFieldValue();
 
 		// build view model for adapter
 		final List<ViewModel> viewModell = new ArrayList<MapField.ViewModel>();

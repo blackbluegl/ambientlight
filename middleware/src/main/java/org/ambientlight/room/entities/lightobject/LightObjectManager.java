@@ -156,6 +156,9 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 	public void setRenderingConfiguration(RenderingProgramConfiguration newConfig, EntityId id) {
 
+		if (newConfig == null)
+			throw new IllegalArgumentException("given config may not be empty for id: " + id);
+
 		System.out.println("LightObjectManager setRenderingConfiguration: setting renderingConfig: "
 				+ newConfig.getClass().getSimpleName() + " for id: " + id);
 
@@ -237,8 +240,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 
 		if (renderObject.lightObject.getPowerState() == powerState) {
 			System.out.println("LightObjectManager - setPowerState(): lightObject" + renderObject.lightObject.getId()
-					+ " already set to: "
-					+ powerState);
+					+ " already set to: " + powerState);
 			return;
 		}
 

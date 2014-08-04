@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 
 public class UnregisterCallbackTask extends AsyncTask<String, Void, Void> {
+
+	private static final String LOG = UnregisterCallbackTask.class.getName();
 
 	private final String URL = "/callback/{room}/client/{clientId}";
 
@@ -21,9 +24,10 @@ public class UnregisterCallbackTask extends AsyncTask<String, Void, Void> {
 		try {
 			Rest.getRestTemplate().delete(Rest.getUrl(URL), vars);
 		} catch (Exception e) {
-			// this may happen. we cannot do anything here
-			System.out.println("");
+			// if the server is unreachable just do nothing.
+			Log.e(LOG, "caught exception and ignoring it.", e);
 		}
+
 		return null;
 	}
 

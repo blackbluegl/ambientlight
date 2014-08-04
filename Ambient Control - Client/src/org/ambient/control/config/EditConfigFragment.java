@@ -95,10 +95,11 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 	protected static <T> void editNewConfigBean(Class<T> clazz, final EditConfigOnExitListener source, final String roomName,
 			final Room roomConfiguration) throws ClassNotFoundException, java.lang.InstantiationException, IllegalAccessException {
 
-		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues alternatives = ValueBindingHelper
+		org.ambientlight.annotations.valueprovider.api.AlternativeValues alternatives = ValueBindingHelper
 				.getValuesForClass(clazz.getAnnotation(AlternativeClassValues.class));
 
-		editNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayValues), source,
+		editNewConfigBean(alternatives.classNames, ValueBindingHelper.toCharSequenceArray(alternatives.displayClassNames),
+				source,
 				roomName, roomConfiguration);
 	}
 
@@ -212,6 +213,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 
 		setHasOptionsMenu(true);
@@ -239,15 +241,12 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-		// integrate object into existing configuration after child fragment
-		// closes and has data for us via onIntegrate - callback we do the
-		// integration here after the arguments and bundles have been restored.
-		// the other way it would be possible that this instance here would be
-		// created by android and all values would be null.
-		// if (this.valueToIntegrate != null) {
-		// this.integrateConfiguration(this.valueToIntegrate);
-		// }
+		// integrate object into existing configuration after child fragment has data left for us via onIntegrate. We do the
+		// integration here after the arguments and bundles have been restored. We cannot merge the values in onCreate() because
+		// it will only be called from android when the fragment instance has been removed before. e.g. screen rotation.
+		if (this.valueToIntegrate != null) {
+			this.integrateConfiguration(this.valueToIntegrate);
+		}
 
 		try {
 
@@ -301,7 +300,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 					continue;
 				}
 
-				LinearLayout categoryView = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
+				LinearLayout categoryView = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_group_header, null);
 				TextView title = (TextView) categoryView.findViewById(R.id.textViewGroupHeader);
 				TextView descriptionTextView = (TextView) categoryView.findViewById(R.id.textViewGroupDescription);
 				content.addView(categoryView);
@@ -344,7 +343,7 @@ public class EditConfigFragment extends Fragment implements EditConfigOnExitList
 			// draw a header for unsorted fields if class description provided
 			// categories for the other fields
 			if (sortedValuesDrawn && unsortedList.isEmpty() == false) {
-				LinearLayout categoryFurther = (LinearLayout) inflater.inflate(R.layout.layout_group_header, null);
+				LinearLayout categoryFurther = (LinearLayout) inflater.inflate(R.layout.layout_editconfig_group_header, null);
 				TextView title = (TextView) categoryFurther.findViewById(R.id.textViewGroupHeader);
 				title.setText("WEITERE");
 				TextView descriptionTextView = (TextView) categoryFurther.findViewById(R.id.textViewGroupDescription);

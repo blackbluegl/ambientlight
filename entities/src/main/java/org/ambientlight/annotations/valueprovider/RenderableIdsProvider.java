@@ -20,9 +20,6 @@ import java.util.Set;
 
 import org.ambientlight.annotations.valueprovider.api.AlternativeValueProvider;
 import org.ambientlight.annotations.valueprovider.api.AlternativeValues;
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 
@@ -33,7 +30,7 @@ import org.ambientlight.ws.Room;
  * 
  * @author Florian Bornkessel
  */
-public class RenderingProgramValueProvider implements AlternativeValueProvider {
+public class RenderableIdsProvider implements AlternativeValueProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -49,13 +46,13 @@ public class RenderingProgramValueProvider implements AlternativeValueProvider {
 			result.keys = new ArrayList<Object>(keys);
 		}
 
-		// create new class instances
-		result.classNames.add(SimpleColorRenderingProgramConfiguration.class.getName());
-		result.displayClassNames.add("Farbe auswählen");
-		result.classNames.add(TronRenderingProgrammConfiguration.class.getName());
-		result.displayClassNames.add("Tron auswählen");
-		result.classNames.add(SunSetRenderingProgrammConfiguration.class.getName());
-		result.displayClassNames.add("Sonnenuntergang auswählen");
+		// // create new class instances
+		// result.classNames.add(SimpleColorRenderingProgramConfiguration.class.getName());
+		// result.displayClassNames.add("Farbe auswählen");
+		// result.classNames.add(TronRenderingProgrammConfiguration.class.getName());
+		// result.displayClassNames.add("Tron auswählen");
+		// result.classNames.add(SunSetRenderingProgrammConfiguration.class.getName());
+		// result.displayClassNames.add("Sonnenuntergang auswählen");
 		return result;
 	}
 }

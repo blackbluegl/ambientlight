@@ -44,7 +44,9 @@ public class EditConfigActivity extends FragmentActivity implements EditConfigOn
 
 		Intent request = new Intent(caller, className);
 		request.putExtras(bundle);
-		request.putExtra(EXTRA_CREATE_CLASSNAME, classNameToCreate);
+		if (classNameToCreate != null) {
+			request.putExtra(EXTRA_CREATE_CLASSNAME, classNameToCreate.getName());
+		}
 		request.putExtra(EXTRA_ROOM_NAME, roomName);
 		request.putExtra(EXTRA_ROOM, room);
 		request.putExtra(EXTRA_CREATE_MODE, createMode);
@@ -63,7 +65,7 @@ public class EditConfigActivity extends FragmentActivity implements EditConfigOn
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setDisplayShowHomeEnabled(true);
 
-		setContentView(R.layout.activity_edit_config_activity);
+		setContentView(R.layout.activity_editconfig_activity);
 
 		if (savedInstanceState == null) {
 

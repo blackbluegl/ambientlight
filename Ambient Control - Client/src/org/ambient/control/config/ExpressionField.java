@@ -53,19 +53,18 @@ public class ExpressionField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public ExpressionField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
-			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+	public ExpressionField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
 
 
 	public void createView() throws IllegalAccessException {
 
-		// create textfield
-		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(contentArea.getContext());
+		final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(contextFragment.getActivity());
 		contentArea.addView(input);
 
-		input.setText((String) field.get(bean));
+		input.setText((String) getFieldValue());
 
 		// display list with sensor variable names
 		List<String> variablesEnrichedValues = new ArrayList<String>();
@@ -85,9 +84,6 @@ public class ExpressionField extends FieldGenerator {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(contextFragment.getActivity(),
 				android.R.layout.simple_dropdown_item_1line, variablesEnrichedValues);
 		input.setAdapter(adapter);
-
-		// display alternative sensors to user when the editor comes up
-		input.showDropDown();
 
 		// shortest threshold for autocorrecture feature. in this case an '#' shows the sensors to the user
 		input.setThreshold(1);
@@ -116,6 +112,18 @@ public class ExpressionField extends FieldGenerator {
 
 			@Override
 			public void afterTextChanged(Editable paramEditable) {
+			}
+		});
+
+		// prevent badTokenException on activity recreation here and call showDropDown after rendering and new activity is applied
+		// in the framework
+		input.post(new Runnable() {
+
+			@Override
+			public void run() {
+				// display alternative sensors to user when the editor comes up
+				input.showDropDown();
+
 			}
 		});
 	}

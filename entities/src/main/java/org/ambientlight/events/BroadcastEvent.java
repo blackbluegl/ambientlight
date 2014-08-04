@@ -6,6 +6,8 @@ import org.ambientlight.annotations.AlternativeValues;
 import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.valueprovider.SceneryEventIdProvider;
+import org.ambientlight.annotations.valueprovider.SwitchesIdsProvider;
 import org.ambientlight.room.entities.features.EntityId;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -17,9 +19,8 @@ public abstract class BroadcastEvent implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@TypeDef(fieldType = FieldType.BEAN_SELECTION)
-	@AlternativeValues(values = {
-			@Value(forSubClass = "org.ambientlight.events.SceneryEntryEvent", valueProvider = "org.ambientlight.annotations.valueprovider.SceneryEventIdProvider"),
-			@Value(forSubClass = "org.ambientlight.events.SwitchEvent", valueProvider = "org.ambientlight.annotations.valueprovider.SwitchesIdsProvider") })
+	@AlternativeValues(values = { @Value(forSubClass = SceneryEntryEvent.class, valueProvider = SceneryEventIdProvider.class),
+			@Value(forSubClass = org.ambientlight.events.SwitchEvent.class, valueProvider = SwitchesIdsProvider.class) })
 	public EntityId sourceId;
 
 
@@ -58,7 +59,5 @@ public abstract class BroadcastEvent implements Serializable {
 			return false;
 		return true;
 	}
-
-
 
 }

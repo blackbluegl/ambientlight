@@ -82,7 +82,7 @@ public class BeanSelectionField extends FieldGenerator {
 
 			int positionOfSelection = 0;
 			for (Object current : altValues) {
-				if (current.equals(field.get(bean))) {
+				if (current.equals(getFieldValue())) {
 					positionOfSelection = altValues.indexOf(current);
 				}
 			}

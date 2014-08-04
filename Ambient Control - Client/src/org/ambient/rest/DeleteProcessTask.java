@@ -1,26 +1,32 @@
 package org.ambient.rest;
 
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 
 public class DeleteProcessTask extends AsyncTask<String, Void, Void> {
 
-	private final String URL = "/process/processes/";
+	private static final String LOG = DeleteProcessTask.class.getName();
+
+	private final String URL = "/process/{roomName}/{id}";
+
 
 	@Override
 	protected Void doInBackground(String... params) {
 
-		String url = Rest.getUrl(params[0]) + URL + params[1];
+		try {
+			Map<String, String> vars = new HashMap<String, String>();
+			vars.put("roomName", params[0]);
+			vars.put("id", params[1]);
 
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(true, requestFactory);
+			Rest.getRestTemplate().delete(Rest.getUrl(URL), vars);
+		} catch (Exception e) {
+			Log.e(LOG, e.getMessage());
+		}
 
-		restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
-		restTemplate.delete(url);
 		return null;
 	}
 }
