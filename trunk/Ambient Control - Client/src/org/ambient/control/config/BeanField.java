@@ -79,37 +79,55 @@ public class BeanField extends FieldGenerator {
 		final TextView beanView = new TextView(contentArea.getContext());
 		contentArea.addView(beanView);
 
-		final Serializable fieldValue = (Serializable) field.get(bean);
-
-		if (fieldValue != null) {
-			beanView.setText(fieldValue.getClass().getName());
+		if (field.get(bean) != null) {
+			beanView.setText(field.get(bean).getClass().getName());
 		} else {
 			beanView.setText("-");
 		}
 
 		beanView.setOnClickListener(new OnClickListener() {
 
+
+
+
 			@Override
 			public void onClick(View v) {
 
-				if (fieldValue == null && altValuesToDisplay.size() > 0) {
+				if (getFieldValue() == null && altClassInstanceValues.size() > 0) {
 
 					EditConfigFragment.editNewConfigBean(altClassInstanceValues,
 							ValueBindingHelper.toCharSequenceArray(altClassInstancesToDisplay), contextFragment, selectedRoom,
 							roomConfig);
-				} else if (fieldValue == null && altValuesToDisplay.size() == 0) {
-					Log.e(LOG, "No alternative Values have been annotated to class.");
-					Toast.makeText(contentArea.getContext(), "No alternative Values annotated", Toast.LENGTH_SHORT).show();
-				} else if (fieldValue != null) {
-					EditConfigFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
+
+				} else if (getFieldValue() == null && altClassInstancesToDisplay.size() == 0) {
+					try {
+						Log.i(LOG, "No alternative Values have been annotated to field or fieldtype class. Trying to"
+								+ " instantiate a concrete Object of type: " + field.getType());
+
+						Serializable newFieldValue = (Serializable) field.getType().newInstance();
+						EditConfigFragment.editConfigBean(contextFragment, newFieldValue, selectedRoom, roomConfig);
+
+					} catch (Exception e) {
+						Log.e(LOG, "Could not instantiate object!", e);
+						Toast.makeText(contentArea.getContext(),
+								"No alternative Values annotated and class can not be instantiated directly", Toast.LENGTH_SHORT)
+								.show();
+					}
+
+				} else if (getFieldValue() != null) {
+					EditConfigFragment.editConfigBean(contextFragment, getFieldValue(), selectedRoom, roomConfig);
 				}
 			}
 		});
 
 		beanView.setOnLongClickListener(new OnLongClickListener() {
 
+
+
 			@Override
 			public boolean onLongClick(View v) {
+
+
 				contextFragment.getActivity().startActionMode(new ActionMode.Callback() {
 
 					@Override
@@ -132,7 +150,7 @@ public class BeanField extends FieldGenerator {
 						inflater.inflate(R.menu.fragment_edit_configuration_cab, menu);
 						MenuItem editItem = mode.getMenu().findItem(R.id.menuEntryEditConfigurationClass);
 
-						editItem.setVisible(fieldValue != null ? true : false);
+						editItem.setVisible(getFieldValue() != null ? true : false);
 
 						return true;
 					}
@@ -158,7 +176,7 @@ public class BeanField extends FieldGenerator {
 
 						case R.id.menuEntryEditConfigurationClass:
 
-							EditConfigFragment.editConfigBean(contextFragment, fieldValue, selectedRoom, roomConfig);
+							EditConfigFragment.editConfigBean(contextFragment, getFieldValue(), selectedRoom, roomConfig);
 
 							break;
 

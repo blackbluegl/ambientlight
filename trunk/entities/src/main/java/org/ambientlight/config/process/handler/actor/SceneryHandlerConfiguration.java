@@ -20,6 +20,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.valueprovider.SceneryNamesProvider;
 import org.ambientlight.config.process.handler.AbstractActionHandlerConfiguration;
 import org.ambientlight.config.process.handler.DataTypeValidation;
 import org.ambientlight.ws.process.validation.HandlerDataTypeValidation;
@@ -36,7 +37,7 @@ public class SceneryHandlerConfiguration extends AbstractActionHandlerConfigurat
 
 	@Presentation(name = "Name Szenerie", position = 1)
 	@TypeDef(fieldType = FieldType.BEAN_SELECTION)
-	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SceneryNamesProvider") })
+	@AlternativeValues(values = { @Value(valueProvider = SceneryNamesProvider.class) })
 	public String sceneryName;
 
 	@Presentation(name = "Name aus Vorgängerknoten", position = 0, description = "Soll der Name der Szenerie nicht selbst festgelegt werden sondern dynamisch aus einem Vorgängerknoten im Prozess ermittelt werden?")

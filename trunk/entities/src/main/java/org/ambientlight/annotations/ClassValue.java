@@ -28,6 +28,6 @@ public @interface ClassValue {
 	public String displayValue() default "";
 
 
-	public String newClassInstanceType() default "";
+	public Class newClassInstanceType() default Object.class;
 
 }

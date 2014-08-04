@@ -4,12 +4,14 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.ambientlight.ws.process.validation.ValidationResult;
-import org.springframework.web.client.RestTemplate;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 
 public class VerifyProcessTask extends AsyncTask<Object, Void, ValidationResult> {
+
+	private static final String LOG = VerifyProcessTask.class.getName();
 
 	private final String URL = "/process/{room}/validation";
 
@@ -17,11 +19,18 @@ public class VerifyProcessTask extends AsyncTask<Object, Void, ValidationResult>
 	@Override
 	protected ValidationResult doInBackground(Object... params) {
 
-		String url = Rest.getUrl(URL);
-		Map<String, String> vars = Collections.singletonMap("room", params[0].toString());
-		RestTemplate restTemplate = Rest.getRestTemplate();
+		try {
+			Map<String, String> vars = Collections.singletonMap("room", params[0].toString());
 
-		ValidationResult result = restTemplate.postForObject(url, params[1], ValidationResult.class, vars);
-		return result;
+			ValidationResult result = Rest.getRestTemplate().postForObject(Rest.getUrl(URL), params[1], ValidationResult.class,
+					vars);
+
+			return result;
+
+		} catch (Exception e) {
+			Log.e(LOG, e.getMessage());
+			return null;
+		}
+
 	}
 }

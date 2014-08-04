@@ -74,8 +74,8 @@ public class ValueBindingHelper {
 
 			// either the annotation is valid for the concrete class and all children or its bound to a parent class and there are
 			// different annotations for each subclass given.
-			if (currentValueAnnotation.forSubClass().isEmpty()
-					|| currentValueAnnotation.forSubClass().equals(bean.getClass().getName())) {
+			if (currentValueAnnotation.forSubClass().getName().equals(Object.class.getName())
+					|| currentValueAnnotation.forSubClass().getName().equals(bean.getClass().getName())) {
 				Log.d(LOG, "value matches for class: " + bean.getClass().getName());
 			} else {
 				// does not match for this calls and will be ignored
@@ -83,19 +83,19 @@ public class ValueBindingHelper {
 			}
 
 			// hard coded case for new classes
-			if (currentValueAnnotation.newClassInstanceType().isEmpty() == false) {
-				result.classNames.add(currentValueAnnotation.newClassInstanceType());
+			if (currentValueAnnotation.newClassInstanceType().getName().equals(Object.class.getName()) == false) {
+				result.classNames.add(currentValueAnnotation.newClassInstanceType().getName());
 				// set display value - if no display value given use class name
 				result.displayClassNames
 				.add(currentValueAnnotation.displayNewClassInstance().isEmpty() == false ? currentValueAnnotation
-						.displayNewClassInstance() : currentValueAnnotation.newClassInstanceType());
+						.displayNewClassInstance() : currentValueAnnotation.newClassInstanceType().getName());
 			}
 
 			// value provider for keys, values and new class instances
-			if (currentValueAnnotation.valueProvider().isEmpty() == false) {
+			if (currentValueAnnotation.valueProvider().getName().equals(Object.class.getName()) == false) {
 				// get generated values from provider
-				AlternativeValueProvider provider = (AlternativeValueProvider) Class.forName(
-						currentValueAnnotation.valueProvider()).newInstance();
+				AlternativeValueProvider provider = (AlternativeValueProvider) currentValueAnnotation.valueProvider()
+						.newInstance();
 				AlternativeValues providerResult = provider.getValue(dataModell, bean);
 
 				// if the provider did not generate any usefull result continue with next annotation
@@ -148,10 +148,10 @@ public class ValueBindingHelper {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static org.ambientlight.annotations.valueprovider.api.AlternativeClassValues getValuesForClass(
+	public static org.ambientlight.annotations.valueprovider.api.AlternativeValues getValuesForClass(
 			AlternativeClassValues annotation) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-		org.ambientlight.annotations.valueprovider.api.AlternativeClassValues result = new org.ambientlight.annotations.valueprovider.api.AlternativeClassValues();
+		org.ambientlight.annotations.valueprovider.api.AlternativeValues result = new org.ambientlight.annotations.valueprovider.api.AlternativeValues();
 
 		if (annotation == null) {
 			Log.d(LOG, "annotation is empty!");
@@ -166,11 +166,12 @@ public class ValueBindingHelper {
 		}
 
 		for (ClassValue currentValueAnnotation : valuesAnnotation) {
-			if (currentValueAnnotation.newClassInstanceType().isEmpty() == false) {
-				result.classNames.add(currentValueAnnotation.newClassInstanceType());
+			if (currentValueAnnotation.newClassInstanceType().getName().equals(Object.class.getName()) == false) {
+				result.classNames.add(currentValueAnnotation.newClassInstanceType().getName());
 				// add display values, if not present add classNames
-				result.displayValues.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation.displayValue()
-						: currentValueAnnotation.newClassInstanceType());
+				result.displayClassNames.add(currentValueAnnotation.displayValue() != null ? currentValueAnnotation
+						.displayValue()
+						: currentValueAnnotation.newClassInstanceType().getName());
 			}
 		}
 

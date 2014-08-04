@@ -7,6 +7,7 @@ import org.ambientlight.annotations.FieldType;
 import org.ambientlight.annotations.Presentation;
 import org.ambientlight.annotations.TypeDef;
 import org.ambientlight.annotations.Value;
+import org.ambientlight.annotations.valueprovider.SensorIdsProviderForExpressionsProvider;
 
 
 public class ExpressionConfiguration implements Serializable {
@@ -18,6 +19,6 @@ public class ExpressionConfiguration implements Serializable {
 			+ "Sensoren möglich. Variablen beginnen mit \'#{\'. Um auf Prozessdaten des Vorgängerkontens zuzugreifen kann"
 			+ " #{tokenValue} verwendet werden.\n\nBolsche Ausdrücke werden in JEVAL mit "
 			+ "1.0 als wahr und mit 0.0 als falsch bezeichnet.")
-	@AlternativeValues(values = { @Value(valueProvider = "org.ambientlight.annotations.valueprovider.SensorIdsProviderForExpressionsProvider") })
+	@AlternativeValues(values = { @Value(valueProvider = SensorIdsProviderForExpressionsProvider.class) })
 	public String expression = "";
 }

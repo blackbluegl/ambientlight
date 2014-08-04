@@ -55,7 +55,7 @@ public class Process {
 
 
 	@POST
-	@Path("/{roomName}/")
+	@Path("/{roomName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object createOrUpdateProcess(@PathParam("roomName") String roomName, EventProcessConfiguration process) {

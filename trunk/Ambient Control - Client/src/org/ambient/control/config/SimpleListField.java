@@ -31,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -60,8 +61,8 @@ public class SimpleListField extends FieldGenerator {
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 */
-	public SimpleListField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment,
-			LinearLayout contentArea) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+	public SimpleListField(Room roomConfig, Object bean, Field field, EditConfigFragment contextFragment, LinearLayout contentArea)
+			throws IllegalAccessException, ClassNotFoundException, InstantiationException {
 		super(roomConfig, bean, field, contextFragment, contentArea);
 	}
 
@@ -91,14 +92,17 @@ public class SimpleListField extends FieldGenerator {
 				android.R.layout.simple_list_item_1, listContent);
 		listView.setAdapter(adapter);
 
+		// create spacer
+		View space = new View(contextFragment.getActivity());
+		contentArea.addView(space);
+		space.setBackgroundResource(R.color.darkGrey);
+		space.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 1));
+
 		// create a '+' button for an empty list so the user can put in his first object
 		final ImageView createNew = new ImageView(contextFragment.getActivity());
 		contentArea.addView(createNew);
 		createNew.setImageResource(R.drawable.content_new);
-		// show it, but only if the list is empty
-		if (listContent.size() > 0) {
-			createNew.setVisibility(View.GONE);
-		}
+
 		// handle on click and create a new bean in a child fragment
 		createNew.setOnClickListener(new OnClickListener() {
 

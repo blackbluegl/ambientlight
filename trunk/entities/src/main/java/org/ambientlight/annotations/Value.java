@@ -29,13 +29,13 @@ public @interface Value {
 	/*
 	 * used if childclasses should have seperate implementations for this annotation
 	 */
-	public String forSubClass() default "";
+	public Class<?> forSubClass() default Object.class;
 
 
 	/*
 	 * give hint for an abstract class what kind of concrete class type can be used for new instances.
 	 */
-	public String newClassInstanceType() default "";
+	public Class<?> newClassInstanceType() default Object.class;
 
 
 	/*
@@ -47,5 +47,5 @@ public @interface Value {
 	/*
 	 * provides keys for maps and values for maps or list.
 	 */
-	public String valueProvider() default "";
+	public Class<?> valueProvider() default Object.class;
 }

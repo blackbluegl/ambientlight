@@ -559,7 +559,7 @@ public class ProcessCardFragment extends RoomServiceAwareFragment {
 			SceneryManagerConfiguration sceneryManager = roomService.getRoomConfiguration(selectedRoom).sceneriesManager;
 			List<Scenery> addNew = new ArrayList<Scenery>();
 			for (Scenery current : ((SceneriesWrapper) configuration).sceneries) {
-				if (sceneryManager.sceneries.containsKey(current.id) == false) {
+				if (current.id.isEmpty() == false && sceneryManager.sceneries.containsKey(current.id) == false) {
 					addNew.add(current);
 				}
 			}
@@ -568,6 +568,31 @@ public class ProcessCardFragment extends RoomServiceAwareFragment {
 			try {
 				for (Scenery current : addNew) {
 					RestClient.createScenery(selectedRoom, current.id);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// extract deleted sceneries
+			List<String> removeDeleted = new ArrayList<String>();
+			for (String current : sceneryManager.sceneries.keySet()) {
+				boolean found = false;
+				for (Scenery currentToCompare : ((SceneriesWrapper) configuration).sceneries) {
+					if (currentToCompare.id.equals(current)) {
+						found = true;
+						break;
+					}
+				}
+
+				if (found == false) {
+					removeDeleted.add(current);
+				}
+			}
+
+			// remove deleted sceneries on server
+			try {
+				for (String current : removeDeleted) {
+					RestClient.deleteScenery(selectedRoom, current);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

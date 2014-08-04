@@ -77,6 +77,8 @@ public class SceneryManager extends Manager implements ScenerySensor {
 		if (config.sceneries.containsKey(scenery) == false)
 			throw new IllegalArgumentException("Scenery does not exist!");
 
+		System.out.println("SceneryManager - deletingScenery(): delete scenery " + scenery);
+
 		persistence.beginTransaction();
 
 		config.sceneries.remove(scenery);
@@ -88,6 +90,14 @@ public class SceneryManager extends Manager implements ScenerySensor {
 
 
 	public void createScenery(String scenery) {
+
+		if (scenery == null || scenery.isEmpty())
+			throw new IllegalArgumentException("Scenery may not be null or empty!");
+
+		if (config.sceneries.containsKey(scenery) == true)
+			throw new IllegalArgumentException("Scenery does already exist!");
+
+		System.out.println("SceneryManager - createScenery(): creating scenery " + scenery);
 
 		persistence.beginTransaction();
 

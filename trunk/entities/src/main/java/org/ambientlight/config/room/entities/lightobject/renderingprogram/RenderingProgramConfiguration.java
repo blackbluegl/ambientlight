@@ -9,9 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 
 @AlternativeClassValues(values = {
-		@ClassValue(displayValue = "Farbe auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration"),
-		@ClassValue(displayValue = "Tron auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.TronRenderingProgrammConfiguration"),
-		@ClassValue(displayValue = "Sonnenuntergang auswählen", newClassInstanceType = "org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration") })
+		@ClassValue(displayValue = "Farbe auswählen", newClassInstanceType = SimpleColorRenderingProgramConfiguration.class),
+		@ClassValue(displayValue = "Tron auswählen", newClassInstanceType = TronRenderingProgrammConfiguration.class),
+		@ClassValue(displayValue = "Sonnenuntergang auswählen", newClassInstanceType = SunSetRenderingProgrammConfiguration.class) })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class RenderingProgramConfiguration implements Serializable {
 
