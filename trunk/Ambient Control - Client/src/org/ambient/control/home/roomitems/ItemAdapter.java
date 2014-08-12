@@ -91,7 +91,7 @@ public class ItemAdapter extends BaseAdapter {
 				}
 
 			} else if (entity instanceof Climate) {
-				this.addItem(entity, new ClimateStrategy());
+				this.addItem(entity, new ClimateStrategy(room.climateManager));
 			}
 		}
 	}

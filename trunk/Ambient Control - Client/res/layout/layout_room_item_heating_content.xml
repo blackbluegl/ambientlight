@@ -1,49 +1,48 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="85dp"
-    android:layout_height="85dp"
-    android:layout_marginTop="5dp" >
+    android:layout_width="60dp"
+    android:layout_height="60dp">
 
     <org.ambient.views.ImageViewWithContextMenuInfo
         android:id="@+id/imageViewHeatingIcon"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:src="@drawable/ic_heating_active" />
 
     <TextView
         android:id="@+id/textViewTempDegree"
-        android:layout_width="80dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_centerInParent="false"
-        android:layout_centerVertical="true"
-        android:gravity="center_horizontal"
-        android:shadowColor="@color/RoomFloor"
+        android:layout_below="@+id/textViewTempMode"
+        android:layout_marginLeft="2dp"
+        android:gravity="center"
+        android:shadowColor="@color/textShaddow"
         android:shadowDx="1"
         android:shadowDy="1"
-        android:shadowRadius="1"
+        android:shadowRadius="4"
         android:text="20.5"
-        android:textColor="@color/RoomWall"
-        android:textSize="32sp"
+        android:textColor="@color/textColorWhite"
+        android:textSize="22sp"
         android:textStyle="bold"
-        android:typeface="sans" >
-    </TextView>
+        android:typeface="sans" />
 
     <TextView
         android:id="@+id/textViewTempMode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textViewTempDegree"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/textViewTempDegree"
+        android:layout_marginBottom="-5dp"
+        android:layout_marginRight="-8dp"
         android:clickable="false"
         android:gravity="right"
-        android:shadowColor="@color/RoomFloor"
+        android:shadowColor="@color/textShaddow"
         android:shadowDx="1"
         android:shadowDy="1"
-        android:shadowRadius="1"
+        android:shadowRadius="4"
         android:text="M"
-        android:textColor="@color/RoomWall"
+        android:textColor="@color/textColorWhite"
         android:textStyle="bold"
         android:typeface="sans" />
 

@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 
 public class SetCurrentClimateModeTask extends AsyncTask<Object, Void, Void> {
 
-	private final String URL = "/climate/{roomName}/mode/boost";
+	private final String URL = "/features/{roomName}/climate/mode";
 
 
 	@Override

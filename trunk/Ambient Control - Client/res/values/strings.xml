@@ -6,6 +6,9 @@
     <string name="title_section_home">Mein Zuhause</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_home_power_off">Hauptschalter aus</string>
+    <string name="menu_home_heating_eco">Eco</string>
+    <string name="menu_home_heating_auto">Auto</string>
     <string name="title_activity_main">Ambient Control</string>
     <string name="title_activity_edit_rendering_config">Program bearbeiten</string>
     <string name="title_activity_process_card_activity">Prozesse bearbeiten</string>
@@ -34,5 +37,6 @@
     <string name="chose_room">Raum:</string>
     <string name="chose_switch">Schalter:</string>
     <string name="button_nfc_program">Anlernen</string>
+    <string name="title_activity_climate">ClimateActivity</string>
 
 </resources>

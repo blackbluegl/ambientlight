@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.room.entities.climate;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
@@ -24,7 +25,15 @@ import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
  * @author Florian Bornkessel
  * 
  */
-public class TemperaturMode {
+public class TemperaturMode implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+
+	public TemperaturMode() {
+
+	}
+
 
 	public TemperaturMode(float temp, Date until, MaxThermostateMode mode) {
 		super();

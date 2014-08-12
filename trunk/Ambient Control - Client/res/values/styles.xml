@@ -8,6 +8,7 @@
     <color name="roomChooserUnChoosen">#000000</color>
     <color name="textColorBlack">#000000</color>
     <color name="textColorWhite">#FFFFFF</color>
+        <color name="textShaddow">#555555</color>
     <color name="defaultGrey">#888888</color>
     <color name="darkGrey">#333333</color>
 

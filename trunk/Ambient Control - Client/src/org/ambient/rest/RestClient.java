@@ -92,7 +92,7 @@ public class RestClient {
 	}
 
 
-	public static void createScenery(String roomName, String scenery) throws Exception {
+	public static void createScenery(String roomName, String scenery) {
 		CreateSceneryTask task = new CreateSceneryTask();
 		task.execute(roomName, scenery);
 	}
@@ -104,13 +104,13 @@ public class RestClient {
 	}
 
 
-	public static void setTemperatureMode(String roomName, TemperaturMode mode) throws Exception {
+	public static void setTemperatureMode(String roomName, TemperaturMode mode) {
 		SetCurrentClimateModeTask task = new SetCurrentClimateModeTask();
 		task.execute(roomName, mode);
 	}
 
 
-	public static void setClimateBoostMode(String roomName, boolean enable) throws Exception {
+	public static void setClimateBoostMode(String roomName, boolean enable) {
 		SetClimateBoostModeTask task = new SetClimateBoostModeTask();
 		task.execute(roomName, enable);
 	}

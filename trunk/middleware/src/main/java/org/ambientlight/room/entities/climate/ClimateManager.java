@@ -595,7 +595,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 	public void setBoostMode(boolean boost) {
 		if (boost) {
-			setClimate(config.temperature, MaxThermostateMode.BOOST, config.temporaryUntil);
+			setClimate(config.temperature, MaxThermostateMode.BOOST, null);
 		} else {
 			setClimate(config.temperature, config.modeBeforeBoost, config.temporaryUntil);
 		}
@@ -608,6 +608,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		if (until != null && config.mode == MaxThermostateMode.TEMPORARY)
 			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
 
+		config.mode = mode;
+		config.temperature = temp;
+		config.temporaryUntil = until;
+
 		// save state for restore
 		if (mode == MaxThermostateMode.BOOST) {
 			config.modeBeforeBoost = config.mode;
@@ -616,22 +620,8 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			config.boostUntil = boostUntil.getTime();
 		}
 
-		config.mode = mode;
-		config.temperature = temp;
-		config.temporaryUntil = until;
-
-		List<Message> messages = new ArrayList<Message>();
-
-		for (MaxComponent current : config.devices.values()) {
-			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.adress);
-				messages.add(outMessage);
-			}
-		}
-
-		queueManager.putOutMessages(messages);
-
 		if (config.mode == MaxThermostateMode.AUTO) {
+			config.temporaryUntil = null;
 			Calendar now = GregorianCalendar.getInstance();
 			MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
 			List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
@@ -653,6 +643,21 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			}
 			config.temperature = nextDayEntry.getTemp();
 		}
+
+		if (config.mode == MaxThermostateMode.MANUAL) {
+			config.temporaryUntil = null;
+		}
+
+		List<Message> messages = new ArrayList<Message>();
+
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.adress);
+				messages.add(outMessage);
+			}
+		}
+
+		queueManager.putOutMessages(messages);
 
 		persistence.commitTransaction();
 		callBackMananger.roomConfigurationChanged();

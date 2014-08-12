@@ -15,6 +15,7 @@
 
 package org.ambientlight.config.room.entities.climate;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
  * @author Florian Bornkessel
  * 
  */
-public class ClimateManagerConfiguration {
+public class ClimateManagerConfiguration implements Serializable {
 
 	public MaxThermostateMode mode = MaxThermostateMode.AUTO;
 	public MaxThermostateMode modeBeforeBoost = MaxThermostateMode.AUTO;

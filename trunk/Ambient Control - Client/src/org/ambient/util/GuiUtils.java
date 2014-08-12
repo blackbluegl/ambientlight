@@ -10,6 +10,7 @@ import org.ambient.control.R;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -44,8 +45,7 @@ public class GuiUtils {
 
 
 	/**
-	 * thanks to doughw
-	 * http://stackoverflow.com/questions/3495890/how-can-i-put-
+	 * thanks to doughw http://stackoverflow.com/questions/3495890/how-can-i-put-
 	 * a-listview-into-a-scrollview-without-it-collapsing/3495908#3495908
 	 * 
 	 * @param listView
@@ -84,6 +84,31 @@ public class GuiUtils {
 		} catch (ClassNotFoundException e) {
 			return null;
 		}
+	}
+
+
+	/**
+	 * @param temp
+	 * @return
+	 */
+	public static int getTemperatureTextColor(float temp, float comfortTemp, float maxTemp, float minTemp) {
+		// create color
+		int currentBarColor = 0;
+		// warm colors above comfort temp
+		if (temp >= comfortTemp) {
+			int redPart = (int) ((temp - comfortTemp) / (maxTemp - comfortTemp) * 255);
+			int greenPart = 255 - redPart;
+			int bluePart = 0;
+			currentBarColor = Color.rgb(redPart, greenPart, bluePart);
+		}
+		// cold colors below comfort temp
+		else {
+			int redPart = 0;
+			int greenPart = (int) ((temp - minTemp) / (comfortTemp - minTemp) * 255);
+			int bluePart = 255 - greenPart;
+			currentBarColor = Color.rgb(redPart, greenPart, bluePart);
+		}
+		return currentBarColor;
 	}
 
 }

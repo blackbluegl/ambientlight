@@ -15,16 +15,26 @@
 
 package org.ambientlight.config.room.entities.climate;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class DayEntry implements Comparable<DayEntry> {
+
+public class DayEntry implements Comparable<DayEntry>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private int hour;
 	private int min;
 	private float temp;
+
+
+	public DayEntry() {
+
+	}
 
 
 	public DayEntry(byte high, byte low) {
@@ -50,6 +60,7 @@ public class DayEntry implements Comparable<DayEntry> {
 	}
 
 
+	@JsonIgnore
 	public byte[] getByteCode() {
 		int amountOfDay = (hour * 60 + min) / 5;
 		int temp = (int) (this.temp * 2);

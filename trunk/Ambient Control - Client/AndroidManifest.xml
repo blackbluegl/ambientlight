@@ -1,18 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ambient.control"
     android:installLocation="auto"
     android:versionCode="1"
     android:versionName="0.16.0-SNAPSHOT" >
 
-    <uses-permission android:name="android.permission.INTERNET" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.NFC" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -28,8 +24,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="org.ambient.control.home.HomeActivity"
-            android:label="@string/title_activity_main"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,13 +41,11 @@
         <activity
             android:name="org.ambient.control.home.EditRenderingConfigActivity"
             android:label="@string/title_activity_edit_rendering_config"
-            android:uiOptions="splitActionBarWhenNarrow" >
-        </activity>
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name="org.ambient.control.processes.ProcessCardActivity"
             android:label="@string/title_activity_process_card_activity"
-            android:uiOptions="splitActionBarWhenNarrow" >
-        </activity>
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name="org.ambient.control.nfc.NFCSwitchHandlerActivity"
             android:label="@string/title_activity_nfcswitch_handler"
@@ -69,8 +62,8 @@
         </activity>
         <activity
             android:name="org.ambient.control.config.EditConfigActivity"
-            android:label="@string/title_activity_edit_config_activity" >
-        </activity>
+            android:label="@string/title_activity_edit_config_activity" />
+        <activity android:name="org.ambient.control.climate.ClimateActivity" />
 
         <receiver
             android:name="org.ambient.widgets.RoomSwitchesWidgetProvider"
@@ -85,10 +78,8 @@
                 android:resource="@xml/appwidgetprovider" />
         </receiver>
 
-        <service android:name="org.ambient.widgets.UpdateWidgetService" >
-        </service>
-        <service android:name="org.ambient.roomservice.RoomConfigService" >
-        </service>
+        <service android:name="org.ambient.widgets.UpdateWidgetService" />
+        <service android:name="org.ambient.roomservice.RoomConfigService" />
 
         <receiver
             android:name="org.ambient.roomservice.boot.StartRoomConfigServiceReceiver"
