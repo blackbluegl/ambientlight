@@ -20,6 +20,7 @@ import org.ambient.control.RoomServiceAwareActivity;
 import org.ambient.control.home.HomeActivity;
 import org.ambient.control.processes.ProcessCardActivity;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
@@ -40,6 +41,10 @@ public class NavigationActivity extends RoomServiceAwareActivity {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+
+		ActionBar actionBar = getActionBar();
+		// actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.show();
 
 		setContentView(R.layout.activity_process_card);
 

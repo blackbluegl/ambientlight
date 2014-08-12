@@ -47,8 +47,6 @@ public class ProcessCardActivity extends NavigationActivity {
 
 			ProcessCardFragment fragment = new ProcessCardFragment();
 			ft.add(content.getId(), fragment, FRAGMENT_TAG);
-			// ft.addToBackStack(null);
-
 			ft.commit();
 		}
 

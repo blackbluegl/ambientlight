@@ -15,6 +15,8 @@
 
 package org.ambient.views;
 
+import org.ambient.util.GuiUtils;
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 
 import android.animation.ValueAnimator;
@@ -52,7 +54,7 @@ public class TemperatureModeView extends View {
 
 	public interface ModeChangeListener {
 
-		public void onModeChanged(String mode);
+		public void onModeChanged(MaxThermostateMode mode);
 	}
 
 	public TemperatureChangeListener temperatureListener = null;
@@ -147,7 +149,7 @@ public class TemperatureModeView extends View {
 
 	public void setBoostMode(int durationToGoInSeconds) {
 		if (durationToGoInSeconds > 0) {
-			updateTemperatureBar(maxTemp);
+			currentTemp = maxTemp;
 			boostMode = true;
 			boostDurationValueAnimator.setDuration(durationToGoInSeconds * 1000);
 			boostDurationValueAnimator.start();
@@ -157,27 +159,57 @@ public class TemperatureModeView extends View {
 			boostDurationValueAnimator.cancel();
 			modeTextValue = "";
 		}
+		invalidate();
 	}
 
 
-	public void setMode(String mode) {
-		modeTextValue = mode;
+	public MaxThermostateMode getMode() {
+		if (modeTextValue.equals("A"))
+			return MaxThermostateMode.AUTO;
+		else if (modeTextValue.equals("B"))
+			return MaxThermostateMode.BOOST;
+		else if (modeTextValue.equals("M"))
+			return MaxThermostateMode.MANUAL;
+		else
+			return MaxThermostateMode.TEMPORARY;
+	}
+
+
+	public void setMode(MaxThermostateMode mode) {
+		if (mode == MaxThermostateMode.AUTO) {
+			modeTextValue = "A";
+		} else if (mode == MaxThermostateMode.BOOST) {
+			modeTextValue = "B";
+		} else if (mode == MaxThermostateMode.MANUAL) {
+			modeTextValue = "M";
+		} else if (mode == MaxThermostateMode.TEMPORARY) {
+			modeTextValue = "T";
+		}
 	}
 
 
 	public void setTemp(float temp) {
-		if (viewWidth != 0) {
-			updateTemperatureBar(temp);
-			invalidate();
-		} else {
-			currentTemp = temp;
-		}
+		currentTemp = temp;
+		// if (viewWidth != 0) {
+		// invalidate();
+		// } else {
+		// currentTemp = temp;
+		// }
+		invalidate();
+	}
+
+
+	public float getTemp() {
+		return currentTemp;
 	}
 
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+
+		// update bar
+		updateTemperatureBar(currentTemp);
 
 		// draw background
 		bgRect.set(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -278,7 +310,6 @@ public class TemperatureModeView extends View {
 		if (temp < minTemp) {
 			temp = minTemp;
 		}
-		this.currentTemp = temp;
 
 		float factor = (temp - minTemp) / (maxTemp - minTemp);
 		int rightEnd = (int) (barPoints[2].x + (factor) * (barPoints[1].x - barPoints[2].x));
@@ -287,22 +318,7 @@ public class TemperatureModeView extends View {
 		markerRect.bottom = viewHeight - barOffsetYBottom - (factor) * (viewHeight - barOffsetYBottom - barOffSetYTop);
 		markerRect.top = markerRect.bottom - viewHeight / 60;
 
-		// create color
-		int currentBarColor = 0;
-		// warm colors above comfort temp
-		if (temp >= comfortTemp) {
-			int redPart = (int) ((temp - comfortTemp) / (maxTemp - comfortTemp) * 255);
-			int greenPart = 255 - redPart;
-			int bluePart = 0;
-			currentBarColor = Color.rgb(redPart, greenPart, bluePart);
-		}
-		// cold colors under comfort temp
-		else {
-			int redPart = 0;
-			int greenPart = (int) ((temp - minTemp) / (comfortTemp - minTemp) * 255);
-			int bluePart = 255 - greenPart;
-			currentBarColor = Color.rgb(redPart, greenPart, bluePart);
-		}
+		int currentBarColor = GuiUtils.getTemperatureTextColor(temp, comfortTemp, maxTemp, minTemp);
 		// glossy effect for this color
 		int[] colors = new int[5];
 		colors[0] = getColor(10f, currentBarColor);
@@ -366,13 +382,17 @@ public class TemperatureModeView extends View {
 			float factor = (viewHeight - e.getY() - barOffsetYBottom) / (viewHeight - barOffsetYBottom - barOffSetYTop);
 			// get temperature
 			float temp = (maxTemp - minTemp) * factor + minTemp;
-			// update temperature
-			updateTemperatureBar(temp);
+
+			temp = (float) (Math.round(temp * 10) / 10.0);
+
+			// store temperature
+			currentTemp = temp;
 
 			// update listener
 			if (temperatureListener != null) {
 				temperatureListener.onTemperatureChange(temp);
 			}
+			invalidate();
 		}
 
 
@@ -392,8 +412,9 @@ public class TemperatureModeView extends View {
 			}
 
 			if (modeChangeListener != null) {
-				modeChangeListener.onModeChanged(modeTextValue);
+				modeChangeListener.onModeChanged(getMode());
 			}
+			invalidate();
 		}
 
 	}

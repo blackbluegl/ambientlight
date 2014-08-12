@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <org.ambient.views.TemperatureModeView
-        android:id="@+id/temperatureModeView1"
+        android:id="@+id/temperatureModeView"
         android:layout_width="107dp"
         android:layout_height="339dp" />
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_heating"
+        android:icon="@drawable/ic_heating_all_eco"
+        android:showAsAction="always|withText"
+        android:title="@string/menu_home_heating_eco"
+        android:visible="true"/>
+    <item
+        android:id="@+id/menu_power"
+        android:icon="@drawable/ic_power_all_off"
+        android:showAsAction="always|withText"
+        android:title="@string/menu_home_power_off"
+        android:visible="true"/>
+
+</menu>

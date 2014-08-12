@@ -18,6 +18,8 @@ package org.ambient.control.home.roomitems;
 import org.ambient.control.R;
 import org.ambient.control.home.RoomFragment;
 import org.ambient.rest.RestClient;
+import org.ambient.util.GuiUtils;
+import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 import org.ambientlight.room.entities.climate.util.MaxUtil;
@@ -26,7 +28,9 @@ import org.ambientlight.room.entities.features.climate.Climate;
 import org.ambientlight.ws.Room;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -41,6 +45,14 @@ import android.widget.TextView;
  * 
  */
 public class ClimateStrategy implements Strategy {
+
+	ClimateManagerConfiguration climate;
+
+
+	public ClimateStrategy(ClimateManagerConfiguration climate) {
+		this.climate = climate;
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -64,7 +76,7 @@ public class ClimateStrategy implements Strategy {
 	private void updateIcon(RelativeLayout itemContent, TemperaturMode mode) {
 		ImageView icon = (ImageView) itemContent.findViewById(R.id.imageViewHeatingIcon);
 
-		boolean disabled = mode.temp <= MaxUtil.MIN_TEMPERATURE;
+		boolean disabled = mode.temp <= MaxUtil.MIN_TEMPERATURE + 0.1f;
 
 		if (mode.thermostateMode == null) {
 			icon.setImageResource(R.drawable.ic_heating_active);
@@ -94,6 +106,8 @@ public class ClimateStrategy implements Strategy {
 
 		TextView tempText = (TextView) itemContent.findViewById(R.id.textViewTempDegree);
 		tempText.setText(String.valueOf(mode.temp));
+		tempText.setTextColor(GuiUtils.getTemperatureTextColor(climate.temperature, climate.comfortTemperatur,
+				MaxUtil.MAX_TEMPERATURE, MaxUtil.MIN_TEMPERATURE));
 	}
 
 
@@ -106,11 +120,11 @@ public class ClimateStrategy implements Strategy {
 
 		try {
 			if (climate.getTemperatureMode().thermostateMode == MaxThermostateMode.BOOST) {
-				mode.thermostateMode = MaxThermostateMode.BOOST;
+				mode.thermostateMode = MaxThermostateMode.MANUAL;
 				updateIcon((RelativeLayout) view, mode);
-				RestClient.setClimateBoostMode(roomFragment.roomName, true);
+				RestClient.setClimateBoostMode(roomFragment.roomName, false);
 			} else {
-				mode.thermostateMode = null;
+				mode.thermostateMode = MaxThermostateMode.BOOST;
 				updateIcon((RelativeLayout) view, mode);
 				RestClient.setClimateBoostMode(roomFragment.roomName, true);
 			}
@@ -129,7 +143,16 @@ public class ClimateStrategy implements Strategy {
 	 */
 	@Override
 	public void onLongClick(View view, Room room, RoomFragment roomFragment, Entity entity) {
+		FragmentManager fm = roomFragment.getFragmentManager();
 
+		Bundle args = new Bundle();
+		args.putString(TemperatureChooserDialogFragment.BUNDLE_ROOM_NAME, room.roomName);
+		args.putSerializable(TemperatureChooserDialogFragment.BUNDLE_CLIMATE_CONFIG, room.climateManager);
+
+		TemperatureChooserDialogFragment tempFragment = new TemperatureChooserDialogFragment();
+		tempFragment.setArguments(args);
+
+		tempFragment.show(fm, "tempChooserFragment");
 	}
 
 }
