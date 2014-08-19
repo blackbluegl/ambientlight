@@ -321,11 +321,11 @@ public class TemperatureModeView extends View {
 		int currentBarColor = GuiUtils.getTemperatureTextColor(temp, comfortTemp, maxTemp, minTemp);
 		// glossy effect for this color
 		int[] colors = new int[5];
-		colors[0] = getColor(10f, currentBarColor);
-		colors[1] = getColor(2.5f, currentBarColor);
-		colors[2] = getColor(1.5f, currentBarColor);
-		colors[3] = getColor(0.8f, currentBarColor);
-		colors[4] = getColor(0.2f, currentBarColor);
+		colors[0] = GuiUtils.getColor(10f, currentBarColor);
+		colors[1] = GuiUtils.getColor(2.5f, currentBarColor);
+		colors[2] = GuiUtils.getColor(1.5f, currentBarColor);
+		colors[3] = GuiUtils.getColor(0.8f, currentBarColor);
+		colors[4] = GuiUtils.getColor(0.2f, currentBarColor);
 		// positions in gradient for glossy effect
 		float[] colorPositions = new float[] { 0f, 0.3f, 0.5f, 0.501f, 1.0f };
 
@@ -404,7 +404,10 @@ public class TemperatureModeView extends View {
 				modeTextValue = "A";
 
 			} else if ("A".equals(modeTextValue)) {
-				setBoostMode(boostDurationInSeconds);
+				// setBoostMode(boostDurationInSeconds);
+				modeTextValue = "B";
+				currentTemp = maxTemp;
+				boostMode = true;
 
 			} else if ("B".equals(modeTextValue)) {
 				setBoostMode(0);
@@ -420,19 +423,7 @@ public class TemperatureModeView extends View {
 	}
 
 
-	/**
-	 * return color based on the value and multiplied with a factor
-	 * 
-	 * @param factor
-	 * @param color
-	 * @return color as int value multiplied with a factor
-	 */
-	private int getColor(float factor, int color) {
-		int rNew = (int) (Color.red(color) * factor > 255 ? 255 : Color.red(color) * factor);
-		int gNew = (int) (Color.green(color) * factor > 255 ? 255 : Color.green(color) * factor);
-		int bNew = (int) (Color.blue(color) * factor > 255 ? 255 : Color.blue(color) * factor);
-		return Color.rgb(rNew, gNew, bNew);
-	}
+
 
 	class BoostUpdateTimerListener implements ValueAnimator.AnimatorUpdateListener {
 

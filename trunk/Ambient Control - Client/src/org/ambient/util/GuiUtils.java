@@ -111,4 +111,19 @@ public class GuiUtils {
 		return currentBarColor;
 	}
 
+
+	/**
+	 * return color based on the value and multiplied with a factor
+	 * 
+	 * @param factor
+	 * @param color
+	 * @return color as int value multiplied with a factor
+	 */
+	public static int getColor(float factor, int color) {
+		int rNew = (int) (Color.red(color) * factor > 255 ? 255 : Color.red(color) * factor);
+		int gNew = (int) (Color.green(color) * factor > 255 ? 255 : Color.green(color) * factor);
+		int bNew = (int) (Color.blue(color) * factor > 255 ? 255 : Color.blue(color) * factor);
+		return Color.rgb(rNew, gNew, bNew);
+	}
+
 }
