@@ -105,9 +105,13 @@ public class ClimateStrategy implements Strategy {
 		}
 
 		TextView tempText = (TextView) itemContent.findViewById(R.id.textViewTempDegree);
-		tempText.setText(String.valueOf(mode.temp));
-		tempText.setTextColor(GuiUtils.getTemperatureTextColor(climate.temperature, climate.comfortTemperatur,
-				MaxUtil.MAX_TEMPERATURE, MaxUtil.MIN_TEMPERATURE));
+		if (mode.thermostateMode != MaxThermostateMode.BOOST && mode.temp > MaxUtil.MIN_TEMPERATURE) {
+			tempText.setText(String.valueOf(mode.temp));
+			tempText.setTextColor(GuiUtils.getColor(3f, GuiUtils.getTemperatureTextColor(climate.temperature,
+					climate.comfortTemperatur, MaxUtil.MAX_TEMPERATURE, MaxUtil.MIN_TEMPERATURE)));
+		} else {
+			tempText.setText("");
+		}
 	}
 
 
@@ -120,7 +124,7 @@ public class ClimateStrategy implements Strategy {
 
 		try {
 			if (climate.getTemperatureMode().thermostateMode == MaxThermostateMode.BOOST) {
-				mode.thermostateMode = MaxThermostateMode.MANUAL;
+				mode.thermostateMode = this.climate.modeBeforeBoost;
 				updateIcon((RelativeLayout) view, mode);
 				RestClient.setClimateBoostMode(roomFragment.roomName, false);
 			} else {

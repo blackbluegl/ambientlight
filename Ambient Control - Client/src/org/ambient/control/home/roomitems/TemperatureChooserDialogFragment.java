@@ -125,7 +125,7 @@ public class TemperatureChooserDialogFragment extends DialogFragment implements 
 		if (mode == MaxThermostateMode.TEMPORARY) {
 			calendar.setVisibility(View.VISIBLE);
 		} else {
-			calendar.setVisibility(View.INVISIBLE);
+			calendar.setVisibility(View.GONE);
 		}
 	}
 }

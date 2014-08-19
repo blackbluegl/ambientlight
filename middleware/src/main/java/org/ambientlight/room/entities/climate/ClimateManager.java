@@ -55,6 +55,7 @@ import org.ambientlight.room.entities.climate.handlers.RemoveShutterContactHandl
 import org.ambientlight.room.entities.climate.handlers.RemoveThermostatHandler;
 import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
+import org.ambientlight.room.entities.climate.util.MaxUtil;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.climate.Climate;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
@@ -605,23 +606,27 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	public void setClimate(float temp, MaxThermostateMode mode, Date until) {
 		persistence.beginTransaction();
 
+		if (temp < MaxUtil.MIN_TEMPERATURE) {
+			temp = MaxUtil.MIN_TEMPERATURE;
+		} else if (temp > MaxUtil.MAX_TEMPERATURE) {
+			temp = MaxUtil.MAX_TEMPERATURE;
+		}
+
 		if (until != null && config.mode == MaxThermostateMode.TEMPORARY)
 			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
 
-		config.mode = mode;
-		config.temperature = temp;
-		config.temporaryUntil = until;
-
 		// save state for restore
 		if (mode == MaxThermostateMode.BOOST) {
-			config.modeBeforeBoost = config.mode;
+			if (config.mode != MaxThermostateMode.BOOST) {
+				config.modeBeforeBoost = config.mode;
+			}
 			Calendar boostUntil = GregorianCalendar.getInstance();
 			boostUntil.add(Calendar.MINUTE, config.boostDurationMins);
 			config.boostUntil = boostUntil.getTime();
 		}
 
-		if (config.mode == MaxThermostateMode.AUTO) {
-			config.temporaryUntil = null;
+		if (mode == MaxThermostateMode.AUTO) {
+			until = null;
 			Calendar now = GregorianCalendar.getInstance();
 			MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
 			List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
@@ -644,9 +649,16 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			config.temperature = nextDayEntry.getTemp();
 		}
 
-		if (config.mode == MaxThermostateMode.MANUAL) {
-			config.temporaryUntil = null;
+		if (mode == MaxThermostateMode.MANUAL) {
+			until = null;
 		}
+
+		if (mode != MaxThermostateMode.BOOST) {
+			config.modeBeforeBoost = mode;
+		}
+		config.mode = mode;
+		config.temperature = temp;
+		config.temporaryUntil = until;
 
 		List<Message> messages = new ArrayList<Message>();
 
