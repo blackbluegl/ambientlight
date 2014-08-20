@@ -17,6 +17,7 @@ package org.ambientlight.webservice;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -29,11 +30,9 @@ import org.ambientlight.room.entities.climate.ClimateManager;
 
 /**
  * @author Florian Bornkessel
- * 
  */
 @Path("/config/climate")
 public class Climate {
-
 
 	@GET
 	@Path("/{roomName}/pairing")
@@ -66,11 +65,11 @@ public class Climate {
 	}
 
 
-	@GET
-	@Path("/{roomName}/currentWeekProfile/{currentProfile}")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@PUT
+	@Path("/{roomName}/currentWeekProfile")
+	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setCurrentWeekProfile(@PathParam("roomName") String roomName, @PathParam("currentProfile") String profile) {
+	public Response setCurrentWeekProfile(@PathParam("roomName") String roomName, String profile) {
 		ClimateManager manager = AmbientControl.getRoom(roomName).climateManager;
 
 		try {

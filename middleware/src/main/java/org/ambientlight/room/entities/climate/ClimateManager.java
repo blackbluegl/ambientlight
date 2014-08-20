@@ -469,10 +469,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		persistence.commitTransaction();
 
-		// this.setMode(0.0f, MaxThermostateMode.AUTO, null);
-
 		callBackMananger.roomConfigurationChanged();
-
 	}
 
 

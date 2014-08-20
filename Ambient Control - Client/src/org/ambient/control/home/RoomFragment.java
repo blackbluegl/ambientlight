@@ -145,7 +145,10 @@ public class RoomFragment extends RoomServiceAwareFragment {
 		// init scenery Spinner
 		this.updateScenerySpinner();
 
-		// init dynamically the clickable entity icons
+		// init climate profile Spinner
+		this.updateClimateSpinner();
+
+		// init the clickable entity icons
 		GridView contentView = (GridView) myRoomView.findViewById(R.id.roomContent);
 		contentView.setAdapter(new ItemAdapter(RoomUtil.getEntities(roomConfig), roomConfig, this));
 
@@ -178,6 +181,50 @@ public class RoomFragment extends RoomServiceAwareFragment {
 				if (!selectedScenery.equals(currentScenery)) {
 					RestClient.setCurrentScenery(roomName, selectedScenery);
 					spinner.setSelection(adapter.getPosition(selectedScenery));
+					disableEventListener(true);
+				}
+			}
+
+
+			@Override
+			public void onNothingSelected(AdapterView<?> paramAdapterView) {
+
+			}
+		});
+	}
+
+
+	/**
+	 * week profile spinner for climate manager
+	 */
+	private void updateClimateSpinner() {
+		final Spinner spinner = (Spinner) myRoomView.findViewById(R.id.spinnerClimateProfile);
+		final Room room = roomService.getRoomConfiguration(roomName);
+
+		if (room.climateManager == null || room.climateManager.weekProfiles == null
+				|| room.climateManager.weekProfiles.size() == 0) {
+			spinner.setVisibility(View.INVISIBLE);
+			return;
+		}
+
+		String[] profileNames = room.climateManager.weekProfiles.keySet().toArray(new String[1]);
+
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item,
+				profileNames);
+		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+
+		spinner.setAdapter(adapter);
+		spinner.setSelection(adapter.getPosition(room.climateManager.currentWeekProfile));
+
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+				String selectedProfile = (String) parent.getItemAtPosition(pos);
+
+				if (!selectedProfile.equals(room.climateManager.currentWeekProfile)) {
+					RestClient.setCurrentClimateProfile(roomName, selectedProfile);
+					spinner.setSelection(adapter.getPosition(selectedProfile));
 					disableEventListener(true);
 				}
 			}
