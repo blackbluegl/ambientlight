@@ -114,4 +114,14 @@ public class RestClient {
 		SetClimateBoostModeTask task = new SetClimateBoostModeTask();
 		task.execute(roomName, enable);
 	}
+
+
+	/**
+	 * @param roomName
+	 * @param selectedProfile
+	 */
+	public static void setCurrentClimateProfile(String roomName, String selectedProfile) {
+		SetCurrentClimateProfileTask task = new SetCurrentClimateProfileTask();
+		task.execute(roomName, selectedProfile);
+	}
 }

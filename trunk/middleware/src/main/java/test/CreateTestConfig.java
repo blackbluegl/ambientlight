@@ -304,6 +304,34 @@ public class CreateTestConfig {
 		climate.vCubeAdress = 1;
 		climate.groupId = 5;
 
+		HashMap<MaxDayInWeek, List<DayEntry>> weekProfile1 = createWeekProfile();
+		HashMap<MaxDayInWeek, List<DayEntry>> weekProfile2 = createWeekProfile();
+
+
+		Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
+		weekProfiles.put("Sommer Profil", weekProfile1);
+		weekProfiles.put("Winter Profil", weekProfile2);
+		climate.weekProfiles = weekProfiles;
+		climate.currentWeekProfile = "Sommer Profil";
+
+		rc.climateManager = climate;
+
+		DispatcherConfiguration dispatcherConfig = new DispatcherConfiguration();
+
+		dispatcherConfig.hostName = "ambi-schlafen";
+		dispatcherConfig.port = 30000;
+		dispatcherConfig.type = DispatcherType.MAX;
+
+		QeueManagerConfiguration qConfig = new QeueManagerConfiguration();
+		qConfig.dispatchers.add(dispatcherConfig);
+		rc.qeueManager = qConfig;
+	}
+
+
+	/**
+	 * @return
+	 */
+	private HashMap<MaxDayInWeek, List<DayEntry>> createWeekProfile() {
 		List<DayEntry> mon = new ArrayList<DayEntry>();
 		DayEntry mon1 = new DayEntry(24, 0, 22.0f);
 		mon.add(mon1);
@@ -339,23 +367,7 @@ public class CreateTestConfig {
 		weekProfile.put(MaxDayInWeek.FRIDAY, fri);
 		weekProfile.put(MaxDayInWeek.SATURDAY, sat);
 		weekProfile.put(MaxDayInWeek.SUNDAY, sun);
-
-		Map<String, HashMap<MaxDayInWeek, List<DayEntry>>> weekProfiles = new HashMap<String, HashMap<MaxDayInWeek, List<DayEntry>>>();
-		weekProfiles.put("default", weekProfile);
-		climate.weekProfiles = weekProfiles;
-		climate.currentWeekProfile = "default";
-
-		rc.climateManager = climate;
-
-		DispatcherConfiguration dispatcherConfig = new DispatcherConfiguration();
-
-		dispatcherConfig.hostName = "ambi-schlafen";
-		dispatcherConfig.port = 30000;
-		dispatcherConfig.type = DispatcherType.MAX;
-
-		QeueManagerConfiguration qConfig = new QeueManagerConfiguration();
-		qConfig.dispatchers.add(dispatcherConfig);
-		rc.qeueManager = qConfig;
+		return weekProfile;
 	}
 
 

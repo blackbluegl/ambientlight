@@ -45,7 +45,8 @@
         <Switch
             android:id="@+id/mainSwitch"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom" />
 
         <Spinner
             android:id="@+id/spinnerSceneries"
@@ -53,6 +54,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginTop="-3dp" />
+
+        <Spinner
+            android:id="@+id/spinnerClimateProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom" />
+
     </LinearLayout>
 
 </LinearLayout>
