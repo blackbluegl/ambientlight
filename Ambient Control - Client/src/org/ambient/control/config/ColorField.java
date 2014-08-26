@@ -17,7 +17,7 @@ package org.ambient.control.config;
 
 import java.lang.reflect.Field;
 
-import org.ambient.views.ColorPickerView;
+import org.ambient.views.ColorChooserView;
 import org.ambientlight.ws.Room;
 
 import android.util.Log;
@@ -62,7 +62,7 @@ public class ColorField extends FieldGenerator {
 	 */
 	public void createView() throws IllegalAccessException {
 
-		ColorPickerView.OnColorChangedListener listener = new ColorPickerView.OnColorChangedListener() {
+		ColorChooserView.OnColorChangedListener listener = new ColorChooserView.OnColorChangedListener() {
 
 			@Override
 			public void colorChanged(int color) {
@@ -75,7 +75,8 @@ public class ColorField extends FieldGenerator {
 			}
 		};
 
-		ColorPickerView colorPickerView = new ColorPickerView(contentArea.getContext(), listener, field.getInt(bean));
+
+		ColorChooserView colorPickerView = new ColorChooserView(contentArea.getContext(), listener, field.getInt(bean));
 		contentArea.addView(colorPickerView);
 	}
 
