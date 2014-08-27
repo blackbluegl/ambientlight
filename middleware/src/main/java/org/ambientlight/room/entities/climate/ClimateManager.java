@@ -593,7 +593,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 	public void setBoostMode(boolean boost) {
 		if (boost) {
-			setClimate(config.temperature, MaxThermostateMode.BOOST, null);
+			setClimate(config.temperature, MaxThermostateMode.BOOST, config.temporaryUntil);
 		} else {
 			setClimate(config.temperature, config.modeBeforeBoost, config.temporaryUntil);
 		}
@@ -624,26 +624,25 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		if (mode == MaxThermostateMode.AUTO) {
 			until = null;
-			Calendar now = GregorianCalendar.getInstance();
-			MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
-			List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
-			int nowInMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60;
-			nowInMinutesOfDay += now.get(Calendar.MINUTE);
-			int latestPossibleMins = 24 * 60;
+			// if the minimum temperature is given we correct the value to actual from the current week profile
+			if (temp <= MaxUtil.MIN_TEMPERATURE) {
+				Calendar now = GregorianCalendar.getInstance();
+				int nowInMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
 
-			if (nowInMinutesOfDay == latestPossibleMins) {
-				nowInMinutesOfDay = 0;
-			}
+				// find the day entry that holds the current temperature
+				MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
+				List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
 
-			DayEntry nextDayEntry = null;
-			for (DayEntry current : entries) {
-				int currentMinutes = current.getHour() * 60 + current.getMin();
-				if (currentMinutes > nowInMinutesOfDay && currentMinutes <= latestPossibleMins) {
-					latestPossibleMins = currentMinutes;
-					nextDayEntry = current;
+				DayEntry nextDayEntry = new DayEntry(24, 0, 0);
+				for (DayEntry current : entries) {
+					int currentMinutes = current.getHour() * 60 + current.getMin();
+					int nextDayEntryMinutes = nextDayEntry.getHour() * 60 + nextDayEntry.getMin();
+					if (currentMinutes > nowInMinutesOfDay && currentMinutes <= nextDayEntryMinutes) {
+						nextDayEntry = current;
+					}
 				}
+				temp = nextDayEntry.getTemp();
 			}
-			config.temperature = nextDayEntry.getTemp();
 		}
 
 		if (mode == MaxThermostateMode.MANUAL) {

@@ -70,6 +70,7 @@ public class TemperatureModeView extends View {
 	public float comfortTemp = 21.5f;
 
 	float currentTemp = 28.5f;
+	float currentDefaultTemp = 28.5f;
 
 	boolean boostMode = false;
 	int boostSecondsToRun = 0;
@@ -190,6 +191,7 @@ public class TemperatureModeView extends View {
 
 	public void setTemp(float temp) {
 		currentTemp = temp;
+		currentDefaultTemp = temp;
 		// if (viewWidth != 0) {
 		// invalidate();
 		// } else {
@@ -399,6 +401,7 @@ public class TemperatureModeView extends View {
 		private void handleModeChange() {
 			if ("M".equals(modeTextValue)) {
 				modeTextValue = "A";
+				currentTemp = currentDefaultTemp;
 
 			} else if ("T".equals(modeTextValue)) {
 				modeTextValue = "A";
@@ -411,6 +414,7 @@ public class TemperatureModeView extends View {
 
 			} else if ("B".equals(modeTextValue)) {
 				setBoostMode(0);
+				currentTemp = currentDefaultTemp;
 				modeTextValue = "M";
 			}
 

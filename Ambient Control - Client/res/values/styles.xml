@@ -4,8 +4,9 @@
 
     <color name="RoomFloor">#151515</color>
     <color name="RoomWall">#4d4d4d</color>
-    <color name="roomChooserChoosen">#707070</color>
-    <color name="roomChooserUnChoosen">#000000</color>
+    <color name="roomChooserChoosenActive">#707070</color> 
+    <color name="roomChooserChoosenInactive">#222222</color>
+    <color name="roomChooserUnChoosen">#00000000</color>
     <color name="textColorBlack">#000000</color>
     <color name="textColorWhite">#FFFFFF</color>
         <color name="textShaddow">#555555</color>

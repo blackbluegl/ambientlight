@@ -44,19 +44,16 @@ public class HomeActivity extends NavigationActivity {
 
 		if (savedInstanceState != null) {
 			selectedRoom = savedInstanceState.getString(BUNDLE_SELECTED_ROOM);
-
 		} else {
 			LinearLayout content = (LinearLayout) findViewById(R.id.navActionContentLinearLayout);
 
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 			RoomChooserFragment roomChooserFragment = new RoomChooserFragment();
-			ft.add(content.getId(), roomChooserFragment);
+			ft.add(content.getId(), roomChooserFragment, "roomChooserFragment");
 
 			RoomFragment roomFragment = new RoomFragment();
 			ft.add(content.getId(), roomFragment, "roomFragment");
-			// ft.addToBackStack(null);
-
 			ft.commit();
 		}
 
@@ -72,24 +69,6 @@ public class HomeActivity extends NavigationActivity {
 		}
 
 		updateMenuState(roomService.getAllRoomConfigurations());
-	}
-
-
-	public String getSelecterRoom() {
-		return selectedRoom;
-	}
-
-
-	/**
-	 * method for the RoomChooserFragment to reflect the chosen rooms by user.
-	 * 
-	 * @param current
-	 */
-	public void setCurrentRoomByUser(String current) {
-		this.selectedRoom = current;
-		RoomFragment roomFragment = (RoomFragment) getSupportFragmentManager().findFragmentByTag("roomFragment");
-		roomFragment.roomName = current;
-		roomFragment.updateRoomContent();
 	}
 
 
@@ -114,14 +93,77 @@ public class HomeActivity extends NavigationActivity {
 	}
 
 
+	public String getSelecterRoom() {
+		return selectedRoom;
+	}
+
+
+	/**
+	 * method for the RoomChooserFragment to reflect the chosen rooms by user.
+	 * 
+	 * @param current
+	 */
+	public void setSelectedRoomByUser(String current) {
+		this.selectedRoom = current;
+		RoomFragment roomFragment = (RoomFragment) getSupportFragmentManager().findFragmentByTag("roomFragment");
+		roomFragment.roomName = current;
+		roomFragment.updateRoomContent();
+	}
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		this.menu = menu;
-
 		getMenuInflater().inflate(R.menu.activity_home, menu);
+
 		this.updateMenuState(roomService.getAllRoomConfigurations());
+
 		return true;
+	}
+
+
+	/**
+	 * controls visibility of the menu items according to the room configuration
+	 * 
+	 * @param rooms
+	 */
+	private void updateMenuState(Collection<Room> rooms) {
+
+		// disable all buttons if no room exists
+		if (rooms == null || rooms.isEmpty()) {
+			menu.findItem(R.id.menu_power).setVisible(false);
+			menu.findItem(R.id.menu_heating).setVisible(false);
+			return;
+		}
+
+		// enable global power down switch
+		boolean powerSwitchEnable = false;
+		for (Room currentRoom : rooms) {
+			if (currentRoom.switchesManager == null || currentRoom.switchesManager.switches == null) {
+				continue;
+			}
+
+			Switchable currentMainSwitch = currentRoom.switchesManager.switches.get(new EntityId(
+					EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN, EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH));
+			if (currentMainSwitch != null) {
+				powerSwitchEnable = true;
+				break;
+			}
+		}
+		menu.findItem(R.id.menu_power).setVisible(powerSwitchEnable);
+
+		// update climate button
+		Boolean climateEco = areAllClimateStatesInEco();
+		if (climateEco == null) {
+			menu.findItem(R.id.menu_heating).setVisible(false);
+		} else if (climateEco) {
+			menu.findItem(R.id.menu_heating).setIcon(R.drawable.ic_heating_all_auto);
+			menu.findItem(R.id.menu_heating).setVisible(true);
+		} else {
+			menu.findItem(R.id.menu_heating).setIcon(R.drawable.ic_heating_all_eco);
+			menu.findItem(R.id.menu_heating).setVisible(true);
+		}
 	}
 
 
@@ -151,7 +193,7 @@ public class HomeActivity extends NavigationActivity {
 
 	/**
 	 * @param b
-	 *            true will set the climateManager to auto mode false to eco
+	 *            true will set the climateManager to auto mode, false to eco.
 	 */
 	private void changeAllClimateStatesToAuto(boolean autoMode) {
 		if (autoMode) {
@@ -219,7 +261,7 @@ public class HomeActivity extends NavigationActivity {
 	 */
 	private void powerOffAllMainSwitches() {
 
-		Toast.makeText(this, "alle Räume aus", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "alle Schalter aus", Toast.LENGTH_SHORT).show();
 
 		for (Room current : this.roomService.getAllRoomConfigurations()) {
 
@@ -238,41 +280,4 @@ public class HomeActivity extends NavigationActivity {
 		}
 	}
 
-
-	private void updateMenuState(Collection<Room> rooms) {
-
-		if (rooms == null || rooms.isEmpty()) {
-			menu.findItem(R.id.menu_power).setVisible(false);
-			menu.findItem(R.id.menu_heating).setVisible(false);
-			return;
-		}
-
-		// enable power down switch
-		boolean powerSwitchEnable = false;
-		for (Room currentRoom : rooms) {
-			if (currentRoom.switchesManager == null || currentRoom.switchesManager.switches == null) {
-				continue;
-			}
-
-			Switchable currentMainSwitch = currentRoom.switchesManager.switches.get(new EntityId(
-					EntityId.DOMAIN_SWITCH_VIRTUAL_MAIN, EntityId.ID_SWITCH_VIRTUAL_MAIN_SWITCH));
-			if (currentMainSwitch != null) {
-				powerSwitchEnable = true;
-				break;
-			}
-		}
-		menu.findItem(R.id.menu_power).setVisible(powerSwitchEnable);
-
-		// update climate button
-		Boolean climateEco = areAllClimateStatesInEco();
-		if (climateEco == null) {
-			menu.findItem(R.id.menu_heating).setVisible(false);
-		} else if (climateEco) {
-			menu.findItem(R.id.menu_heating).setIcon(R.drawable.ic_heating_all_auto);
-			menu.findItem(R.id.menu_heating).setVisible(true);
-		} else {
-			menu.findItem(R.id.menu_heating).setIcon(R.drawable.ic_heating_all_eco);
-			menu.findItem(R.id.menu_heating).setVisible(true);
-		}
-	}
 }

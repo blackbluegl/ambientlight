@@ -205,6 +205,8 @@ public class RoomFragment extends RoomServiceAwareFragment {
 				|| room.climateManager.weekProfiles.size() == 0) {
 			spinner.setVisibility(View.INVISIBLE);
 			return;
+		} else {
+			spinner.setVisibility(View.VISIBLE);
 		}
 
 		String[] profileNames = room.climateManager.weekProfiles.keySet().toArray(new String[1]);
