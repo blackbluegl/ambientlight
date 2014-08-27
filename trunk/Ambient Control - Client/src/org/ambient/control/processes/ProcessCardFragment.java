@@ -545,11 +545,13 @@ public class ProcessCardFragment extends RoomServiceAwareFragment {
 				NodeConfiguration node = new NodeConfiguration();
 				this.selectedProcess.nodes.put(0, node);
 			}
+			drawer.setProcess(selectedProcess);
 		}
 		if (configuration instanceof NodeConfiguration) {
 			startEditMode();
 			NodeConfiguration nodeConfig = (NodeConfiguration) configuration;
 			this.selectedProcess.nodes.put(nodeConfig.id, nodeConfig);
+			drawer.setProcess(selectedProcess);
 		}
 
 		if (configuration instanceof SceneriesWrapper) {
