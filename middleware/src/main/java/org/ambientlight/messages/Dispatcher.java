@@ -70,6 +70,7 @@ public abstract class Dispatcher {
 		try {
 			this.isConnected = false;
 			socket.close();
+			socket = null;
 		} catch (Exception e) {
 			System.out.println("Dispatcher closeConnection(): error while closing connection: ");
 		}

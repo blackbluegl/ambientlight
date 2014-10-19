@@ -69,18 +69,18 @@ public class AddShutterContactHandler implements MessageActionHandler {
 		// create device
 		ShutterContact device = new ShutterContact();
 
-		device.isOpen = false;
-		device.label = "Fensterkontakt";
-		device.adress = pairMessage.getFromAdress();
-		device.batteryLow = false;
-		device.firmware = pairMessage.getFirmware();
-		device.invalidArgument = false;
-		device.lastUpdate = new Date();
-		device.rfError = false;
-		device.serial = pairMessage.getSerial();
-		device.timedOut = false;
+		device.setOpen(false);
+		device.setLabel("Fensterkontakt");
+		device.setAdress(pairMessage.getFromAdress());
+		device.setBatteryLow(false);
+		device.setFirmware(pairMessage.getFirmware());
+		device.setInvalidArgument(false);
+		device.setLastUpdate(new Date());
+		device.setRfError(false);
+		device.setSerial(pairMessage.getSerial());
+		device.setTimedOut(false);
 
-		config.devices.put(device.adress, device);
+		config.devices.put(device.getAdress(), device);
 
 		// link devices
 		for (MaxComponent currentConfig : config.devices.values()) {
@@ -91,7 +91,7 @@ public class AddShutterContactHandler implements MessageActionHandler {
 			}
 
 			// link current device to the proxy adress of the shutter
-			MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.adress,
+			MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.getAdress(),
 					config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 			outMessages.add(linkCurrentToNew);
 		}

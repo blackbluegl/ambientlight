@@ -59,11 +59,11 @@ public class MaxMessageCreator {
 	public MaxSetTemperatureMessage getSetTempForDevice(int adress) {
 		MaxSetTemperatureMessage outMessage = new MaxSetTemperatureMessage();
 		outMessage.setFromAdress(config.vCubeAdress);
-		if (config.mode != MaxThermostateMode.AUTO) {
-			outMessage.setTemp(config.temperature);
-		} else {
-			outMessage.setTemp(0.0f);
-		}
+		// if (config.mode != MaxThermostateMode.AUTO) {
+		outMessage.setTemp(config.temperature);
+		// } else {
+		// outMessage.setTemp(0.0f);
+		// }
 		outMessage.setTemporaryUntil(config.temporaryUntil);
 		outMessage.setMode(config.mode);
 		outMessage.setSequenceNumber(getNewSequnceNumber());

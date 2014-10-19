@@ -51,26 +51,27 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 		for (MaxComponent currentDevice : devices.values()) {
 
 			// only other thermostates
-			if (currentDevice.adress == device.adress || currentDevice instanceof Thermostat == false) {
+			if (currentDevice.getAdress() == device.getAdress() || currentDevice instanceof Thermostat == false) {
 				continue;
 			}
 
-			MaxRemoveLinkPartnerMessage unlink = new MaxMessageCreator(config).getUnlinkMessageForDevice(currentDevice.adress,
-					device.adress, device.getDeviceType());
+			MaxRemoveLinkPartnerMessage unlink = new MaxMessageCreator(config).getUnlinkMessageForDevice(
+					currentDevice.getAdress(), device.getAdress(), device.getDeviceType());
 			queueManager.putOutMessage(unlink);
 		}
 
 		// send remove
-		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.adress);
+		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.getAdress());
 		queueManager.putOutMessage(resetDevice);
 
 		// remove correlator - rfm bridge does route its messages to all clients
-		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, device.adress,
+		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
+				device.getAdress(),
 				config.vCubeAdress);
 		queueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
-		devices.remove(device.adress);
+		devices.remove(device.getAdress());
 
 		persistence.commitTransaction();
 		callbackManager.roomConfigurationChanged();

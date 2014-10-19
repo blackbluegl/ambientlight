@@ -71,19 +71,19 @@ public class AddThermostateHandler implements MessageActionHandler {
 		// start
 		device.setTemperature(config.temperature);
 
-		device.offset = MaxUtil.DEFAULT_OFFSET;
-		device.label = "Thermostat";
-		device.adress = pairMessage.getFromAdress();
-		device.batteryLow = false;
-		device.firmware = pairMessage.getFirmware();
-		device.invalidArgument = false;
-		device.lastUpdate = new Date();
-		device.rfError = false;
-		device.serial = pairMessage.getSerial();
-		device.timedOut = false;
+		device.setOffset(MaxUtil.DEFAULT_OFFSET);
+		device.setLabel("Thermostat");
+		device.setAdress(pairMessage.getFromAdress());
+		device.setBatteryLow(false);
+		device.setFirmware(pairMessage.getFirmware());
+		device.setInvalidArgument(false);
+		device.setLastUpdate(new Date());
+		device.setRfError(false);
+		device.setSerial(pairMessage.getSerial());
+		device.setTimedOut(false);
 
 		// add device to ambientcontrol
-		config.devices.put(device.adress, device);
+		config.devices.put(device.getAdress(), device);
 
 		// setup Time;
 		outMessages.add(new MaxMessageCreator(config).getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
@@ -108,7 +108,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 		}
 
 		// link to proxyShutterContact
-		MaxAddLinkPartnerMessage linkToShutterContact = new MaxMessageCreator(config).getLinkMessage(device.adress,
+		MaxAddLinkPartnerMessage linkToShutterContact = new MaxMessageCreator(config).getLinkMessage(device.getAdress(),
 				config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
 		outMessages.add(linkToShutterContact);
 
@@ -116,19 +116,20 @@ public class AddThermostateHandler implements MessageActionHandler {
 		for (MaxComponent currentConfig : config.devices.values()) {
 
 			// do not link with ourself
-			if (currentConfig.adress == pairMessage.getFromAdress()) {
+			if (currentConfig.getAdress() == pairMessage.getFromAdress()) {
 				continue;
 			}
 
 			if (currentConfig instanceof Thermostat) {
 				// link current to new
-				MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.adress,
+				MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(
+						currentConfig.getAdress(),
 						pairMessage.getFromAdress(), pairMessage.getDeviceType());
 				outMessages.add(linkCurrentToNew);
 
 				// link new device to current
 				MaxAddLinkPartnerMessage linkNewToCurrent = new MaxMessageCreator(config).getLinkMessage(pairMessage.getFromAdress(),
-						currentConfig.adress, currentConfig.getDeviceType());
+ currentConfig.getAdress(), currentConfig.getDeviceType());
 				outMessages.add(linkNewToCurrent);
 			}
 		}
