@@ -17,6 +17,8 @@ package org.ambientlight.room.entities.climate;
 
 import org.ambientlight.room.entities.climate.util.DeviceType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 /**
@@ -27,7 +29,7 @@ public class ShutterContact extends MaxComponent {
 
 	private static final long serialVersionUID = 1L;
 
-	public boolean isOpen = false;
+	private boolean isOpen = false;
 
 
 	/*
@@ -38,8 +40,19 @@ public class ShutterContact extends MaxComponent {
 	 * ()
 	 */
 	@Override
+	@JsonIgnore
 	public DeviceType getDeviceType() {
 		return DeviceType.SHUTTER_CONTACT;
+	}
+
+
+	public boolean isOpen() {
+		return isOpen;
+	}
+
+
+	public void setOpen(boolean isOpen) {
+		this.isOpen = isOpen;
 	}
 
 }

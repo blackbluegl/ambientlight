@@ -19,6 +19,8 @@ import org.ambientlight.room.entities.climate.util.DeviceType;
 import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * @author Florian Bornkessel
@@ -28,8 +30,8 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 
 	private static final long serialVersionUID = 1L;
 
-	public float offset;
-	public boolean isLocked;
+	private float offset;
+	private boolean isLocked;
 	private float temperature;
 
 
@@ -39,13 +41,9 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	 * @see org.ambientlight.config.room.actors.MaxComponentConfiguration#getDeviceType ()
 	 */
 	@Override
+	@JsonIgnore
 	public DeviceType getDeviceType() {
 		return DeviceType.HEATING_THERMOSTAT;
-	}
-
-
-	public void setTemperature(float messuredTemp) {
-		this.temperature = messuredTemp;
 	}
 
 
@@ -55,10 +53,10 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorId()
 	 */
 	@Override
+	@JsonIgnore
 	public EntityId getSensorId() {
-		return new EntityId(EntityId.DOMAIN_TEMP_MAX_THERMOSTATE, this.label);
+		return new EntityId(EntityId.DOMAIN_TEMP_MAX_THERMOSTATE, this.getLabel());
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -66,8 +64,38 @@ public class Thermostat extends MaxComponent implements TemperatureSensor {
 	 * @see org.ambientlight.room.entities.features.sensor.Sensor#getSensorValue()
 	 */
 	@Override
+	@JsonIgnore
 	public Object getSensorValue() {
 		return this.temperature;
 	}
 
+
+	public float getOffset() {
+		return offset;
+	}
+
+
+	public void setOffset(float offset) {
+		this.offset = offset;
+	}
+
+
+	public boolean isLocked() {
+		return isLocked;
+	}
+
+
+	public void setLocked(boolean isLocked) {
+		this.isLocked = isLocked;
+	}
+
+
+	public float getTemperature() {
+		return temperature;
+	}
+
+
+	public void setTemperature(float messuredTemp) {
+		this.temperature = messuredTemp;
+	}
 }
