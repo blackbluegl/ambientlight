@@ -104,6 +104,9 @@ public class RoomFactory {
 		room.climateManager = initClimateManager(roomConfig.climateManager, room.qeueManager, room.callBackManager,
 				room.featureFacade, persistence);
 
+		// init dispatchers after all callback clients are ready
+		initDispatchers(roomConfig.qeueManager, room.qeueManager);
+
 		// init remoteSwitchManager
 		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackManager,
 				room.featureFacade, persistence);
@@ -119,6 +122,32 @@ public class RoomFactory {
 		System.out.println("RoomFactory initRoom(): finished");
 
 		return room;
+	}
+
+
+	/**
+	 * @param dispatchers
+	 */
+	private void initDispatchers(QeueManagerConfiguration queueConfig, QeueManager qeueManager) {
+		if (queueConfig == null || queueConfig.dispatchers == null || queueConfig.dispatchers.size() == 0) {
+			System.out.println("RoomFactory initDispatchers(): no configuration - skipping!");
+			return;
+		}
+
+		HashMap<DispatcherType, Dispatcher> dispatcherModules = new HashMap<DispatcherType, Dispatcher>();
+		for (DispatcherConfiguration dispatcherConfig : queueConfig.dispatchers) {
+			if (dispatcherConfig.type.equals(DispatcherType.MAX)) {
+				MaxDispatcher dispatcher = new MaxDispatcher(dispatcherConfig, qeueManager);
+				dispatcherModules.put(DispatcherType.MAX, dispatcher);
+			}
+		}
+
+		qeueManager.dispatcherManager = new DispatcherManager(qeueManager, dispatcherModules);
+
+		qeueManager.startQeues();
+
+		qeueManager.dispatcherManager.startDispatchers();
+
 	}
 
 
@@ -204,21 +233,6 @@ public class RoomFactory {
 		}
 
 		QeueManager qeueManager = new QeueManager();
-
-		HashMap<DispatcherType, Dispatcher> dispatcherModules = new HashMap<DispatcherType, Dispatcher>();
-		for (DispatcherConfiguration dispatcherConfig : config.dispatchers) {
-			if (dispatcherConfig.type.equals(DispatcherType.MAX)) {
-				MaxDispatcher dispatcher = new MaxDispatcher(dispatcherConfig, qeueManager);
-				dispatcherModules.put(DispatcherType.MAX, dispatcher);
-				dispatcherModules.put(DispatcherType.SYSTEM, dispatcher);
-			}
-		}
-
-		qeueManager.dispatcherManager = new DispatcherManager(qeueManager, dispatcherModules);
-
-		qeueManager.startQeues();
-
-		qeueManager.dispatcherManager.startDispatchers();
 
 		return qeueManager;
 	}

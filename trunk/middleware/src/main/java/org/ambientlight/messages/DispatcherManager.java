@@ -44,15 +44,9 @@ public class DispatcherManager {
 		for (final Dispatcher currentDispatcher : outDispatchers.values()) {
 			connectDispatcher(currentDispatcher);
 
-			new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					if (currentDispatcher instanceof InDispatcher) {
-						startReceiveMessages(currentDispatcher);
-					}
-				}
-			}).start();
+			if (currentDispatcher instanceof InDispatcher) {
+				startReceiveMessages(currentDispatcher);
+			}
 
 			queueManager.onConnectDispatcher(DispatcherType.MAX);
 			startHeartBeatCheck(currentDispatcher);
@@ -84,10 +78,8 @@ public class DispatcherManager {
 					try {
 						if (dispatcher.checkConnection() == false) {
 							System.out
-							.println("DispatcherManager startHeartBeatCheck(): Connection lost. Reconnecting Dispatcher: "
-									+ dispatcher.getClass().getSimpleName()
-									+ " to: "
-									+ dispatcher.configuration.hostName);
+									.println("DispatcherManager startHeartBeatCheck(): Connection lost. Reconnecting Dispatcher: "
+											+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 							queueManager.onDisconnectDispatcher(dispatcher.getDispatcherType());
 							dispatcher.closeConnection();
 							dispatcher.connect();
@@ -102,7 +94,7 @@ public class DispatcherManager {
 								+ ". Retrying");
 					} finally {
 						try {
-							Thread.sleep(10000);
+							Thread.sleep(12000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -135,13 +127,11 @@ public class DispatcherManager {
 					} catch (Exception e) {
 
 						System.out
-						.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect for Dispatcher: "
-								+ dispatcher.getClass().getSimpleName()
-								+ " to: "
-								+ dispatcher.configuration.hostName);
+								.println("DispatcherManager startReceiveMessages(): No connection. Awaiting reconnect for Dispatcher: "
+										+ dispatcher.getClass().getSimpleName() + " to: " + dispatcher.configuration.hostName);
 
 						try {
-							Thread.sleep(5000);
+							Thread.sleep(2500);
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}

@@ -74,16 +74,16 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 		// check if removal of shuttercontact changes the open window state of
 		// the thermostates
 		boolean isAWindowOpen = climateManager.isAWindowOpen();
-		this.device.isOpen = false;
+		this.device.setOpen(false);
 		boolean isAWindowNowOpen = climateManager.isAWindowOpen();
 		if (isAWindowOpen != isAWindowNowOpen) {
 			climateManager.sendWindowStateToThermostates(isAWindowNowOpen);
 		}
 
 		// Wait until shutterContact comes alive and remove it
-		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.adress,
+		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.getAdress(),
 				config.vCubeAdress);
-		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.adress);
+		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.getAdress());
 		this.sequenceNumberForDeletedDevice = resetDevice.getSequenceNumber();
 		queueManager.putOutMessage(resetDevice, condition);
 
@@ -100,13 +100,14 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 	private void handleRemoveFromModell() {
 
 		// remove correlator
-		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX, device.adress,
+		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
+				device.getAdress(),
 				config.vCubeAdress);
 		queueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
 		persistence.beginTransaction();
-		config.devices.remove(device.adress);
+		config.devices.remove(device.getAdress());
 		persistence.commitTransaction();
 
 		this.actionState = ActionState.FINISHED;
@@ -132,7 +133,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		// catch all window shutter messages until it was reset - the climate
 		// manager shall not handle any message during removal
-		if (((MaxMessage) message).getFromAdress().equals(this.device.adress) && this.actionState != ActionState.FINISHED)
+		if (((MaxMessage) message).getFromAdress().equals(this.device.getAdress()) && this.actionState != ActionState.FINISHED)
 			return true;
 
 		return false;

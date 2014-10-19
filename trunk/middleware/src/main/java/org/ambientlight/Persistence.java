@@ -34,8 +34,10 @@ public class Persistence {
 		this.roomConfig = loadRoomConfig();
 	}
 
-	public static final String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight"
-			+ File.separator + "sceneries";
+	// public static final String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight"
+	// + File.separator + "sceneries";
+
+	public static final String DATA_DIRECTORY = "/opt/ambientcontrol/";
 
 	ReentrantLock saveLock = new ReentrantLock();
 
@@ -82,7 +84,7 @@ public class Persistence {
 			}
 		} catch (IOException e) {
 			System.out
-					.println("Persistence - commitTransaktion(): "
+			.println("Persistence - commitTransaktion(): "
 					+ "Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
 		}

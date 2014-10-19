@@ -188,13 +188,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			persistence.beginTransaction();
 
 			if (state == State.TIMED_OUT) {
-				device.timedOut = true;
-				System.out.println("Climate Manager - onResponse(): Error! Timeout for Device: " + device.label);
+				device.setTimedOut(true);
+				System.out.println("Climate Manager - onResponse(): Error! Timeout for Device: " + device.getLabel());
 
 			} else if (state == State.RETRIEVED_ANSWER && response instanceof MaxAckMessage
 					&& ((MaxAckMessage) response).getAckType() == MaxAckType.ACK_INVALID_MESSAGE) {
-				device.invalidArgument = true;
-				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.label
+				device.setInvalidArgument(true);
+				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.getLabel()
 						+ " reported invalid Arguments!");
 			} else {
 				System.out.println("Climate Manager - onResponse(): did not handle message");
@@ -371,10 +371,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		persistence.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) config.devices.get(message.getFromAdress());
-		shutter.batteryLow = message.isBatteryLow();
-		shutter.isOpen = message.isOpen();
-		shutter.rfError = message.hadRfError();
-		shutter.lastUpdate = new Date(System.currentTimeMillis());
+		shutter.setBatteryLow(message.isBatteryLow());
+		shutter.setOpen(message.isOpen());
+		shutter.setRfError(message.hadRfError());
+		shutter.setLastUpdate(new Date(System.currentTimeMillis()));
 
 		persistence.commitTransaction();
 
@@ -401,9 +401,9 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		persistence.beginTransaction();
 
-		thermostat.batteryLow = message.isBatteryLow();
-		thermostat.isLocked = message.isLocked();
-		thermostat.lastUpdate = new Date(System.currentTimeMillis());
+		thermostat.setBatteryLow(message.isBatteryLow());
+		thermostat.setLocked(message.isLocked());
+		thermostat.setLastUpdate(new Date(System.currentTimeMillis()));
 
 		thermostat.setTemperature(message.getActualTemp());
 
@@ -450,6 +450,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			throw new IllegalArgumentException("the selected weekProfile does not exist or is empty and unusable!");
 
 		config.currentWeekProfile = profile;
+		config.temperature = getCurrentTemperatureFromWeekProfile();
 
 		List<Message> messages = new ArrayList<Message>();
 
@@ -457,11 +458,12 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			if (current instanceof Thermostat) {
 				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
 				wakeup.setFromAdress(config.vCubeAdress);
-				wakeup.setToAdress(current.adress);
+				wakeup.setToAdress(current.getAdress());
 				wakeup.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
 				messages.add(wakeup);
 
-				messages.addAll(new MaxMessageCreator(config).getWeekProfileForDevice(current.adress, profile));
+				messages.addAll(new MaxMessageCreator(config).getWeekProfileForDevice(current.getAdress(), profile));
+				messages.add(new MaxMessageCreator(config).getSetTempForDevice(current.getAdress()));
 			}
 		}
 
@@ -502,7 +504,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			sendMessage.setFromAdress(this.config.proxyShutterContactAdress);
 			sendMessage.setFlags(0x6);
 			sendMessage.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
-			sendMessage.setToAdress(current.adress);
+			sendMessage.setToAdress(current.getAdress());
 			sendMessage.setOpen(open);
 			queueManager.putOutMessage(sendMessage);
 		}
@@ -513,7 +515,8 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		List<Message> correlators = new ArrayList<Message>();
 		for (MaxComponent currentDeviceConfig : config.devices.values()) {
 			correlators
-			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.adress, config.vCubeAdress));
+			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.getAdress(),
+					config.vCubeAdress));
 		}
 		queueManager.putOutMessages(correlators);
 	}
@@ -526,7 +529,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxTimeInformationMessage message = new MaxMessageCreator(config).getTimeInfoForDevice(now, current.adress);
+				MaxTimeInformationMessage message = new MaxMessageCreator(config).getTimeInfoForDevice(now, current.getAdress());
 				messages.add(message);
 			}
 		}
@@ -556,7 +559,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 	public boolean isAWindowOpen() {
 		for (MaxComponent current : config.devices.values()) {
-			if (current instanceof ShutterContact && ((ShutterContact) (current)).isOpen)
+			if (current instanceof ShutterContact && ((ShutterContact) (current)).isOpen())
 				return true;
 		}
 		return false;
@@ -626,22 +629,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			until = null;
 			// if the minimum temperature is given we correct the value to actual from the current week profile
 			if (temp <= MaxUtil.MIN_TEMPERATURE) {
-				Calendar now = GregorianCalendar.getInstance();
-				int nowInMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
-
-				// find the day entry that holds the current temperature
-				MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
-				List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
-
-				DayEntry nextDayEntry = new DayEntry(24, 0, 0);
-				for (DayEntry current : entries) {
-					int currentMinutes = current.getHour() * 60 + current.getMin();
-					int nextDayEntryMinutes = nextDayEntry.getHour() * 60 + nextDayEntry.getMin();
-					if (currentMinutes > nowInMinutesOfDay && currentMinutes <= nextDayEntryMinutes) {
-						nextDayEntry = current;
-					}
-				}
-				temp = nextDayEntry.getTemp();
+				temp = getCurrentTemperatureFromWeekProfile();
 			}
 		}
 
@@ -660,15 +648,41 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.adress);
+				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.getAdress());
 				messages.add(outMessage);
 			}
 		}
-
+		System.out.println("Climate Manager - setClimate(): sending climate message to this and " + messages.size()
+				+ " other devices:\n" + messages.get(0));
 		queueManager.putOutMessages(messages);
 
 		persistence.commitTransaction();
 		callBackMananger.roomConfigurationChanged();
+	}
+
+
+	/**
+	 * @return
+	 */
+	private float getCurrentTemperatureFromWeekProfile() {
+		float temp;
+		Calendar now = GregorianCalendar.getInstance();
+		int nowInMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+
+		// find the day entry that holds the current temperature
+		MaxDayInWeek today = MaxDayInWeek.forCalendarDayInWeek(now.get(Calendar.DAY_OF_WEEK));
+		List<DayEntry> entries = config.weekProfiles.get(config.currentWeekProfile).get(today);
+
+		DayEntry nextDayEntry = new DayEntry(24, 0, 0);
+		for (DayEntry current : entries) {
+			int currentMinutes = current.getHour() * 60 + current.getMin();
+			int nextDayEntryMinutes = nextDayEntry.getHour() * 60 + nextDayEntry.getMin();
+			if (currentMinutes > nowInMinutesOfDay && currentMinutes <= nextDayEntryMinutes) {
+				nextDayEntry = current;
+			}
+		}
+		temp = nextDayEntry.getTemp();
+		return temp;
 	}
 
 }
