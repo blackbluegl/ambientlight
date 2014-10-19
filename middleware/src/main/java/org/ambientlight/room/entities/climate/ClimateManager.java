@@ -109,10 +109,11 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		// register sensors
 		featureFacade.registerSensor(this);
 		featureFacade.registerClimateManager(this);
-
-		for (MaxComponent current : config.devices.values()) {
-			if (current instanceof Thermostat) {
-				featureFacade.registerSensor((TemperatureSensor) current);
+		if (config.devices != null) {
+			for (MaxComponent current : config.devices.values()) {
+				if (current instanceof Thermostat) {
+					featureFacade.registerSensor((TemperatureSensor) current);
+				}
 			}
 		}
 
@@ -248,7 +249,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				System.out.println("ClimateManager - handleMessage(): handle " + message);
 				handleGetTimeInfo((MaxTimeInformationMessage) message);
 			} else {
-				System.out.println("ClimateManager handleMessage(): could not handle: " + message);
+				System.out.println("ClimateManager handleMessage(): ignored message: " + message);
 			}
 
 		} catch (Exception e) {
@@ -512,10 +513,11 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	private void sendRegisterCorrelators() {
+		if (config.devices == null)
+			return;
 		List<Message> correlators = new ArrayList<Message>();
 		for (MaxComponent currentDeviceConfig : config.devices.values()) {
-			correlators
-			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.getAdress(),
+			correlators.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, currentDeviceConfig.getAdress(),
 					config.vCubeAdress));
 		}
 		queueManager.putOutMessages(correlators);
@@ -650,10 +652,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			if (current instanceof Thermostat) {
 				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.getAdress());
 				messages.add(outMessage);
+				System.out.println("Climate Manager - setClimate(): sending climate message:\n" + outMessage);
 			}
 		}
-		System.out.println("Climate Manager - setClimate(): sending climate message to this and " + messages.size()
-				+ " other devices:\n" + messages.get(0));
+
 		queueManager.putOutMessages(messages);
 
 		persistence.commitTransaction();
