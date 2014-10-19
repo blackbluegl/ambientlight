@@ -15,7 +15,9 @@
 
 package test;
 
+import org.ambientlight.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 
 /**
@@ -28,9 +30,9 @@ public class MaxMessageTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
-		// temp.setMode(MaxThermostateMode.TEMPORARY);
-		// temp.setTemp(32f);
+		MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
+		temp.setMode(MaxThermostateMode.TEMPORARY);
+		temp.setTemp(11.5f);
 		//
 		// Calendar cal = Calendar.getInstance();
 		// cal.set(Calendar.YEAR, 2012);
