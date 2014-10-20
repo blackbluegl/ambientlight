@@ -18,9 +18,9 @@ package test;
 import java.util.Date;
 
 import org.ambientlight.config.messages.DispatcherType;
-import org.ambientlight.messages.Message;
-import org.ambientlight.messages.MessageListener;
-import org.ambientlight.messages.QeueManager.State;
+import org.ambientlight.rfmbridge.Message;
+import org.ambientlight.rfmbridge.MessageListener;
+import org.ambientlight.rfmbridge.QeueManager.State;
 
 
 /**

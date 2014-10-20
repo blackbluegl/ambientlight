@@ -13,23 +13,22 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
+package org.ambientlight.rfmbridge;
 
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
+import org.ambientlight.config.messages.DispatcherType;
+
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public interface MessageActionHandler {
+public abstract class Message {
 
-	public boolean onMessage(Message message);
-
-
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
+	public abstract DispatcherType getDispatcherType();
 
 
-	public boolean isFinished();
+	public abstract String getCommand();
 
+
+	public abstract String getValue();
 }

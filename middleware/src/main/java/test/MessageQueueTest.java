@@ -22,11 +22,11 @@ import java.util.Map;
 
 import org.ambientlight.config.messages.DispatcherConfiguration;
 import org.ambientlight.config.messages.DispatcherType;
-import org.ambientlight.messages.Dispatcher;
-import org.ambientlight.messages.DispatcherManager;
-import org.ambientlight.messages.QeueManager;
-import org.ambientlight.messages.max.MaxDispatcher;
-import org.ambientlight.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.rfmbridge.Dispatcher;
+import org.ambientlight.rfmbridge.DispatcherManager;
+import org.ambientlight.rfmbridge.QeueManager;
+import org.ambientlight.rfmbridge.messages.max.MaxDispatcher;
+import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 

@@ -13,23 +13,24 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
+package org.ambientlight.rfmbridge.messages.max;
 
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
+import org.ambientlight.config.messages.DispatcherType;
+import org.ambientlight.rfmbridge.messages.UnRegisterCorrelatorMessage;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface MessageActionHandler {
+public class MaxUnregisterCorrelationMessage extends UnRegisterCorrelatorMessage {
 
-	public boolean onMessage(Message message);
-
-
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
-
-
-	public boolean isFinished();
+	/**
+	 * @param dispatcherType
+	 * @param correlator
+	 */
+	public MaxUnregisterCorrelationMessage(DispatcherType dispatcherType, int adress, int vCubeAdress) {
+		super(dispatcherType, adress + "_" + vCubeAdress);
+	}
 
 }

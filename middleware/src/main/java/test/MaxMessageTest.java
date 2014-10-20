@@ -15,8 +15,8 @@
 
 package test;
 
-import org.ambientlight.messages.max.MaxSetTemperatureMessage;
-import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 

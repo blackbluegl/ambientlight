@@ -13,23 +13,22 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
-
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
+package org.ambientlight.rfmbridge;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface MessageActionHandler {
+public class ConditionalMessage {
 
-	public boolean onMessage(Message message);
-
-
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
+	public WaitForResponseCondition condition;
+	public Message message;
 
 
-	public boolean isFinished();
+	public ConditionalMessage(WaitForResponseCondition condition, Message message) {
+		super();
+		this.condition = condition;
+		this.message = message;
+	}
 
 }
