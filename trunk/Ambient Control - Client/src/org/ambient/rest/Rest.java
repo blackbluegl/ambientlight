@@ -7,8 +7,8 @@ import org.springframework.web.client.RestTemplate;
 
 public class Rest {
 
-	// public static final String SERVER_NAME = "192.168.1.29:8080";
-	public static final String SERVER_NAME = "10.0.2.2:8080";
+    public static final String SERVER_NAME = "10.0.2.2:8080";
+	//public static final String SERVER_NAME = "server:8080";
 
 	public static String getUrl(String suffix) {
 		return "http://" + SERVER_NAME + "/middleware/webapi" + suffix;

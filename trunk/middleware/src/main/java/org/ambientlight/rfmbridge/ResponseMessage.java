@@ -13,23 +13,14 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
+package org.ambientlight.rfmbridge;
 
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
 
 /**
  * @author Florian Bornkessel
- * 
+ *
  */
-public interface MessageActionHandler {
+public interface ResponseMessage {
 
-	public boolean onMessage(Message message);
-
-
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
-
-
-	public boolean isFinished();
-
+	public String getCorrelator();
 }

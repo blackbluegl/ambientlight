@@ -13,23 +13,36 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
+package org.ambientlight.rfmbridge.messages.max;
 
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
+import org.ambientlight.room.entities.climate.util.DeviceType;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface MessageActionHandler {
+public class MaxPairPongMessage extends MaxMessage {
 
-	public boolean onMessage(Message message);
+	// there are two types. a repairing and a pairing
+
+	public MaxPairPongMessage() {
+		payload = new byte[11];
+		setMessageType(MaxMessageType.PAIR_PONG);
+		payload[10] = DeviceType.CUBE.byteValue;
+	}
 
 
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
+
+	public DeviceType getDeviceType() {
+		return DeviceType.forCode(getPayload()[10]);
+	}
 
 
-	public boolean isFinished();
-
+	@Override
+	public String toString() {
+		String parent = super.toString();
+		String current = "DeviceType: " + getDeviceType();
+		return parent + "\n" + current;
+	}
 }

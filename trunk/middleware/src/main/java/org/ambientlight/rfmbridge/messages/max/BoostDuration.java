@@ -13,23 +13,35 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
-
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
+package org.ambientlight.rfmbridge.messages.max;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface MessageActionHandler {
+public enum BoostDuration {
 
-	public boolean onMessage(Message message);
+	_0(0), _5(5), _10(10), _15(15), _20(20), _25(25), _30(30), _60(60);
+
+	public final int minutes;
 
 
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
+	BoostDuration(int minutes) {
+		this.minutes = minutes;
+	}
 
 
-	public boolean isFinished();
+	public static BoostDuration getClosest(int minutes) {
+		BoostDuration closest = _0;
+		int howClose = Integer.MAX_VALUE;
+		for (BoostDuration bd : BoostDuration.values()) {
+			int diff = Math.abs(bd.minutes - minutes);
+			if (diff < howClose) {
+				closest = bd;
+				howClose = diff;
+			}
+		}
 
+		return closest;
+	}
 }

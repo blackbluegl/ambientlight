@@ -13,23 +13,24 @@
    limitations under the License.
  */
 
-package org.ambientlight.room.entities.climate.handlers;
-
-import org.ambientlight.rfmbridge.Message;
-import org.ambientlight.rfmbridge.QeueManager;
+package org.ambientlight.rfmbridge.messages.max;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public interface MessageActionHandler {
+public class MaxRemoveGroupIdMessage extends MaxMessage {
 
-	public boolean onMessage(Message message);
-
-
-	public boolean onResponse(QeueManager.State state, Message response, Message request);
+	public final static int DEFAULT_GROUP_ID = 0;
+	public final static int MAX_GROUP_ID = 255;
 
 
-	public boolean isFinished();
+	// there are two types. a repairing and a pairing
+
+	public MaxRemoveGroupIdMessage() {
+		payload = new byte[11];
+		setMessageType(MaxMessageType.REMOVE_GROUP_ID);
+		payload[10] = DEFAULT_GROUP_ID;
+	}
 
 }

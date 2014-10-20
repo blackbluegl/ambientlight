@@ -24,17 +24,17 @@ import java.util.Map.Entry;
 import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration;
 import org.ambientlight.config.room.entities.climate.DayEntry;
 import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
-import org.ambientlight.messages.Message;
-import org.ambientlight.messages.max.MaxAddLinkPartnerMessage;
-import org.ambientlight.messages.max.MaxConfigValveMessage;
-import org.ambientlight.messages.max.MaxConfigValveMessage.DecalcEntry;
-import org.ambientlight.messages.max.MaxConfigureTemperaturesMessage;
-import org.ambientlight.messages.max.MaxConfigureWeekProgrammMessage;
-import org.ambientlight.messages.max.MaxFactoryResetMessage;
-import org.ambientlight.messages.max.MaxRemoveLinkPartnerMessage;
-import org.ambientlight.messages.max.MaxSetGroupIdMessage;
-import org.ambientlight.messages.max.MaxSetTemperatureMessage;
-import org.ambientlight.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.rfmbridge.Message;
+import org.ambientlight.rfmbridge.messages.max.MaxAddLinkPartnerMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigureTemperaturesMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigureWeekProgrammMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxFactoryResetMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxRemoveLinkPartnerMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxSetGroupIdMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage.DecalcEntry;
 
 
 /**
