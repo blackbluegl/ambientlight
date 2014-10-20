@@ -70,8 +70,8 @@ public abstract class Dispatcher {
 			ps.print(header);
 			ps.flush();
 
+			// write payload
 			deliverPayLoad(message);
-
 		} catch (Exception e) {
 			System.out.println("MaxDispatcher deliverMessage(): was unable to send data!");
 			return false;

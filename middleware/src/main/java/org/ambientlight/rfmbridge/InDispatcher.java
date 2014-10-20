@@ -126,7 +126,10 @@ public abstract class InDispatcher extends Dispatcher {
 		}
 
 		// all other messages will be handled by concrete dispatchers
-		return handleInMessage(dispatcherType, input);
+		if (getDispatcherType().toString().equals(dispatcherType))
+			return handleInMessage(input);
+		else
+			return null;
 	}
 
 
@@ -138,7 +141,7 @@ public abstract class InDispatcher extends Dispatcher {
 	 * @param input
 	 * @return
 	 */
-	public abstract Message handleInMessage(String dispatcherType, byte[] input);
+	public abstract Message handleInMessage(byte[] input);
 
 
 	/**
