@@ -24,14 +24,11 @@ import org.ambientlight.room.entities.climate.util.DeviceType;
  */
 public class MaxPairPongMessage extends MaxMessage {
 
-	// there are two types. a repairing and a pairing
-
 	public MaxPairPongMessage() {
 		payload = new byte[11];
 		setMessageType(MaxMessageType.PAIR_PONG);
 		payload[10] = DeviceType.CUBE.byteValue;
 	}
-
 
 
 	public DeviceType getDeviceType() {

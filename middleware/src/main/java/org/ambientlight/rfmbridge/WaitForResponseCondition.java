@@ -16,6 +16,9 @@
 package org.ambientlight.rfmbridge;
 
 /**
+ * if an out message was posted in the queueManager with that condition. The queue Manager waits until the fulfilled condition
+ * becomes true. The condition will be checked for every message that comes in from the rfm22-bridge.
+ * 
  * @author Florian Bornkessel
  * 
  */

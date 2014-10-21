@@ -24,15 +24,13 @@ import org.ambientlight.room.entities.climate.util.DeviceType;
  */
 public class MaxPairPingMessage extends MaxMessage {
 
-	// there are two types. a repairing and a pairing
-
 	public MaxPairPingMessage() {
 		payload = new byte[23];
 		setMessageType(MaxMessageType.PAIR_PING);
 	}
 
 
-
+	// there are two types. a repairing and a pairing
 	public boolean isReconnecting() {
 		if (super.getToAdress().equals(0))
 			return false;
@@ -71,8 +69,8 @@ public class MaxPairPingMessage extends MaxMessage {
 	@Override
 	public String toString() {
 		String parent = super.toString();
-		String current = "isReconnecting: " + isReconnecting() + "\nfirmware: " + getFirmware()
-				+ "\nDeviceType: " + getDeviceType() + "\nisValid: " + isValid() + "\nSerial: " + getSerial();
+		String current = "isReconnecting: " + isReconnecting() + "\nfirmware: " + getFirmware() + "\nDeviceType: "
+				+ getDeviceType() + "\nisValid: " + isValid() + "\nSerial: " + getSerial();
 		return parent + "\n" + current;
 	}
 }

@@ -26,6 +26,9 @@ import org.ambientlight.rfmbridge.messages.UnRegisterCorrelatorMessage;
 public class MaxUnregisterCorrelationMessage extends UnRegisterCorrelatorMessage {
 
 	/**
+	 * unregister a correlator in the rfm22-bridge. all messages from that device will be broadcasted from now on to all
+	 * max-dispatcher clients that have an connection to the rfm22-bridge
+	 * 
 	 * @param dispatcherType
 	 * @param correlator
 	 */

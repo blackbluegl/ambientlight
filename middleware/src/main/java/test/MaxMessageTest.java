@@ -15,9 +15,11 @@
 
 package test;
 
-import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
+import java.util.Calendar;
+
+import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
-import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 
 /**
@@ -30,9 +32,9 @@ public class MaxMessageTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
-		temp.setMode(MaxThermostateMode.TEMPORARY);
-		temp.setTemp(11.5f);
+		// MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
+		// temp.setMode(MaxThermostateMode.TEMPORARY);
+		// temp.setTemp(11.5f);
 		//
 		// Calendar cal = Calendar.getInstance();
 		// cal.set(Calendar.YEAR, 2012);
@@ -61,17 +63,17 @@ public class MaxMessageTest {
 		// week2.setPayload(week.getPayload());
 		// System.out.println(week2.toString());
 		//
-		// MaxConfigValveMessage valve = new MaxConfigValveMessage();
-		// valve.setBoostDuration(23);
-		// valve.setBoostValvePosition(100);
-		// MaxConfigValveMessage.DecalcEntry decalc = valve.new DecalcEntry();
-		// decalc.day = MaxDayInWeek.FRIDAY;
-		// decalc.hour = 23;
-		// valve.setDecalc(decalc);
-		// valve.setMaxValvePosition(300);
-		// valve.setValveOffset(256);
-		//
-		// System.out.println(valve);
+		MaxConfigValveMessage valve = new MaxConfigValveMessage();
+		valve.setBoostDuration(23);
+		valve.setBoostValvePosition(100);
+		MaxConfigValveMessage.DecalcEntry decalc = valve.new DecalcEntry();
+		decalc.day = MaxDayInWeek.FRIDAY;
+		decalc.hour = 23;
+		valve.setDecalc(decalc);
+		valve.setMaxValvePosition(30);
+		valve.setValveOffset(25);
+
+		System.out.println(valve);
 		//
 		// MaxConfigureTemperaturesMessage temps = new
 		// MaxConfigureTemperaturesMessage();
@@ -120,10 +122,21 @@ public class MaxMessageTest {
 
 		System.out.println("timeTest");
 		MaxTimeInformationMessage timeTest = new MaxTimeInformationMessage();
-		timeTest.setPayload(new byte[] { 0x65, 0x00, 0x03, 0x02, (byte) 0x8F, (byte) 0xC2, 0x08, 0x31, (byte) 0xED, 0x00, 0x0D,
-				0x12, 0x55, (byte) 0xD2, 0x22 });
+		timeTest.setPayload(new byte[] { (byte) 0x2D, (byte) 0x05, (byte) 0x03, (byte) 0x02, (byte) 0x8F, (byte) 0xC2,
+				(byte) 0x08, (byte) 0x76, (byte) 0xF5, (byte) 0x00, (byte) 0x0E, (byte) 0x15, (byte) 0x8E, (byte) 0x99,
+				(byte) 0xB8
+
+		});
 		System.out.println(timeTest);
 		timeTest.setTime(timeTest.getTime());
+
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, 2012);
+		cal.set(Calendar.MONTH, 0);
+		cal.set(Calendar.DAY_OF_MONTH, 21);
+		cal.set(Calendar.HOUR_OF_DAY, 19);
+		cal.set(Calendar.MINUTE, 30);
+		timeTest.setTime(cal.getTime());
 		System.out.println(timeTest);
 	}
 }

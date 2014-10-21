@@ -38,7 +38,8 @@ public class WaitForShutterContactCondition extends WaitForResponseCondition {
 
 
 	/*
-	 * (non-Javadoc)
+	 * becomes true if an shutter contact became active and sent its state to the climatemanager. The shutter contact will be
+	 * awake for 50msec. So the waiting request message will be directly send when this condition becomes true.
 	 * 
 	 * @see org.ambientlight.messages.Condition#fullfilled(java.lang.Object)
 	 */

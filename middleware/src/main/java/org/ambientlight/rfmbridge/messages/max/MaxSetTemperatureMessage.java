@@ -46,7 +46,7 @@ public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessa
 
 
 	public float getTemp() {
-		return (float) (payload[10] & 0x3f) / 2;
+		return (payload[10] & 0x3f) / 2.0f;
 	}
 
 

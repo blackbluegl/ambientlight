@@ -43,7 +43,7 @@ public class MaxUtil {
 			return null;
 
 		int year = 2000 + (untilTime[1] & 0x3f);
-		int month = ((untilTime[0] & 0xE0) >> 4) | (untilTime[1] & 0xFF >> 7) - 1;
+		int month = (((untilTime[0] & 0xE0) >> 4) | (untilTime[1] & 0xFF >> 7)) - 1;
 		int day = untilTime[0] & 0x1f;
 		int timeInMinutes = (untilTime[2] & 0x3f) * 30;
 		int hours = (int) TimeUnit.MINUTES.toHours(timeInMinutes);
