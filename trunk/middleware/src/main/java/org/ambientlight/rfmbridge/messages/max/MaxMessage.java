@@ -138,10 +138,6 @@ public class MaxMessage extends Message {
 	}
 
 
-	// public void setGroupNumber(int groupNumber) {
-	// payload[9] = (byte) groupNumber;
-	// }
-
 	@Override
 	public String toString() {
 		return "MaxMessage: " + getMessageType() + " - SeqNr: " + getSequenceNumber() + " from: " + getFromAdress() + " to: "

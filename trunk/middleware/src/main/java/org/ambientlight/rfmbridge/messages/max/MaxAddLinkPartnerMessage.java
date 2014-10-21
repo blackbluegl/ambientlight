@@ -23,7 +23,6 @@ import org.ambientlight.room.entities.climate.util.MaxUtil;
 /**
  * 
  * @author Florian Bornkessel
- * 
  */
 public class MaxAddLinkPartnerMessage extends MaxMessage implements RequestMessage {
 
@@ -82,9 +81,7 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements RequestMessa
 	 * @see org.ambientlight.messages.AckRequestMessage#getRetryCount()
 	 */
 	@Override
-
 	public int getRetryCount() {
-		// TODO Auto-generated method stub
 		return 10;
 	}
 
@@ -96,7 +93,6 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements RequestMessa
 	 */
 	@Override
 	public String getCorrelation() {
-		// TODO Auto-generated method stub
 		return String.valueOf(getSequenceNumber());
 	}
 }

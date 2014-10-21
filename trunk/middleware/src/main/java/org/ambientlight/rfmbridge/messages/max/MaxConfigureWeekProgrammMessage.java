@@ -31,8 +31,6 @@ import org.ambientlight.rfmbridge.RequestMessage;
  */
 public class MaxConfigureWeekProgrammMessage extends MaxMessage implements RequestMessage {
 
-
-
 	private List<DayEntry> entries = new ArrayList<DayEntry>();
 
 
@@ -44,7 +42,7 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 
 
 	public boolean isSecondPart() {
-		if ((payload[10] >> 4) > 0)
+		if (((payload[10]& 0xFF )>> 4 ) > 0)
 			return true;
 		else
 			return false;
@@ -96,7 +94,7 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 	public void setPayload(byte[] payload) {
 		this.payload = payload;
 
-		// determine type
+		// determine type - second part is shorter
 		if (payload.length > 23) {
 			setSecondPart(false);
 		} else {
@@ -149,6 +147,7 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 		payload[10] = (byte) (day.byteValue | payload[10]);
 	}
 
+
 	@Override
 	public String toString() {
 		Collections.sort(this.entries);
@@ -166,7 +165,6 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 	 */
 	@Override
 	public int getTimeOutSec() {
-		// TODO Auto-generated method stub
 		return 2;
 	}
 
@@ -178,7 +176,6 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 	 */
 	@Override
 	public int getRetryCount() {
-		// TODO Auto-generated method stub
 		return 10;
 	}
 
@@ -190,7 +187,6 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 	 */
 	@Override
 	public String getCorrelation() {
-		// TODO Auto-generated method stub
 		return String.valueOf(getSequenceNumber());
 	}
 

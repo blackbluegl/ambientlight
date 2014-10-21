@@ -25,8 +25,6 @@ public class MaxSetGroupIdMessage extends MaxMessage {
 	public final static int MAX_GROUP_ID = 255;
 
 
-	// there are two types. a repairing and a pairing
-
 	public MaxSetGroupIdMessage() {
 		payload = new byte[11];
 		setMessageType(MaxMessageType.SET_GROUP_ID);

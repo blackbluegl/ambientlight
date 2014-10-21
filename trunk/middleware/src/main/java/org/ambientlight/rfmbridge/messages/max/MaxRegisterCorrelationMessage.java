@@ -20,8 +20,13 @@ import org.ambientlight.rfmbridge.messages.RegisterCorrelatorMessage;
 
 
 /**
+ * Message to register a correlator for the max dispatcher type in the rfm22-bridge. With that correlator the rfm22-bridge is able
+ * to route messages from max components to the apropriate climate manager instance. Without an correlationt an incomming message
+ * will be broadcasted to all max-dispatcher clients that are connected to the rfm22-bridge. Note this correlator is different
+ * from the correlator in request messages. The message correlator maps response-messages to request messages. This correlator
+ * binds devices to the climatemanager.
+ * 
  * @author Florian Bornkessel
- *
  */
 public class MaxRegisterCorrelationMessage extends RegisterCorrelatorMessage {
 

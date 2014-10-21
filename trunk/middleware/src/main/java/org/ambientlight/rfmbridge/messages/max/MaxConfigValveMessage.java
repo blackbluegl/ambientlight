@@ -32,7 +32,6 @@ public class MaxConfigValveMessage extends MaxMessage {
 	public static final int DEFAULT_BOOST_VALVE_POSITION = 80;
 	public static final int MAX_BOOST_VALVE_POSITION = 100;
 
-
 	public static final int MAX_VALVE_OFFSET = 255;
 
 	public class DecalcEntry {

@@ -17,6 +17,7 @@ package org.ambientlight.rfmbridge.messages.max;
 
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 
+
 /**
  * @author Florian Bornkessel
  * 
@@ -30,7 +31,6 @@ public class MaxConfigureTemperaturesMessage extends MaxMessage {
 	public final static float DEFALUT_ECO_TEMPERATUR = 17.0f;
 	public final static float DEFAULT_WINDOW_OPEN_TEMPERATUR = 12.0f;
 	public final static int DEFAULT_WINDOW_OPEN_TIME_MIN = 15;
-
 
 
 	public MaxConfigureTemperaturesMessage() {

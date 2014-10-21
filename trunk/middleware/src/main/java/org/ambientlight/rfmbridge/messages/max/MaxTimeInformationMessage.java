@@ -57,13 +57,13 @@ public class MaxTimeInformationMessage extends MaxMessage {
 	public Date getTime() {
 		if (isRequest())
 			return null;
-		int year = payload[10] + 2000;
-		int day = payload[11];
+		int year = (payload[10] & 0xFF) + 2000;
+		int day = payload[11] & 0xFF;
 		int hour = payload[12] & 0x1F;
 		int minute = payload[13] & 0x3F;
 		int second = payload[14] & 0x3F;
-		int month = (((payload[13] & 0xC0) >> 4) | ((payload[14]) >> 6)) - 1;
-		GregorianCalendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
+		int month0Based = ((((payload[13] & 0xC0) >> 4) | ((payload[14] & 0xC0) >> 6)) & 0xFF) - 1;
+		GregorianCalendar calendar = new GregorianCalendar(year, month0Based, day, hour, minute, second);
 		return calendar.getTime();
 	}
 

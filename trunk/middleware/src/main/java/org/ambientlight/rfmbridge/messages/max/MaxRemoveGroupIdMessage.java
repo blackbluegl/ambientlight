@@ -25,8 +25,6 @@ public class MaxRemoveGroupIdMessage extends MaxMessage {
 	public final static int MAX_GROUP_ID = 255;
 
 
-	// there are two types. a repairing and a pairing
-
 	public MaxRemoveGroupIdMessage() {
 		payload = new byte[11];
 		setMessageType(MaxMessageType.REMOVE_GROUP_ID);

@@ -15,16 +15,23 @@
 
 package org.ambientlight.rfmbridge;
 
-
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public interface RequestMessage {
 
 	public int getTimeOutSec();
 
+
 	public int getRetryCount();
 
+
+	/**
+	 * define correlator value for response messages. If the correlation value of the response messages is equal to this message
+	 * correlator, the queueManager calls onResponse() from the sender of the request message.
+	 * 
+	 * @return correlation value for response messages
+	 */
 	public String getCorrelation();
 }

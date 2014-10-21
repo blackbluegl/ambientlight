@@ -25,7 +25,6 @@ import org.ambientlight.room.entities.climate.util.MaxUtil;
 
 /**
  * @author Florian Bornkessel
- * 
  */
 public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 
@@ -95,7 +94,7 @@ public class MaxAckMessage extends MaxMessage implements ResponseMessage {
 	public float getSetTemp() {
 		if (payload.length < 14)
 			return 0.0f;
-		return (payload[13] & 0xff) / 2;
+		return (payload[13] & 0xff) / 2.0f;
 	}
 
 
