@@ -71,7 +71,9 @@ public abstract class Dispatcher {
 			ps.flush();
 
 			// write payload
-			deliverPayLoad(message);
+			if (message.getDispatcherType().equals(this.configuration.type)) {
+				deliverPayLoad(message);
+			}
 		} catch (Exception e) {
 			System.out.println("MaxDispatcher deliverMessage(): was unable to send data!");
 			return false;
