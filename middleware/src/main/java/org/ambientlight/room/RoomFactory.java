@@ -97,7 +97,7 @@ public class RoomFactory {
 		room.lightObjectManager = initLightObjectManager(roomConfig.lightObjectManager, room.callBackManager, room.featureFacade,
 				persistence, roomConfig.debug);
 
-		// init queueManager
+		// init rfm22 queueManager
 		room.qeueManager = initQeueManager(roomConfig.qeueManager);
 
 		// init climateManager
@@ -106,7 +106,7 @@ public class RoomFactory {
 
 		// init dispatchers after all callback clients are ready
 		initDispatchers(roomConfig.qeueManager, room.qeueManager);
-
+		
 		// init remoteSwitchManager
 		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackManager,
 				room.featureFacade, persistence);
@@ -122,32 +122,6 @@ public class RoomFactory {
 		System.out.println("RoomFactory initRoom(): finished");
 
 		return room;
-	}
-
-
-	/**
-	 * @param dispatchers
-	 */
-	private void initDispatchers(QeueManagerConfiguration queueConfig, QeueManager qeueManager) {
-		if (queueConfig == null || queueConfig.dispatchers == null || queueConfig.dispatchers.size() == 0) {
-			System.out.println("RoomFactory initDispatchers(): no configuration - skipping!");
-			return;
-		}
-
-		HashMap<DispatcherType, Dispatcher> dispatcherModules = new HashMap<DispatcherType, Dispatcher>();
-		for (DispatcherConfiguration dispatcherConfig : queueConfig.dispatchers) {
-			if (dispatcherConfig.type.equals(DispatcherType.MAX)) {
-				MaxDispatcher dispatcher = new MaxDispatcher(dispatcherConfig, qeueManager);
-				dispatcherModules.put(DispatcherType.MAX, dispatcher);
-			}
-		}
-
-		qeueManager.dispatcherManager = new DispatcherManager(qeueManager, dispatcherModules);
-
-		qeueManager.startQeues();
-
-		qeueManager.dispatcherManager.startDispatchers();
-
 	}
 
 
@@ -309,6 +283,32 @@ public class RoomFactory {
 		return climateManager;
 	}
 
+	
+	/**
+	 * @param dispatchers
+	 */
+	private void initDispatchers(QeueManagerConfiguration queueConfig, QeueManager qeueManager) {
+		if (queueConfig == null || queueConfig.dispatchers == null || queueConfig.dispatchers.size() == 0) {
+			System.out.println("RoomFactory initDispatchers(): no configuration - skipping!");
+			return;
+		}
+
+		HashMap<DispatcherType, Dispatcher> dispatcherModules = new HashMap<DispatcherType, Dispatcher>();
+		for (DispatcherConfiguration dispatcherConfig : queueConfig.dispatchers) {
+			if (dispatcherConfig.type.equals(DispatcherType.MAX)) {
+				MaxDispatcher dispatcher = new MaxDispatcher(dispatcherConfig, qeueManager);
+				dispatcherModules.put(DispatcherType.MAX, dispatcher);
+			}
+		}
+
+		qeueManager.dispatcherManager = new DispatcherManager(qeueManager, dispatcherModules);
+
+		qeueManager.startQeues();
+
+		qeueManager.dispatcherManager.startDispatchers();
+
+	}
+	
 
 	private List<StripePart> getAllStripePartsInRoom(List<AnimateableLedDevice> devices) {
 		List<StripePart> result = new ArrayList<StripePart>();

@@ -121,7 +121,7 @@ public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessa
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 10;
+		return 3;
 	}
 
 
@@ -132,7 +132,7 @@ public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessa
 	 */
 	@Override
 	public int getRetryCount() {
-		return 5;
+		return 10;
 	}
 
 

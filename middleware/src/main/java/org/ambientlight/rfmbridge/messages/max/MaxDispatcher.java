@@ -43,11 +43,10 @@ public class MaxDispatcher extends InDispatcher {
 
 	@Override
 	protected void deliverPayLoad(Message message) throws IOException {
-		// write the binary message for the max devices. skip others like registration, pings etc.
-		if (message instanceof MaxMessage) {
-			socket.getOutputStream().write(((MaxMessage) message).getPayload());
-			socket.getOutputStream().flush();
-		}
+
+		// write the binary message for the max devices.
+		socket.getOutputStream().write(((MaxMessage) message).getPayload());
+		socket.getOutputStream().flush();
 	}
 
 

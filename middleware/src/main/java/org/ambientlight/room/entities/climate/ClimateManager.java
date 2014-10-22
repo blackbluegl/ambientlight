@@ -38,6 +38,8 @@ import org.ambientlight.rfmbridge.QeueManager;
 import org.ambientlight.rfmbridge.QeueManager.State;
 import org.ambientlight.rfmbridge.messages.max.MaxAckMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxAckType;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxPairPingMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxPairPongMessage;
@@ -67,7 +69,7 @@ import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
  */
 public class ClimateManager extends Manager implements MessageListener, TemperatureSensor {
 
-	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 90;
+	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 180;
 
 	private CallBackManager callBackMananger;
 
@@ -101,9 +103,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		Calendar threePm = GregorianCalendar.getInstance();
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
 		threePm.set(Calendar.MINUTE, 5);
-		if (threePm.getTimeInMillis() < new Date().getTime()) {
-			threePm.add(Calendar.DAY_OF_MONTH, 1);
-		}
+
 		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 
 		// register sensors
@@ -149,9 +149,9 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		if (dispatcher == DispatcherType.MAX) {
 
 			this.sendRegisterCorrelators();
-
 			this.sendTimeInfoToThermostates();
-
+			this.sendTempConfigToThermostates();
+			this.sendValveConfigToThermostates();
 			this.setClimate(config.temperature, config.mode, config.temporaryUntil);
 		}
 	}
@@ -533,6 +533,39 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			if (current instanceof Thermostat) {
 				MaxTimeInformationMessage message = new MaxMessageCreator(config).getTimeInfoForDevice(now, current.getAdress());
 				messages.add(message);
+				System.out.println("Climate Manager - sendTimeInfoToThermostates(): sending time signal message:\n" + message);
+			}
+		}
+		queueManager.putOutMessages(messages);
+	}
+
+
+	private void sendValveConfigToThermostates() {
+
+		List<Message> messages = new ArrayList<Message>();
+
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+				MaxConfigValveMessage message = new MaxMessageCreator(config).getConfigValveForDevice(current.getAdress());
+				messages.add(message);
+				System.out
+				.println("Climate Manager - sendValveConfigToThermostates(): sending valve config message:\n" + message);
+			}
+		}
+		queueManager.putOutMessages(messages);
+	}
+
+
+	private void sendTempConfigToThermostates() {
+
+		List<Message> messages = new ArrayList<Message>();
+
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+				MaxConfigureTemperaturesMessage message = new MaxMessageCreator(config).getConfigureTemperatures(current
+						.getAdress());
+				messages.add(message);
+				System.out.println("Climate Manager - sendTempConfigToThermostates(): sending valve config message:\n" + message);
 			}
 		}
 		queueManager.putOutMessages(messages);
