@@ -88,7 +88,7 @@ public class QeueManager {
 					}
 				}
 			}
-		}).start();
+		}, "Outqueue").start();
 
 		new Thread(new Runnable() {
 
@@ -107,7 +107,7 @@ public class QeueManager {
 				}
 			}
 
-		}).start();
+		}, "InQeue").start();
 	}
 
 
@@ -241,7 +241,7 @@ public class QeueManager {
 								e.printStackTrace();
 							}
 						}
-					}).start();
+					}, "QeueDecoupleInMessage").start();
 					messageHandled = true;
 				}
 				// maybe it timed out or there was never a request for this
@@ -269,7 +269,7 @@ public class QeueManager {
 							e.printStackTrace();
 						}
 					}
-				}).start();
+				}, "InMessageNotHandled").start();
 			}
 		}
 
@@ -342,7 +342,7 @@ public class QeueManager {
 					}
 				}
 			}
-		}).start();
+		}, "QeueWatchDog").start();
 	}
 
 
@@ -373,7 +373,7 @@ public class QeueManager {
 				}
 				outLock.unlock();
 			}
-		}).start();
+		}, "RetryHandleOut").start();
 	}
 
 

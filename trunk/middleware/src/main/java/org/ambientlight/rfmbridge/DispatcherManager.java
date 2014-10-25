@@ -103,7 +103,7 @@ public class DispatcherManager {
 					}
 				}
 			}
-		}).start();
+		}, "HeartBeatCheck").start();
 	}
 
 
@@ -140,6 +140,6 @@ public class DispatcherManager {
 					}
 				}
 			}
-		}).start();
+		}, "DispatcherManagerReceiveMessages").start();
 	}
 }

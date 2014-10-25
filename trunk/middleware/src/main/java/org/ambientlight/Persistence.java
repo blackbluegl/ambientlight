@@ -52,10 +52,13 @@ public class Persistence {
 	}
 
 
-	public void beginTransaction() {
+	public synchronized void beginTransaction() {
+
 		semaphore++;
 		if (isTransactionRunning() == false) {
-			System.out.println("Persistence - beginTransaction(): beginning transaction.");
+			System.out.println("Persistence-" + fileName + " - beginTransaction(): beginning transaction for: "
+					+ Thread.currentThread().getName()
+					+ Thread.currentThread().getId());
 			saveLock.lock();
 		} else {
 			System.out.println("Persistence - beginTransaction(): transaction currently running.");
@@ -63,7 +66,7 @@ public class Persistence {
 	}
 
 
-	public void commitTransaction() {
+	public synchronized void commitTransaction() {
 		try {
 
 			// first check if this transaction is encapsulated in an outer one. do not save the state then
@@ -76,22 +79,27 @@ public class Persistence {
 
 			// if no transaction is running because it was canceled. do not save anything to disc
 			if (isTransactionRunning() == false) {
-				System.out.println("Persistence - commitTransaktion(): Warning no transaction running! No  configuration saved!");
+				System.out.println("Persistence-" + fileName
+						+ " - commitTransaktion(): Warning no transaction running! No  configuration saved!");
 			} else {
-				saveLock.unlock();
+				System.out.println("Persistence-" + fileName + " - commitTransaktion(): commiting for: "
+						+ Thread.currentThread().getName()
+						+ Thread.currentThread().getId());
+
 				saveRoomConfiguration(this.fileName, this.roomConfig);
-				System.out.println("Persistence - commitTransaktion(): Successfully saved configuration.");
+				saveLock.unlock();
+				System.out.println("Persistence-" + fileName + " - commitTransaktion(): Successfully saved configuration.");
 			}
 		} catch (IOException e) {
 			System.out
-			.println("Persistence - commitTransaktion(): "
+.println("Persistence-" + fileName + " - commitTransaktion(): "
 					+ "Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
 		}
 	}
 
 
-	public void cancelTransaction() {
+	public synchronized void cancelTransaction() {
 		System.out.println("Persistence - cancelTransaction(): Canceling transaction");
 		semaphore = 0;
 		saveLock.unlock();
@@ -107,7 +115,7 @@ public class Persistence {
 	}
 
 
-	public static void saveRoomConfiguration(String fileName, RoomConfiguration config) throws IOException {
+	public void saveRoomConfiguration(String fileName, RoomConfiguration config) throws IOException {
 		XStream xstream = getXStream();
 
 		String result = xstream.toXML(config);
@@ -130,7 +138,7 @@ public class Persistence {
 	}
 
 
-	private static XStream getXStream() {
+	private XStream getXStream() {
 		XStream xstream = new XStream();
 		xstream.processAnnotations(RoomConfiguration.class);
 		xstream.processAnnotations(StripePartConfiguration.class);

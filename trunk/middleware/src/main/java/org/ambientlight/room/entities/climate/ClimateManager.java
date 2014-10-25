@@ -85,6 +85,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		@Override
 		public void run() {
+			// wait a little time to let other climate manager complete their jobs
+			int wait = (int) (Math.random() * 40.0f);
+			try {
+				Thread.sleep(wait * 1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			sendTimeInfoToThermostates();
 		}
 	};
@@ -148,16 +155,23 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	@Override
 	public void onConnectDispatcher(DispatcherType dispatcher) {
 
-
 		System.out.println("ClimateManager - onConnectDispatcher(): got connection. Syncing MAX devices.");
 		if (dispatcher == DispatcherType.MAX) {
 
 			this.sendRegisterCorrelators();
 
-			if (System.currentTimeMillis() < lastReconnect + 3600 * 1000) {
+			if (System.currentTimeMillis() < lastReconnect + 3600 * 100000) {
 				System.out
 				.println("ClimateManager - onConnectDispatcher(): got connection. Last reconnect was earlier than one hour before. Do not sync data with MAX devices.");
 				return;
+			}
+
+			// wait a little time to let other climate manager complete their jobs
+			int wait = (int) (Math.random() * 40.0f);
+			try {
+				Thread.sleep(wait * 1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 
 			this.sendWakeUpCallsToThermostates();
@@ -165,7 +179,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			this.sendTempConfigToThermostates();
 			this.sendTimeInfoToThermostates();
 			this.setClimate(config.temperature, config.mode, config.temporaryUntil);
-			this.lastReconnect=System.currentTimeMillis();
+			this.lastReconnect = System.currentTimeMillis();
 		}
 	}
 
@@ -376,7 +390,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 */
 	private void handleShutterState(MaxShutterContactStateMessage message) {
 		ShutterContact shutterContact = (ShutterContact) config.devices.get(message.getFromAdress());
-		if (shutterContact == null || message.getToAdress() != this.config.vCubeAdress) {
+		if (shutterContact == null) {
 			System.out.println("ClimateManager handleShutterState(): got request from unknown device: adress="
 					+ message.getFromAdress());
 			return;

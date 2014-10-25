@@ -56,15 +56,26 @@ public class AmbientControl extends HttpServlet {
 			}
 		};
 		String[] filenames = configDir.list(filter);
-		for (String currentFileName : filenames) {
+		for (final String currentFileName : filenames) {
 			try {
+				new Thread(new Runnable() {
 
-				Persistence persistence = new Persistence(currentFileName);
+					@Override
+					public void run() {
+						try {
 
-				RoomConfiguration roomConfiguration = persistence.getRoomConfiguration();
+							Persistence persistence = new Persistence(currentFileName);
 
-				Room room = roomFactory.initRoom(roomConfiguration, persistence);
-				rooms.put(roomConfiguration.roomName, room);
+							RoomConfiguration roomConfiguration = persistence.getRoomConfiguration();
+
+							Room room = roomFactory.initRoom(roomConfiguration, persistence);
+							rooms.put(roomConfiguration.roomName, room);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}, currentFileName).start();
 
 			} catch (Exception e) {
 				throw new ServletException(e);
