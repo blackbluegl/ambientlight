@@ -98,13 +98,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		this.config = config;
 		this.persistence = persistence;
 
-		// set time to thermostates at 3:00 every day
+		// set time to thermostates at 3:00 every day beginning tomorrow
 		Timer timer = new Timer();
 		Calendar threePm = GregorianCalendar.getInstance();
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
 		threePm.set(Calendar.MINUTE, 5);
-
-		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
+		threePm.add(Calendar.DAY_OF_MONTH, 1);
+	    timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 
 		// register sensors
 		featureFacade.registerSensor(this);
@@ -149,9 +149,11 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		if (dispatcher == DispatcherType.MAX) {
 
 			this.sendRegisterCorrelators();
-			this.sendTimeInfoToThermostates();
-			this.sendTempConfigToThermostates();
+
+			this.sendWakeUpCallsToThermostates();
 			this.sendValveConfigToThermostates();
+			this.sendTempConfigToThermostates();
+			this.sendTimeInfoToThermostates();
 			this.setClimate(config.temperature, config.mode, config.temporaryUntil);
 		}
 	}
@@ -540,12 +542,33 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	}
 
 
+	private void sendWakeUpCallsToThermostates() {
+
+		List<Message> messages = new ArrayList<Message>();
+
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+
+				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
+				wakeup.setFromAdress(config.vCubeAdress);
+				wakeup.setToAdress(current.getAdress());
+				wakeup.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
+				messages.add(wakeup);
+
+				System.out.println("Climate Manager - sendWakeUpCalls(): sending wake up message:\n" + wakeup);
+			}
+		}
+		queueManager.putOutMessages(messages);
+	}
+
+
 	private void sendValveConfigToThermostates() {
 
 		List<Message> messages = new ArrayList<Message>();
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
+
 				MaxConfigValveMessage message = new MaxMessageCreator(config).getConfigValveForDevice(current.getAdress());
 				messages.add(message);
 				System.out
