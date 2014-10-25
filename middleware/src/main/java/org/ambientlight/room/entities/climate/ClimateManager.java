@@ -69,6 +69,8 @@ import org.ambientlight.room.entities.features.sensor.TemperatureSensor;
  */
 public class ClimateManager extends Manager implements MessageListener, TemperatureSensor {
 
+	private long lastReconnect = 0;
+
 	public static int WAIT_FOR_NEW_DEVICES_TIMEOUT = 180;
 
 	private CallBackManager callBackMananger;
@@ -104,7 +106,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		threePm.set(Calendar.HOUR_OF_DAY, 3);
 		threePm.set(Calendar.MINUTE, 5);
 		threePm.add(Calendar.DAY_OF_MONTH, 1);
-	    timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
+		timer.scheduleAtFixedRate(syncTimeTask, threePm.getTime(), 24 * 60 * 60 * 1000);
 
 		// register sensors
 		featureFacade.registerSensor(this);
@@ -145,16 +147,25 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 */
 	@Override
 	public void onConnectDispatcher(DispatcherType dispatcher) {
+
+
 		System.out.println("ClimateManager - onConnectDispatcher(): got connection. Syncing MAX devices.");
 		if (dispatcher == DispatcherType.MAX) {
 
 			this.sendRegisterCorrelators();
+
+			if (System.currentTimeMillis() < lastReconnect + 3600 * 1000) {
+				System.out
+				.println("ClimateManager - onConnectDispatcher(): got connection. Last reconnect was earlier than one hour before. Do not sync data with MAX devices.");
+				return;
+			}
 
 			this.sendWakeUpCallsToThermostates();
 			this.sendValveConfigToThermostates();
 			this.sendTempConfigToThermostates();
 			this.sendTimeInfoToThermostates();
 			this.setClimate(config.temperature, config.mode, config.temporaryUntil);
+			this.lastReconnect=System.currentTimeMillis();
 		}
 	}
 
