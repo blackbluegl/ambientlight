@@ -114,5 +114,15 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.2.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.philips.hue</groupId>
+			<artifactId>huelocalsdk</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.philips.hue</groupId>
+			<artifactId>huesdkresources</artifactId>
+			<version>1.3.1</version>
+		</dependency>
 	</dependencies>
 </project>
