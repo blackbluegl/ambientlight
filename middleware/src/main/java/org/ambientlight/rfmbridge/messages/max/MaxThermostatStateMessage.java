@@ -36,7 +36,6 @@ public class MaxThermostatStateMessage extends MaxMessage {
 	}
 
 
-
 	public MaxThermostateMode getMode() {
 		return MaxThermostateMode.forCode(payload[10] & 0x3);
 	}
@@ -51,9 +50,11 @@ public class MaxThermostatStateMessage extends MaxMessage {
 		return (payload[10] >> 5 & 0x1) > 0 ? true : false;
 	}
 
+
 	public boolean hadRfError() {
 		return (payload[10] >> 6 & 0x1) > 0 ? true : false;
 	}
+
 
 	public boolean isBatteryLow() {
 		return (payload[10] >> 7) > 0 ? true : false;
@@ -71,16 +72,17 @@ public class MaxThermostatStateMessage extends MaxMessage {
 
 
 	/**
-	 * the actual temperature will be returned if mode is not TEMPORARY. Because
-	 * the bytes will be used elsewhere for the UntilTime.
+	 * the actual temperature will be returned if mode is not TEMPORARY. Because the bytes will be used elsewhere for the
+	 * UntilTime.
 	 * 
 	 * @return
 	 */
 	public Float getActualTemp() {
 		if (this.getMode() == MaxThermostateMode.TEMPORARY)
 			return null;
-		int tempRaw = ((payload[13] & 0x1) << 8) + payload[14] & 0xff;
-		return tempRaw / 10.0f;
+		int tempRaw = ((payload[13] & 0x01) << 8) + payload[14] & 0xff;
+		// sometimes thermostates send temperatures below 1 degree. Even in warm environments. Those values will be ignored
+		return tempRaw > 10 ? (tempRaw / 10.0f) : null;
 	}
 
 
