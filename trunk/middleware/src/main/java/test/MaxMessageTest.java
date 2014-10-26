@@ -19,6 +19,7 @@ import java.util.Calendar;
 
 import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
 import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxThermostatStateMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
 
 
@@ -138,5 +139,10 @@ public class MaxMessageTest {
 		cal.set(Calendar.MINUTE, 30);
 		timeTest.setTime(cal.getTime());
 		System.out.println(timeTest);
+
+		MaxThermostatStateMessage thermostate = new MaxThermostatStateMessage();
+		thermostate.setPayload(new byte[] { 0x02, 0x04, 0x60, 0x08, 0x69, (byte) 0x91, 0x00, 0x00, 0x00, 0x00, 0x18, 0x0D, 0x2C,
+				0x01, 0x03 });
+		System.out.println(thermostate);
 	}
 }
