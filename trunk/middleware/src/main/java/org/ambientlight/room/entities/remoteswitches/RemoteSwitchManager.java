@@ -69,18 +69,18 @@ public class RemoteSwitchManager extends Manager implements SwitchablesHandler {
 			return;
 		}
 
-		persistence.beginTransaction();
-
-		remoteSwitch.setPowerState(powerState);
-
-		persistence.commitTransaction();
-
 		try {
 			device.setState("ELRO", remoteSwitch.houseCode, remoteSwitch.switchingUnitCode, powerState);
 		} catch (IOException e) {
 			System.out.println("RemoteSwitchManager handleSwitchChange():could not change remoteswitchs powerstate!");
 			e.printStackTrace();
+			return;
 		}
+
+		// persist changes
+		persistence.beginTransaction();
+		remoteSwitch.setPowerState(powerState);
+		persistence.commitTransaction();
 
 		callbackManager.roomConfigurationChanged();
 

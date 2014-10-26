@@ -62,20 +62,21 @@ public class SwitchManager extends Manager implements SwitchablesHandler {
 	 */
 	@Override
 	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
+
 		if (config.switches.containsKey(id) == false) {
 			System.out.println("SwitchManager handleSwitchChange(): got request from unknown device: " + id);
 			return;
 		}
 
+		// persist changes
 		persistence.beginTransaction();
-
 		Switch switchObject = config.switches.get(id);
 		switchObject.setPowerState(powerState);
+		persistence.commitTransaction();
 
 		if (fireEvent) {
 			eventManager.onEvent(new SwitchEvent(id, powerState));
 		}
-		persistence.commitTransaction();
 
 		callback.roomConfigurationChanged();
 	}

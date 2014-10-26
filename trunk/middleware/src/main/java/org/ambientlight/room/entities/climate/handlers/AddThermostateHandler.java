@@ -43,34 +43,20 @@ import org.ambientlight.room.entities.climate.util.MaxUtil;
  */
 public class AddThermostateHandler implements MessageActionHandler {
 
-	boolean finished = false;
+	// will be called by climateManager at any time. Set to true if the handler is ready to be removed
+	private boolean isFinished = false;
 
 
 	public AddThermostateHandler(MaxPairPingMessage pairMessage, CallBackManager callbackManager, QeueManager qeueManager,
 			Persistence persistence, ClimateManagerConfiguration config) {
 
-		// Send pair pong
-		MaxPairPongMessage pairPong = new MaxPairPongMessage();
-		pairPong.setFromAdress(config.vCubeAdress);
-		pairPong.setToAdress(pairMessage.getFromAdress());
-
-		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
-		qeueManager.putOutMessage(pairPong);
-
-		// add and setup new device
+		// add new device
 		persistence.beginTransaction();
-		List<Message> outMessages = new ArrayList<Message>();
-
-		// register the device at the rfmbridge - for direct routing
-		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), config.vCubeAdress));
 
 		// create device in ambientcontrol
 		Thermostat device = new Thermostat();
-
-		// it is the sensor value we can read. but we need something to
-		// start
+		// we need a value to start with. so use the current temperature of the room.
 		device.setTemperature(config.temperature);
-
 		device.setOffset(MaxUtil.DEFAULT_OFFSET);
 		device.setLabel("Thermostat");
 		device.setAdress(pairMessage.getFromAdress());
@@ -84,6 +70,21 @@ public class AddThermostateHandler implements MessageActionHandler {
 
 		// add device to ambientcontrol
 		config.devices.put(device.getAdress(), device);
+
+		persistence.commitTransaction();
+
+		// Setup device
+		List<Message> outMessages = new ArrayList<Message>();
+
+		// Send pair pong
+		MaxPairPongMessage pairPong = new MaxPairPongMessage();
+		pairPong.setFromAdress(config.vCubeAdress);
+		pairPong.setToAdress(pairMessage.getFromAdress());
+		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
+		outMessages.add(pairPong);
+
+		// register the device at the rfmbridge - for direct routing
+		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), config.vCubeAdress));
 
 		// setup Time;
 		outMessages.add(new MaxMessageCreator(config).getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
@@ -115,7 +116,7 @@ public class AddThermostateHandler implements MessageActionHandler {
 		// link devices to other thermostates
 		for (MaxComponent currentConfig : config.devices.values()) {
 
-			// do not link with ourself
+			// do not link with itself
 			if (currentConfig.getAdress() == pairMessage.getFromAdress()) {
 				continue;
 			}
@@ -123,64 +124,55 @@ public class AddThermostateHandler implements MessageActionHandler {
 			if (currentConfig instanceof Thermostat) {
 				// link current to new
 				MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(
-						currentConfig.getAdress(),
-						pairMessage.getFromAdress(), pairMessage.getDeviceType());
+						currentConfig.getAdress(), pairMessage.getFromAdress(), pairMessage.getDeviceType());
 				outMessages.add(linkCurrentToNew);
 
 				// link new device to current
-				MaxAddLinkPartnerMessage linkNewToCurrent = new MaxMessageCreator(config).getLinkMessage(pairMessage.getFromAdress(),
- currentConfig.getAdress(), currentConfig.getDeviceType());
+				MaxAddLinkPartnerMessage linkNewToCurrent = new MaxMessageCreator(config).getLinkMessage(
+						pairMessage.getFromAdress(), currentConfig.getAdress(), currentConfig.getDeviceType());
 				outMessages.add(linkNewToCurrent);
 			}
 		}
 
 		qeueManager.putOutMessages(outMessages);
-		persistence.commitTransaction();
+
 		callbackManager.roomConfigurationChanged();
 
-		finished = true;
+		isFinished = true;
 	}
 
 
 	/*
-	 * (non-Javadoc)
+	 * we do not manage any incomming messages for this action
 	 * 
-	 * @see
-	 * org.ambientlight.climate.MessageActionHandler#onMessage(org.ambientlight
-	 * .messages.Message)
+	 * @see org.ambientlight.climate.MessageActionHandler#onMessage(org.ambientlight .messages.Message)
 	 */
 	@Override
 	public boolean onMessage(Message message) {
-		// we do not manage any incomming messages for this action
 		return false;
 	}
 
 
 	/*
-	 * (non-Javadoc)
+	 * normally the thermostates react within the retry amount of the // requests.
 	 * 
-	 * @see
-	 * org.ambientlight.climate.MessageActionHandler#onAckResponseMessage(org
-	 * .ambientlight.messages.QeueManager.State,
+	 * @see org.ambientlight.climate.MessageActionHandler#onAckResponseMessage(org .ambientlight.messages.QeueManager.State,
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
 	public boolean onResponse(State state, Message response, Message request) {
-		// normally the thermostates react within the retry amount of the
-		// requests.
 		return false;
 	}
 
 
 	/*
-	 * (non-Javadoc)
+	 * always finisched after frist run.
 	 * 
 	 * @see org.ambientlight.climate.MessageActionHandler#isFinished()
 	 */
 	@Override
 	public boolean isFinished() {
-		// TODO Auto-generated method stub
-		return this.finished;
+		return isFinished;
 	}
 
 }

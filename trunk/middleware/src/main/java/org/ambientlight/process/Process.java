@@ -49,8 +49,6 @@ public class Process implements EventListener {
 		Node currentNode = null;
 
 		try {
-			persistence.beginTransaction();
-
 			// Start action here until token nextNode is empty
 			while (token.nextNodeId != null) {
 				currentNode = nodes.get(token.nextNodeId);
@@ -60,13 +58,10 @@ public class Process implements EventListener {
 			}
 
 			callback.roomConfigurationChanged();
-
-			persistence.commitTransaction();
 			System.out.println("Process: " + config.id + " finished successfully.");
 		} catch (Exception e) {
-			System.out.println("Process: " + config.id + " canceled with an error in node: " + currentNode.config.id + ":");
+			System.out.println("Process: " + config.id + " interrupted with an error in node: " + currentNode.config.id + ":");
 			e.printStackTrace();
-			persistence.cancelTransaction();
 		}
 	}
 
