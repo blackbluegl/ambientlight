@@ -110,7 +110,6 @@ public class ProcessManager extends Manager {
 		result.start();
 
 		processes.put(processConfig.id, result);
-
 		processConfig.run = true;
 
 		persistence.commitTransaction();
@@ -273,13 +272,15 @@ public class ProcessManager extends Manager {
 
 
 	public void deleteProcess(String id) {
-		persistence.beginTransaction();
 		ProcessConfiguration process = config.processes.get(id);
 
 		if (process == null)
 			throw new IllegalArgumentException("ProcessId does not exist!");
 
 		stopProcess(id);
+
+		persistence.beginTransaction();
+
 		config.processes.remove(id);
 
 		persistence.commitTransaction();

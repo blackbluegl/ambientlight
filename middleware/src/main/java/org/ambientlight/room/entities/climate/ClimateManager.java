@@ -236,6 +236,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			persistence.cancelTransaction();
 		} finally {
 			clearFinishedActionHandlers();
+
 			callBackMananger.roomConfigurationChanged();
 		}
 	}
@@ -307,6 +308,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 *             public Map<String, Sensor> sensors;
 	 */
 	private void handleSetTemperature(MaxSetTemperatureMessage message) {
+
 		Thermostat thermostat = (Thermostat) config.devices.get(message.getFromAdress());
 		if (thermostat == null) {
 			System.out.println("ClimateManager handleSetTemperature(): got request from unknown device: adress="
@@ -319,12 +321,12 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		if (message.getMode() == MaxThermostateMode.BOOST) {
 			config.modeBeforeBoost = config.mode;
 		}
-
 		config.mode = message.getMode();
 		config.temperature = message.getTemp();
 		config.temporaryUntil = message.getTemporaryUntil();
 
 		persistence.commitTransaction();
+
 		callBackMananger.roomConfigurationChanged();
 	}
 
@@ -389,6 +391,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	 * @throws IOException
 	 */
 	private void handleShutterState(MaxShutterContactStateMessage message) {
+
 		ShutterContact shutterContact = (ShutterContact) config.devices.get(message.getFromAdress());
 		if (shutterContact == null) {
 			System.out.println("ClimateManager handleShutterState(): got request from unknown device: adress="
@@ -407,8 +410,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		persistence.commitTransaction();
 
 		// inform thermostates
-		boolean open = isAWindowOpen();
-		sendWindowStateToThermostates(open);
+		sendWindowStateToThermostates(isAWindowOpen());
 
 		callBackMananger.roomConfigurationChanged();
 	}
@@ -432,8 +434,8 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		thermostat.setBatteryLow(message.isBatteryLow());
 		thermostat.setLocked(message.isLocked());
 		thermostat.setLastUpdate(new Date(System.currentTimeMillis()));
-
 		thermostat.setTemperature(message.getActualTemp());
+		thermostat.setRfError(message.hadRfError());
 
 		config.mode = message.getMode();
 		config.temporaryUntil = message.getTemporaryUntil();
@@ -472,32 +474,37 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	public void setCurrentProfile(String profile) {
-		persistence.beginTransaction();
 
+		// validation that may harm an transaction
 		if (config.weekProfiles.containsKey(profile) == false || config.weekProfiles.get(profile).isEmpty())
 			throw new IllegalArgumentException("the selected weekProfile does not exist or is empty and unusable!");
 
+		persistence.beginTransaction();
+
 		config.currentWeekProfile = profile;
+		// set temp according the profile day entry
 		config.temperature = getCurrentTemperatureFromWeekProfile();
 
-		List<Message> messages = new ArrayList<Message>();
+		persistence.commitTransaction();
 
+		// send profile to thermostates
+		List<Message> messages = new ArrayList<Message>();
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
+				// wakeup device - we will send more than one message
 				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
 				wakeup.setFromAdress(config.vCubeAdress);
 				wakeup.setToAdress(current.getAdress());
 				wakeup.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
 				messages.add(wakeup);
-
+				// send one or two messages per day for 7 days
 				messages.addAll(new MaxMessageCreator(config).getWeekProfileForDevice(current.getAdress(), profile));
+				// set the temperature that we have had updatet to the new actual temp in the week profile
 				messages.add(new MaxMessageCreator(config).getSetTempForDevice(current.getAdress()));
 			}
 		}
 
 		queueManager.putOutMessages(messages);
-
-		persistence.commitTransaction();
 
 		callBackMananger.roomConfigurationChanged();
 	}
@@ -687,27 +694,34 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	public void setClimate(float temp, MaxThermostateMode mode, Date until) {
+
+		// validation that may harm an transaction
+		if (until != null && config.mode == MaxThermostateMode.TEMPORARY)
+			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
+
 		persistence.beginTransaction();
 
+		// validate and correct temperatures
 		if (temp < MaxUtil.MIN_TEMPERATURE) {
 			temp = MaxUtil.MIN_TEMPERATURE;
 		} else if (temp > MaxUtil.MAX_TEMPERATURE) {
 			temp = MaxUtil.MAX_TEMPERATURE;
 		}
 
-		if (until != null && config.mode == MaxThermostateMode.TEMPORARY)
-			throw new IllegalArgumentException("An until date may only be set in temporary mode.");
-
-		// save state for restore
+		// handle boost params
 		if (mode == MaxThermostateMode.BOOST) {
+			// save state before boost for a restore if boost is switched off via setBoostMode()
 			if (config.mode != MaxThermostateMode.BOOST) {
 				config.modeBeforeBoost = config.mode;
 			}
 			Calendar boostUntil = GregorianCalendar.getInstance();
 			boostUntil.add(Calendar.MINUTE, config.boostDurationMins);
 			config.boostUntil = boostUntil.getTime();
+		} else {
+			config.modeBeforeBoost = mode;
 		}
 
+		// handle auto mode params
 		if (mode == MaxThermostateMode.AUTO) {
 			until = null;
 			// if the minimum temperature is given we correct the value to actual from the current week profile
@@ -716,19 +730,21 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			}
 		}
 
+		// handle maual mode
 		if (mode == MaxThermostateMode.MANUAL) {
 			until = null;
 		}
 
-		if (mode != MaxThermostateMode.BOOST) {
-			config.modeBeforeBoost = mode;
-		}
+		// common handling
 		config.mode = mode;
 		config.temperature = temp;
 		config.temporaryUntil = until;
 
-		List<Message> messages = new ArrayList<Message>();
+		// persist changes
+		persistence.commitTransaction();
 
+		// set temperatures to all thermostates
+		List<Message> messages = new ArrayList<Message>();
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
 				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.getAdress());
@@ -736,10 +752,8 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				System.out.println("Climate Manager - setClimate(): sending climate message:\n" + outMessage);
 			}
 		}
-
 		queueManager.putOutMessages(messages);
 
-		persistence.commitTransaction();
 		callBackMananger.roomConfigurationChanged();
 	}
 

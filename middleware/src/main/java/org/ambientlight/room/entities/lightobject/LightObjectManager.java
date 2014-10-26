@@ -169,11 +169,11 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 			return;
 		}
 
+		// persist changes
 		persistence.beginTransaction();
-
 		renderObject.lightObject.setRenderingProgrammConfiguration(newConfig);
-
 		persistence.commitTransaction();
+
 		renderer.removeRenderTaskForLightObject(renderObject);
 
 		this.addLightObjectToRender(renderer, renderObject, effectFactory.getFadeInEffect(renderObject));
@@ -247,6 +247,7 @@ public class LightObjectManager extends Manager implements SwitchablesHandler {
 		persistence.beginTransaction();
 		renderObject.lightObject.setPowerState(powerState);
 		persistence.commitTransaction();
+
 		callBackMananger.roomConfigurationChanged();
 
 		if (powerState == false) {

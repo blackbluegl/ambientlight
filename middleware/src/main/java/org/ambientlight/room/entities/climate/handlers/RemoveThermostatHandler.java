@@ -15,6 +15,8 @@
 
 package org.ambientlight.room.entities.climate.handlers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.Persistence;
@@ -39,7 +41,8 @@ import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
  */
 public class RemoveThermostatHandler implements MessageActionHandler {
 
-	boolean finished = false;
+	// will be called by climateManager at any time. Set to true if the handler is ready to be removed
+	private boolean isFinished = false;
 
 
 	public RemoveThermostatHandler(Thermostat device, Map<Integer, MaxComponent> devices, CallBackManager callbackManager,
@@ -47,9 +50,10 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 
 		persistence.beginTransaction();
 
+		List<Message> outMessages = new ArrayList<Message>();
+
 		// unregister link from other thermostates
 		for (MaxComponent currentDevice : devices.values()) {
-
 			// only other thermostates
 			if (currentDevice.getAdress() == device.getAdress() || currentDevice instanceof Thermostat == false) {
 				continue;
@@ -57,53 +61,50 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 
 			MaxRemoveLinkPartnerMessage unlink = new MaxMessageCreator(config).getUnlinkMessageForDevice(
 					currentDevice.getAdress(), device.getAdress(), device.getDeviceType());
-			queueManager.putOutMessage(unlink);
+			outMessages.add(unlink);
 		}
 
 		// send remove
 		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.getAdress());
-		queueManager.putOutMessage(resetDevice);
+		outMessages.add(resetDevice);
 
 		// remove correlator - rfm bridge does route its messages to all clients
 		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
-				device.getAdress(),
-				config.vCubeAdress);
-		queueManager.putOutMessage(unRegisterCorelator);
+				device.getAdress(), config.vCubeAdress);
+		outMessages.add(unRegisterCorelator);
 
 		// Remove from modell
 		devices.remove(device.getAdress());
 
 		persistence.commitTransaction();
+
+		queueManager.putOutMessages(outMessages);
+
 		callbackManager.roomConfigurationChanged();
-		finished = true;
+
+		isFinished = true;
 	}
 
 
 	/*
-	 * (non-Javadoc)
+	 * there should occour no timeout
 	 * 
-	 * @see
-	 * org.ambientlight.climate.MessageActionHandler#onMessage(org.ambientlight
-	 * .messages.Message)
+	 * @see org.ambientlight.climate.MessageActionHandler#onMessage(org.ambientlight .messages.Message)
 	 */
 	@Override
 	public boolean onMessage(Message message) {
-		// there should occour no timeout
 		return false;
 	}
 
 
 	/*
-	 * (non-Javadoc)
+	 * there should occour no timeout
 	 * 
-	 * @see
-	 * org.ambientlight.climate.MessageActionHandler#onAckResponseMessage(org
-	 * .ambientlight.messages.QeueManager.State,
+	 * @see org.ambientlight.climate.MessageActionHandler#onAckResponseMessage(org .ambientlight.messages.QeueManager.State,
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
 	public boolean onResponse(State state, Message response, Message request) {
-		// there should occour no timeout
 		return false;
 	}
 
@@ -115,7 +116,7 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 	 */
 	@Override
 	public boolean isFinished() {
-		return this.finished;
+		return this.isFinished;
 	}
 
 }

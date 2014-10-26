@@ -67,48 +67,53 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 		this.callbackManager = callbackManager;
 
-		persistence.beginTransaction();
-
 		this.device = device;
 
-		// check if removal of shuttercontact changes the open window state of
-		// the thermostates
+		// prepare new shutter state in configuration
+		persistence.beginTransaction();
+
+		// check if removal of shuttercontact changes the open window state of the thermostates
 		boolean isAWindowOpen = climateManager.isAWindowOpen();
 		this.device.setOpen(false);
 		boolean isAWindowNowOpen = climateManager.isAWindowOpen();
+
+		persistence.commitTransaction();
+
 		if (isAWindowOpen != isAWindowNowOpen) {
 			climateManager.sendWindowStateToThermostates(isAWindowNowOpen);
 		}
 
 		// Wait until shutterContact comes alive and remove it
-		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.getAdress(),
-				config.vCubeAdress);
+		WaitForShutterContactCondition condition = new WaitForShutterContactCondition(device.getAdress(), config.vCubeAdress);
 		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.getAdress());
+		// remember the sequence number to handle ack messages later
 		this.sequenceNumberForDeletedDevice = resetDevice.getSequenceNumber();
+
 		queueManager.putOutMessage(resetDevice, condition);
 
 		actionState = ActionState.REMOVE_FROM_MODELL;
 
-		persistence.commitTransaction();
-
+		// update clients if shutter is now closed
 		if (isAWindowOpen != isAWindowNowOpen) {
 			callbackManager.roomConfigurationChanged();
 		}
 	}
 
 
+	/**
+	 * when the shutter has responded it will be removed from the data model
+	 */
 	private void handleRemoveFromModell() {
-
-		// remove correlator
-		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
-				device.getAdress(),
-				config.vCubeAdress);
-		queueManager.putOutMessage(unRegisterCorelator);
 
 		// Remove from modell
 		persistence.beginTransaction();
 		config.devices.remove(device.getAdress());
 		persistence.commitTransaction();
+
+		// remove correlator
+		UnRegisterCorrelatorMessage unRegisterCorelator = new MaxUnregisterCorrelationMessage(DispatcherType.MAX,
+				device.getAdress(), config.vCubeAdress);
+		queueManager.putOutMessage(unRegisterCorelator);
 
 		this.actionState = ActionState.FINISHED;
 
@@ -117,11 +122,10 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 
 	/*
-	 * (non-Javadoc)
+	 * all messages from the shutter contact that have no context will be handled here. This might be if the shutter did not
+	 * received the reset message because the network was to slow.
 	 * 
-	 * @see
-	 * org.ambientlight.messages.MessageListener#onMessage(org.ambientlight.
-	 * messages.Message)
+	 * @see org.ambientlight.messages.MessageListener#onMessage(org.ambientlight. messages.Message)
 	 */
 	@Override
 	public boolean onMessage(Message message) {
@@ -141,10 +145,10 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 
 	/*
-	 * (non-Javadoc)
+	 * handle responses from shutter contact. we can get timeouts and retrieve an answer. Hopefully an answer. timeouts may occour
+	 * if the conditinial message was to slow via network and the shutter contact did not wait after it was woken up.
 	 * 
-	 * @see org.ambientlight.messages.MessageListener#onAckResponseMessage(org.
-	 * ambientlight.messages.QeueManager.State,
+	 * @see org.ambientlight.messages.MessageListener#onAckResponseMessage(org. ambientlight.messages.QeueManager.State,
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
@@ -158,7 +162,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 			} else if (state == State.RETRIEVED_ANSWER) {
 				System.out.println("RemoveShutterHandler onAckResponseMessage(): successfully removed shutterContact.");
 			}
-
+			// we will remove the shuttercontact from the modell anyway.
 			this.handleRemoveFromModell();
 			return true;
 		}
@@ -167,7 +171,7 @@ public class RemoveShutterContactHandler implements MessageActionHandler {
 
 
 	/*
-	 * (non-Javadoc)
+	 * this handler is finished if the shuttercontact was removed.
 	 * 
 	 * @see org.ambientlight.climate.MessageActionHandler#isFinished()
 	 */

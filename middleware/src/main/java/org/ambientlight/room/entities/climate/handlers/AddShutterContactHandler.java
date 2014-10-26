@@ -26,15 +26,10 @@ import org.ambientlight.config.room.entities.climate.ClimateManagerConfiguration
 import org.ambientlight.rfmbridge.Message;
 import org.ambientlight.rfmbridge.QeueManager;
 import org.ambientlight.rfmbridge.QeueManager.State;
-import org.ambientlight.rfmbridge.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxPairPingMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxPairPongMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxRegisterCorrelationMessage;
-import org.ambientlight.room.entities.climate.MaxComponent;
 import org.ambientlight.room.entities.climate.ShutterContact;
-import org.ambientlight.room.entities.climate.Thermostat;
-import org.ambientlight.room.entities.climate.util.DeviceType;
-import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
 
 
 /**
@@ -43,32 +38,17 @@ import org.ambientlight.room.entities.climate.util.MaxMessageCreator;
  */
 public class AddShutterContactHandler implements MessageActionHandler {
 
-	boolean finished = false;
+	// will be called by climateManager at any time. Set to true if the handler is ready to be removed
+	private boolean isFinished = false;
 
 
-	public AddShutterContactHandler(MaxPairPingMessage pairMessage, ClimateManagerConfiguration config,
-			QeueManager qeueManager,
+	public AddShutterContactHandler(MaxPairPingMessage pairMessage, ClimateManagerConfiguration config, QeueManager qeueManager,
 			CallBackManager callbackManager, Persistence persistence) {
 
-		// Send pair pong
-		MaxPairPongMessage pairPong = new MaxPairPongMessage();
-		pairPong.setFromAdress(config.vCubeAdress);
-		pairPong.setToAdress(pairMessage.getFromAdress());
-
-		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
-		qeueManager.putOutMessage(pairPong);
-
-		// add and setup new device
 		persistence.beginTransaction();
-		List<Message> outMessages = new ArrayList<Message>();
-
-		// register the device at the rfmbridge - it will ack some requests
-		// directly because the way over network is to long.
-		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), config.vCubeAdress));
 
 		// create device
 		ShutterContact device = new ShutterContact();
-
 		device.setOpen(false);
 		device.setLabel("Fensterkontakt");
 		device.setAdress(pairMessage.getFromAdress());
@@ -82,34 +62,50 @@ public class AddShutterContactHandler implements MessageActionHandler {
 
 		config.devices.put(device.getAdress(), device);
 
+		persistence.commitTransaction();
+
+		// setup new device
+		List<Message> outMessages = new ArrayList<Message>();
+
+		// link shutter with us
+		MaxPairPongMessage pairPong = new MaxPairPongMessage();
+		pairPong.setFromAdress(config.vCubeAdress);
+		pairPong.setToAdress(pairMessage.getFromAdress());
+		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
+		outMessages.add(pairPong);
+
+		// register correlator at the rfmbridge. The rfmbridge will handle ack messages directly. Cause is: the shuttercontact
+		// waits only 50msec. Via network is to slow.
+		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), config.vCubeAdress));
+
+		// should be done alread. TODO: remove this code after a few tests
 		// link devices
-		for (MaxComponent currentConfig : config.devices.values()) {
-
-			// do link only with thermostates
-			if (currentConfig instanceof Thermostat == false) {
-				continue;
-			}
-
-			// link current device to the proxy adress of the shutter
-			MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.getAdress(),
-					config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
-			outMessages.add(linkCurrentToNew);
-		}
+		// for (MaxComponent currentConfig : config.devices.values()) {
+		//
+		// // do link only with thermostates
+		// if (currentConfig instanceof Thermostat == false) {
+		// continue;
+		// }
+		//
+		//
+		// link current device to the proxy adress of the shutter
+		// MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(currentConfig.getAdress(),
+		// config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
+		// outMessages.add(linkCurrentToNew);
+		// }
 
 		qeueManager.putOutMessages(outMessages);
-		persistence.commitTransaction();
+
 		callbackManager.roomConfigurationChanged();
 
-		finished = true;
+		isFinished = true;
 	}
 
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.ambientlight.climate.MessageActionHandler#onMessage(org.ambientlight
-	 * .messages.Message)
+	 * @see org.ambientlight.climate.MessageActionHandler#onMessage(org.ambientlight .messages.Message)
 	 */
 	@Override
 	public boolean onMessage(Message message) {
@@ -119,29 +115,26 @@ public class AddShutterContactHandler implements MessageActionHandler {
 
 
 	/*
-	 * (non-Javadoc)
+	 * does not handle responses. The shuttercontact has asked us and waited for our response. The queuemanager repeats all send
+	 * messages several times until an ack arrives. This should be fine most of the time.
 	 * 
-	 * @see
-	 * org.ambientlight.climate.MessageActionHandler#onAckResponseMessage(org
-	 * .ambientlight.messages.QeueManager.State,
+	 * @see org.ambientlight.climate.MessageActionHandler#onAckResponseMessage(org .ambientlight.messages.QeueManager.State,
 	 * org.ambientlight.messages.Message, org.ambientlight.messages.Message)
 	 */
 	@Override
 	public boolean onResponse(State state, Message response, Message request) {
-		// we do not wait for an ack here. the queue retry mechanism should be
-		// fine.
 		return false;
 	}
 
 
 	/*
-	 * (non-Javadoc)
+	 * The handler is finished directly after it has initialized the shutter contact in the constructor
 	 * 
 	 * @see org.ambientlight.climate.MessageActionHandler#isFinished()
 	 */
 	@Override
 	public boolean isFinished() {
-		return this.finished;
+		return isFinished;
 	}
 
 }

@@ -58,15 +58,13 @@ public class SceneryManager extends Manager implements ScenerySensor {
 		if (config.sceneries.containsKey(scenery) == false)
 			throw new IllegalArgumentException("Scenery does not exist!");
 		System.out.println("SceneryManager - setCurrentScenery: setting current scenery " + scenery);
+
+		// persist changes
 		persistence.beginTransaction();
-
 		this.config.currentScenery = config.sceneries.get(scenery);
-
 		persistence.commitTransaction();
 
-		SceneryEntryEvent event = new SceneryEntryEvent(new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER),
-				scenery);
-		eventManager.onEvent(event);
+		eventManager.onEvent(new SceneryEntryEvent(new EntityId(EntityId.DOMAIN_SCENRERY, EntityId.ID_SCENERY_MANAGER), scenery));
 
 		callbackManager.roomConfigurationChanged();
 	}
@@ -79,10 +77,9 @@ public class SceneryManager extends Manager implements ScenerySensor {
 
 		System.out.println("SceneryManager - deletingScenery(): delete scenery " + scenery);
 
+		// persist changes
 		persistence.beginTransaction();
-
 		config.sceneries.remove(scenery);
-
 		persistence.commitTransaction();
 
 		callbackManager.roomConfigurationChanged();
@@ -99,13 +96,11 @@ public class SceneryManager extends Manager implements ScenerySensor {
 
 		System.out.println("SceneryManager - createScenery(): creating scenery " + scenery);
 
+		// persist changes
 		persistence.beginTransaction();
-
 		Scenery newScenery = new Scenery();
 		newScenery.id = scenery;
-
 		config.sceneries.put(scenery, newScenery);
-
 		persistence.commitTransaction();
 
 		callbackManager.roomConfigurationChanged();

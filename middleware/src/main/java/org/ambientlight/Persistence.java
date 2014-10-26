@@ -22,24 +22,19 @@ import com.thoughtworks.xstream.XStream;
 
 public class Persistence {
 
+	public static final String DATA_DIRECTORY = "/opt/ambientcontrol/";
+
+	private ReentrantLock saveLock = new ReentrantLock();
+
 	private String fileName;
 
 	private RoomConfiguration roomConfig;
-
-	private int semaphore = 0;
 
 
 	public Persistence(String fileName) throws FileNotFoundException {
 		this.fileName = fileName;
 		this.roomConfig = loadRoomConfig();
 	}
-
-	// public static final String DATA_DIRECTORY = System.getProperty("user.home") + File.separator + "ambientlight"
-	// + File.separator + "sceneries";
-
-	public static final String DATA_DIRECTORY = "/opt/ambientcontrol/";
-
-	ReentrantLock saveLock = new ReentrantLock();
 
 
 	public boolean isTransactionRunning() {
@@ -52,56 +47,41 @@ public class Persistence {
 	}
 
 
-	public synchronized void beginTransaction() {
+	public void beginTransaction() {
 
-		semaphore++;
-		if (isTransactionRunning() == false) {
-			System.out.println("Persistence-" + fileName + " - beginTransaction(): beginning transaction for: "
-					+ Thread.currentThread().getName()
-					+ Thread.currentThread().getId());
-			saveLock.lock();
-		} else {
-			System.out.println("Persistence - beginTransaction(): transaction currently running.");
-		}
+		System.out.println("Persistence-" + fileName + " - beginTransaction(): aquiring lock for: "
+				+ Thread.currentThread().getName() + Thread.currentThread().getId());
+		saveLock.lock();
+		System.out.println("Persistence-" + fileName + " - beginTransaction(): got lock for: " + Thread.currentThread().getName()
+				+ Thread.currentThread().getId());
 	}
 
 
-	public synchronized void commitTransaction() {
+	public void commitTransaction() {
 		try {
-
-			// first check if this transaction is encapsulated in an outer one. do not save the state then
-			semaphore = semaphore > 0 ? semaphore - 1 : 0;
-			if (semaphore > 0) {
-				System.out.println("Persistence - commitTransaktion(): "
-						+ "Warning ommitting because an outer transaction is running!");
-				return;
-			}
-
 			// if no transaction is running because it was canceled. do not save anything to disc
 			if (isTransactionRunning() == false) {
 				System.out.println("Persistence-" + fileName
 						+ " - commitTransaktion(): Warning no transaction running! No  configuration saved!");
 			} else {
-				System.out.println("Persistence-" + fileName + " - commitTransaktion(): commiting for: "
-						+ Thread.currentThread().getName()
-						+ Thread.currentThread().getId());
+				System.out.println("Persistence-" + fileName + " - commitTransaktion(): releasing lock for: "
+						+ Thread.currentThread().getName() + Thread.currentThread().getId());
 
 				saveRoomConfiguration(this.fileName, this.roomConfig);
 				saveLock.unlock();
-				System.out.println("Persistence-" + fileName + " - commitTransaktion(): Successfully saved configuration.");
+				System.out.println("Persistence-" + fileName
+						+ " - commitTransaktion(): Successfully released lock and saved configuration.");
 			}
 		} catch (IOException e) {
-			System.out
-.println("Persistence-" + fileName + " - commitTransaktion(): "
+			System.out.println("Persistence-" + fileName + " - commitTransaktion(): "
 					+ "Error writing roomConfiguration to Disk! Emergency exit!");
 			System.exit(1);
 		}
 	}
 
 
-	public synchronized void cancelTransaction() {
+	public void cancelTransaction() {
 		System.out.println("Persistence - cancelTransaction(): Canceling transaction");
-		semaphore = 0;
 		saveLock.unlock();
 	}
 

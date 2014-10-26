@@ -150,7 +150,7 @@ public class AlarmManager extends Manager implements SwitchablesHandler {
 	 * org.ambientlight.room.entities.switches.SwitchType, boolean)
 	 */
 	@Override
-	public void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
+	public synchronized void setPowerState(EntityId id, boolean powerState, boolean fireEvent) {
 		DailyAlarm alarm = config.alarms.get(id);
 
 		if (alarm == null) {
