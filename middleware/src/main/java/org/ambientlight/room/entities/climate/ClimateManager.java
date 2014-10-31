@@ -740,6 +740,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		config.temperature = temp;
 		config.temporaryUntil = until;
 
+		// set time out marker to false
+		for (MaxComponent current : config.devices.values()) {
+			if (current instanceof Thermostat) {
+				current.setTimedOut(false);
+			}
+		}
+
 		// persist changes
 		persistence.commitTransaction();
 
