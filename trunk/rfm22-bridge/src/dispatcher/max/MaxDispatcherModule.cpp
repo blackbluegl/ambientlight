@@ -80,6 +80,13 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		sendLong = false;
 	}
 
+	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0xF1) {
+		cout << "MaxDispatcherModule - sendMessage(): sending an \"WakeUp\" and therefore a long preamble\n";
+		sendLong = true;
+		//seems that the thermostates take some time to respond on that message
+		//waitForResponseInMs=500;
+	}
+
 //	if (sendLong == true) {
 //		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
 //	} else {
