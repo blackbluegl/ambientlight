@@ -92,6 +92,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			// wakeup thermostates for batch updates
+			sendWakeUpCallsToThermostates();
+
 			sendTimeInfoToThermostates();
 		}
 	};
@@ -174,11 +178,14 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				e.printStackTrace();
 			}
 
+			// wakeup thermostates for batch updates
 			this.sendWakeUpCallsToThermostates();
+
 			this.sendValveConfigToThermostates();
 			this.sendTempConfigToThermostates();
 			this.sendTimeInfoToThermostates();
 			this.setClimate(config.temperature, config.mode, config.temporaryUntil);
+
 			this.lastReconnect = System.currentTimeMillis();
 		}
 	}
@@ -434,7 +441,9 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		thermostat.setBatteryLow(message.isBatteryLow());
 		thermostat.setLocked(message.isLocked());
 		thermostat.setLastUpdate(new Date(System.currentTimeMillis()));
-		thermostat.setTemperature(message.getActualTemp());
+		if (message.getActualTemp() != null) {
+			thermostat.setTemperature(message.getActualTemp());
+		}
 		thermostat.setRfError(message.hadRfError());
 
 		config.mode = message.getMode();
@@ -474,7 +483,8 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	public void setCurrentProfile(String profile) {
-
+		// TODO: works but it might be better to have a handler that sets each thermostate in an own transaction and that get sure
+		// that all thermostates where updated correctly.
 		// validation that may harm an transaction
 		if (config.weekProfiles.containsKey(profile) == false || config.weekProfiles.get(profile).isEmpty())
 			throw new IllegalArgumentException("the selected weekProfile does not exist or is empty and unusable!");
@@ -487,16 +497,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		persistence.commitTransaction();
 
-		// send profile to thermostates
+		// wakeup thermostates for batch updates
+		sendWakeUpCallsToThermostates();
+
 		List<Message> messages = new ArrayList<Message>();
+
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				// wakeup device - we will send more than one message
-				MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
-				wakeup.setFromAdress(config.vCubeAdress);
-				wakeup.setToAdress(current.getAdress());
-				wakeup.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
-				messages.add(wakeup);
 				// send one or two messages per day for 7 days
 				messages.addAll(new MaxMessageCreator(config).getWeekProfileForDevice(current.getAdress(), profile));
 				// set the temperature that we have had updatet to the new actual temp in the week profile
@@ -575,9 +582,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	private void sendWakeUpCallsToThermostates() {
-
-		List<Message> messages = new ArrayList<Message>();
-
+		// TODO: think about a dedicated handler to get shure that all devices are really woken up correctly
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
 
@@ -585,12 +590,10 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				wakeup.setFromAdress(config.vCubeAdress);
 				wakeup.setToAdress(current.getAdress());
 				wakeup.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
-				messages.add(wakeup);
-
+				queueManager.putOutMessage(wakeup);
 				System.out.println("Climate Manager - sendWakeUpCalls(): sending wake up message:\n" + wakeup);
 			}
 		}
-		queueManager.putOutMessages(messages);
 	}
 
 
@@ -600,11 +603,9 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-
 				MaxConfigValveMessage message = new MaxMessageCreator(config).getConfigValveForDevice(current.getAdress());
 				messages.add(message);
-				System.out
-				.println("Climate Manager - sendValveConfigToThermostates(): sending valve config message:\n" + message);
+				System.out.println("Climate Manager - sendValveConfigToThermostates(): sending valve config:\n" + message);
 			}
 		}
 		queueManager.putOutMessages(messages);
@@ -620,7 +621,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				MaxConfigureTemperaturesMessage message = new MaxMessageCreator(config).getConfigureTemperatures(current
 						.getAdress());
 				messages.add(message);
-				System.out.println("Climate Manager - sendTempConfigToThermostates(): sending valve config message:\n" + message);
+				System.out.println("Climate Manager - sendTempConfigToThermostates(): sending temp config message:\n" + message);
 			}
 		}
 		queueManager.putOutMessages(messages);
@@ -750,16 +751,21 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		// persist changes
 		persistence.commitTransaction();
 
-		// set temperatures to all thermostates
-		List<Message> messages = new ArrayList<Message>();
+		// find one thermostat - the others are linked (in sync) and will react immediately
+		Thermostat anyThermostatFromGroup = null;
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.getAdress());
-				messages.add(outMessage);
-				System.out.println("Climate Manager - setClimate(): sending climate message:\n" + outMessage);
+				anyThermostatFromGroup = (Thermostat) current;
+				break;
 			}
 		}
-		queueManager.putOutMessages(messages);
+
+		if (anyThermostatFromGroup != null) {
+			MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(anyThermostatFromGroup
+					.getAdress());
+			queueManager.putOutMessage(outMessage);
+			System.out.println("Climate Manager - setClimate(): sending climate message:\n" + outMessage);
+		}
 
 		callBackMananger.roomConfigurationChanged();
 	}

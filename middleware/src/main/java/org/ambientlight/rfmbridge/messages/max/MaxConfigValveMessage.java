@@ -16,6 +16,7 @@
 package org.ambientlight.rfmbridge.messages.max;
 
 import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
+import org.ambientlight.rfmbridge.RequestMessage;
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 
 
@@ -23,8 +24,7 @@ import org.ambientlight.room.entities.climate.util.MaxUtil;
  * @author Florian Bornkessel
  * 
  */
-public class MaxConfigValveMessage extends MaxMessage {
-
+public class MaxConfigValveMessage extends MaxMessage implements RequestMessage {
 
 	public static final int DEFAULT_BOOST_DURATION_MIN = 5;
 	public static final int MAX_BOOST_DURATION_MIN = 60;
@@ -139,5 +139,40 @@ public class MaxConfigValveMessage extends MaxMessage {
 				+ "DecalcTime: " + getDecalc() + "\nMaxValvePosition: " + getMaxValvePosition() + "\nValveOffset: "
 				+ getValveOffset();
 		return parent + "\n" + current;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		if (getSequenceNumber() == null)
+			return null;
+		return getSequenceNumber().toString();
 	}
 }

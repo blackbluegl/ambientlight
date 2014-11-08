@@ -95,7 +95,7 @@ public class Persistence {
 	}
 
 
-	public void saveRoomConfiguration(String fileName, RoomConfiguration config) throws IOException {
+	public static void saveRoomConfiguration(String fileName, RoomConfiguration config) throws IOException {
 		XStream xstream = getXStream();
 
 		String result = xstream.toXML(config);
@@ -118,7 +118,7 @@ public class Persistence {
 	}
 
 
-	private XStream getXStream() {
+	private static XStream getXStream() {
 		XStream xstream = new XStream();
 		xstream.processAnnotations(RoomConfiguration.class);
 		xstream.processAnnotations(StripePartConfiguration.class);

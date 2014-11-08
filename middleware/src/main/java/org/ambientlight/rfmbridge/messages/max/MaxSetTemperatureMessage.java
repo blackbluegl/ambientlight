@@ -121,7 +121,7 @@ public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessa
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 3;
+		return 10;
 	}
 
 

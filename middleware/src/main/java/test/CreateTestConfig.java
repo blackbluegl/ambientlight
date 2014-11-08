@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.ambientlight.Persistence;
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
-import org.ambientlight.config.device.drivers.DummyRemoteSwitchBridgeConfiguration;
+import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
@@ -51,6 +51,7 @@ public class CreateTestConfig {
 	public static String LO_BACKGROUND_ID = "background";
 	public static String LO_LO1_ID = "lightObject1";
 	public static String REMOTE_SWITCH_1 = "remoteSwitch1";
+	public static String REMOTE_SWITCH_2 = "remoteSwitch2";
 	public static String SCENERY_SCENERY1 = "Scenario1";
 	public static String SCENERY_SCENERY2 = "Scenario2";
 
@@ -62,7 +63,7 @@ public class CreateTestConfig {
 	public static void main(String[] args) throws IOException {
 		CreateTestConfig test = new CreateTestConfig();
 
-		new Persistence("default.xml").saveRoomConfiguration("default.xml", test.getTestRoom());
+		Persistence.saveRoomConfiguration("default.xml", test.getTestRoom());
 	}
 
 
@@ -187,23 +188,29 @@ public class CreateTestConfig {
 	 */
 	private void createRemoteSwitchManager(RoomConfiguration rc) {
 
-		DummyRemoteSwitchBridgeConfiguration switchingBridge = new DummyRemoteSwitchBridgeConfiguration();
-		// SwitchDeviceOverEthernetConfiguration switchingBridge = new
-		// SwitchDeviceOverEthernetConfiguration();
-		// switchingBridge.hostName = "rfmbridge";
-		// switchingBridge.port = 2003;
+		// DummyRemoteSwitchBridgeConfiguration switchingBridge = new DummyRemoteSwitchBridgeConfiguration();
+
+		RemoteSwitchBridgeConfiguration switchingBridge = new RemoteSwitchBridgeConfiguration();
+		switchingBridge.hostName = "rfmbridge";
+		switchingBridge.port = 2003;
 
 		RemoteSwitchManagerConfiguration config = new RemoteSwitchManagerConfiguration();
 		rc.remoteSwitchesManager = config;
 		config.device = switchingBridge;
 
 		RemoteSwitch sw1 = new RemoteSwitch();
-		sw1.houseCode = 15;
-		sw1.switchingUnitCode = 3;
+		sw1.houseCode = 1;
+		sw1.switchingUnitCode = 1;
 		sw1.setId(new EntityId(EntityId.DOMAIN_SWITCH_REMOTE, CreateTestConfig.REMOTE_SWITCH_1));
 		sw1.setPowerState(false);
-
 		config.remoteSwitches.put(sw1.getId(), sw1);
+
+		RemoteSwitch sw2 = new RemoteSwitch();
+		sw2.houseCode = 1;
+		sw2.switchingUnitCode = 2;
+		sw2.setId(new EntityId(EntityId.DOMAIN_SWITCH_REMOTE, CreateTestConfig.REMOTE_SWITCH_2));
+		sw2.setPowerState(false);
+		config.remoteSwitches.put(sw2.getId(), sw2);
 
 	}
 
