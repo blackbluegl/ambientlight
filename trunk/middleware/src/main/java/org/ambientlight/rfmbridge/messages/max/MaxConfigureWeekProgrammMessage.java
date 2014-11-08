@@ -165,7 +165,7 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 2;
+		return 10;
 	}
 
 

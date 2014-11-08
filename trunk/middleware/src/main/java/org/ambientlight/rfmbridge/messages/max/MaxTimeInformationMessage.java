@@ -19,12 +19,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.ambientlight.rfmbridge.RequestMessage;
+
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class MaxTimeInformationMessage extends MaxMessage {
+public class MaxTimeInformationMessage extends MaxMessage implements RequestMessage {
 
 	public MaxTimeInformationMessage() {
 		payload = new byte[15];
@@ -73,5 +75,40 @@ public class MaxTimeInformationMessage extends MaxMessage {
 		String parent = super.toString();
 		String result = "\nTime: " + String.valueOf(getTime()) + "\nisRequest: " + isRequest();
 		return (parent + result);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		if (getSequenceNumber() == null)
+			return null;
+		return getSequenceNumber().toString();
 	}
 }

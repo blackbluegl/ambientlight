@@ -15,6 +15,7 @@
 
 package org.ambientlight.rfmbridge.messages.max;
 
+import org.ambientlight.rfmbridge.RequestMessage;
 import org.ambientlight.room.entities.climate.util.MaxUtil;
 
 
@@ -22,7 +23,7 @@ import org.ambientlight.room.entities.climate.util.MaxUtil;
  * @author Florian Bornkessel
  * 
  */
-public class MaxConfigureTemperaturesMessage extends MaxMessage {
+public class MaxConfigureTemperaturesMessage extends MaxMessage implements RequestMessage {
 
 	public final static float MIN_OFFSET = -3.5f;
 	public final static float MAX_OFFSET = 3.5f;
@@ -162,5 +163,40 @@ public class MaxConfigureTemperaturesMessage extends MaxMessage {
 				+ getMaxTemp() + "\nMinTemperature: " + getMinTemp() + "\nOffsetTemperature: " + getOffsetTemp()
 				+ "\nWindowOpenTemperatur: " + getWindowOpenTemp() + "\nWindowOpenTime: " + getWindowOpenTime();
 		return parent + "\n" + current;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getTimeOutSec()
+	 */
+	@Override
+	public int getTimeOutSec() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getRetryCount()
+	 */
+	@Override
+	public int getRetryCount() {
+		return 10;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambientlight.rfmbridge.RequestMessage#getCorrelation()
+	 */
+	@Override
+	public String getCorrelation() {
+		if (getSequenceNumber() == null)
+			return null;
+		return getSequenceNumber().toString();
 	}
 }
