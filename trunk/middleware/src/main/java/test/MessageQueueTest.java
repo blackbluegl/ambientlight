@@ -16,7 +16,6 @@
 package test;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,10 +29,7 @@ import org.ambientlight.rfmbridge.QeueManager;
 import org.ambientlight.rfmbridge.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxDispatcher;
 import org.ambientlight.rfmbridge.messages.max.MaxMessage;
-import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
-import org.ambientlight.rfmbridge.messages.max.MaxWakeUpMessage;
-import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 
 /**
@@ -67,44 +63,45 @@ public class MessageQueueTest {
 		// MaxFactoryResetMessage reset = new MaxFactoryResetMessage();
 		// reset.setFromAdress(41);
 		// reset.setToAdress(adress);
+		//
+		// MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
+		// wakeUp.setFromAdress(167874);
+		// wakeUp.setToAdress(537069);
+		// wakeUp.setSequenceNumber(11);
+		// wakeUp.setGroupNumber(4);
+		// wakeUp.setFlags(MaxMessage.FLAG_REQUEST);
+		// manager.putOutMessage(wakeUp);
 
-		MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
-		wakeUp.setFromAdress(41);
-		wakeUp.setToAdress(431563);
-		wakeUp.setSequenceNumber(11);
-		wakeUp.setGroupNumber(4);
-		wakeUp.setFlags(MaxMessage.FLAG_REQUEST_BURST | MaxMessage.FLAG_REQUEST);
-
-		manager.putOutMessage(wakeUp);
-
-		// createWeek(manager, MaxDayInWeek.MONDAY, 5f, 1);
+		// createWeek(manager, MaxDayInWeek.MONDAY, 11f, 1);
 		// createWeek(manager, MaxDayInWeek.TUESDAY, 12f, 2);
 		// createWeek(manager, MaxDayInWeek.WEDNESDAY, 13f, 3);
 		// createWeek(manager, MaxDayInWeek.THURSDAY, 14f, 4);
 		// createWeek(manager, MaxDayInWeek.FRIDAY, 15f, 5);
 		// createWeek(manager, MaxDayInWeek.SATURDAY, 16f, 6);
 		// createWeek(manager, MaxDayInWeek.SUNDAY, 17f, 7);
+		//
+		//
 
 		Calendar date = Calendar.getInstance();
-		// date.add(Calendar.DAY_OF_WEEK, -1);
+		date.add(Calendar.DAY_OF_WEEK, 1);
 		MaxTimeInformationMessage time = new MaxTimeInformationMessage();
 		time.setTime(date.getTime());
-		time.setFromAdress(41);
+		time.setFromAdress(167874);
 		time.setToAdress(431563);
-		time.setSequenceNumber(33);
+		time.setSequenceNumber(12);
 		manager.putOutMessage(time);
 		System.out.println(time);
 
-		MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
-		temp.setFromAdress(41);
-		temp.setToAdress(431563);
-		temp.setTemp(4.5f);
-		temp.setMode(MaxThermostateMode.TEMPORARY);
-		Calendar newTime = GregorianCalendar.getInstance();
-		newTime.add(Calendar.MINUTE, 30);
-		newTime.add(Calendar.DAY_OF_WEEK, 0);
-		temp.setTemporaryUntil(newTime.getTime());
-		manager.putOutMessage(temp);
+		// MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
+		// temp.setFromAdress(41);
+		// temp.setToAdress(431563);
+		// temp.setTemp(4.5f);
+		// temp.setMode(MaxThermostateMode.TEMPORARY);
+		// Calendar newTime = GregorianCalendar.getInstance();
+		// newTime.add(Calendar.MINUTE, 30);
+		// newTime.add(Calendar.DAY_OF_WEEK, 0);
+		// temp.setTemporaryUntil(newTime.getTime());
+		// manager.putOutMessage(temp);
 		System.out.println("finished");
 	}
 
@@ -117,7 +114,7 @@ public class MessageQueueTest {
 		week.setDay(dayInWeek);
 		DayEntry entry = new DayEntry(24, 0, temp);
 		week.addEntry(entry);
-		week.setFromAdress(41);
+		week.setFromAdress(167874);
 		week.setSecondPart(false);
 		week.setSequenceNumber(sequenceNumber);
 		week.setToAdress(431563);
