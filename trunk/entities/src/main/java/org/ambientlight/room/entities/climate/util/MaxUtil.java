@@ -43,14 +43,14 @@ public class MaxUtil {
 			return null;
 
 		int year = 2000 + (untilTime[1] & 0x3f);
-		int month = (((untilTime[0] & 0xE0) >> 4) | (untilTime[1] & 0xFF >> 7)) - 1;
+		int month = (((untilTime[0] & 0xE0) >> 4) | ((untilTime[1] & 0xFF) >> 7)) - 1;
 		int day = untilTime[0] & 0x1f;
 		int timeInMinutes = (untilTime[2] & 0x3f) * 30;
 		int hours = (int) TimeUnit.MINUTES.toHours(timeInMinutes);
 		int minutes = (int) TimeUnit.MINUTES.toMinutes(timeInMinutes) - (int) TimeUnit.HOURS.toMinutes(hours);
 
 		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(year, month - 1, day, hours, minutes, 00);
+		calendar.set(year, month, day, hours, minutes, 00);
 		return calendar.getTime();
 	}
 

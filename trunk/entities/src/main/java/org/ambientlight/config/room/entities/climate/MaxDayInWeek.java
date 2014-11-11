@@ -26,8 +26,8 @@ import java.util.Map;
  */
 public enum MaxDayInWeek {
 	MONDAY((byte) 0x02, Calendar.MONDAY), TUESDAY((byte) 0x03, Calendar.TUESDAY), WEDNESDAY((byte) 0x04, Calendar.WEDNESDAY), THURSDAY(
-			(byte) 0x05, Calendar.THURSDAY), FRIDAY((byte) 0x6, Calendar.FRIDAY), SATURDAY((byte) 0x0, Calendar.SATURDAY), SUNDAY(
-					(byte) 0x1, Calendar.SUNDAY);
+			(byte) 0x05, Calendar.THURSDAY), FRIDAY((byte) 0x6, Calendar.FRIDAY), SATURDAY((byte) 0x00, Calendar.SATURDAY), SUNDAY(
+			(byte) 0x01, Calendar.SUNDAY);
 
 	public final byte byteValue;
 	public final int calendarDayInWeek;
