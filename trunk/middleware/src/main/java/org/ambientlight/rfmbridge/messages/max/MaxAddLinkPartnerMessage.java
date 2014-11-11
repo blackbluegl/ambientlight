@@ -29,7 +29,7 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements RequestMessa
 	public MaxAddLinkPartnerMessage() {
 		payload = new byte[14];
 		setMessageType(MaxMessageType.ADD_LINK_PARTNER);
-		setFlags(FLAGS_NONE);
+		setFlags(FLAGS_NO_FOLLOWING_MESSAGES);
 	}
 
 
@@ -71,7 +71,7 @@ public class MaxAddLinkPartnerMessage extends MaxMessage implements RequestMessa
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 2;
+		return 10;
 	}
 
 

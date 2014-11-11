@@ -31,6 +31,7 @@ public class MaxWakeUpMessage extends MaxMessage implements RequestMessage {
 		payload = new byte[11];
 		setMessageType(MaxMessageType.WAKE_UP);
 		payload[10] = WAKE_UP_CALL;
+		setFlags(FLAG_REQUEST);
 	}
 
 

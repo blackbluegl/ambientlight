@@ -31,7 +31,7 @@ public class MaxTimeInformationMessage extends MaxMessage implements RequestMess
 	public MaxTimeInformationMessage() {
 		payload = new byte[15];
 		setMessageType(MaxMessageType.TIME_INFORMATION);
-		setFlags(FLAG_REQUEST | FLAG_REQUEST_FROM_CUBE);
+		setFlags(FLAG_REQUEST | FLAG_REQUEST_BURST);
 	}
 
 
@@ -53,6 +53,8 @@ public class MaxTimeInformationMessage extends MaxMessage implements RequestMess
 		payload[12] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
 		payload[13] = (byte) (calendar.get(Calendar.MINUTE) | (((calendar.get(Calendar.MONTH) + 1) & 0x0C) << 4));
 		payload[14] = (byte) (calendar.get(Calendar.SECOND) | (((calendar.get(Calendar.MONTH) + 1) & 0x03) << 6));
+		// use hardcoded value for now..
+		this.setSummerTime(false);
 	}
 
 
@@ -70,10 +72,31 @@ public class MaxTimeInformationMessage extends MaxMessage implements RequestMess
 	}
 
 
+	public void setSummerTime(boolean summerTime) {
+		payload[12] = (byte) (payload[12] & 0xDF);
+		if (summerTime) {
+			payload[12] = (byte) (payload[12] | 0x80);
+		} else {
+			payload[12] = (byte) (payload[12] | 0x40);
+		}
+	}
+
+
+	public Boolean isSummerTime() {
+		if (((payload[12] >> 6) & 0x01) == 1)
+			return false;
+
+		if (((payload[12] >> 7) & 0x01) == 1)
+			return true;
+		return null;
+	}
+
+
 	@Override
 	public String toString() {
 		String parent = super.toString();
-		String result = "\nTime: " + String.valueOf(getTime()) + "\nisRequest: " + isRequest();
+		String result = "\nTime: " + String.valueOf(getTime()) + "\nisRequest: " + isRequest() + "\nisSummerTimer: "
+				+ isSummerTime();
 		return (parent + result);
 	}
 

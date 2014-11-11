@@ -28,9 +28,9 @@ public class MaxMessage extends Message {
 
 	public static int MAX_SEQUENCE_NUMBER = 255;
 
-	public static final int FLAGS_NONE = 0x0;
+	public static final int FLAGS_NO_FOLLOWING_MESSAGES = 0x0;
 	public static final int FLAG_REQUEST = 0x4;
-	public static final int FLAG_REQUEST_FROM_CUBE = 0x1;
+	public static final int FLAG_REQUEST_BURST = 0x1;
 	public static final int FLAG_RESPONSE = 0x2;
 
 	protected byte[] payload = new byte[10];

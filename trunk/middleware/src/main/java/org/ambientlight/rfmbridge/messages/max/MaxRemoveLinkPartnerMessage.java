@@ -30,7 +30,7 @@ public class MaxRemoveLinkPartnerMessage extends MaxMessage implements RequestMe
 	public MaxRemoveLinkPartnerMessage() {
 		payload = new byte[14];
 		setMessageType(MaxMessageType.REMOVE_LINK_PARTNER);
-		setFlags(FLAGS_NONE);
+		setFlags(FLAGS_NO_FOLLOWING_MESSAGES);
 	}
 
 

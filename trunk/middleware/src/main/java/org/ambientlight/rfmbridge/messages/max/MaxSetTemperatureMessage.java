@@ -32,7 +32,7 @@ public class MaxSetTemperatureMessage extends MaxMessage implements RequestMessa
 	public MaxSetTemperatureMessage() {
 		payload = new byte[14];
 		setMessageType(MaxMessageType.SET_TEMPERATURE);
-		setFlags(FLAG_REQUEST | FLAG_REQUEST_FROM_CUBE);
+		setFlags(FLAG_REQUEST | FLAG_REQUEST_BURST);
 	}
 
 
