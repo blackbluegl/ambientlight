@@ -37,7 +37,7 @@ public class MaxFactoryResetMessage extends MaxMessage implements RequestMessage
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 2;
+		return 5;
 	}
 
 
