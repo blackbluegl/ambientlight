@@ -27,6 +27,7 @@ import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
 import org.ambientlight.rfmbridge.Message;
 import org.ambientlight.rfmbridge.messages.max.MaxAddLinkPartnerMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage.DecalcEntry;
 import org.ambientlight.rfmbridge.messages.max.MaxConfigureTemperaturesMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxFactoryResetMessage;
@@ -34,7 +35,6 @@ import org.ambientlight.rfmbridge.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
-import org.ambientlight.rfmbridge.messages.max.MaxConfigValveMessage.DecalcEntry;
 
 
 /**
@@ -82,6 +82,7 @@ public class MaxMessageCreator {
 	public List<Message> getWeekProfileForDevice(Integer deviceAdress, String weekProfile) {
 		List<Message> messages = new ArrayList<Message>();
 		HashMap<MaxDayInWeek, List<DayEntry>> profiles = config.weekProfiles.get(weekProfile);
+
 		for (Entry<MaxDayInWeek, List<DayEntry>> currentDayProfile : profiles.entrySet()) {
 			int entryCountPartOne = currentDayProfile.getValue().size();
 			boolean twoParts = false;
@@ -104,7 +105,7 @@ public class MaxMessageCreator {
 			week.setToAdress(deviceAdress);
 
 			messages.add(week);
-
+			System.out.println("MaxMessageCreator - getWeekProfileForDevice(): created message:\n" + week);
 			if (twoParts) {
 				MaxConfigureWeekProgrammMessage week2 = new MaxConfigureWeekProgrammMessage();
 				for (int i = 7; i < currentDayProfile.getValue().size(); i++) {
@@ -119,10 +120,8 @@ public class MaxMessageCreator {
 				week2.setSequenceNumber(getNewSequnceNumber());
 				week2.setToAdress(deviceAdress);
 				messages.add(week2);
+				System.out.println("MaxMessageCreator - getWeekProfileForDevice(): created message:\n" + week2);
 			}
-
-
-
 		}
 		return messages;
 	}

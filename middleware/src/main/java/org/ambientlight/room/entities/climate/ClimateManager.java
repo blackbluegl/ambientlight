@@ -85,6 +85,9 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 		@Override
 		public void run() {
+
+			System.out.println("ClimateManager - TimerTask.run(): sending time signal to thermosates.");
+
 			// wait a little time to let other climate manager complete their jobs
 			int wait = (int) (Math.random() * 40.0f);
 			try {

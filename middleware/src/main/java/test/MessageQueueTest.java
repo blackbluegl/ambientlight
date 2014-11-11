@@ -22,11 +22,17 @@ import java.util.Map;
 
 import org.ambientlight.config.messages.DispatcherConfiguration;
 import org.ambientlight.config.messages.DispatcherType;
+import org.ambientlight.config.room.entities.climate.DayEntry;
+import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
 import org.ambientlight.rfmbridge.Dispatcher;
 import org.ambientlight.rfmbridge.DispatcherManager;
 import org.ambientlight.rfmbridge.QeueManager;
+import org.ambientlight.rfmbridge.messages.max.MaxConfigureWeekProgrammMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxDispatcher;
+import org.ambientlight.rfmbridge.messages.max.MaxMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxWakeUpMessage;
 import org.ambientlight.room.entities.climate.util.MaxThermostateMode;
 
 
@@ -42,7 +48,7 @@ public class MessageQueueTest {
 		manager.registerMessageListener(DispatcherType.MAX, dump);
 
 		DispatcherConfiguration config = new DispatcherConfiguration();
-		config.hostName = "ambi-schlafen";
+		config.hostName = "max-bridge";
 		config.port = 30000;
 		config.type = DispatcherType.MAX;
 
@@ -50,122 +56,77 @@ public class MessageQueueTest {
 
 		Map<DispatcherType, Dispatcher> dispatchers = new HashMap<DispatcherType, Dispatcher>();
 		dispatchers.put(DispatcherType.MAX, dispatcher);
-		dispatchers.put(DispatcherType.SYSTEM, dispatcher);
+		// dispatchers.put(DispatcherType.SYSTEM, dispatcher);
 
 		DispatcherManager df = new DispatcherManager(manager, dispatchers);
 		manager.dispatcherManager = df;
 		manager.startQeues();
+		df.startDispatchers();
 
-		// MaxSetTemperatureMessage tempMsg = new MaxSetTemperatureMessage();
-		// tempMsg.setFlags(0x5);
-		// tempMsg.setFromAdress(167874);
-		// tempMsg.setToAdress(431563);
-		// // tempMsg.setGroupNumber(1);
-		// tempMsg.setMessageType(MaxMessageType.SET_TEMPERATURE);
-		// tempMsg.setMode(MaxThermostateMode.AUTO);
-		// tempMsg.setSequenceNumber(37);
-		// tempMsg.setTemp(22.5f);
+		//
+		// MaxFactoryResetMessage reset = new MaxFactoryResetMessage();
+		// reset.setFromAdress(41);
+		// reset.setToAdress(adress);
 
-		// ArrayList<Message> out = new ArrayList<Message>();
-		// out.add(tempMsg);
-		// Thread.sleep(1500);
-		// manager.putOutMessages(out);
-		//
-		// for (int i = 0; i < 10000; i++) {
-		// TestMessage test = new TestMessage();
-		// manager.putOutMessage(test);
-		// // Thread.sleep(1);
-		// // System.out.println(i);
-		// }
-		// MaxPairPongMessage pairPong = new MaxPairPongMessage();
-		// pairPong.setSequenceNumber(1);
-		// pairPong.setFromAdress(1);
-		// pairPong.setToAdress(529299);
-		//
-		// MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
-		// wakeUp.setFromAdress(1);
-		// wakeUp.setToAdress(529299);
-		// wakeUp.setFlags(MaxWakeUpMessage.FLAGS_NONE);
-		// wakeUp.setSequenceNumber(2);
-		//
-		// MaxWakeUpMessage wakeUp2 = new MaxWakeUpMessage();
-		// wakeUp2.setFromAdress(1);
-		// wakeUp2.setToAdress(537069);
-		// wakeUp2.setFlags(MaxWakeUpMessage.FLAGS_NONE);
-		// wakeUp2.setSequenceNumber(3);
+		MaxWakeUpMessage wakeUp = new MaxWakeUpMessage();
+		wakeUp.setFromAdress(41);
+		wakeUp.setToAdress(431563);
+		wakeUp.setSequenceNumber(11);
+		wakeUp.setGroupNumber(4);
+		wakeUp.setFlags(MaxMessage.FLAG_REQUEST_BURST | MaxMessage.FLAG_REQUEST);
 
-		// byte[] payloadTest = wakeUp.getPayload();
-		// byte[] p2 = new byte[12];
-		// for (int i = 0; i < 11; i++) {
-		// p2[i] = payloadTest[i];
-		// }
-		// wakeUp.setPayload(p2);
+		manager.putOutMessage(wakeUp);
 
-		// MaxPairPongMessage pairPong1 = new MaxPairPongMessage();
-		// pairPong.setSequenceNumber(3);
-		// pairPong.setFromAdress(1);
-		// pairPong.setToAdress(529299);
-		//
-		// MaxAddLinkPartnerMessage link = new MaxAddLinkPartnerMessage();
-		// link.setFromAdress(1);
-		// link.setToAdress(537069);
-		// link.setSequenceNumber(4);
-		// link.setLinkPartnerAdress(529299);
-		// link.setLinkPartnerDeviceType(DeviceType.SHUTTER_CONTACT);
-		//
-		// MaxAddLinkPartnerMessage link2 = new MaxAddLinkPartnerMessage();
-		// link2.setFromAdress(1);
-		// link2.setToAdress(529299);
-		// link2.setSequenceNumber(5);
-		// link2.setLinkPartnerAdress(537069);
-		// link2.setLinkPartnerDeviceType(DeviceType.HEATING_THERMOSTAT);
-		//
-		// MaxAddLinkPartnerMessage link3 = new MaxAddLinkPartnerMessage();
-		// link3.setFromAdress(1);
-		// link3.setToAdress(529299);
-		// link3.setSequenceNumber(52);
-		// link3.setLinkPartnerAdress(537069);
-		// link3.setLinkPartnerDeviceType(DeviceType.HEATING_THERMOSTAT);
+		// createWeek(manager, MaxDayInWeek.MONDAY, 5f, 1);
+		// createWeek(manager, MaxDayInWeek.TUESDAY, 12f, 2);
+		// createWeek(manager, MaxDayInWeek.WEDNESDAY, 13f, 3);
+		// createWeek(manager, MaxDayInWeek.THURSDAY, 14f, 4);
+		// createWeek(manager, MaxDayInWeek.FRIDAY, 15f, 5);
+		// createWeek(manager, MaxDayInWeek.SATURDAY, 16f, 6);
+		// createWeek(manager, MaxDayInWeek.SUNDAY, 17f, 7);
 
-		// MaxAddLinkPartnerMessage link4 = new MaxAddLinkPartnerMessage();
-		// link4.setFromAdress(1);
-		// link4.setToAdress(529299);
-		// link4.setSequenceNumber(55);
-		// link4.setLinkPartnerAdress(537069);
-		// link4.setLinkPartnerDeviceType(DeviceType.HEATING_THERMOSTAT);
+		Calendar date = Calendar.getInstance();
+		// date.add(Calendar.DAY_OF_WEEK, -1);
+		MaxTimeInformationMessage time = new MaxTimeInformationMessage();
+		time.setTime(date.getTime());
+		time.setFromAdress(41);
+		time.setToAdress(431563);
+		time.setSequenceNumber(33);
+		manager.putOutMessage(time);
+		System.out.println(time);
 
 		MaxSetTemperatureMessage temp = new MaxSetTemperatureMessage();
-		temp.setSequenceNumber(22);
-		temp.setFromAdress(1);
-		temp.setToAdress(537069);
-		temp.setMode(MaxThermostateMode.MANUAL);
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.MINUTE, 30);
-		temp.setTemp(22.0f);
-		temp.setTemporaryUntil(cal.getTime());
-		System.out.println(temp);
+		temp.setFromAdress(41);
+		temp.setToAdress(431563);
+		temp.setTemp(4.5f);
+		temp.setMode(MaxThermostateMode.TEMPORARY);
+		Calendar newTime = GregorianCalendar.getInstance();
+		newTime.add(Calendar.MINUTE, 30);
+		newTime.add(Calendar.DAY_OF_WEEK, 0);
+		temp.setTemporaryUntil(newTime.getTime());
 		manager.putOutMessage(temp);
-		// manager.putOutMessage(temp);
-		// manager.putOutMessage(pairPong);
-		// manager.putOutMessage(wakeUp);
-		// manager.putOutMessage(pairPong1);
-		// manager.putOutMessage(link);
-		// manager.putOutMessage(link2);
-		// List<Message> outMessages = new ArrayList<Message>();
-		// outMessages.add(temp);
-		// outMessages.add(pairPong);
-		// outMessages.add(wakeUp);
-		// outMessages.add(link);
-		// outMessages.add(link2);
-
-		// WaitForShutterContactCondition condition = new
-		// WaitForShutterContactCondition(529299, 1);
-		// manager.putOutMessage(wakeUp, condition);
-		// manager.putOutMessage(wakeUp2, condition);
-		// manager.putOutMessage(link2, condition);
-		// manager.putOutMessage(link3, condition);
-		// manager.putOutMessage(link4, condition);
-		// manager.putOutMessages(outMessages);
 		System.out.println("finished");
+	}
+
+
+	/**
+	 * @param manager
+	 */
+	private static void createWeek(QeueManager manager, MaxDayInWeek dayInWeek, float temp, int sequenceNumber) {
+		MaxConfigureWeekProgrammMessage week = new MaxConfigureWeekProgrammMessage();
+		week.setDay(dayInWeek);
+		DayEntry entry = new DayEntry(24, 0, temp);
+		week.addEntry(entry);
+		week.setFromAdress(41);
+		week.setSecondPart(false);
+		week.setSequenceNumber(sequenceNumber);
+		week.setToAdress(431563);
+		// byte[] mod = week.getPayload();
+		// mod[14] = (byte) 0xFF;
+		// mod[13] = (byte) 0xFF;
+		// week.setPayload(mod);
+		week.setFlags(MaxMessage.FLAG_REQUEST_BURST);
+		System.out.println(week);
+		manager.putOutMessage(week);
 	}
 }
