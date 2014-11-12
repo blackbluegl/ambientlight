@@ -53,8 +53,6 @@ public class MaxTimeInformationMessage extends MaxMessage implements RequestMess
 		payload[12] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
 		payload[13] = (byte) (calendar.get(Calendar.MINUTE) | (((calendar.get(Calendar.MONTH) + 1) & 0x0C) << 4));
 		payload[14] = (byte) (calendar.get(Calendar.SECOND) | (((calendar.get(Calendar.MONTH) + 1) & 0x03) << 6));
-		// use hardcoded value for now..
-		this.setSummerTime(true);
 	}
 
 
@@ -72,7 +70,8 @@ public class MaxTimeInformationMessage extends MaxMessage implements RequestMess
 	}
 
 
-	// TODO protocoll is unclear to me. so keep the thermostates in a local timezone and always emulate summertime if possible.
+	// TODO protocoll is unclear to me. there are some more bits that represents a timezone. For now keep the thermostates with an
+	// offset of 0. and let climate manager regulate summer and winter time.
 	private void setSummerTime(boolean summerTime) {
 		payload[12] = (byte) (payload[12] & 0xDF);
 		if (summerTime) {
