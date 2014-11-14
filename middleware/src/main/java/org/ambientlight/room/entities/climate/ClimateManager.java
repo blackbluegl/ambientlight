@@ -265,20 +265,21 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			// try to handle the message via an actionhandler
 			for (MessageActionHandler current : actionHandlers) {
 				if (current.onMessage(message)) {
-					System.out.println("ClimateManager - onMessage: message handled by actionhandler.");
+					System.out.println("ClimateManager - onMessage() - " + Calendar.getInstance().getTime()
+							+ " : message handled by actionhandler.");
 					return;
 				}
 			}
 
 			// handle by ourself
 			if (message instanceof MaxThermostatStateMessage) {
-				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				// System.out.println("ClimateManager - handleMessage(): handle " + message);
 				handleThermostatState((MaxThermostatStateMessage) message);
 			} else if (message instanceof MaxSetTemperatureMessage) {
 				System.out.println("ClimateManager - handleMessage(): handle " + message);
 				handleSetTemperature((MaxSetTemperatureMessage) message);
 			} else if (message instanceof MaxShutterContactStateMessage) {
-				System.out.println("ClimateManager - handleMessage(): handle " + message);
+				// System.out.println("ClimateManager - handleMessage(): handle " + message);
 				handleShutterState((MaxShutterContactStateMessage) message);
 			} else if (message instanceof MaxPairPingMessage) {
 				System.out.println("ClimateManager - handleMessage(): handle " + message);
@@ -287,7 +288,8 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				System.out.println("ClimateManager - handleMessage(): handle " + message);
 				handleGetTimeInfo((MaxTimeInformationMessage) message);
 			} else {
-				System.out.println("ClimateManager handleMessage(): ignored message: " + message);
+				System.out.println("ClimateManager handleMessage() - " + Calendar.getInstance().getTime() + ": ignored message: "
+						+ message);
 			}
 
 		} catch (Exception e) {
@@ -409,6 +411,9 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			return;
 		}
 
+		System.out.println("ClimateManager handleShutterState() - " + Calendar.getInstance().getTime() + ": got request: "
+				+ message);
+
 		persistence.beginTransaction();
 
 		ShutterContact shutter = (ShutterContact) config.devices.get(message.getFromAdress());
@@ -433,12 +438,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	private void handleThermostatState(MaxThermostatStateMessage message) {
 
 		Thermostat thermostat = (Thermostat) config.devices.get(message.getFromAdress());
-		if (thermostat == null) {
-			System.out.println("ClimateManager handleThermostatState(): got request from unknown device: adress="
-					+ message.getFromAdress());
+		if (thermostat == null)
+			// System.out.println("ClimateManager handleThermostatState(): got request from unknown device: adress="
+			// + message.getFromAdress());
 			return;
-		}
 
+		System.out.println("ClimateManager handleThermostatState() - " + Calendar.getInstance().getTime() + ": got request "
+				+ message);
 		persistence.beginTransaction();
 
 		thermostat.setBatteryLow(message.isBatteryLow());

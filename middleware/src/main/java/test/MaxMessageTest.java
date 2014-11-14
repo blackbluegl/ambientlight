@@ -185,6 +185,6 @@ public class MaxMessageTest {
 		System.out.println(temp);
 		temp.setPayload(temp.getPayload());
 		System.out.println(temp);
-
+		System.out.println(Calendar.getInstance().getTime());
 	}
 }
