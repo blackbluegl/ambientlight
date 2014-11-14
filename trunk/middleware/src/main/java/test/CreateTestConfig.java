@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.Persistence;
-import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
+import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
-import org.ambientlight.config.device.led.StripeConfiguration;
-import org.ambientlight.config.device.led.StripePartConfiguration;
+import org.ambientlight.config.device.led.LedPointConfiguration;
 import org.ambientlight.config.messages.DispatcherConfiguration;
 import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.config.messages.QeueManagerConfiguration;
@@ -33,7 +32,6 @@ import org.ambientlight.config.room.entities.climate.MaxDayInWeek;
 import org.ambientlight.config.room.entities.lightobject.LightObjectManagerConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.SimpleColorRenderingProgramConfiguration;
-import org.ambientlight.config.room.entities.lightobject.renderingprogram.SunSetRenderingProgrammConfiguration;
 import org.ambientlight.config.room.entities.remoteswitches.RemoteSwitchManagerConfiguration;
 import org.ambientlight.config.room.entities.scenery.SceneryManagerConfiguration;
 import org.ambientlight.config.room.entities.switches.SwitchManagerConfiguration;
@@ -220,38 +218,14 @@ public class CreateTestConfig {
 	 */
 	private void createLightObjectManager(RoomConfiguration rc) {
 
+
 		LightObjectManagerConfiguration config = new LightObjectManagerConfiguration();
 		rc.lightObjectManager = config;
-		config.height = 400;
-		config.width = 400;
-
-		// LK35CLientDeviceConfiguration lk35 = new
-		// LK35CLientDeviceConfiguration();
-		// lk35.hostName = "ambi-lk35-2";
-		// lk35.port = 8899;
-		// LedPointConfiguration ledPoint = new LedPointConfiguration();
-		// ledPoint.xPosition = 10;
-		// ledPoint.yPosition = 10;
-		// ledPoint.port = 1;
-		// lk35.configuredLeds.add(ledPoint);
-		// rc.deviceConfigurations.add(lk35);
-		//
-		// LedPointConfiguration ledPoint2 = new LedPointConfiguration();
-		// ledPoint2.xPosition = 40;
-		// ledPoint2.yPosition = 30;
-		// ledPoint2.port = 2;
-		// lk35.configuredLeds.add(ledPoint2);
-
-		DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
-		// MultiStripeOverEthernetClientDeviceConfiguration dc = new
-		// MultiStripeOverEthernetClientDeviceConfiguration();
-		// dc.hostName = "ambi-schlafen";
-		// dc.port = 2002;
-
-		config.devices.add(dc);
+		config.height = 40;
+		config.width = 20;
 
 		float value = 1.0f;
-		float gamma = 1.0f;
+		float gamma = 1.3f;
 		ColorConfiguration cConfig = new ColorConfiguration();
 		cConfig.gammaRed = gamma;
 		cConfig.gammaGreen = gamma;
@@ -260,45 +234,67 @@ public class CreateTestConfig {
 		cConfig.levelBlue = value;
 		cConfig.levelGreen = value;
 
-		StripeConfiguration sc = new StripeConfiguration();
-		sc.colorConfiguration = cConfig;
+		LK35CLientDeviceConfiguration lk35 = new LK35CLientDeviceConfiguration();
+		lk35.hostName = "ambi-lk35";
+		lk35.port = 8899;
 
-		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
-		sc.pixelAmount = 162;
-		sc.port = 0;
+		LedPointConfiguration ledPoint = new LedPointConfiguration();
+		ledPoint.xPosition = 20;
+		ledPoint.yPosition = 19;
+		ledPoint.port = 1;
+		ledPoint.colorConfiguration = cConfig;
+		lk35.configuredLeds.add(ledPoint);
+		config.devices.add(lk35);
 
-		StripePartConfiguration spLo1S1 = new StripePartConfiguration();
-		spLo1S1.endXPositionInRoom = 161;
-		spLo1S1.endYPositionInRoom = 0;
-		spLo1S1.offsetInStripe = 0;
-		spLo1S1.pixelAmount = 162;
-		spLo1S1.startXPositionInRoom = 0;
-		spLo1S1.startYPositionInRoom = 0;
-		sc.stripeParts.add(spLo1S1);
+		// DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
+		// MultiStripeOverEthernetClientDeviceConfiguration dc = new
+		// MultiStripeOverEthernetClientDeviceConfiguration();
+		// dc.hostName = "ambi-schlafen";
+		// dc.port = 2002;
+		// config.devices.add(dc);
 
-		dc.configuredStripes.add(sc);
+
+
+		// StripeConfiguration sc = new StripeConfiguration();
+		// sc.colorConfiguration = cConfig;
+		//
+		// sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
+		// sc.pixelAmount = 162;
+		// sc.port = 0;
+		//
+		// StripePartConfiguration spLo1S1 = new StripePartConfiguration();
+		// spLo1S1.endXPositionInRoom = 161;
+		// spLo1S1.endYPositionInRoom = 0;
+		// spLo1S1.offsetInStripe = 0;
+		// spLo1S1.pixelAmount = 162;
+		// spLo1S1.startXPositionInRoom = 0;
+		// spLo1S1.startYPositionInRoom = 0;
+		// sc.stripeParts.add(spLo1S1);
+		//
+		// dc.configuredStripes.add(sc);
 
 		LightObject lo = new LightObject();
-		lo.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_LO1_ID));
+		// lo.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_LO1_ID));
+		lo.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, "Highboard"));
 		lo.height = 20;
-		lo.layerNumber = 2;
-		lo.width = 20;
+		lo.layerNumber = 1;
+		lo.width = 40;
 		lo.xOffsetInRoom = 0;
 		lo.yOffsetInRoom = 0;
 		lo.setRenderingProgrammConfiguration(this.createSimpleColor());
 		config.lightObjects.put(lo.getId(), lo);
 
-		LightObject background = new LightObject();
-		background.setPowerState(true);
-		background.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_BACKGROUND_ID));
-		background.height = 200;
-		background.layerNumber = 1;
-		background.width = 200;
-		background.xOffsetInRoom = 0;
-		background.yOffsetInRoom = 0;
-		SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
-		background.setRenderingProgrammConfiguration(sunset);
-		config.lightObjects.put(background.getId(), background);
+		// LightObject background = new LightObject();
+		// background.setPowerState(true);
+		// background.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_BACKGROUND_ID));
+		// background.height = 200;
+		// background.layerNumber = 1;
+		// background.width = 200;
+		// background.xOffsetInRoom = 0;
+		// background.yOffsetInRoom = 0;
+		// SunSetRenderingProgrammConfiguration sunset = new SunSetRenderingProgrammConfiguration();
+		// background.setRenderingProgrammConfiguration(sunset);
+		// config.lightObjects.put(background.getId(), background);
 	}
 
 
