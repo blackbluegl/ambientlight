@@ -68,7 +68,9 @@ public class HomeActivity extends NavigationActivity {
 			selectedRoom = roomService.getAllRoomNames().iterator().next();
 		}
 
-		updateMenuState(roomService.getAllRoomConfigurations());
+		if (this.menu != null) {
+			updateMenuState(roomService.getAllRoomConfigurations());
+		}
 	}
 
 

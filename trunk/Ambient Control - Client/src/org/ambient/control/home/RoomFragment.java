@@ -72,7 +72,7 @@ public class RoomFragment extends RoomServiceAwareFragment {
 
 		// create the home container
 		myRoomView = inflater.inflate(R.layout.fragment_home_room, null);
-
+		this.disableEventListener(true);
 		return myRoomView;
 	}
 

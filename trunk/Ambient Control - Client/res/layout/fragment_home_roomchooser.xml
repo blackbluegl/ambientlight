@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/roomChooserLinearLayout"
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/roomChooserHorizontalScrollView"
     android:layout_width="match_parent"
     android:layout_height="80dp"
     android:background="@drawable/home_roomchooser_background"
     android:gravity="left"
     android:orientation="horizontal" >
-</LinearLayout>
+        <LinearLayout
+            android:id="@+id/roomChooserLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+        </LinearLayout>
+</HorizontalScrollView>

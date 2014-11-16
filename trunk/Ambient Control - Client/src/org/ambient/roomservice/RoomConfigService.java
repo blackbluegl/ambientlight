@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ambient.rest.RestClient;
+import org.ambient.rest.callbacks.GetRoomResulthandler;
+import org.ambient.rest.callbacks.RegisterCallbackResultHandler;
 import org.ambient.roomservice.socketcallback.CallbackSocketServerRunnable;
 import org.ambientlight.ws.Room;
 
@@ -53,7 +55,7 @@ import android.util.Log;
  * @author Florian Bornkessel
  * 
  */
-public class RoomConfigService extends Service {
+public class RoomConfigService extends Service implements RegisterCallbackResultHandler, GetRoomResulthandler {
 
 	public static final String BROADCAST_INTENT_UPDATE_ROOMCONFIG = "org.ambientcontrol.callback.updateRoomConfig";
 
@@ -87,7 +89,19 @@ public class RoomConfigService extends Service {
 
 			if (action.equals(Intent.ACTION_SCREEN_ON) && isConnectedToWifi(context)) {
 				Log.i(LOG, " startCallBackServer and reload roomConfigurations because of ACTION_SCREEN_ON");
-				initAllRoomConfigurations(true);
+				if (roomConfiguration.keySet() == null) {
+					Log.i(LOG, " startCallBackServer and reload rooms syncronous because roomnames do not exist for now");
+					initAllRoomConfigurations();
+					for (String currentRoom : roomConfiguration.keySet()) {
+						notifyListener(currentRoom);
+					}
+				} else {
+					for (String currentRoom : roomConfiguration.keySet()) {
+						Log.i(LOG, " startCallBackServer and reload rooms asyncronous because roomnames already exist");
+						updateRoomConfigForRoomName(currentRoom);
+					}
+				}
+
 				startCallBackServer(roomConfiguration.keySet());
 
 			} else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
@@ -97,12 +111,15 @@ public class RoomConfigService extends Service {
 				} else {
 					stopCallBackServer(false);
 				}
-				roomConfiguration.clear();
-
+				// roomConfiguration.clear();
 			} else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION) && isConnectedToWifi(context)) {
 				// wlan on, wlan reset,fm on
-				Log.i(LOG, "updateWidget because of NETWORK_STATE_CHANGED_ACTION and isConnected=true");
-				initAllRoomConfigurations(true);
+				Log.i(LOG,
+						"startCallBackServer because of NETWORK_STATE_CHANGED_ACTION and isConnected=true reload rooms synchronously");
+				initAllRoomConfigurations();
+				for (String currentRoom : roomConfiguration.keySet()) {
+					notifyListener(currentRoom);
+				}
 				startCallBackServer(roomConfiguration.keySet());
 
 			} else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !isConnectedToWifi(context)) {
@@ -111,10 +128,6 @@ public class RoomConfigService extends Service {
 				Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
 				stopCallBackServer(false);
 				roomConfiguration.clear();
-			}
-
-			for (String currentRoom : roomConfiguration.keySet()) {
-				notifyListener(currentRoom);
 			}
 		}
 	};
@@ -128,16 +141,11 @@ public class RoomConfigService extends Service {
 	// update request from server
 	public void updateRoomConfigForRoomName(String roomName) {
 		try {
-			Room roomConfig = RestClient.getRoom(roomName);
-			// update Model
-			roomConfiguration.put(roomName, roomConfig);
+			RestClient.getRoom(roomName, this, true);
 		} catch (Exception e) {
 			Log.e(LOG, "updateRoomConfigForRoomName() failed. Set roomConfig to null for room: " + roomName, e);
 			roomConfiguration.put(roomName, null);
 		}
-
-		// send BroadcastMessage to listeners who might be interested
-		notifyListener(roomName);
 	}
 
 
@@ -188,13 +196,13 @@ public class RoomConfigService extends Service {
 		}
 
 		// initially load all RoomConfigurations
-		initAllRoomConfigurations(false);
+		initAllRoomConfigurations();
 		// init callbackServer which depends on the presence of the roomConfigurations
 		startCallBackServer(roomConfiguration.keySet());
 	}
 
 
-	private void initAllRoomConfigurations(boolean notifyListeners) {
+	private void initAllRoomConfigurations() {
 		List<String> roomNames;
 
 		try {
@@ -213,11 +221,12 @@ public class RoomConfigService extends Service {
 
 		for (String currentRoom : roomNames) {
 			try {
-				Room config = RestClient.getRoom(currentRoom);
-				roomConfiguration.put(currentRoom, config);
+				Room room = RestClient.getRoom(currentRoom, this, false);
+				roomConfiguration.put(currentRoom, room);
 			} catch (Exception e) {
-				Log.e(LOG, "error loading room. Ignoring this one", e);
 				roomConfiguration.put(currentRoom, null);
+
+				Log.e(LOG, "error loading room. Ignoring this one", e);
 			}
 		}
 	}
@@ -242,9 +251,7 @@ public class RoomConfigService extends Service {
 			String hostname = getIpAdress() + ":4321";
 			for (String currentRoom : roomNames) {
 				try {
-					if (RestClient.registerCallback(currentRoom, hostname) == false) {
-						roomConfiguration.put(currentRoom, null);
-					}
+					RestClient.registerCallback(currentRoom, hostname, this);
 				} catch (Exception e) {
 					Log.e(LOG, "error trying to register callback. Ommiting server and remove the configuration.");
 					roomConfiguration.put(currentRoom, null);
@@ -335,5 +342,30 @@ public class RoomConfigService extends Service {
 			inEmulator = true;
 		}
 		return inEmulator;
+	}
+
+
+	/*
+	 * handle result for socket registration. if it is negative, invalidate the room and set it to null
+	 * 
+	 * @see org.ambient.rest.callbacks.RegisterCallbackResultHandler#onRegisterResult(java.lang.String, boolean)
+	 */
+	@Override
+	public void onRegisterResult(String roomName, boolean result) {
+		if (result == false) {
+			roomConfiguration.put(roomName, null);
+		}
+	}
+
+
+	/*
+	 * set roomconfig that was returned from the async rest call to the server.
+	 * 
+	 * @see org.ambient.rest.callbacks.GetRoomResulthandler#onGetRoomResult(java.lang.String, org.ambientlight.ws.Room)
+	 */
+	@Override
+	public void onGetRoomResult(String roomName, Room result) {
+		roomConfiguration.put(roomName, result);
+		notifyListener(roomName);
 	}
 }

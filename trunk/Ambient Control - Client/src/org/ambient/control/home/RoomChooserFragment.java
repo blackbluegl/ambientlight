@@ -44,8 +44,9 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		myContent = (LinearLayout) inflater.inflate(R.layout.fragment_home_roomchooser, null);
-		return myContent;
+		View scrollview = inflater.inflate(R.layout.fragment_home_roomchooser, null);
+		myContent = (LinearLayout) scrollview.findViewById(R.id.roomChooserLinearLayout);
+		return scrollview;
 	}
 
 
@@ -126,7 +127,11 @@ public class RoomChooserFragment extends RoomServiceAwareFragment {
 	 * @param roomName
 	 */
 	private void setCurrentRoomTab(String roomName) {
-		boolean isActive = RoomUtil.anySwitchTurnedOn(roomService.getRoomConfiguration(roomName));
+		boolean isActive = false;
+		Room currentRoom = roomService.getRoomConfiguration(roomName);
+		if (currentRoom != null) {
+			isActive = RoomUtil.anySwitchTurnedOn(currentRoom);
+		}
 
 		for (int i = 0; i < myContent.getChildCount(); i++) {
 			LinearLayout current = (LinearLayout) myContent.getChildAt(i);
