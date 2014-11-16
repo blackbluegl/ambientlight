@@ -139,7 +139,7 @@ public class UpdateWidgetService extends Service {
 		Map<String, Room> config = new HashMap<String, Room>();
 
 		try {
-			for (String currentServer : RestClient.getRoomNames()) {
+			for (String currentServer : roomService.getAllRoomNames()) {
 				Room roomConfig = roomService.getRoomConfiguration(currentServer);
 				if (roomConfig == null) {
 					continue;

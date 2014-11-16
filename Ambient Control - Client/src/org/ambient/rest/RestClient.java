@@ -3,6 +3,8 @@ package org.ambient.rest;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.ambient.rest.callbacks.GetRoomResulthandler;
+import org.ambient.rest.callbacks.RegisterCallbackResultHandler;
 import org.ambientlight.config.process.ProcessConfiguration;
 import org.ambientlight.config.room.entities.climate.TemperaturMode;
 import org.ambientlight.config.room.entities.lightobject.renderingprogram.RenderingProgramConfiguration;
@@ -13,10 +15,13 @@ import org.ambientlight.ws.process.validation.ValidationResult;
 
 public class RestClient {
 
-	public static Room getRoom(String roomName) throws InterruptedException, ExecutionException {
+	public static Room getRoom(String roomName, GetRoomResulthandler handler, boolean async) throws InterruptedException,
+	ExecutionException {
 		GetRoomTask task = new GetRoomTask();
-		task.execute(roomName);
-		return task.get();
+		task.execute(roomName, handler);
+		if (!async)
+			return task.get();
+		return null;
 	}
 
 
@@ -27,10 +32,10 @@ public class RestClient {
 	}
 
 
-	public static Boolean registerCallback(String roomName, String ipAndPort) throws InterruptedException, ExecutionException {
+	public static void registerCallback(String roomName, String ipAndPort, RegisterCallbackResultHandler callback)
+			throws InterruptedException, ExecutionException {
 		RegisterCallbackTask task = new RegisterCallbackTask();
-		task.execute(roomName, ipAndPort);
-		return task.get();
+		task.execute(roomName, ipAndPort, callback);
 	}
 
 
