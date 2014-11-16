@@ -82,7 +82,11 @@ public class Persistence {
 
 	public void cancelTransaction() {
 		System.out.println("Persistence - cancelTransaction(): Canceling transaction");
-		saveLock.unlock();
+		try {
+			saveLock.unlock();
+		} catch (IllegalMonitorStateException e) {
+			System.out.println("Persistence - cancelTransaction(): error. No lock was released. Ignoring.");
+		}
 	}
 
 

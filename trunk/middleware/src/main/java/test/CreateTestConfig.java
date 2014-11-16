@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientlight.Persistence;
-import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
+import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
-import org.ambientlight.config.device.led.LedPointConfiguration;
+import org.ambientlight.config.device.led.StripeConfiguration;
+import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.config.messages.DispatcherConfiguration;
 import org.ambientlight.config.messages.DispatcherType;
 import org.ambientlight.config.messages.QeueManagerConfiguration;
@@ -234,44 +235,43 @@ public class CreateTestConfig {
 		cConfig.levelBlue = value;
 		cConfig.levelGreen = value;
 
-		LK35CLientDeviceConfiguration lk35 = new LK35CLientDeviceConfiguration();
-		lk35.hostName = "ambi-lk35";
-		lk35.port = 8899;
-
-		LedPointConfiguration ledPoint = new LedPointConfiguration();
-		ledPoint.xPosition = 20;
-		ledPoint.yPosition = 19;
-		ledPoint.port = 1;
-		ledPoint.colorConfiguration = cConfig;
-		lk35.configuredLeds.add(ledPoint);
-		config.devices.add(lk35);
+		// LK35CLientDeviceConfiguration lk35 = new LK35CLientDeviceConfiguration();
+		// lk35.hostName = "ambi-lk35";
+		// lk35.port = 8899;
+		//
+		// LedPointConfiguration ledPoint = new LedPointConfiguration();
+		// ledPoint.xPosition = 20;
+		// ledPoint.yPosition = 19;
+		// ledPoint.port = 1;
+		// ledPoint.colorConfiguration = cConfig;
+		// lk35.configuredLeds.add(ledPoint);
+		// config.devices.add(lk35);
 
 		// DummyLedStripeDeviceConfiguration dc = new DummyLedStripeDeviceConfiguration();
-		// MultiStripeOverEthernetClientDeviceConfiguration dc = new
-		// MultiStripeOverEthernetClientDeviceConfiguration();
-		// dc.hostName = "ambi-schlafen";
-		// dc.port = 2002;
-		// config.devices.add(dc);
+		MultiStripeOverEthernetClientDeviceConfiguration dc = new MultiStripeOverEthernetClientDeviceConfiguration();
+		dc.hostName = "ambi-schlafen";
+		dc.port = 2002;
+		config.devices.add(dc);
 
 
 
-		// StripeConfiguration sc = new StripeConfiguration();
-		// sc.colorConfiguration = cConfig;
-		//
-		// sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
-		// sc.pixelAmount = 162;
-		// sc.port = 0;
-		//
-		// StripePartConfiguration spLo1S1 = new StripePartConfiguration();
-		// spLo1S1.endXPositionInRoom = 161;
-		// spLo1S1.endYPositionInRoom = 0;
-		// spLo1S1.offsetInStripe = 0;
-		// spLo1S1.pixelAmount = 162;
-		// spLo1S1.startXPositionInRoom = 0;
-		// spLo1S1.startYPositionInRoom = 0;
-		// sc.stripeParts.add(spLo1S1);
-		//
-		// dc.configuredStripes.add(sc);
+		StripeConfiguration sc = new StripeConfiguration();
+		sc.colorConfiguration = cConfig;
+
+		sc.protocollType = StripeConfiguration.PROTOCOLL_TYPE_DIRECT_SPI;
+		sc.pixelAmount = 162;
+		sc.port = 0;
+
+		StripePartConfiguration spLo1S1 = new StripePartConfiguration();
+		spLo1S1.endXPositionInRoom = 161;
+		spLo1S1.endYPositionInRoom = 0;
+		spLo1S1.offsetInStripe = 0;
+		spLo1S1.pixelAmount = 162;
+		spLo1S1.startXPositionInRoom = 0;
+		spLo1S1.startYPositionInRoom = 0;
+		sc.stripeParts.add(spLo1S1);
+
+		dc.configuredStripes.add(sc);
 
 		LightObject lo = new LightObject();
 		// lo.setId(new EntityId(EntityId.DOMAIN_LIGHTOBJECT, LO_LO1_ID));

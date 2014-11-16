@@ -57,7 +57,8 @@ public class Process implements EventListener {
 				currentNode.performAction(token);
 			}
 
-			callback.roomConfigurationChanged();
+			// TODO verify - should not be needed because all entities have their own notification handlers
+			// callback.roomConfigurationChanged();
 			System.out.println("Process: " + config.id + " finished successfully.");
 		} catch (Exception e) {
 			System.out.println("Process: " + config.id + " interrupted with an error in node: " + currentNode.config.id + ":");
