@@ -222,32 +222,37 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 				}
 			}
 
-			// common handling of unhandled responses
-			persistence.beginTransaction();
-
+			// report timed out messages that where not handled by actionhandler
 			if (state == State.TIMED_OUT) {
+				persistence.beginTransaction();
 				device.setTimedOut(true);
+				persistence.commitTransaction();
 				System.out.println("Climate Manager - onResponse(): Error! Timeout for Device: " + device.getLabel());
+				callBackMananger.roomConfigurationChanged();
 
+				// report invalid arguments from devices
 			} else if (state == State.RETRIEVED_ANSWER && response instanceof MaxAckMessage
 					&& ((MaxAckMessage) response).getAckType() == MaxAckType.ACK_INVALID_MESSAGE) {
+				persistence.beginTransaction();
 				device.setInvalidArgument(true);
-				System.out.println("Climate Manager - handleResponseMessage(): Device: Error! " + device.getLabel()
-						+ " reported invalid Arguments!");
-			} else {
+				System.out.println("Climate Manager - handleResponseMessage(): Invalid Argument from: " + device.getLabel());
+				persistence.commitTransaction();
+				callBackMananger.roomConfigurationChanged();
+			}
+
+			// default case
+			else {
 				System.out.println("Climate Manager - onResponse(): did not handle message");
 			}
 
-			persistence.commitTransaction();
-
 		} catch (Exception e) {
+			// roll back in case of an exception
 			System.out.println("ClimateManager - onResponse: caught exception: ");
 			e.printStackTrace();
 			persistence.cancelTransaction();
+
 		} finally {
 			clearFinishedActionHandlers();
-
-			callBackMananger.roomConfigurationChanged();
 		}
 	}
 
@@ -261,7 +266,6 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	public void onMessage(Message message) {
 
 		try {
-
 			// try to handle the message via an actionhandler
 			for (MessageActionHandler current : actionHandlers) {
 				if (current.onMessage(message)) {
