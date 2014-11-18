@@ -112,6 +112,7 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 					stopCallBackServer(false);
 				}
 				// roomConfiguration.clear();
+				// action.equals(Intent.ACTION_USER_FOREGROUND) && isConnectedToWifi(context)
 			} else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION) && isConnectedToWifi(context)) {
 				// wlan on, wlan reset,fm on
 				Log.i(LOG,
@@ -122,11 +123,17 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 				}
 				startCallBackServer(roomConfiguration.keySet());
 
-			} else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !isConnectedToWifi(context)) {
+			} else if (action.equals(Intent.ACTION_USER_BACKGROUND) || action.equals(ConnectivityManager.CONNECTIVITY_ACTION)
+					&& !isConnectedToWifi(context)) {
 
-				// fm off, wlan off, wlan lost
+				// fm off, wlan off, wlan lost, user switched
 				Log.i(LOG, " disable because of CONNECTIVITY_ACTION and isConnected=false");
 				stopCallBackServer(false);
+				// clear all and notify all listeners
+				for (String currentRoom : roomConfiguration.keySet()) {
+					roomConfiguration.put(currentRoom, null);
+					notifyListener(currentRoom);
+				}
 				roomConfiguration.clear();
 			}
 		}
@@ -187,6 +194,8 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
 		filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		filter.addAction(Intent.ACTION_USER_BACKGROUND);
+		filter.addAction(Intent.ACTION_USER_FOREGROUND);
 
 		registerReceiver(receiver, filter);
 
@@ -339,6 +348,7 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 		boolean inEmulator = false;
 		String brand = Build.BRAND;
 		if (brand.compareTo("generic_x86") == 0) {
+			Log.d(LOG, "is running in an emulator. connection to wifi will be asumed!");
 			inEmulator = true;
 		}
 		return inEmulator;
@@ -367,5 +377,6 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 	public void onGetRoomResult(String roomName, Room result) {
 		roomConfiguration.put(roomName, result);
 		notifyListener(roomName);
+		Log.d(LOG, "notified listener for roomname: " + roomName);
 	}
 }

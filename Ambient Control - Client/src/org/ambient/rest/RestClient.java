@@ -12,11 +12,14 @@ import org.ambientlight.room.entities.features.EntityId;
 import org.ambientlight.ws.Room;
 import org.ambientlight.ws.process.validation.ValidationResult;
 
+import android.util.Log;
+
 
 public class RestClient {
 
 	public static Room getRoom(String roomName, GetRoomResulthandler handler, boolean async) throws InterruptedException,
 	ExecutionException {
+		Log.d("RestClient", "get Room async: " + async);
 		GetRoomTask task = new GetRoomTask();
 		task.execute(roomName, handler);
 		if (!async)

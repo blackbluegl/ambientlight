@@ -29,6 +29,7 @@ public class GetRoomTask extends AsyncTask<Object, Void, Room> {
 		Map<String, String> vars = Collections.singletonMap("room", roomName);
 
 		try {
+			Log.d(LOG, "get roomconfig for: " + roomName);
 			return Rest.getRestTemplate().getForObject(Rest.getUrl(URL), Room.class, vars);
 		} catch (Exception e) {
 			Log.e(LOG, e.getMessage());
