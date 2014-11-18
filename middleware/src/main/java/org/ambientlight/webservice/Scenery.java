@@ -56,11 +56,16 @@ public class Scenery {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Object setCurrentScenery(@PathParam("roomName") String roomName, String scenery) {
 		try {
+			AmbientControl.getRoom(roomName).callBackManager.suspendCallback();
+
 			AmbientControl.getRoom(roomName).sceneryManager.setCurrentScenery(scenery);
 			return Response.status(200).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
+		} finally {
+			AmbientControl.getRoom(roomName).callBackManager.resumeCallback();
+			AmbientControl.getRoom(roomName).callBackManager.roomConfigurationChanged();
 		}
 	}
 

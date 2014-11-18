@@ -40,6 +40,7 @@ public class Process implements EventListener {
 
 	@Override
 	public void handleEvent(BroadcastEvent event) {
+
 		token = new Token();
 		token.nextNodeId = getFirstNode();
 
