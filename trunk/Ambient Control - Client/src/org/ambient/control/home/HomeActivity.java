@@ -142,7 +142,7 @@ public class HomeActivity extends NavigationActivity {
 		// enable global power down switch
 		boolean powerSwitchEnable = false;
 		for (Room currentRoom : rooms) {
-			if (currentRoom.switchesManager == null || currentRoom.switchesManager.switches == null) {
+			if (currentRoom == null || currentRoom.switchesManager == null || currentRoom.switchesManager.switches == null) {
 				continue;
 			}
 

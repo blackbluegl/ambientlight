@@ -67,13 +67,12 @@ public abstract class RoomServiceAwareActivity extends FragmentActivity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-
 			String action = intent.getAction();
 
 			if (action.equals(RoomConfigService.BROADCAST_INTENT_UPDATE_ROOMCONFIG)) {
 				String roomName = intent.getExtras().getString(RoomConfigService.EXTRA_ROOM_NAME);
 				Room config = (Room) intent.getExtras().getSerializable(RoomConfigService.EXTRA_ROOMCONFIG);
-				Log.i(LOG, "got update for Room");
+				Log.i(LOG, "got update for Room: " + roomName);
 				onRoomConfigurationChange(roomName, config);
 				for (IRoomServiceCallbackListener listener : roomServiceListeners) {
 					listener.onRoomConfigurationChange(roomName, config);
