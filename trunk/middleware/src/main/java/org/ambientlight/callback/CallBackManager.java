@@ -38,6 +38,8 @@ public class CallBackManager extends Manager {
 
 	List<String> clients = new ArrayList<String>();
 
+	boolean pause = false;
+
 
 	public CallBackManager(String roomName, Persistence persistence) {
 		this.roomName = roomName;
@@ -45,7 +47,22 @@ public class CallBackManager extends Manager {
 	}
 
 
+	public void suspendCallback() {
+		pause = true;
+	}
+
+
+	public void resumeCallback() {
+		pause = false;
+	}
+
+
 	public void roomConfigurationChanged() {
+
+		if (pause) {
+			System.out.println("CallbackManager - roomConfigurationChanged(): callback paused. ommiting callback!");
+			return;
+		}
 
 		if (persistence.isTransactionRunning()) {
 			System.out.println("CallbackManager - roomConfigurationChanged(): transaction running. ommiting callback!");

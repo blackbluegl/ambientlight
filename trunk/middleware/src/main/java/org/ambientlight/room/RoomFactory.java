@@ -106,7 +106,7 @@ public class RoomFactory {
 
 		// init dispatchers after all callback clients are ready
 		initDispatchers(roomConfig.qeueManager, room.qeueManager);
-		
+
 		// init remoteSwitchManager
 		room.remoteSwitchManager = initRemoteSwitchManager(roomConfig.remoteSwitchesManager, room.callBackManager,
 				room.featureFacade, persistence);
@@ -283,7 +283,7 @@ public class RoomFactory {
 		return climateManager;
 	}
 
-	
+
 	/**
 	 * @param dispatchers
 	 */
@@ -308,7 +308,7 @@ public class RoomFactory {
 		qeueManager.dispatcherManager.startDispatchers();
 
 	}
-	
+
 
 	private List<StripePart> getAllStripePartsInRoom(List<AnimateableLedDevice> devices) {
 		List<StripePart> result = new ArrayList<StripePart>();
@@ -348,7 +348,11 @@ public class RoomFactory {
 
 			boolean validTerminationEntryFoun = false;
 			for (DayEntry currentEntry : currentDayEntry.getValue()) {
-				if (currentEntry.getHour() == 24 && currentEntry.getMin() == 0) {
+				if (currentEntry.getHour() >= 24 && currentEntry.getMin() == 0) {
+					validTerminationEntryFoun = true;
+					break;
+				}
+				if (currentEntry.getHour() >= 23 && currentEntry.getMin() == 55) {
 					validTerminationEntryFoun = true;
 					break;
 				}

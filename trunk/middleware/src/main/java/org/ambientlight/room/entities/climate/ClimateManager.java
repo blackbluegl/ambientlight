@@ -459,12 +459,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		}
 		thermostat.setRfError(message.hadRfError());
 
+		if (message.getMode() == MaxThermostateMode.BOOST && config.mode != MaxThermostateMode.BOOST) {
+			config.modeBeforeBoost = config.mode;
+		}
+
 		config.mode = message.getMode();
 		config.temporaryUntil = message.getTemporaryUntil();
 		config.temperature = message.getSetTemp();
-		if (message.getMode() == MaxThermostateMode.BOOST) {
-			config.modeBeforeBoost = config.mode;
-		}
 
 		persistence.commitTransaction();
 

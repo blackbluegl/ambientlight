@@ -52,6 +52,7 @@ public class Features {
 			@PathParam("id") String itemName, Boolean powerState) {
 
 		try {
+			AmbientControl.getRoom(roomName).callBackManager.suspendCallback();
 
 			AmbientControl.getRoom(roomName).featureFacade.setSwitcheablePowerState(new EntityId(domain, itemName), powerState,
 					true);
@@ -60,6 +61,9 @@ public class Features {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).build();
+		} finally {
+			AmbientControl.getRoom(roomName).callBackManager.resumeCallback();
+			AmbientControl.getRoom(roomName).callBackManager.roomConfigurationChanged();
 		}
 	}
 
