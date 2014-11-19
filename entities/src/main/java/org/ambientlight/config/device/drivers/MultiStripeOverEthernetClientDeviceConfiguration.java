@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.ambientlight.config.device.led.StripeConfiguration;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("multiStripeOverEthernetClientDeviceConfiguration")
 public class MultiStripeOverEthernetClientDeviceConfiguration extends
-		RemoteHostConfiguration {
+RemoteHostConfiguration {
+
+	private static final long serialVersionUID = 1L;
+
 	public List<StripeConfiguration> configuredStripes = new ArrayList<StripeConfiguration>();
 
 }
