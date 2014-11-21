@@ -44,6 +44,7 @@ public class MaxConfigureTemperaturesMessage extends MaxMessage implements Reque
 		this.setOffsetTemp(MaxUtil.DEFAULT_OFFSET);
 		this.setWindowOpenTemp(DEFAULT_WINDOW_OPEN_TEMPERATUR);
 		this.setWindowOpenTime(DEFAULT_WINDOW_OPEN_TIME_MIN);
+		setFlags(FLAG_REQUEST_BURST);
 	}
 
 

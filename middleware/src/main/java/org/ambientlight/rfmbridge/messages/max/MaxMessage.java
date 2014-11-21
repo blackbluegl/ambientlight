@@ -28,9 +28,19 @@ public class MaxMessage extends Message {
 
 	public static int MAX_SEQUENCE_NUMBER = 255;
 
+	/** for a simple message without to just one thermosate **/
 	public static final int FLAGS_NO_FOLLOWING_MESSAGES = 0x0;
-	public static final int FLAG_REQUEST = 0x4;
+
+	/**
+	 * shows thermostate that this message is in interest for the complete group. In combination with FLAG_REQUEST_BURST this flag
+	 * keeps all thermostates registered to the vcube awake for the burst.
+	 **/
+	public static final int FLAG_BROADCAST = 0x4;
+
+	/** thermostate awaits another message for a short period of time. so we can send a burst of messages without a wakeup call **/
 	public static final int FLAG_REQUEST_BURST = 0x1;
+
+	/** default response flag that we send for an ack. not completely clear **/
 	public static final int FLAG_RESPONSE = 0x2;
 
 	protected byte[] payload = new byte[10];

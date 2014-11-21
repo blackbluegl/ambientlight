@@ -31,7 +31,7 @@ public class MaxTimeInformationMessage extends MaxMessage implements RequestMess
 	public MaxTimeInformationMessage() {
 		payload = new byte[15];
 		setMessageType(MaxMessageType.TIME_INFORMATION);
-		setFlags(FLAG_REQUEST | FLAG_REQUEST_BURST);
+		setFlags(FLAG_BROADCAST | FLAG_REQUEST_BURST);
 	}
 
 

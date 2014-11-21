@@ -55,6 +55,7 @@ public class MaxConfigValveMessage extends MaxMessage implements RequestMessage 
 		this.setDecalc(new DecalcEntry());
 		this.setValveOffset(MaxUtil.DEFAULT_VALVE_OFFSET);
 		this.setMaxValvePosition(MaxUtil.DEFAULT_MAX_VALVE_POSITION);
+		setFlags(FLAG_REQUEST_BURST);
 	}
 
 

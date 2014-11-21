@@ -27,6 +27,7 @@ public class MaxShutterContactStateMessage extends MaxMessage implements Request
 	public MaxShutterContactStateMessage() {
 		payload = new byte[11];
 		setMessageType(MaxMessageType.SHUTTER_CONTACT_STATE);
+		setFlags(FLAG_BROADCAST);
 	}
 
 
