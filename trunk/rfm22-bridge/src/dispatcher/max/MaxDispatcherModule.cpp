@@ -36,7 +36,7 @@ void MaxDispatcherModule::handleAckSend() {
 		usleep(25000);
 		dispatcher->sendADirectResponse(this->asyncMessageToSend);
 
-	//	cout << "MaxDispatcherModule - handleAckSend(): sent directly a message.\n";
+		//	cout << "MaxDispatcherModule - handleAckSend(): sent directly a message.\n";
 	}
 }
 
@@ -69,14 +69,14 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
-	//	cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
+		//	cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
 		waitForResponseInMs = 20;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
-	//	cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
+		//	cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
 		sendLong = false;
 	}
 
@@ -166,18 +166,18 @@ void MaxDispatcherModule::receiveMessage(RF22 *rf22) {
 				<< " from " << rfMessage->addr_from << " to " << rfMessage->addr_to << "\r\n";
 	}
 
-	//the latest version seems to be fast enough to send acks from the client. but this has to be tested for slower clients.
 	if (rfMessage->type == MessageType::SHUTTER_CONTACT_STATE) {
 		//we have to create a response very fast for the shuttercontact we have less than 50ms time
 		stringstream ss;
 		ss << "MAX_" << rfMessage->addr_from << "_" << rfMessage->addr_to;
 		string correlator = ss.str();
-		//we do this only if we know the device
 
+		//we do this only if we know the device
 		if (this->dispatcher->queueManager->correlation->getSocketForID(correlator) != NULL) {
 			this->asyncMessageToSend.payLoad.clear();
 			this->asyncMessageToSend.payLoad.push_back(rfMessage->seqnum);
-			this->asyncMessageToSend.payLoad.push_back(0x0); //flags maybe wrong. have to sniff again
+			//was 0x00 i set it to 0x01 to mark a burst and hope that sender  stays awake. maybe 0x0 does only work here.
+			this->asyncMessageToSend.payLoad.push_back(0x01);
 			this->asyncMessageToSend.payLoad.push_back(0x2); //ack
 			this->asyncMessageToSend.payLoad.push_back(data[7]); //swap from and to
 			this->asyncMessageToSend.payLoad.push_back(data[8]);
