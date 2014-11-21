@@ -512,7 +512,7 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		persistence.commitTransaction();
 
 		// wakeup thermostates for batch updates
-		sendWakeUpCallsToThermostates();
+		// sendWakeUpCallsToThermostates();
 
 		List<Message> messages = new ArrayList<Message>();
 
@@ -765,20 +765,14 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		// persist changes
 		persistence.commitTransaction();
 
-		// find one thermostat - the others are linked (in sync) and will react immediately
-		Thermostat anyThermostatFromGroup = null;
+		// send temperature to all thermostates. they should react automatically like their link partners. but sometimes they miss
+		// an update. so get sure that all thermostates get their update
 		for (MaxComponent current : config.devices.values()) {
 			if (current instanceof Thermostat) {
-				anyThermostatFromGroup = (Thermostat) current;
-				break;
+				MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(current.getAdress());
+				queueManager.putOutMessage(outMessage);
+				System.out.println("Climate Manager - setClimate(): sending climate message:\n" + outMessage);
 			}
-		}
-
-		if (anyThermostatFromGroup != null) {
-			MaxSetTemperatureMessage outMessage = new MaxMessageCreator(config).getSetTempForDevice(anyThermostatFromGroup
-					.getAdress());
-			queueManager.putOutMessage(outMessage);
-			System.out.println("Climate Manager - setClimate(): sending climate message:\n" + outMessage);
 		}
 
 		callBackMananger.roomConfigurationChanged();
