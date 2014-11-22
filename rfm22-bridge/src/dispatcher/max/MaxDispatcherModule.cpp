@@ -60,6 +60,7 @@ bool MaxDispatcherModule::init(RF22 *rf22) {
 
 int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	int waitForResponseInMs = 150; //was 100 and worked good
+
 	//send short preemble if last Send was not longer than 4  seconds in the past
 	time_t now;
 	now = time(NULL);
@@ -68,15 +69,41 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		sendLong = true;
 	}
 
+	uint8_t fromAdress[3];
+	fromAdress[0] = message.payLoad[3];
+	fromAdress[1] = message.payLoad[4];
+	fromAdress[2] = message.payLoad[5];
+
+	//if group is 0 we cannot determine if the vbcube send to the same or another group.
+	//This case happens normally only if configurations will be send to a device.
+	//So either it does not play a role or it is talking to a group anyway
+	uint8_t fromGroup = message.payLoad[9];
+	if (fromGroup == 0x0) {
+		fromGroup = lastOutMessageGroup;
+	}
+
+	// simple way to determine if we need to send a long preamble because thermostates stay awake only for messages of their own group.
+	if (lastOutMessageFrom[0] != fromAdress[0] || lastOutMessageFrom[1] != fromAdress[1] || lastOutMessageFrom[2] != fromAdress[2]
+			|| lastOutMessageGroup != fromGroup) {
+		sendLong = true;
+		cout << "MaxDispatcherModule - sendMessage(): sending on different vcubeId or groupId and therefore a long preamble\n";
+	}
+
+	//store values for the next time to compare for differences
+	lastOutMessageFrom[0] = message.payLoad[3];
+	lastOutMessageFrom[1] = message.payLoad[4];
+	lastOutMessageFrom[2] = message.payLoad[5];
+	lastOutMessageGroup = fromGroup;
+
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x02) {
-		//	cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
+		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
 		waitForResponseInMs = 20;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
-		//	cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
+		cout << "MaxDispatcherModule - sendMessage(): sending an \"PONG\" and therefore a short preamble\n";
 		sendLong = false;
 	}
 
@@ -86,12 +113,6 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		//seems that the thermostates take some time to respond on that message
 		//waitForResponseInMs=500;
 	}
-
-//	if (sendLong == true) {
-//		cout << "MaxDispatcherModule - sendMessage(): sending long preamble\n";
-//	} else {
-//		cout << "MaxDispatcherModule - sendMessage(): sending short preamble\n";
-//	}
 
 	sendLongPreamble(rf22, sendLong);
 

@@ -20,8 +20,9 @@ public:
 	pthread_cond_t conditionSendAck = PTHREAD_COND_INITIALIZER;
 
 	MaxDispatcherModule(RFMDispatcher *rfmDispatcher) :
-				DispatcherModule(rfmDispatcher) {
-		};
+			DispatcherModule(rfmDispatcher) {
+	}
+	;
 
 	virtual ~MaxDispatcherModule();
 
@@ -61,6 +62,8 @@ private:
 
 	time_t lastMessageOnAir;
 	OutMessage asyncMessageToSend;
+	uint8_t lastOutMessageFrom[3] = { 0x0, 0x0, 0x0 };
+	uint8_t lastOutMessageGroup = 0x0;
 
 };
 
