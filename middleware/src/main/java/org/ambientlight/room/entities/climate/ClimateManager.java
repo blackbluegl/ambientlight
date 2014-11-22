@@ -532,6 +532,11 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 
 
 	public void setPairingMode() {
+		if (this.learnMode) {
+			System.out.println("ClimateManager - startPairing(): Already waiting for new Devices");
+			return;
+		}
+
 		this.learnMode = true;
 		new Thread(new Runnable() {
 

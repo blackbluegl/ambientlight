@@ -54,6 +54,7 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 
 		// unregister link from other thermostates
 		for (MaxComponent currentDevice : devices.values()) {
+
 			// only other thermostates
 			if (currentDevice.getAdress() == device.getAdress() || currentDevice instanceof Thermostat == false) {
 				continue;
@@ -62,7 +63,16 @@ public class RemoveThermostatHandler implements MessageActionHandler {
 			MaxRemoveLinkPartnerMessage unlink = new MaxMessageCreator(config).getUnlinkMessageForDevice(
 					currentDevice.getAdress(), device.getAdress(), device.getDeviceType());
 			outMessages.add(unlink);
+
+			MaxRemoveLinkPartnerMessage unlink2 = new MaxMessageCreator(config).getUnlinkMessageForDevice(device.getAdress(),
+					currentDevice.getAdress(), device.getDeviceType());
+			outMessages.add(unlink2);
 		}
+
+		// remove shutter link
+		MaxRemoveLinkPartnerMessage unlinkShutter = new MaxMessageCreator(config).getUnlinkMessageForDevice(device.getAdress(),
+				config.proxyShutterContactAdress, device.getDeviceType());
+		outMessages.add(unlinkShutter);
 
 		// send remove
 		MaxFactoryResetMessage resetDevice = new MaxMessageCreator(config).getFactoryResetMessageForDevice(device.getAdress());

@@ -33,7 +33,7 @@ public class MaxMessage extends Message {
 
 	/**
 	 * shows thermostate that this message is in interest for the complete group. In combination with FLAG_REQUEST_BURST this flag
-	 * keeps all thermostates registered to the vcube awake for the burst.
+	 * keeps all thermostates registered to the group and cube awake for the burst.
 	 **/
 	public static final int FLAG_BROADCAST = 0x4;
 
