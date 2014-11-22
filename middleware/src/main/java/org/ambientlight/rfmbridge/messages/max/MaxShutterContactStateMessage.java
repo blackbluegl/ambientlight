@@ -68,7 +68,7 @@ public class MaxShutterContactStateMessage extends MaxMessage implements Request
 	 */
 	@Override
 	public int getTimeOutSec() {
-		return 3;
+		return 10;
 	}
 
 
@@ -79,7 +79,7 @@ public class MaxShutterContactStateMessage extends MaxMessage implements Request
 	 */
 	@Override
 	public int getRetryCount() {
-		return 7;
+		return 10;
 	}
 
 
