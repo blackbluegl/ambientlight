@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.radio.playist.PlayListRunnable;
 
 
-/**
- */
 @WebServlet(description = "Streams converted radio from tvheadend")
 public class Stream extends HttpServlet {
 
@@ -57,9 +55,9 @@ public class Stream extends HttpServlet {
 			String replacement = getProperties().getProperty(REPLACEMENT);
 			String urlString = getProperties().getProperty(URL);
 			String path = getProperties().getProperty(PATH);
-			playListGen = new PlayListRunnable(channelRegex, replacement, urlString, path, debug);
 
 			System.out.println("RadioAdapter: init playListGenerator");
+			playListGen = new PlayListRunnable(channelRegex, replacement, urlString, path, debug);
 			new Thread(playListGen, "PlayListGenerator").start();
 
 			System.out.println("RadioAdapter: init complete");
