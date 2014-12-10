@@ -21,6 +21,8 @@ package org.radio.playist;
  */
 public class PlayListRunnable implements Runnable {
 
+	private boolean debug = false;
+
 	private boolean run = true;
 
 	private String channelRegex;
@@ -29,12 +31,13 @@ public class PlayListRunnable implements Runnable {
 	private String path;
 
 
-	public PlayListRunnable(String channelRegex, String replacement, String urlString, String path) {
+	public PlayListRunnable(String channelRegex, String replacement, String urlString, String path, boolean debug) {
 		super();
 		this.channelRegex = channelRegex;
 		this.replacement = replacement;
 		this.urlString = urlString;
 		this.path = path;
+		this.debug = debug;
 	}
 
 
@@ -51,6 +54,10 @@ public class PlayListRunnable implements Runnable {
 				System.out.println("RadioAdapter: generating playlist for url: " + urlString);
 
 				String playList = pc.getPlayList(urlString, channelRegex, replacement);
+
+				if (debug) {
+					System.out.println(playList);
+				}
 
 				pc.savePlayList(path, playList);
 
