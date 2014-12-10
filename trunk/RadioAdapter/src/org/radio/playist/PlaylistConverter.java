@@ -58,7 +58,6 @@ public class PlaylistConverter {
 			}
 			line = rd.readLine();
 		}
-		System.out.println(result);
 		return result;
 	}
 

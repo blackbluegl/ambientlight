@@ -19,10 +19,8 @@ import org.radio.playist.PlayListRunnable;
 
 
 /**
- * final Process process = new ProcessBuilder("/usr/bin/avconv", "-probesize", "5000", "-i", "-", "-vn", "-f", "mp3", "-ab",
- * "320000", "-").start(); /channelid\/(\d+) Servlet implementation class Stream
  */
-@WebServlet(description = "Streams converted radio from tvheadend", urlPatterns = { "/Stream" })
+@WebServlet(description = "Streams converted radio from tvheadend")
 public class Stream extends HttpServlet {
 
 	private static final String PATH = "path";
@@ -59,7 +57,7 @@ public class Stream extends HttpServlet {
 			String replacement = getProperties().getProperty(REPLACEMENT);
 			String urlString = getProperties().getProperty(URL);
 			String path = getProperties().getProperty(PATH);
-			playListGen = new PlayListRunnable(channelRegex, replacement, urlString, path);
+			playListGen = new PlayListRunnable(channelRegex, replacement, urlString, path, debug);
 
 			System.out.println("RadioAdapter: init playListGenerator");
 			new Thread(playListGen, "PlayListGenerator").start();
@@ -121,7 +119,7 @@ public class Stream extends HttpServlet {
 			new Thread(new TranscodingLogRunnable(errorProcessStream, debug)).start();
 
 			// // handle input into process in a seperate process
-			streamSourceRunnable = new StreamSourceRunnable(intoProcessStream, requestUrl);
+			streamSourceRunnable = new StreamSourceRunnable(intoProcessStream, requestUrl, debug);
 			new Thread(streamSourceRunnable).start();
 
 			// write output until stream will be closed by client with an exception
@@ -132,7 +130,9 @@ public class Stream extends HttpServlet {
 
 		} catch (Exception e) {
 			System.out.println("RadioAdapter: stopped streaming");
-			// e.printStackTrace();
+			if (debug) {
+				e.printStackTrace();
+			}
 		} finally {
 			try {
 

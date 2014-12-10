@@ -30,19 +30,23 @@ import java.net.URL;
  */
 public class StreamSourceRunnable implements Runnable {
 
+	private static final int RETRY_COUNT = 100;
 	OutputStream intoTranscoderStream;
 	String requestUrl;
 
 	HttpURLConnection conn = null;
 	DataInputStream serverInputDataStream = null;
 
+	boolean debug = false;
+
 	boolean run = true;
 
 
-	public StreamSourceRunnable(OutputStream intoTranscoderStream, String requestUrl) {
+	public StreamSourceRunnable(OutputStream intoTranscoderStream, String requestUrl, boolean debug) {
 		super();
 		this.intoTranscoderStream = intoTranscoderStream;
 		this.requestUrl = requestUrl;
+		this.debug = debug;
 	}
 
 
@@ -51,19 +55,57 @@ public class StreamSourceRunnable implements Runnable {
 		try {
 			connect(requestUrl);
 			while (run) {
-				intoTranscoderStream.write(serverInputDataStream.readUnsignedByte());
+				int readByte = 0;
+				try {
+					readByte = serverInputDataStream.readUnsignedByte();
+				} catch (Exception e) {
+					if (reconnect()) {
+						readByte = serverInputDataStream.readUnsignedByte();
+					} else {
+						// signal transcoder that there will be no more data
+						intoTranscoderStream.close();
+						// stop listening to server
+						break;
+					}
+				}
+				// maybe during a reconnect this thread was supposed to stop. if so we cannot write into streams that may not
+				// exist anymore. so only write into if this thread should run.
+				if (run) {
+					intoTranscoderStream.write(readByte);
+				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				intoTranscoderStream.close();
-			} catch (IOException e1) {
-				// cannot do anything here
-			}
+			// an exception occours if transcoder process was finished. In this case we finish here
+			System.out.println("RadioAdapter: could not connect to server or transcoder died. Connection to server closed.");
 		} finally {
 			disconnect();
-			System.out.println("RadioAdapter: server connection lost");
+			System.out.println("RadioAdapter: connection to server closed");
 		}
+	}
+
+
+	// reconnect forever until this runnable will be stopped by client
+	private boolean reconnect() {
+		int i = 0;
+		while (run && i < RETRY_COUNT) {
+			i++;
+			if (debug) {
+				System.out.println("RadioAdapter: reconnecting to server");
+			}
+			disconnect();
+			try {
+				connect(requestUrl);
+				return true;
+			} catch (Exception e) {
+				try {
+					Thread.sleep(5000);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+
+		return false;
 	}
 
 
@@ -74,11 +116,11 @@ public class StreamSourceRunnable implements Runnable {
 
 	private void disconnect() {
 		try {
-			conn.disconnect();
 			serverInputDataStream.close();
 		} catch (Exception e) {
 			// do nothing here
 		}
+		conn.disconnect();
 	}
 
 
