@@ -35,7 +35,7 @@ public class MaxMessage extends Message {
 	 * shows thermostate that this message is in interest for the complete group. In combination with FLAG_REQUEST_BURST this flag
 	 * keeps all thermostates registered to the group and cube awake for the burst.
 	 **/
-	public static final int FLAG_BROADCAST = 0x4;
+	public static final int FLAG_ROOM_BROADCAST = 0x4;
 
 	/** thermostate awaits another message for a short period of time. so we can send a burst of messages without a wakeup call **/
 	public static final int FLAG_REQUEST_BURST = 0x1;

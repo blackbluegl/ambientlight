@@ -36,7 +36,7 @@ public class MaxConfigureWeekProgrammMessage extends MaxMessage implements Reque
 
 	public MaxConfigureWeekProgrammMessage() {
 		payload = new byte[25];
-		setFlags(FLAG_REQUEST_BURST | FLAG_BROADCAST);
+		setFlags(FLAG_REQUEST_BURST);
 		this.setMessageType(MaxMessageType.CONFIG_WEEK_PROFILE);
 	}
 
