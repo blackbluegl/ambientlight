@@ -459,8 +459,14 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		}
 		thermostat.setRfError(message.hadRfError());
 
-		if (message.getMode() == MaxThermostateMode.BOOST && config.mode != MaxThermostateMode.BOOST) {
-			config.modeBeforeBoost = config.mode;
+		if (message.getMode() == MaxThermostateMode.BOOST) {
+			// save state before boost for a restore if boost is switched off via setBoostMode()
+			if (config.mode != MaxThermostateMode.BOOST) {
+				config.modeBeforeBoost = config.mode;
+			}
+			Calendar boostUntil = GregorianCalendar.getInstance();
+			boostUntil.add(Calendar.MINUTE, config.boostDurationMins);
+			config.boostUntil = boostUntil.getTime();
 		}
 
 		config.mode = message.getMode();
@@ -556,6 +562,12 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 	}
 
 
+	/**
+	 * send temperature to first thermostate in room. the message should have the broadcast flag to inform the other thermostates
+	 * as well.
+	 * 
+	 * @param open
+	 */
 	public void sendWindowStateToThermostates(boolean open) {
 		for (MaxComponent current : this.config.devices.values()) {
 			if (current instanceof Thermostat == false) {
@@ -563,11 +575,13 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 			}
 			MaxShutterContactStateMessage sendMessage = new MaxShutterContactStateMessage();
 			sendMessage.setFromAdress(this.config.proxyShutterContactAdress);
+			// broadcast flag
 			sendMessage.setFlags(0x6);
 			sendMessage.setSequenceNumber(new MaxMessageCreator(config).getNewSequnceNumber());
 			sendMessage.setToAdress(current.getAdress());
 			sendMessage.setOpen(open);
 			queueManager.putOutMessage(sendMessage);
+			return;
 		}
 	}
 
