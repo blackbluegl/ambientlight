@@ -89,7 +89,7 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 
 			if (action.equals(Intent.ACTION_SCREEN_ON) && isConnectedToWifi(context)) {
 				Log.i(LOG, " startCallBackServer and reload roomConfigurations because of ACTION_SCREEN_ON");
-				if (roomConfiguration.keySet() == null) {
+				if (roomConfiguration.keySet() == null || roomConfiguration.keySet().isEmpty()) {
 					Log.i(LOG, " startCallBackServer and reload rooms syncronous because roomnames do not exist for now");
 					initAllRoomConfigurations();
 					for (String currentRoom : roomConfiguration.keySet()) {

@@ -64,6 +64,10 @@ public class HomeActivity extends NavigationActivity {
 	protected void onRoomConfigurationChange(String roomName, Room config) {
 		// if ambientcontrol started without server connection and now reaches the server again, check if a roomname was set
 		// earlier. If not, use the first name that is available.
+
+		if (this.roomService == null)
+			return;
+
 		if (selectedRoom == null && roomService.getAllRoomNames().isEmpty() == false) {
 			selectedRoom = roomService.getAllRoomNames().iterator().next();
 		}
@@ -118,6 +122,9 @@ public class HomeActivity extends NavigationActivity {
 
 		this.menu = menu;
 		getMenuInflater().inflate(R.menu.activity_home, menu);
+
+		if (this.roomService == null)
+			return true;
 
 		this.updateMenuState(roomService.getAllRoomConfigurations());
 
