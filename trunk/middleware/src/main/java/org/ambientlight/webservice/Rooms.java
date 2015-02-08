@@ -1,5 +1,6 @@
 package org.ambientlight.webservice;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.ambientlight.AmbientControl;
 import org.ambientlight.ws.Room;
+import org.ambientlight.ws.RoomsResponse;
 
 
 @Path("/rooms")
@@ -49,5 +51,18 @@ public class Rooms {
 		room.lightObjectManager = AmbientControl.getRoom(roomName).config.lightObjectManager;
 
 		return room;
+	}
+
+
+	@GET
+	@Path("/configs")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RoomsResponse getAllRoomConfiguration() {
+		RoomsResponse response = new RoomsResponse();
+		response.rooms = new ArrayList<Room>();
+		for (String currentName : AmbientControl.getRoomNames()) {
+			response.rooms.add(getRoomConfiguration(currentName));
+		}
+		return response;
 	}
 }

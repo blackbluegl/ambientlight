@@ -212,31 +212,20 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 
 
 	private void initAllRoomConfigurations() {
-		List<String> roomNames;
-
 		try {
-			roomNames = RestClient.getRoomNames();
+			roomConfiguration = new HashMap<String, Room>();
+			List<Room> rooms = RestClient.getAllRooms(this, false);
+
+			for (Room currentRoom : rooms) {
+				// use only identifyable rooms
+				if (currentRoom == null || currentRoom.roomName == null || currentRoom.roomName.isEmpty()) {
+					continue;
+				}
+				roomConfiguration.put(currentRoom.roomName, currentRoom);
+			}
 		} catch (Exception e) {
 			Log.e(LOG, "caught exception whilee trying to async call RestClient. Resetting!", e);
-			roomConfiguration = new HashMap<String, Room>();
 			return;
-		}
-
-		if (roomNames == null) {
-			Log.e(LOG, "error could not retreive roomNames. Resetting!");
-			roomConfiguration = new HashMap<String, Room>();
-			return;
-		}
-
-		for (String currentRoom : roomNames) {
-			try {
-				Room room = RestClient.getRoom(currentRoom, this, false);
-				roomConfiguration.put(currentRoom, room);
-			} catch (Exception e) {
-				roomConfiguration.put(currentRoom, null);
-
-				Log.e(LOG, "error loading room. Ignoring this one", e);
-			}
 		}
 	}
 
@@ -378,5 +367,20 @@ public class RoomConfigService extends Service implements RegisterCallbackResult
 		roomConfiguration.put(roomName, result);
 		notifyListener(roomName);
 		Log.d(LOG, "notified listener for roomname: " + roomName);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ambient.rest.callbacks.GetRoomResulthandler#onGetRoomResult(java.util.List)
+	 */
+	@Override
+	public void onGetRoomResult(List<Room> result) {
+		if (result != null) {
+			for (Room current : result) {
+				this.onGetRoomResult(current.roomName, current);
+			}
+		}
 	}
 }

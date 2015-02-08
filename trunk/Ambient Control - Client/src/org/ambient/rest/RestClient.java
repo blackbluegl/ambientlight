@@ -28,6 +28,16 @@ public class RestClient {
 	}
 
 
+	public static List<Room> getAllRooms(GetRoomResulthandler handler, boolean async) throws InterruptedException,
+			ExecutionException {
+		Log.d("RestClient", "get all Rooms async: " + async);
+		GetAllRoomsTask task = new GetAllRoomsTask();
+		task.execute(handler);
+		if (!async)
+			return task.get();
+		return null;
+	}
+
 	public static List<String> getRoomNames() throws InterruptedException, ExecutionException {
 		GetRoomNamesTask task = new GetRoomNamesTask();
 		task.execute();

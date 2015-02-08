@@ -13,21 +13,16 @@
    limitations under the License.
  */
 
-package org.ambient.rest.callbacks;
+package org.ambientlight.ws;
 
 import java.util.List;
-
-import org.ambientlight.ws.Room;
 
 
 /**
  * @author Florian Bornkessel
  *
  */
-public interface GetRoomResulthandler {
+public class RoomsResponse {
 
-	public void onGetRoomResult(String roomName, Room result);
-
-
-	public void onGetRoomResult(List<Room> result);
+	public List<Room> rooms;
 }
