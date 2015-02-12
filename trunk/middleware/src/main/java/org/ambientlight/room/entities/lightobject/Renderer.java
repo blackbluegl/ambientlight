@@ -24,8 +24,6 @@ import org.ambientlight.room.entities.lightobject.util.StripeUtil;
 
 public class Renderer {
 
-	List<RenderObject> queueDeleteLightObjects = new ArrayList<RenderObject>();
-
 	boolean debug = false;
 
 	List<StripePixelMapping> stripePixelMapping = new ArrayList<StripePixelMapping>();
@@ -92,10 +90,6 @@ public class Renderer {
 				this.fillStripesWithLight();
 			}
 
-			for (RenderObject current : this.queueDeleteLightObjects) {
-				this.removeRenderTaskForLightObject(current);
-			}
-			this.queueDeleteLightObjects.clear();
 
 		} finally {
 			lightObjectMappingLock.unlock();

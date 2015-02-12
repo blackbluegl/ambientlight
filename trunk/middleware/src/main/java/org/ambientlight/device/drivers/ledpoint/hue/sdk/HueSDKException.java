@@ -13,22 +13,23 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.device.led;
-
-import java.io.Serializable;
-
+package org.ambientlight.device.drivers.ledpoint.hue.sdk;
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class LedPointConfiguration implements Serializable {
+public class HueSDKException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public String id;
-	public int xPosition;
-	public int yPosition;
 
-	public ColorConfiguration colorConfiguration;
+	public HueSDKException() {
+		super();
+	}
+
+
+	public HueSDKException(String message) {
+		super(message);
+	}
 }
