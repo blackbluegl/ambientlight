@@ -12,7 +12,7 @@ import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
 import org.ambientlight.config.device.led.LedPointConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
-import org.ambientlight.device.drivers.ledpoint.LK35ClientDeviceDriver;
+import org.ambientlight.device.drivers.ledpoint.LK35.LK35ClientDeviceDriver;
 import org.ambientlight.device.drivers.ledstripes.DummyLedStripeDeviceDriver;
 import org.ambientlight.device.drivers.ledstripes.MultistripeOverEthernetClientDeviceDriver;
 import org.ambientlight.device.drivers.remoteswitches.DummySwitchingDeviceDriver;

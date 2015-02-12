@@ -85,13 +85,14 @@ public class HueTest {
 				phHueSDK.setSelectedBridge(b);
 				phHueSDK.enableHeartbeat(b, PHHueSDK.HB_INTERVAL);
 				// Here it is recommended to set your connected bridge in your sdk object (as above) and start the heartbeat.
-				// At this point you are connected to a bridge so you should pass control to your main program/activity.
+				// At this point you are connected to a bcurrentridge so you should pass control to your main program/activity.
 				// Also it is recommended you store the connected IP Address/ Username in your app here. This will allow easy
 				// automatic connection on subsequent use.
 
 				PHBridgeResourcesCache cache = phHueSDK.getSelectedBridge().getResourceCache();
 				// And now you can get any resource you want, for example:
 				List<PHLight> myLights = cache.getAllLights();
+				Map<String, PHLight> result = cache.getLights();
 				for (PHLight current : myLights) {
 					System.out.println(current.getIdentifier());
 					System.out.println(current.getName());

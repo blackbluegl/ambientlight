@@ -13,22 +13,21 @@
    limitations under the License.
  */
 
-package org.ambientlight.config.device.led;
+package org.ambientlight.config.device.drivers;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ambientlight.config.device.led.LedPointConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class LedPointConfiguration implements Serializable {
+public class HueConfiguration extends DeviceConfiguration {
 
 	private static final long serialVersionUID = 1L;
-
-	public String id;
-	public int xPosition;
-	public int yPosition;
-
-	public ColorConfiguration colorConfiguration;
+	public String macAdress;
+	public List<LedPointConfiguration> configuredLeds = new ArrayList<LedPointConfiguration>();
 }

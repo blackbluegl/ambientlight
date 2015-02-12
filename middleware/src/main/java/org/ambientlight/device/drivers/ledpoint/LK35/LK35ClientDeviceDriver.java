@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.drivers.ledpoint;
+package org.ambientlight.device.drivers.ledpoint.LK35;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -57,7 +57,6 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 	 * .ambientlight.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration
 	 * )
 	 */
-	@Override
 	public void setConfiguration(RemoteHostConfiguration configuration) {
 		this.config = (LK35CLientDeviceConfiguration) configuration;
 	}
@@ -113,7 +112,7 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 			done.add(current);
 
 			List<Integer> zones = new ArrayList<Integer>();
-			zones.add(current.configuration.port);
+			zones.add(current.configuration.id);
 
 			for (LedPoint currentOther : points) {
 				if (done.contains(currentOther)) {
@@ -121,7 +120,7 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 				}
 
 				if (currentOther.getOutputResult().equals(current.getOutputResult())) {
-					zones.add(currentOther.configuration.port);
+					zones.add(currentOther.configuration.id);
 					done.add(currentOther);
 				}
 			}
