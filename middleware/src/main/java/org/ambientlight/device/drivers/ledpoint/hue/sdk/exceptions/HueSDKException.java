@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-package org.ambientlight.device.drivers.ledpoint.hue.sdk;
+package org.ambientlight.device.drivers.ledpoint.hue.sdk.exceptions;
 
 /**
  * @author Florian Bornkessel

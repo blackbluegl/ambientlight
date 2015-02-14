@@ -15,12 +15,12 @@
 
 package org.ambientlight.config.device.led;
 
-
 /**
  * @author Florian Bornkessel
- *
+ * 
  */
 public class HueLedPointConfiguration extends LedPointConfiguration {
 
+	private static final long serialVersionUID = 1L;
 	public String id;
 }

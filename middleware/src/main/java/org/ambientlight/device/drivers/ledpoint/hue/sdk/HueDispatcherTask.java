@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import org.ambientlight.device.drivers.ledpoint.hue.sdk.exceptions.HueSDKException;
+
 import com.philips.lighting.model.PHBridgeResourcesCache;
 import com.philips.lighting.model.PHLight;
 
@@ -91,7 +93,7 @@ public class HueDispatcherTask extends TimerTask {
 			// ignore if needed
 			if (currentLightState.ignoreThisRound) {
 				currentLightState.ignoreThisRound = false;
-				return;
+				continue;
 			}
 
 			// render if needed
@@ -107,8 +109,9 @@ public class HueDispatcherTask extends TimerTask {
 				return;
 			} else {
 				// render next time
-				currentLightState.mustBeThisRound = true;
+				currentLightState.mustBeThisRound = false;
 				currentLightState.ignoreThisRound = false;
+				continue;
 			}
 		}
 	}
@@ -175,8 +178,8 @@ public class HueDispatcherTask extends TimerTask {
 			if (outQeue.contains(newLightState) == false) {
 				newLightState.ignoreThisRound = true;
 				newLightState.mustBeThisRound = true;
-				newLightState.from = current.getValue();
-				newLightState.to = current.getValue();
+				newLightState.from = Color.BLACK;
+				newLightState.to = Color.BLACK;
 				outQeue.add(newLightState);
 			}
 		}

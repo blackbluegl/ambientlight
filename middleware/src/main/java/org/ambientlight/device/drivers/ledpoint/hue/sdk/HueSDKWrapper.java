@@ -24,6 +24,7 @@ import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ambientlight.config.device.led.HueLedPointConfiguration;
+import org.ambientlight.device.drivers.ledpoint.hue.sdk.exceptions.HueSDKException;
 import org.ambientlight.device.led.LedPoint;
 
 import com.philips.lighting.hue.sdk.PHAccessPoint;
@@ -47,7 +48,7 @@ public class HueSDKWrapper {
 
 	private Map<String, Timer> dispatcherTimer = new HashMap<String, Timer>();
 
-	protected static final int BRIDGE_UPDATE_FREQUENCY = 10;
+	protected static final int BRIDGE_UPDATE_FREQUENCY = 9;
 
 	private Map<String, PHAccessPoint> bridgesList = new HashMap<String, PHAccessPoint>();
 
@@ -107,7 +108,11 @@ public class HueSDKWrapper {
 				System.out.println("HUESDKWrapper - onError():" + currentMacAdress + ", " + errorCode + ", " + errorDescription);
 
 				// disconnect
-				disconnectFromMacAdress(currentMacAdress);
+				try {
+					disconnectFromMacAdress(currentMacAdress);
+				} catch (Exception e) {
+
+				}
 
 				// wait and reconnect
 				try {
@@ -197,6 +202,7 @@ public class HueSDKWrapper {
 		// trying to connect if possible
 		PHAccessPoint ap = this.bridgesList.get(macAdress);
 		if (ap != null) {
+			ap.setUsername("ambientControlUser");
 			hueSDK.connect(ap);
 			System.out.println("HUESDKWrapper.connectToMac(): connected to this mac" + macAdress);
 		} else {
@@ -243,8 +249,14 @@ public class HueSDKWrapper {
 		}
 
 		PHBridgeResourcesCache cache = getLightCache(macAdress);
-
-		PHLight light = cache.getLights().get(lightName);
+		PHLight light = null;
+		List<PHLight> allLights = cache.getAllLights();
+		for (PHLight current : allLights) {
+			if (lightName.equals(current.getName())) {
+				light = current;
+				break;
+			}
+		}
 
 		// if light is not reachable return false to show that updates cannot performed
 		if (light == null || light.getLastKnownLightState().isReachable() == false)
@@ -260,7 +272,7 @@ public class HueSDKWrapper {
 
 		float[] hsb = new float[3];
 		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		lightState.setBrightness((int) hsb[3] * 255);
+		lightState.setBrightness((int) (hsb[2] * 255));
 
 		float xy[] = PHUtilities.calculateXYFromRGB(color.getRed(), color.getGreen(), color.getBlue(), light.getModelNumber());
 		lightState.setColorMode(PHLightColorMode.COLORMODE_XY);
@@ -309,7 +321,8 @@ public class HueSDKWrapper {
 		// disconnect
 
 		this.stopDispatcher(macAdress);
-		hueSDK.disableAllHeartbeat();
+		// hueSDK.disableAllHeartbeat();
+		hueSDK.disableHeartbeat(hueSDK.getSelectedBridge());
 		hueSDK.disconnect(hueSDK.getSelectedBridge());
 		hueSDK.setSelectedBridge(null);
 		this.currentMacAdress = "";
