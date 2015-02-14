@@ -19,9 +19,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimerTask;
-
-import org.ambientlight.device.led.LedPoint;
 
 import com.philips.lighting.model.PHBridgeResourcesCache;
 import com.philips.lighting.model.PHLight;
@@ -36,7 +35,6 @@ public class HueDispatcherTask extends TimerTask {
 	List<LightState> outQeue = new ArrayList<LightState>();
 	HueSDKWrapper wrapper;
 	String macAdressOfBridge;
-	// int queueLength = 0;
 	int positionInList = 0;
 
 
@@ -56,57 +54,109 @@ public class HueDispatcherTask extends TimerTask {
 	 */
 	@Override
 	public void run() {
-		// get remembered position in list
-		int pos = this.positionInList;
+		// get time
+		long now = System.currentTimeMillis();
 
 		// get inQeue
-		List<LedPoint> inQueue = this.wrapper.getInQeue().get(macAdressOfBridge);
+		Map<String, Color> inQueue = this.wrapper.getInQeue(macAdressOfBridge);
 
-		// and add new lights at the end
+		// and add or update new lights for next round trip
 		addNewLights(inQueue, outQeue);
 
 		// remove lights that are not in inQueue
-		pos = pos - removeNotUpdatedLightsFromOutQeue(inQueue, outQeue, pos);
-		if (pos > outQeue.size() - 1) {
-			pos = 0;
-		}
+		positionInList = removeNotUpdatedLightsFromOutQeue(inQueue, outQeue, positionInList, now);
 
 		// remove lights that are not reachable
 		try {
 			PHBridgeResourcesCache cache = this.wrapper.getLightCache(macAdressOfBridge);
-			pos = pos - removeUnReachableLights(outQeue, cache, pos);
-			if (pos > outQeue.size() - 1) {
-				pos = 0;
-			}
+			positionInList = removeUnReachableLights(outQeue, cache, positionInList);
 		} catch (HueSDKException e) {
 			// this may happen if bridge is not available.
-			// we should stop here and wait to be started by a new timer if bridge is up again later;
+			// we should stop here and will be started by a new timer if bridge is up again later;
 			return;
 		}
 
-		// return if nothing is left todo
-		if (outQeue.isEmpty())
+		// return if nothing is left to render
+		if (outQeue.isEmpty()) {
+			positionInList = 0;
 			return;
-
-		// get count of all lights that are not new in list
-		int transitionTime = calculateTransitionTime(outQeue);
-
-		// set current with small changes one behind until the next one until a greater change was found - therefore calculate
-		// actual color regarding
-		LedPoint ledPointForCurrent = getLedpointFor(outQeue.get(pos));
-		boolean hasSmallChanges =
-
-				// if current light is new. set flag to false and iterate to next light. and so on. update qeueLenght
-				// colors and transitiontime
-				// calculate transition time depending on the amount of all lights in queue
-				// persist duration and timestamp and color of current light
-				// write lightstate of current light - ignore exceptions. bridge should recover automatically.
-
-				// increment or reset position in list
-				this.positionInList = pos + 1;
-		if (this.positionInList >= outQeue.size()) {
-			this.positionInList = 0;
 		}
+
+		// get count of all lights that are not new in list and calculate transition time that is needed
+		int transitionTime = calculateTransitionTimeMS(outQeue);
+		while (true) {
+			LightState currentLightState = getNextLightStateAndIncrementPosition();
+			Color inColor = inQueue.get(currentLightState.id);
+
+			// ignore if needed
+			if (currentLightState.ignoreThisRound) {
+				currentLightState.ignoreThisRound = false;
+				return;
+			}
+
+			// render if needed
+			if (currentLightState.mustBeThisRound) {
+				currentLightState.mustBeThisRound = false;
+				writeToLed(now, transitionTime, currentLightState, inColor);
+				return;
+			}
+
+			// write if color has changed enough
+			if (isColorChanged(currentLightState, inColor, outQeue.size(), now)) {
+				writeToLed(now, transitionTime, currentLightState, inColor);
+				return;
+			} else {
+				// render next time
+				currentLightState.mustBeThisRound = true;
+				currentLightState.ignoreThisRound = false;
+			}
+		}
+	}
+
+
+	/**
+	 * @param now
+	 * @param transitionTime
+	 * @param currentLightState
+	 * @param ledPointForCurrent
+	 */
+	protected void writeToLed(long now, int transitionTime, LightState currentLightState, Color color) {
+		try {
+			boolean lightUpdated = wrapper.updateLight(this.macAdressOfBridge, currentLightState.id, transitionTime, color);
+			if (lightUpdated) {
+				currentLightState.timeStamp = now;
+				currentLightState.from = calculateActualColor(currentLightState, now);
+				currentLightState.to = color;
+				currentLightState.mustBeThisRound = false;
+				currentLightState.ignoreThisRound = false;
+				currentLightState.transitionTime = transitionTime;
+			} else {
+				outQeue.remove(currentLightState);
+				positionInList--;
+			}
+			return;
+		} catch (HueSDKException e) {
+			outQeue.remove(currentLightState);
+			positionInList--;
+			return;
+		}
+	}
+
+
+	/**
+	 * iterate through outlist and set pointer to next
+	 * 
+	 * @return
+	 */
+	private LightState getNextLightStateAndIncrementPosition() {
+		positionInList++;
+		if (positionInList >= outQeue.size()) {
+			positionInList = 0;
+		}
+
+		LightState result = this.outQeue.get(positionInList);
+
+		return result;
 	}
 
 
@@ -114,9 +164,22 @@ public class HueDispatcherTask extends TimerTask {
 	 * @param inQueue
 	 * @param outQeue2
 	 */
-	private void addNewLights(List<LedPoint> inQueue, List<LightState> outQeue2) {
-		// TODO Auto-generated method stub
-		implementieren
+	private void addNewLights(Map<String, Color> inQueue, List<LightState> outQeue) {
+		for (Map.Entry<String, Color> current : inQueue.entrySet()) {
+
+			// create template
+			LightState newLightState = new LightState();
+			newLightState.id = current.getKey();
+
+			// if lightstate does not exist create it
+			if (outQeue.contains(newLightState) == false) {
+				newLightState.ignoreThisRound = true;
+				newLightState.mustBeThisRound = true;
+				newLightState.from = current.getValue();
+				newLightState.to = current.getValue();
+				outQeue.add(newLightState);
+			}
+		}
 	}
 
 
@@ -124,10 +187,10 @@ public class HueDispatcherTask extends TimerTask {
 	 * @param outQeue2
 	 * @return
 	 */
-	private int calculateTransitionTime(List<LightState> outQeue) {
+	private int calculateTransitionTimeMS(List<LightState> outQeue) {
 		int result = 0;
 		for (LightState current : outQeue) {
-			if (current.newInRound == false) {
+			if (current.ignoreThisRound == false) {
 				result++;
 			}
 		}
@@ -147,7 +210,6 @@ public class HueDispatcherTask extends TimerTask {
 	 * @param pos
 	 */
 	private int removeUnReachableLights(List<LightState> outQeue, PHBridgeResourcesCache cache, int pos) {
-		int moveBackInList = 0;
 
 		Iterator<LightState> i = outQeue.iterator();
 		while (i.hasNext()) {
@@ -165,13 +227,30 @@ public class HueDispatcherTask extends TimerTask {
 			}
 
 			if (found == false) {
-				if (outQeue.indexOf(current) < pos) {
-					moveBackInList++;
-				}
 				i.remove();
+				pos = calculateNewPosition(outQeue, pos, outQeue.indexOf(current));
 			}
 		}
-		return moveBackInList;
+		return pos;
+	}
+
+
+	/**
+	 * calculate the new position for the pointer in list. may also return -1. this is ok as long as it is garanteed that the
+	 * pointer will be set to pos+1 at the end of a round.
+	 * 
+	 * @param outQeue
+	 * @param pos
+	 * @param current
+	 * @return
+	 */
+	protected int calculateNewPosition(List<LightState> outQeue, int pos, int removedAt) {
+		if (removedAt < pos) {
+			pos--;
+		} else if (pos >= outQeue.size()) {
+			pos = outQeue.size() - 1;
+		}
+		return pos;
 	}
 
 
@@ -182,35 +261,33 @@ public class HueDispatcherTask extends TimerTask {
 	 * @param outQeue
 	 * @param pos
 	 */
-	private int removeNotUpdatedLightsFromOutQeue(List<LedPoint> inQueue, List<LightState> outQeue, int pos) {
-		int moveBackInList = 0;
+	private int removeNotUpdatedLightsFromOutQeue(Map<String, Color> inQueue, List<LightState> outQeue, int pos, long now) {
 
 		Iterator<LightState> i = outQeue.iterator();
 		while (i.hasNext()) {
 			LightState current = i.next();
-
-			boolean found = false;
-			for (LedPoint currentLedPoint : inQueue) {
-				if (currentLedPoint.configuration.id.equals(current.id)) {
-					found = true;
-					break;
-				}
-			}
-
-			if (found == false) {
-				if (outQeue.indexOf(current) < pos) {
-					moveBackInList++;
-				}
+			Color currentInColor = inQueue.get(current.id);
+			if (currentInColor == null) {
 				i.remove();
+				pos = calculateNewPosition(outQeue, pos, outQeue.indexOf(current));
+			} else {
+				if (calculateActualColor(current, now).equals(currentInColor)) {
+					i.remove();
+					pos = calculateNewPosition(outQeue, pos, outQeue.indexOf(current));
+				}
 			}
 		}
-		return moveBackInList;
+
+		return pos;
 	}
 
 
-	private boolean isColorChanged(LightState lightState, Color newColor, int queueSize) {
+	private boolean isColorChanged(LightState lightState, Color newColor, int queueSize, long now) {
+		// switched of leds have always to be rendered
+		if (Color.black.equals(newColor))
+			return true;
+
 		Color oldColor = lightState.from;
-		long now = System.currentTimeMillis();
 
 		// calculate actual color
 		if (now < lightState.timeStamp + lightState.transitionTime) {
@@ -228,6 +305,8 @@ public class HueDispatcherTask extends TimerTask {
 
 
 	protected Color calculateActualColor(LightState lightState, long now) {
+		if (now >= lightState.timeStamp)
+			return lightState.to;
 		float position = (float) (now - lightState.timeStamp) / lightState.transitionTime;
 		float red = (lightState.from.getRed() * (1 - position) + lightState.to.getRed() * position) / 255;
 		float green = (lightState.from.getGreen() * (1 - position) + lightState.to.getGreen() * position) / 255;

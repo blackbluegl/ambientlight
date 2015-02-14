@@ -15,20 +15,11 @@
 
 package org.ambientlight.config.device.led;
 
-import java.io.Serializable;
-
-
 /**
  * @author Florian Bornkessel
  * 
  */
-public abstract class LedPointConfiguration implements Serializable {
+public class LK35LedPointConfiguration extends LedPointConfiguration {
 
-	private static final long serialVersionUID = 1L;
-
-
-	public int xPosition;
-	public int yPosition;
-
-	public ColorConfiguration colorConfiguration;
+	public int id;
 }

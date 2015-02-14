@@ -6,13 +6,17 @@ import java.util.List;
 import org.ambientlight.config.device.drivers.DeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummyLedStripeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.DummyRemoteSwitchBridgeConfiguration;
+import org.ambientlight.config.device.drivers.HueBridgeDeviceConfiguration;
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.RemoteSwitchBridgeConfiguration;
-import org.ambientlight.config.device.led.LedPointConfiguration;
+import org.ambientlight.config.device.led.HueLedPointConfiguration;
+import org.ambientlight.config.device.led.LK35LedPointConfiguration;
 import org.ambientlight.config.device.led.StripeConfiguration;
 import org.ambientlight.config.device.led.StripePartConfiguration;
 import org.ambientlight.device.drivers.ledpoint.LK35.LK35ClientDeviceDriver;
+import org.ambientlight.device.drivers.ledpoint.hue.HueBridgeDeviceDriver;
+import org.ambientlight.device.drivers.ledpoint.hue.sdk.HueSDKWrapper;
 import org.ambientlight.device.drivers.ledstripes.DummyLedStripeDeviceDriver;
 import org.ambientlight.device.drivers.ledstripes.MultistripeOverEthernetClientDeviceDriver;
 import org.ambientlight.device.drivers.remoteswitches.DummySwitchingDeviceDriver;
@@ -20,6 +24,8 @@ import org.ambientlight.device.drivers.remoteswitches.SwitchDeviceOverEthernetDr
 import org.ambientlight.device.led.LedPoint;
 import org.ambientlight.device.led.Stripe;
 import org.ambientlight.device.led.StripePart;
+
+import com.philips.lighting.hue.sdk.PHHueSDK;
 
 
 public class DeviceDriverFactory {
@@ -45,6 +51,27 @@ public class DeviceDriverFactory {
 
 
 	public AnimateableLedDevice createLedDevice(DeviceConfiguration dc) {
+
+		if (dc instanceof HueBridgeDeviceConfiguration) {
+			System.out.println("DeviceDriverFactory: init HueBridgeDeviceConfiguration device");
+			HueBridgeDeviceConfiguration configuration = (HueBridgeDeviceConfiguration) dc;
+			PHHueSDK sdk = PHHueSDK.getInstance();
+			HueSDKWrapper wrapper = HueSDKWrapper.getInstance(sdk);
+			HueBridgeDeviceDriver device = new HueBridgeDeviceDriver(wrapper, configuration);
+			for (HueLedPointConfiguration currentLedPointConfig : configuration.configuredLeds) {
+				LedPoint ledPoint = new LedPoint();
+				ledPoint.configuration = currentLedPointConfig;
+				ledPoint.clear();
+				device.attachLedPoint(ledPoint);
+			}
+
+			try {
+				device.connect();
+			} catch (Exception e) {
+				System.out.println("connect to HueBridge device failed. Maybe the device comes up later: " + e.getMessage());
+			}
+			return device;
+		}
 
 		if (dc instanceof DummyLedStripeDeviceConfiguration) {
 			System.out.println("DeviceDriverFactory: init DummyLedDeviceDriver device");
@@ -88,7 +115,7 @@ public class DeviceDriverFactory {
 			LK35CLientDeviceConfiguration configuration = (LK35CLientDeviceConfiguration) dc;
 			LK35ClientDeviceDriver device = new LK35ClientDeviceDriver();
 			device.setConfiguration(configuration);
-			for (LedPointConfiguration currentLedPointConfig : configuration.configuredLeds) {
+			for (LK35LedPointConfiguration currentLedPointConfig : configuration.configuredLeds) {
 				LedPoint ledPoint = new LedPoint();
 				ledPoint.configuration = currentLedPointConfig;
 				ledPoint.clear();

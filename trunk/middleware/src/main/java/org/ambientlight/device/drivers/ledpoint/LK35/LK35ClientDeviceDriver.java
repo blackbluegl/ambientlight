@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.ambientlight.config.device.drivers.LK35CLientDeviceConfiguration;
 import org.ambientlight.config.device.drivers.RemoteHostConfiguration;
+import org.ambientlight.config.device.led.LK35LedPointConfiguration;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.led.LedPoint;
 import org.lk35.api.LK35ColorHandler;
@@ -106,21 +107,23 @@ public class LK35ClientDeviceDriver implements LedPointDeviceDriver {
 		List<LedPoint> done = new ArrayList<LedPoint>();
 
 		for (LedPoint current : points) {
+			LK35LedPointConfiguration currentConfig = (LK35LedPointConfiguration) current.configuration;
 			if (done.contains(current)) {
 				continue;
 			}
 			done.add(current);
 
 			List<Integer> zones = new ArrayList<Integer>();
-			zones.add(current.configuration.id);
+			zones.add(currentConfig.id);
 
 			for (LedPoint currentOther : points) {
+				LK35LedPointConfiguration currentOtherConfig = (LK35LedPointConfiguration) currentOther.configuration;
 				if (done.contains(currentOther)) {
 					continue;
 				}
 
 				if (currentOther.getOutputResult().equals(current.getOutputResult())) {
-					zones.add(currentOther.configuration.id);
+					zones.add(currentOtherConfig.id);
 					done.add(currentOther);
 				}
 			}
