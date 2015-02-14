@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.config.device.drivers.HueConfiguration;
+import org.ambientlight.config.device.drivers.HueBridgeDeviceConfiguration;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
 import org.ambientlight.device.drivers.ledpoint.hue.sdk.HueListener;
 import org.ambientlight.device.drivers.ledpoint.hue.sdk.HueSDKWrapper;
@@ -35,14 +35,14 @@ public class HueBridgeDeviceDriver implements LedPointDeviceDriver, HueListener 
 
 	HueSDKWrapper wrapper;
 
-	HueConfiguration config;
+	HueBridgeDeviceConfiguration config;
 
 	boolean isConnected = false;
 
 	private List<LedPoint> lights = new ArrayList<LedPoint>();
 
 
-	public HueBridgeDeviceDriver(HueSDKWrapper hueSDKWrapper, HueConfiguration config) {
+	public HueBridgeDeviceDriver(HueSDKWrapper hueSDKWrapper, HueBridgeDeviceConfiguration config) {
 		this.wrapper = hueSDKWrapper;
 		this.config = config;
 	}
@@ -92,7 +92,6 @@ public class HueBridgeDeviceDriver implements LedPointDeviceDriver, HueListener 
 	 */
 	@Override
 	public List<LedPoint> getLedPoints() {
-		// TODO Auto-generated method stub
 		return this.lights;
 	}
 

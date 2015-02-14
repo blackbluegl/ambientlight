@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ambientlight.config.device.led.HueLedPointConfiguration;
 import org.ambientlight.device.led.LedPoint;
-import org.ambientlight.device.led.color.Color64Bit;
 
 import com.philips.lighting.hue.sdk.PHAccessPoint;
 import com.philips.lighting.hue.sdk.PHBridgeSearchManager;
@@ -59,8 +59,18 @@ public class HueSDKWrapper {
 
 	private Map<String, List<LedPoint>> inQeue = new ConcurrentHashMap<String, List<LedPoint>>();
 
+	private static HueSDKWrapper instance;
 
-	public HueSDKWrapper(PHHueSDK sdk) {
+
+	public static HueSDKWrapper getInstance(PHHueSDK sdk) {
+		if (instance == null) {
+			instance = new HueSDKWrapper(sdk);
+		}
+		return instance;
+	}
+
+
+	private HueSDKWrapper(PHHueSDK sdk) {
 
 		hueSDK = sdk;
 		hueSDK.setAppName("middleware");
@@ -219,7 +229,7 @@ public class HueSDKWrapper {
 	}
 
 
-	private synchronized boolean updateLight(String macAdress, String lightName, int duration, Color64Bit color)
+	protected synchronized boolean updateLight(String macAdress, String lightName, int duration, Color color)
 			throws HueSDKException {
 		if (currentMacAdress.equals(macAdress) == false) {
 			System.out.println("HUESDKWrapper.updateLight(): Sorry. We are currently connected to this mac: "
@@ -242,19 +252,17 @@ public class HueSDKWrapper {
 
 		PHLightState lightState = new PHLightState();
 
-		Color rgb = color.getColor();
-
-		if (Color.BLACK.equals(rgb)) {
+		if (Color.BLACK.equals(color)) {
 			lightState.setOn(false);
 		} else {
 			lightState.setOn(true);
 		}
 
 		float[] hsb = new float[3];
-		Color.RGBtoHSB(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), hsb);
+		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
 		lightState.setBrightness((int) hsb[3] * 255);
 
-		float xy[] = PHUtilities.calculateXYFromRGB(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), light.getModelNumber());
+		float xy[] = PHUtilities.calculateXYFromRGB(color.getRed(), color.getGreen(), color.getBlue(), light.getModelNumber());
 		lightState.setColorMode(PHLightColorMode.COLORMODE_XY);
 		lightState.setX(xy[0]);
 		lightState.setY(xy[1]);
@@ -277,7 +285,7 @@ public class HueSDKWrapper {
 	 * @return
 	 * @throws HueSDKException
 	 */
-	protected PHBridgeResourcesCache getLightCache(String macAdress) throws HueSDKException {
+	protected synchronized PHBridgeResourcesCache getLightCache(String macAdress) throws HueSDKException {
 
 		if (hueSDK.getSelectedBridge() == null) {
 			System.out.println("HUESDKWrapper.updateLight(): Sorry. No current bridge set for mac: " + this.currentMacAdress);
@@ -308,15 +316,6 @@ public class HueSDKWrapper {
 	}
 
 
-	/**
-	 * @param lights
-	 * @param macAdress
-	 */
-	public void dispatch(List<LedPoint> lights, String macAdress) {
-		this.inQeue.put(macAdress, lights);
-	}
-
-
 	private void startDispatcher(String macAdress) {
 		Timer t = new Timer();
 		t.schedule(new HueDispatcherTask(macAdress, this), 0, 1000 / BRIDGE_UPDATE_FREQUENCY);
@@ -329,7 +328,21 @@ public class HueSDKWrapper {
 	}
 
 
-	protected Map<String, List<LedPoint>> getInQeue() {
-		return inQeue;
+	/**
+	 * @param lights
+	 * @param macAdress
+	 */
+	public void dispatch(List<LedPoint> lights, String macAdress) {
+		this.inQeue.put(macAdress, lights);
+	}
+
+
+	protected synchronized Map<String, Color> getInQeue(String macAdress) {
+		Map<String, Color> result = new HashMap<String, Color>();
+		for (LedPoint current : this.inQeue.get(macAdress)) {
+			Color c = current.getOutputResult();
+			result.put(((HueLedPointConfiguration) current.configuration).id, c);
+		}
+		return result;
 	}
 }

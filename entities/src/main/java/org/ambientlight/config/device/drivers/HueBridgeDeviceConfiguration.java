@@ -18,16 +18,16 @@ package org.ambientlight.config.device.drivers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.config.device.led.LedPointConfiguration;
+import org.ambientlight.config.device.led.HueLedPointConfiguration;
 
 
 /**
  * @author Florian Bornkessel
  * 
  */
-public class HueConfiguration extends DeviceConfiguration {
+public class HueBridgeDeviceConfiguration extends DeviceConfiguration {
 
 	private static final long serialVersionUID = 1L;
 	public String macAdress;
-	public List<LedPointConfiguration> configuredLeds = new ArrayList<LedPointConfiguration>();
+	public List<HueLedPointConfiguration> configuredLeds = new ArrayList<HueLedPointConfiguration>();
 }

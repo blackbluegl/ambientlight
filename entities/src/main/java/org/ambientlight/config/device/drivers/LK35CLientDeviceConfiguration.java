@@ -18,7 +18,7 @@ package org.ambientlight.config.device.drivers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ambientlight.config.device.led.LedPointConfiguration;
+import org.ambientlight.config.device.led.LK35LedPointConfiguration;
 
 
 /**
@@ -29,5 +29,5 @@ public class LK35CLientDeviceConfiguration extends RemoteHostConfiguration {
 
 	private static final long serialVersionUID = 1L;
 
-	public List<LedPointConfiguration> configuredLeds = new ArrayList<LedPointConfiguration>();
+	public List<LK35LedPointConfiguration> configuredLeds = new ArrayList<LK35LedPointConfiguration>();
 }
