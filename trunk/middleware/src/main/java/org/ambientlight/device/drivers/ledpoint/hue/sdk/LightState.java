@@ -29,8 +29,8 @@ public class LightState {
 	protected Color from;
 	protected Color to;
 	protected int transitionTime;
+	protected int renderScore = 0;
 	protected boolean ignoreThisRound = true;
-	protected boolean mustBeThisRound = false;
 
 
 	@Override

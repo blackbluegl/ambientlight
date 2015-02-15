@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.ambientlight.config.device.led.HueLedPointConfiguration;
 import org.ambientlight.device.drivers.ledpoint.hue.sdk.exceptions.HueSDKException;
@@ -48,7 +47,7 @@ public class HueSDKWrapper {
 
 	private Map<String, Timer> dispatcherTimer = new HashMap<String, Timer>();
 
-	protected static final int BRIDGE_UPDATE_FREQUENCY = 9;
+	protected static final int BRIDGE_UPDATE_FREQUENCY = 10;
 
 	private Map<String, PHAccessPoint> bridgesList = new HashMap<String, PHAccessPoint>();
 
@@ -58,7 +57,7 @@ public class HueSDKWrapper {
 
 	private List<HueListener> listener = new ArrayList<HueListener>();
 
-	private Map<String, List<LedPoint>> inQeue = new ConcurrentHashMap<String, List<LedPoint>>();
+	private Map<String, Map<String, Color>> inQeue = new HashMap<String, Map<String, Color>>();
 
 	private static HueSDKWrapper instance;
 
@@ -109,6 +108,7 @@ public class HueSDKWrapper {
 
 				// disconnect
 				try {
+					stopDispatcherTask(currentMacAdress);
 					disconnectFromMacAdress(currentMacAdress);
 				} catch (Exception e) {
 
@@ -126,16 +126,17 @@ public class HueSDKWrapper {
 
 			@Override
 			public void onConnectionResumed(PHBridge paramPHBridge) {
-				startDispatcher(currentMacAdress);
-				for (HueListener current : listener) {
-					current.onBridgeConnected();
-				}
+				// startDispatcher(currentMacAdress);
+				// for (HueListener current : listener) {
+				// current.onBridgeConnected();
+				// }
 			}
 
 
 			@Override
-			public void onConnectionLost(PHAccessPoint paramPHAccessPoint) {
-				dispatcherTimer.get(currentMacAdress).cancel();
+			public void onConnectionLost(PHAccessPoint ap) {
+				stopDispatcherTask(ap.getMacAddress());
+				// stopDispatcherTask(currentMacAdress);
 				for (HueListener current : listener) {
 					current.onBridgeConnectionLost();
 				}
@@ -153,10 +154,12 @@ public class HueSDKWrapper {
 				hueSDK.setSelectedBridge(b);
 				hueSDK.enableHeartbeat(b, PHHueSDK.HB_INTERVAL);
 
+				startDispatcher(currentMacAdress);
+
 				for (HueListener current : listener) {
 					current.onBridgeConnected();
 				}
-				startDispatcher(currentMacAdress);
+
 				System.out.println("HUESDKWrapper.onBridgeConnected(): bridge connected, dispatcher started.");
 			}
 
@@ -218,7 +221,7 @@ public class HueSDKWrapper {
 		}
 		if (aListener != null) {
 			this.listener.add(aListener);
-			this.inQeue.put(macAdress, new ArrayList<LedPoint>());
+			this.inQeue.put(macAdress, new HashMap<String, Color>());
 		}
 	}
 
@@ -320,7 +323,7 @@ public class HueSDKWrapper {
 	public synchronized void disconnectFromMacAdress(String macAdress) {
 		// disconnect
 
-		this.stopDispatcher(macAdress);
+		this.stopDispatcherTask(macAdress);
 		// hueSDK.disableAllHeartbeat();
 		hueSDK.disableHeartbeat(hueSDK.getSelectedBridge());
 		hueSDK.disconnect(hueSDK.getSelectedBridge());
@@ -330,14 +333,23 @@ public class HueSDKWrapper {
 
 
 	private void startDispatcher(String macAdress) {
+		System.out.println("HUESDKWrapper.startDispatcher(): starting timer: " + macAdress);
 		Timer t = new Timer();
 		t.schedule(new HueDispatcherTask(macAdress, this), 0, 1000 / BRIDGE_UPDATE_FREQUENCY);
 		this.dispatcherTimer.put(macAdress, t);
 	}
 
 
-	private void stopDispatcher(String macAdress) {
-		this.dispatcherTimer.get(macAdress).cancel();
+	private void stopDispatcherTask(String macAdress) {
+		System.out.println("HUESDKWrapper.stopDispatcherTask(): stopping timer: " + macAdress);
+		Timer timer = this.dispatcherTimer.get(macAdress);
+		if (timer != null) {
+			timer.cancel();
+			timer.purge();
+			System.out.println("HUESDKWrapper.stopDispatcherTask(): stopped timer: " + macAdress);
+		} else {
+			System.out.println("HUESDKWrapper.stopDispatcherTask(): no timer: " + macAdress);
+		}
 	}
 
 
@@ -345,17 +357,17 @@ public class HueSDKWrapper {
 	 * @param lights
 	 * @param macAdress
 	 */
-	public void dispatch(List<LedPoint> lights, String macAdress) {
-		this.inQeue.put(macAdress, lights);
-	}
+	public synchronized void dispatch(List<LedPoint> lights, String macAdress) {
+		Map<String, Color> result = this.inQeue.get(macAdress);
 
-
-	protected synchronized Map<String, Color> getInQeue(String macAdress) {
-		Map<String, Color> result = new HashMap<String, Color>();
-		for (LedPoint current : this.inQeue.get(macAdress)) {
+		for (LedPoint current : lights) {
 			Color c = current.getOutputResult();
 			result.put(((HueLedPointConfiguration) current.configuration).id, c);
 		}
-		return result;
+	}
+
+
+	protected Map<String, Color> getInQeue(String macAdress) {
+		return this.inQeue.get(macAdress);
 	}
 }
