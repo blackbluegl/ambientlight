@@ -17,7 +17,6 @@ package org.ambientlight.device.drivers.ledpoint.hue.sdk;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -38,6 +37,8 @@ public class HueDispatcherTask extends TimerTask {
 	HueSDKWrapper wrapper;
 	String macAdressOfBridge;
 	int positionInList = 0;
+
+	LightState renderThisRound = null;
 
 
 	/**
@@ -65,55 +66,38 @@ public class HueDispatcherTask extends TimerTask {
 		// and add or update new lights for next round trip
 		addNewLights(inQueue, outQeue);
 
-		// remove lights that are not in inQueue
-		positionInList = removeNotUpdatedLightsFromOutQeue(inQueue, outQeue, positionInList, now);
-
-		// remove lights that are not reachable
+		// ignore lights that are not reachable
 		try {
 			PHBridgeResourcesCache cache = this.wrapper.getLightCache(macAdressOfBridge);
-			positionInList = removeUnReachableLights(outQeue, cache, positionInList);
+			filterUnReachableLights(outQeue, cache);
 		} catch (HueSDKException e) {
 			// this may happen if bridge is not available.
 			// we should stop here and will be started by a new timer if bridge is up again later;
 			return;
 		}
 
-		// return if nothing is left to render
-		if (outQeue.isEmpty()) {
-			positionInList = 0;
-			return;
-		}
+		// define the rendering order
+		this.renderThisRound = scoreLights(inQueue, outQeue, now);
 
 		// get count of all lights that are not new in list and calculate transition time that is needed
 		int transitionTime = calculateTransitionTimeMS(outQeue);
-		while (true) {
-			LightState currentLightState = getNextLightStateAndIncrementPosition();
-			Color inColor = inQueue.get(currentLightState.id);
 
-			// ignore if needed
-			if (currentLightState.ignoreThisRound) {
-				currentLightState.ignoreThisRound = false;
-				continue;
-			}
+		// System.out.println("render transitiontime is " + transitionTime);
 
-			// render if needed
-			if (currentLightState.mustBeThisRound) {
-				currentLightState.mustBeThisRound = false;
-				writeToLed(now, transitionTime, currentLightState, inColor);
-				return;
-			}
+		if (this.renderThisRound == null)
+			//	System.out.println("nothing to render");
+			return;
 
-			// write if color has changed enough
-			if (isColorChanged(currentLightState, inColor, outQeue.size(), now)) {
-				writeToLed(now, transitionTime, currentLightState, inColor);
-				return;
-			} else {
-				// render next time
-				currentLightState.mustBeThisRound = false;
-				currentLightState.ignoreThisRound = false;
-				continue;
-			}
-		}
+		// System.out.println("render " + renderThisRound.id);
+
+		Color inColor = inQueue.get(renderThisRound.id);
+
+		// write led. This timeslot is used and so we return and next wait for next call.
+		writeToLed(now, transitionTime, renderThisRound, inColor);
+		// reset score. to render the other ligts first.
+		renderThisRound.renderScore = 0;
+		renderThisRound = null;
+		return;
 	}
 
 
@@ -125,12 +109,12 @@ public class HueDispatcherTask extends TimerTask {
 	 */
 	protected void writeToLed(long now, int transitionTime, LightState currentLightState, Color color) {
 		try {
+			System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + color);
 			boolean lightUpdated = wrapper.updateLight(this.macAdressOfBridge, currentLightState.id, transitionTime, color);
 			if (lightUpdated) {
 				currentLightState.timeStamp = now;
 				currentLightState.from = calculateActualColor(currentLightState, now);
 				currentLightState.to = color;
-				currentLightState.mustBeThisRound = false;
 				currentLightState.ignoreThisRound = false;
 				currentLightState.transitionTime = transitionTime;
 			} else {
@@ -147,23 +131,6 @@ public class HueDispatcherTask extends TimerTask {
 
 
 	/**
-	 * iterate through outlist and set pointer to next
-	 * 
-	 * @return
-	 */
-	private LightState getNextLightStateAndIncrementPosition() {
-		positionInList++;
-		if (positionInList >= outQeue.size()) {
-			positionInList = 0;
-		}
-
-		LightState result = this.outQeue.get(positionInList);
-
-		return result;
-	}
-
-
-	/**
 	 * @param inQueue
 	 * @param outQeue2
 	 */
@@ -176,8 +143,7 @@ public class HueDispatcherTask extends TimerTask {
 
 			// if lightstate does not exist create it
 			if (outQeue.contains(newLightState) == false) {
-				newLightState.ignoreThisRound = true;
-				newLightState.mustBeThisRound = true;
+				newLightState.ignoreThisRound = false;
 				newLightState.from = Color.BLACK;
 				newLightState.to = Color.BLACK;
 				outQeue.add(newLightState);
@@ -193,7 +159,7 @@ public class HueDispatcherTask extends TimerTask {
 	private int calculateTransitionTimeMS(List<LightState> outQeue) {
 		int result = 0;
 		for (LightState current : outQeue) {
-			if (current.ignoreThisRound == false) {
+			if (current.renderScore > 0) {
 				result++;
 			}
 		}
@@ -208,52 +174,30 @@ public class HueDispatcherTask extends TimerTask {
 	/**
 	 * we do not need any lights in queue that are not reachable.
 	 * 
-	 * @param outQeue2
+	 * @param outQeue
 	 * @param cache
 	 * @param pos
 	 */
-	private int removeUnReachableLights(List<LightState> outQeue, PHBridgeResourcesCache cache, int pos) {
+	private void filterUnReachableLights(List<LightState> outQeue, PHBridgeResourcesCache cache) {
 
-		Iterator<LightState> i = outQeue.iterator();
-		while (i.hasNext()) {
-
-			LightState current = i.next();
+		for (LightState current : outQeue) {
 			boolean found = false;
+
 			for (PHLight currentPhillipsLight : cache.getAllLights()) {
-				if (currentPhillipsLight.getName() != null && currentPhillipsLight.getName().equals(current.id)) {
-					if (currentPhillipsLight.getLastKnownLightState() != null
-							&& currentPhillipsLight.getLastKnownLightState().isReachable()) {
-						found = true;
-					}
+
+				if (currentPhillipsLight.getName() != null && currentPhillipsLight.getName().equals(current.id)
+						&& currentPhillipsLight.getLastKnownLightState() != null
+						&& currentPhillipsLight.getLastKnownLightState().isReachable()) {
+					found = true;
 					break;
 				}
 			}
 
 			if (found == false) {
-				i.remove();
-				pos = calculateNewPosition(outQeue, pos, outQeue.indexOf(current));
+				// System.out.println("unreachable " + current.id);
+				current.ignoreThisRound = true;
 			}
 		}
-		return pos;
-	}
-
-
-	/**
-	 * calculate the new position for the pointer in list. may also return -1. this is ok as long as it is garanteed that the
-	 * pointer will be set to pos+1 at the end of a round.
-	 * 
-	 * @param outQeue
-	 * @param pos
-	 * @param current
-	 * @return
-	 */
-	protected int calculateNewPosition(List<LightState> outQeue, int pos, int removedAt) {
-		if (removedAt < pos) {
-			pos--;
-		} else if (pos >= outQeue.size()) {
-			pos = outQeue.size() - 1;
-		}
-		return pos;
 	}
 
 
@@ -264,31 +208,41 @@ public class HueDispatcherTask extends TimerTask {
 	 * @param outQeue
 	 * @param pos
 	 */
-	private int removeNotUpdatedLightsFromOutQeue(Map<String, Color> inQueue, List<LightState> outQeue, int pos, long now) {
+	private LightState scoreLights(Map<String, Color> inQueue, List<LightState> outQeue, long now) {
 
-		Iterator<LightState> i = outQeue.iterator();
-		while (i.hasNext()) {
-			LightState current = i.next();
+		LightState renderThisRound = this.renderThisRound;
+
+		for (LightState current : outQeue) {
+
+			if (current.ignoreThisRound) {
+				current.ignoreThisRound = false;
+				current.renderScore = 0;
+				continue;
+			}
+
 			Color currentInColor = inQueue.get(current.id);
+
+			// ignore if no update in inqueue
 			if (currentInColor == null) {
-				i.remove();
-				pos = calculateNewPosition(outQeue, pos, outQeue.indexOf(current));
-			} else {
-				if (calculateActualColor(current, now).equals(currentInColor)) {
-					i.remove();
-					pos = calculateNewPosition(outQeue, pos, outQeue.indexOf(current));
-				}
+				current.renderScore = 0;
+				// System.out.println(current.id + " no in color change - ingore");
+				continue;
+			}
+
+			int score = isColorChanged(current, currentInColor, outQeue.size(), now);
+
+			current.renderScore += score;
+			// System.out.println(current.id + " renderscore " + current.renderScore);
+
+			if (current.renderScore > 0 && (renderThisRound == null || current.renderScore >= renderThisRound.renderScore)) {
+				renderThisRound = current;
 			}
 		}
-
-		return pos;
+		return renderThisRound;
 	}
 
 
-	private boolean isColorChanged(LightState lightState, Color newColor, int queueSize, long now) {
-		// switched of leds have always to be rendered
-		if (Color.black.equals(newColor))
-			return true;
+	private int isColorChanged(LightState lightState, Color newColor, int queueSize, long now) {
 
 		Color oldColor = lightState.from;
 
@@ -297,13 +251,7 @@ public class HueDispatcherTask extends TimerTask {
 			oldColor = calculateActualColor(lightState, now);
 		}
 
-		int changeLevel = getDifference(oldColor, newColor);
-
-		// little algoritm to determine if a color change is big enough to be rendered or not
-		if (changeLevel > queueSize * 2)
-			return true;
-
-		return false;
+		return getDifference(oldColor, newColor);
 	}
 
 
