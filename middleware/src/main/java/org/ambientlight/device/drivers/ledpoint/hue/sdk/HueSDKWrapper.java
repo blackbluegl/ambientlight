@@ -17,10 +17,12 @@ package org.ambientlight.device.drivers.ledpoint.hue.sdk;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.ambientlight.config.device.led.HueLedPointConfiguration;
 import org.ambientlight.device.drivers.ledpoint.hue.sdk.exceptions.HueSDKException;
@@ -30,6 +32,7 @@ import com.philips.lighting.hue.sdk.PHAccessPoint;
 import com.philips.lighting.hue.sdk.PHBridgeSearchManager;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.hue.sdk.PHSDKListener;
+import com.philips.lighting.hue.sdk.exception.PHBridgeNotConnectedException;
 import com.philips.lighting.hue.sdk.utilities.PHUtilities;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHBridgeResourcesCache;
@@ -45,21 +48,24 @@ import com.philips.lighting.model.PHLightState;
  */
 public class HueSDKWrapper {
 
+	protected static final int BRIDGE_UPDATE_FREQUENCY = 10;
+
 	private Map<String, Timer> dispatcherTimer = new HashMap<String, Timer>();
 
-	protected static final int BRIDGE_UPDATE_FREQUENCY = 10;
+	private Map<String, List<HueListener>> listener = new HashMap<String, List<HueListener>>();
 
 	private Map<String, PHAccessPoint> bridgesList = new HashMap<String, PHAccessPoint>();
 
+	private Map<String, Map<String, LedPoint>> inQeue = new HashMap<String, Map<String, LedPoint>>();
+	private Map<String, ReentrantLock> queueLocks = new HashMap<String, ReentrantLock>();
+
 	private PHHueSDK hueSDK;
+	private static HueSDKWrapper instance;
 
 	private String currentMacAdress = "";
 
-	private List<HueListener> listener = new ArrayList<HueListener>();
-
-	private Map<String, Map<String, Color>> inQeue = new HashMap<String, Map<String, Color>>();
-
-	private static HueSDKWrapper instance;
+	private boolean reconnect = false;
+	private boolean searchAP = true;
 
 
 	public static HueSDKWrapper getInstance(PHHueSDK sdk) {
@@ -81,65 +87,37 @@ public class HueSDKWrapper {
 			@Override
 			public void onParsingErrors(List<PHHueParsingError> errors) {
 
-				// print errors
+				// print errors before reconnect
 				System.out.println("HUESDKWrapper - onParsingErrors(): printing errors and reconnecting: ");
 				for (PHHueParsingError currentError : errors) {
 					System.out.println("Error: " + currentError.getAddress() + ", " + currentError.getCode() + ", "
 							+ currentError.getMessage());
 				}
 
-				// disconnect
-				disconnectFromMacAdress(currentMacAdress);
-
-				// wait and reconnect
-				try {
-					Thread.sleep(10 * 1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				connectToMacAdress(currentMacAdress);
+				reconnect(currentMacAdress);
 			}
 
 
 			@Override
 			public void onError(int errorCode, String errorDescription) {
-				// print error
+				// print error before reconnect
 				System.out.println("HUESDKWrapper - onError():" + currentMacAdress + ", " + errorCode + ", " + errorDescription);
 
-				// disconnect
-				try {
-					stopDispatcherTask(currentMacAdress);
-					disconnectFromMacAdress(currentMacAdress);
-				} catch (Exception e) {
-
-				}
-
-				// wait and reconnect
-				try {
-					Thread.sleep(10 * 1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				connectToMacAdress(currentMacAdress);
+				reconnect(currentMacAdress);
 			}
 
 
 			@Override
 			public void onConnectionResumed(PHBridge paramPHBridge) {
-				// startDispatcher(currentMacAdress);
-				// for (HueListener current : listener) {
-				// current.onBridgeConnected();
-				// }
 			}
 
 
 			@Override
 			public void onConnectionLost(PHAccessPoint ap) {
-				stopDispatcherTask(ap.getMacAddress());
-				// stopDispatcherTask(currentMacAdress);
-				for (HueListener current : listener) {
-					current.onBridgeConnectionLost();
-				}
+				// print error before reconnect
+				System.out.println("HUESDKWrapper - onConnectionLost():" + currentMacAdress);
+
+				reconnect(currentMacAdress);
 			}
 
 
@@ -154,26 +132,29 @@ public class HueSDKWrapper {
 				hueSDK.setSelectedBridge(b);
 				hueSDK.enableHeartbeat(b, PHHueSDK.HB_INTERVAL);
 
+				// create qeue and start Dispatcher
+				inQeue.put(currentMacAdress, new HashMap<String, LedPoint>());
 				startDispatcher(currentMacAdress);
 
-				for (HueListener current : listener) {
+				for (HueListener current : listener.get(currentMacAdress)) {
 					current.onBridgeConnected();
 				}
 
-				System.out.println("HUESDKWrapper.onBridgeConnected(): bridge connected, dispatcher started.");
+				System.out.println("HUESDKWrapper.onBridgeConnected(): bridge connected, dispatcher started. Hue is ready.");
 			}
 
 
 			@Override
 			public void onAuthenticationRequired(PHAccessPoint accessPoint) {
 				hueSDK.startPushlinkAuthentication(accessPoint);
-				System.out.println("HUESDKWrapper: auth required! You have 30 seconds to activate ambientcontrol.");
+				System.out.println("HUESDKWrapper: auth required! You have 30 seconds to push bridge button.");
 			}
 
 
 			@Override
 			public void onAccessPointsFound(List<PHAccessPoint> paramList) {
 				System.out.println("HUESDKWrapper: found these bridges here:");
+				searchAP = false;
 				for (PHAccessPoint current : paramList) {
 					bridgesList.put(current.getMacAddress(), current);
 					System.out.println("HUESDKWrapper: " + current.getMacAddress());
@@ -186,20 +167,40 @@ public class HueSDKWrapper {
 			}
 		});
 
-		PHBridgeSearchManager sm = (PHBridgeSearchManager) hueSDK.getSDKService(PHHueSDK.SEARCH_BRIDGE);
-		sm.search(true, false);
+		final PHBridgeSearchManager sm = (PHBridgeSearchManager) hueSDK.getSDKService(PHHueSDK.SEARCH_BRIDGE);
+
+		// search until a first ap shows up
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (searchAP) {
+					System.out.println("HUESDKWrapper: searching bridges...");
+					sm.search(true, false);
+					try {
+						Thread.sleep(20000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+
 	}
 
 
 	public synchronized void connectToMacAdress(String macAdress) {
 
+		// create a locking object
+		queueLocks.put(macAdress, new ReentrantLock());
+
 		if (hueSDK.getSelectedBridge() != null) {
-			System.out.println("HUESDKWrapper.connectToMac(): Sorry. We are currently connected to this mac already: "
+			System.out.println("HUESDKWrapper.connectToMac(): We are currently connected to this mac already: "
 					+ this.currentMacAdress);
 			return;
 		}
 
-		System.out.println("HUESDKWrapper.connectToMac(): want to connect to this macAdress" + macAdress);
+		System.out.println("HUESDKWrapper.connectToMac(): want to connect to this macAdress: " + macAdress);
 		this.currentMacAdress = macAdress;
 
 		// trying to connect if possible
@@ -207,10 +208,65 @@ public class HueSDKWrapper {
 		if (ap != null) {
 			ap.setUsername("ambientControlUser");
 			hueSDK.connect(ap);
-			System.out.println("HUESDKWrapper.connectToMac(): connected to this mac" + macAdress);
 		} else {
-			System.out.println("HUESDKWrapper.connectToMac(): mac was not found(already). Waiting for it" + macAdress);
+			System.out.println("HUESDKWrapper.connectToMac(): mac was not found(already). Waiting for it: " + macAdress);
 		}
+	}
+
+
+	/**
+	 * @param macAdress
+	 */
+	public synchronized void disconnectFromMacAdress(String macAdress) {
+		List<HueListener> listeners = this.listener.get(macAdress);
+
+		for (HueListener current : listeners) {
+			current.onBridgeConnectionLost();
+		}
+
+		// disconnect
+		if (listener.get(macAdress).size() == 0) {
+			this.stopDispatcherTask(macAdress);
+			hueSDK.disableHeartbeat(hueSDK.getSelectedBridge());
+			hueSDK.disconnect(hueSDK.getSelectedBridge());
+			hueSDK.setSelectedBridge(null);
+			this.currentMacAdress = "";
+		}
+	}
+
+
+	private void reconnect(String macAdress) {
+		// can be called several times. if is empty ignore because reconnect was initiated before
+		if (reconnect || searchAP)
+			return;
+
+		reconnect = true;
+
+		// disconnect
+		List<HueListener> listeners = this.listener.get(macAdress);
+		for (HueListener current : listeners) {
+			current.onBridgeConnectionLost();
+		}
+
+		// disconnect
+		this.stopDispatcherTask(macAdress);
+		try {
+			hueSDK.disableHeartbeat(hueSDK.getSelectedBridge());
+			hueSDK.disconnect(hueSDK.getSelectedBridge());
+		} catch (PHBridgeNotConnectedException e) {
+			// maybe bridge is not connected anymore. this is ok.
+		}
+		hueSDK.setSelectedBridge(null);
+
+		// wait and reconnect
+		try {
+			Thread.sleep(10 * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		connectToMacAdress(macAdress);
+
+		reconnect = false;
 	}
 
 
@@ -219,16 +275,20 @@ public class HueSDKWrapper {
 			System.out.println("HUESDKWrapper.registerListener(): Sorry. We are currently connected to this mac: "
 					+ this.currentMacAdress);
 		}
+
+		if (this.listener.get(macAdress) == null) {
+			this.listener.put(macAdress, new ArrayList<HueListener>());
+		}
+
 		if (aListener != null) {
-			this.listener.add(aListener);
-			this.inQeue.put(macAdress, new HashMap<String, Color>());
+			this.listener.get(macAdress).add(aListener);
 		}
 	}
 
 
-	public synchronized void unRegisterListener(HueListener aListener) {
+	public synchronized void unRegisterListener(String macAdress, HueListener aListener) {
 		if (aListener != null) {
-			this.listener.remove(aListener);
+			this.listener.get(macAdress).remove(aListener);
 		}
 	}
 
@@ -282,8 +342,8 @@ public class HueSDKWrapper {
 		lightState.setX(xy[0]);
 		lightState.setY(xy[1]);
 
-		// transition time is in 10msec values
-		lightState.setTransitionTime(duration / 10);
+		// transition time is in 100msec values
+		lightState.setTransitionTime(duration / 100);
 		try {
 			hueSDK.getSelectedBridge().updateLightState(light, lightState);
 		} catch (Exception e) {
@@ -317,21 +377,6 @@ public class HueSDKWrapper {
 	}
 
 
-	/**
-	 * @param macAdress
-	 */
-	public synchronized void disconnectFromMacAdress(String macAdress) {
-		// disconnect
-
-		this.stopDispatcherTask(macAdress);
-		// hueSDK.disableAllHeartbeat();
-		hueSDK.disableHeartbeat(hueSDK.getSelectedBridge());
-		hueSDK.disconnect(hueSDK.getSelectedBridge());
-		hueSDK.setSelectedBridge(null);
-		this.currentMacAdress = "";
-	}
-
-
 	private void startDispatcher(String macAdress) {
 		System.out.println("HUESDKWrapper.startDispatcher(): starting timer: " + macAdress);
 		Timer t = new Timer();
@@ -341,14 +386,12 @@ public class HueSDKWrapper {
 
 
 	private void stopDispatcherTask(String macAdress) {
-		System.out.println("HUESDKWrapper.stopDispatcherTask(): stopping timer: " + macAdress);
 		Timer timer = this.dispatcherTimer.get(macAdress);
 		if (timer != null) {
 			timer.cancel();
 			timer.purge();
+			this.dispatcherTimer.put(macAdress, null);
 			System.out.println("HUESDKWrapper.stopDispatcherTask(): stopped timer: " + macAdress);
-		} else {
-			System.out.println("HUESDKWrapper.stopDispatcherTask(): no timer: " + macAdress);
 		}
 	}
 
@@ -357,17 +400,39 @@ public class HueSDKWrapper {
 	 * @param lights
 	 * @param macAdress
 	 */
-	public synchronized void dispatch(List<LedPoint> lights, String macAdress) {
-		Map<String, Color> result = this.inQeue.get(macAdress);
+	public void dispatch(List<LedPoint> lights, String macAdress) {
+		ReentrantLock lock = queueLocks.get(macAdress);
 
-		for (LedPoint current : lights) {
-			Color c = current.getOutputResult();
-			result.put(((HueLedPointConfiguration) current.configuration).id, c);
+		try {
+			lock.lock();
+			for (LedPoint current : lights) {
+				this.inQeue.get(macAdress).put(((HueLedPointConfiguration) current.configuration).id, current);
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
 
 	protected Map<String, Color> getInQeue(String macAdress) {
-		return this.inQeue.get(macAdress);
+		ReentrantLock lock = queueLocks.get(macAdress);
+
+		try {
+			lock.lock();
+
+			Map<String, Color> result = new HashMap<String, Color>();
+
+			Collection<LedPoint> lights = this.inQeue.get(macAdress).values();
+			for (LedPoint current : lights) {
+				Color c = current.getOutputResult();
+				result.put(((HueLedPointConfiguration) current.configuration).id, c);
+			}
+			return result;
+
+		} finally {
+			lock.unlock();
+		}
+
 	}
+
 }

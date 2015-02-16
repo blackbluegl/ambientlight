@@ -61,8 +61,12 @@ public class HueDispatcherTask extends TimerTask {
 		long now = System.currentTimeMillis();
 
 		// get inQeue
-		Map<String, Color> inQueue = this.wrapper.getInQeue(macAdressOfBridge);
-
+		Map<String, Color> inQueue;
+		try {
+			inQueue = this.wrapper.getInQeue(macAdressOfBridge);
+		} catch (NullPointerException e) {
+			return;
+		}
 		// and add or update new lights for next round trip
 		addNewLights(inQueue, outQeue);
 
@@ -85,7 +89,7 @@ public class HueDispatcherTask extends TimerTask {
 		// System.out.println("render transitiontime is " + transitionTime);
 
 		if (this.renderThisRound == null)
-			//	System.out.println("nothing to render");
+			// System.out.println("nothing to render");
 			return;
 
 		// System.out.println("render " + renderThisRound.id);
@@ -109,8 +113,16 @@ public class HueDispatcherTask extends TimerTask {
 	 */
 	protected void writeToLed(long now, int transitionTime, LightState currentLightState, Color color) {
 		try {
-			System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + color);
-			boolean lightUpdated = wrapper.updateLight(this.macAdressOfBridge, currentLightState.id, transitionTime, color);
+			// strange hue behavior fix
+			int r = color.getRed() == 255 ? 254 : color.getRed();
+			int g = color.getGreen() == 255 ? 254 : color.getGreen();
+			int b = color.getBlue() == 255 ? 254 : color.getBlue();
+			Color colorForOutput = new Color(r, g, b);
+
+			// System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + colorForOutput);
+			boolean lightUpdated = wrapper.updateLight(this.macAdressOfBridge, currentLightState.id, transitionTime,
+					colorForOutput);
+
 			if (lightUpdated) {
 				currentLightState.timeStamp = now;
 				currentLightState.from = calculateActualColor(currentLightState, now);
@@ -121,6 +133,7 @@ public class HueDispatcherTask extends TimerTask {
 				outQeue.remove(currentLightState);
 				positionInList--;
 			}
+
 			return;
 		} catch (HueSDKException e) {
 			outQeue.remove(currentLightState);
