@@ -67,7 +67,7 @@ public class HueBridgeDeviceDriver implements LedPointDeviceDriver, HueListener 
 	 */
 	@Override
 	public void closeConnection() {
-		wrapper.unRegisterListener(this);
+		wrapper.unRegisterListener(config.macAdress, this);
 		wrapper.disconnectFromMacAdress(config.macAdress);
 	}
 

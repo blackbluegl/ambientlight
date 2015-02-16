@@ -26,4 +26,5 @@ public interface HueListener {
 
 	public void onBridgeConnectionLost();
 
+
 }
