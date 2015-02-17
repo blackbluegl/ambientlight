@@ -19,7 +19,7 @@ package org.ambientlight.device.drivers.ledpoint.hue.sdk;
  * @author Florian Bornkessel
  * 
  */
-public interface HueListener {
+public interface HueConnectionListener {
 
 	public void onBridgeConnected();
 

@@ -57,16 +57,13 @@ public class HueDispatcherTask extends TimerTask {
 	 */
 	@Override
 	public void run() {
-		// get time
+
+		// get time for all pending operations
 		long now = System.currentTimeMillis();
 
 		// get inQeue
-		Map<String, Color> inQueue;
-		try {
-			inQueue = this.wrapper.getInQeue(macAdressOfBridge);
-		} catch (NullPointerException e) {
-			return;
-		}
+		Map<String, Color> inQueue = this.wrapper.getInQeue(macAdressOfBridge);
+
 		// and add or update new lights for next round trip
 		addNewLights(inQueue, outQeue);
 
@@ -86,13 +83,8 @@ public class HueDispatcherTask extends TimerTask {
 		// get count of all lights that are not new in list and calculate transition time that is needed
 		int transitionTime = calculateTransitionTimeMS(outQeue);
 
-		// System.out.println("render transitiontime is " + transitionTime);
-
 		if (this.renderThisRound == null)
-			// System.out.println("nothing to render");
 			return;
-
-		// System.out.println("render " + renderThisRound.id);
 
 		Color inColor = inQueue.get(renderThisRound.id);
 
@@ -119,7 +111,7 @@ public class HueDispatcherTask extends TimerTask {
 			int b = color.getBlue() == 255 ? 254 : color.getBlue();
 			Color colorForOutput = new Color(r, g, b);
 
-			// System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + colorForOutput);
+			System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + colorForOutput);
 			boolean lightUpdated = wrapper.updateLight(this.macAdressOfBridge, currentLightState.id, transitionTime,
 					colorForOutput);
 
@@ -166,7 +158,7 @@ public class HueDispatcherTask extends TimerTask {
 
 
 	/**
-	 * @param outQeue2
+	 * @param outQeue
 	 * @return
 	 */
 	private int calculateTransitionTimeMS(List<LightState> outQeue) {
@@ -207,7 +199,6 @@ public class HueDispatcherTask extends TimerTask {
 			}
 
 			if (found == false) {
-				// System.out.println("unreachable " + current.id);
 				current.ignoreThisRound = true;
 			}
 		}
@@ -238,14 +229,12 @@ public class HueDispatcherTask extends TimerTask {
 			// ignore if no update in inqueue
 			if (currentInColor == null) {
 				current.renderScore = 0;
-				// System.out.println(current.id + " no in color change - ingore");
 				continue;
 			}
 
 			int score = isColorChanged(current, currentInColor, outQeue.size(), now);
 
 			current.renderScore += score;
-			// System.out.println(current.id + " renderscore " + current.renderScore);
 
 			if (current.renderScore > 0 && (renderThisRound == null || current.renderScore >= renderThisRound.renderScore)) {
 				renderThisRound = current;
