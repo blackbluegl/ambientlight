@@ -111,7 +111,7 @@ public class HueDispatcherTask extends TimerTask {
 			int b = color.getBlue() == 255 ? 254 : color.getBlue();
 			Color colorForOutput = new Color(r, g, b);
 
-			System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + colorForOutput);
+			// System.out.println("HueDispatcherTask.writeToLed(): " + currentLightState.id + " " + colorForOutput);
 			boolean lightUpdated = wrapper.updateLight(this.macAdressOfBridge, currentLightState.id, transitionTime,
 					colorForOutput);
 
@@ -172,6 +172,10 @@ public class HueDispatcherTask extends TimerTask {
 		if (result == 0) {
 			result = 1;
 		}
+
+		// add 0.1 sec to have it more smoothly even if it responds slower
+		result = result + 1;
+
 		return (int) (result * (1000 / (float) HueSDKWrapper.BRIDGE_UPDATE_FREQUENCY));
 	}
 
