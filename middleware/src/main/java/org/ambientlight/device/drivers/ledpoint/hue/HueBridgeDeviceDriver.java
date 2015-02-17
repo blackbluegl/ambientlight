@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.ambientlight.config.device.drivers.HueBridgeDeviceConfiguration;
 import org.ambientlight.device.drivers.LedPointDeviceDriver;
-import org.ambientlight.device.drivers.ledpoint.hue.sdk.HueListener;
+import org.ambientlight.device.drivers.ledpoint.hue.sdk.HueConnectionListener;
 import org.ambientlight.device.drivers.ledpoint.hue.sdk.HueSDKWrapper;
 import org.ambientlight.device.led.LedPoint;
 
@@ -31,7 +31,7 @@ import org.ambientlight.device.led.LedPoint;
  * @author Florian Bornkessel
  * 
  */
-public class HueBridgeDeviceDriver implements LedPointDeviceDriver, HueListener {
+public class HueBridgeDeviceDriver implements LedPointDeviceDriver, HueConnectionListener {
 
 	HueSDKWrapper wrapper;
 

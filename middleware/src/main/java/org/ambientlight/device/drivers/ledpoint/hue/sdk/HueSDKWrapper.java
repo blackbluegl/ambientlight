@@ -52,7 +52,7 @@ public class HueSDKWrapper {
 
 	private Map<String, Timer> dispatcherTimer = new HashMap<String, Timer>();
 
-	private Map<String, List<HueListener>> listener = new HashMap<String, List<HueListener>>();
+	private Map<String, List<HueConnectionListener>> listener = new HashMap<String, List<HueConnectionListener>>();
 
 	private Map<String, PHAccessPoint> bridgesList = new HashMap<String, PHAccessPoint>();
 
@@ -136,7 +136,7 @@ public class HueSDKWrapper {
 				inQeue.put(currentMacAdress, new HashMap<String, LedPoint>());
 				startDispatcher(currentMacAdress);
 
-				for (HueListener current : listener.get(currentMacAdress)) {
+				for (HueConnectionListener current : listener.get(currentMacAdress)) {
 					current.onBridgeConnected();
 				}
 
@@ -154,13 +154,16 @@ public class HueSDKWrapper {
 			@Override
 			public void onAccessPointsFound(List<PHAccessPoint> paramList) {
 				System.out.println("HUESDKWrapper: found these bridges here:");
+
+				// stop searching for access points
 				searchAP = false;
+
 				for (PHAccessPoint current : paramList) {
 					bridgesList.put(current.getMacAddress(), current);
 					System.out.println("HUESDKWrapper: " + current.getMacAddress());
 				}
 
-				// try to connect to bridge directly if a mac was given already
+				// try to connect to bridge if a mac was given already
 				if (currentMacAdress != null && currentMacAdress.isEmpty() == false) {
 					connectToMacAdress(currentMacAdress);
 				}
@@ -185,14 +188,10 @@ public class HueSDKWrapper {
 				}
 			}
 		}).start();
-
 	}
 
 
 	public synchronized void connectToMacAdress(String macAdress) {
-
-		// create a locking object
-		queueLocks.put(macAdress, new ReentrantLock());
 
 		if (hueSDK.getSelectedBridge() != null) {
 			System.out.println("HUESDKWrapper.connectToMac(): We are currently connected to this mac already: "
@@ -202,6 +201,9 @@ public class HueSDKWrapper {
 
 		System.out.println("HUESDKWrapper.connectToMac(): want to connect to this macAdress: " + macAdress);
 		this.currentMacAdress = macAdress;
+
+		// create a lock for inQueue handlers
+		queueLocks.put(macAdress, new ReentrantLock());
 
 		// trying to connect if possible
 		PHAccessPoint ap = this.bridgesList.get(macAdress);
@@ -218,9 +220,9 @@ public class HueSDKWrapper {
 	 * @param macAdress
 	 */
 	public synchronized void disconnectFromMacAdress(String macAdress) {
-		List<HueListener> listeners = this.listener.get(macAdress);
+		List<HueConnectionListener> listeners = this.listener.get(macAdress);
 
-		for (HueListener current : listeners) {
+		for (HueConnectionListener current : listeners) {
 			current.onBridgeConnectionLost();
 		}
 
@@ -236,15 +238,16 @@ public class HueSDKWrapper {
 
 
 	private void reconnect(String macAdress) {
-		// can be called several times. if is empty ignore because reconnect was initiated before
+		// can be called several times. because hue callback sends several errors. so stop right now if we are reconnecting
+		// already or never have had a connection open to a bridge (see constructor)
 		if (reconnect || searchAP)
 			return;
 
 		reconnect = true;
 
 		// disconnect
-		List<HueListener> listeners = this.listener.get(macAdress);
-		for (HueListener current : listeners) {
+		List<HueConnectionListener> listeners = this.listener.get(macAdress);
+		for (HueConnectionListener current : listeners) {
 			current.onBridgeConnectionLost();
 		}
 
@@ -256,6 +259,7 @@ public class HueSDKWrapper {
 		} catch (PHBridgeNotConnectedException e) {
 			// maybe bridge is not connected anymore. this is ok.
 		}
+
 		hueSDK.setSelectedBridge(null);
 
 		// wait and reconnect
@@ -270,14 +274,14 @@ public class HueSDKWrapper {
 	}
 
 
-	public synchronized void registerListener(String macAdress, HueListener aListener) {
+	public synchronized void registerListener(String macAdress, HueConnectionListener aListener) {
 		if (macAdress != this.currentMacAdress) {
 			System.out.println("HUESDKWrapper.registerListener(): Sorry. We are currently connected to this mac: "
 					+ this.currentMacAdress);
 		}
 
 		if (this.listener.get(macAdress) == null) {
-			this.listener.put(macAdress, new ArrayList<HueListener>());
+			this.listener.put(macAdress, new ArrayList<HueConnectionListener>());
 		}
 
 		if (aListener != null) {
@@ -286,14 +290,14 @@ public class HueSDKWrapper {
 	}
 
 
-	public synchronized void unRegisterListener(String macAdress, HueListener aListener) {
+	public synchronized void unRegisterListener(String macAdress, HueConnectionListener aListener) {
 		if (aListener != null) {
 			this.listener.get(macAdress).remove(aListener);
 		}
 	}
 
 
-	private synchronized boolean updateLight(String macAdress, String lightName, int duration, int ColorTemp, int brightness) {
+	protected synchronized boolean updateLight(String macAdress, String lightName, int duration, int ColorTemp, int brightness) {
 		return false;
 	}
 
@@ -327,6 +331,7 @@ public class HueSDKWrapper {
 
 		PHLightState lightState = new PHLightState();
 
+		// black color switches the light off
 		if (Color.BLACK.equals(color)) {
 			lightState.setOn(false);
 		} else {
@@ -432,7 +437,5 @@ public class HueSDKWrapper {
 		} finally {
 			lock.unlock();
 		}
-
 	}
-
 }
