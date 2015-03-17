@@ -67,9 +67,9 @@ public class Color64Bit {
 		blue = (Math.pow(blue, colorConfiguratin.gammaBlue));
 
 		// apply level adjustment - after gamma correction
-		red = this.levelRed * color.getRed();
-		green = this.levelGreen * color.getGreen();
-		blue = this.levelBlue * color.getBlue();
+		red = this.levelRed * red;
+		green = this.levelGreen * green;
+		blue = this.levelBlue * blue;
 
 		// store and convert to 64 bit integer values
 		this.red = (int) (red * Integer.MAX_VALUE);
