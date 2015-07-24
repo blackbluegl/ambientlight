@@ -359,20 +359,33 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		if (message.getToAdress().equals(config.vCubeAdress) == false && message.isReconnecting()) {
 			System.out.println("ClimateManager handlePairPing(): Device wants to refresh pairing with some other device: "
 					+ message);
+			return;
 		}
 
 		// device wants to re-pair with vcube
-		else if (message.isReconnecting() && message.getToAdress().equals(config.vCubeAdress) == true) {
+		if (message.isReconnecting() && message.getToAdress().equals(config.vCubeAdress) == true) {
 
 			// device is known and will be refreshed
 			if (config.devices.get(message.getFromAdress()) != null) {
 				System.out.println("ClimateManager handlePairPing(): re-pairing device: " + message);
 
-				MaxPairPongMessage pairPong = new MaxPairPongMessage();
-				pairPong.setFromAdress(config.vCubeAdress);
-				pairPong.setToAdress(message.getFromAdress());
-				pairPong.setSequenceNumber(message.getSequenceNumber());
-				queueManager.putOutMessage(pairPong);
+				switch (message.getDeviceType()) {
+				case HEATING_THERMOSTAT:
+					registerActionHandler(new AddThermostateHandler(false, message, callBackMananger, queueManager, persistence,
+							config));
+					break;
+				case HEATING_THERMOSTAT_PLUS:
+					registerActionHandler(new AddThermostateHandler(false, message, callBackMananger, queueManager, persistence,
+							config));
+					break;
+				default:
+					MaxPairPongMessage pairPong = new MaxPairPongMessage();
+					pairPong.setFromAdress(config.vCubeAdress);
+					pairPong.setToAdress(message.getFromAdress());
+					pairPong.setSequenceNumber(message.getSequenceNumber());
+					queueManager.putOutMessage(pairPong);
+					break;
+				}
 			}
 			// device is unknown
 			else {
@@ -385,10 +398,12 @@ public class ClimateManager extends Manager implements MessageListener, Temperat
 		else if (learnMode && message.isReconnecting() == false) {
 			switch (message.getDeviceType()) {
 			case HEATING_THERMOSTAT:
-				registerActionHandler(new AddThermostateHandler(message, callBackMananger, queueManager, persistence, config));
+				registerActionHandler(new AddThermostateHandler(true, message, callBackMananger, queueManager, persistence,
+						config));
 				break;
 			case HEATING_THERMOSTAT_PLUS:
-				registerActionHandler(new AddThermostateHandler(message, callBackMananger, queueManager, persistence, config));
+				registerActionHandler(new AddThermostateHandler(true, message, callBackMananger, queueManager, persistence,
+						config));
 				break;
 			case SHUTTER_CONTACT:
 				registerActionHandler(new AddShutterContactHandler(message, config, queueManager, callBackMananger, persistence));

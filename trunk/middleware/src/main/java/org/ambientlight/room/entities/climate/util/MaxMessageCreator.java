@@ -35,6 +35,7 @@ import org.ambientlight.rfmbridge.messages.max.MaxRemoveLinkPartnerMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxSetGroupIdMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxSetTemperatureMessage;
 import org.ambientlight.rfmbridge.messages.max.MaxTimeInformationMessage;
+import org.ambientlight.rfmbridge.messages.max.MaxWakeUpMessage;
 
 
 /**
@@ -195,6 +196,16 @@ public class MaxMessageCreator {
 		group.setToAdress(adress);
 		group.setGroupId(config.groupId);
 		return group;
+	}
+
+
+	public MaxWakeUpMessage getWakeUpMessage(int adress) {
+
+		MaxWakeUpMessage wakeup = new MaxWakeUpMessage();
+		wakeup.setFromAdress(config.vCubeAdress);
+		wakeup.setToAdress(adress);
+		wakeup.setSequenceNumber(getNewSequnceNumber());
+		return wakeup;
 	}
 
 

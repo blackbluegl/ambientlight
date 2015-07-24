@@ -3,6 +3,9 @@ package test;
 import java.awt.Color;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import org.ambientlight.config.device.drivers.MultiStripeOverEthernetClientDeviceConfiguration;
 import org.ambientlight.config.device.led.ColorConfiguration;
@@ -16,8 +19,8 @@ public class TestMultiStripeOEDevice {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		MultistripeOverEthernetClientDeviceDriver device = new MultistripeOverEthernetClientDeviceDriver();
 		MultiStripeOverEthernetClientDeviceConfiguration config = new MultiStripeOverEthernetClientDeviceConfiguration();
-		config.hostName = "192.168.1.44";
-		// config.hostName = "localhost";
+		// config.hostName = "192.168.1.44";
+		config.hostName = "led-bridge-wohnen";
 		config.port = 2002;
 		device.setConfiguration(config);
 
@@ -42,31 +45,66 @@ public class TestMultiStripeOEDevice {
 
 		device.connect();
 
-		while (true) {
-			for (int i = 0; i < 256; i++) {
-				int color = i;
-				Color c2 = new Color((int) (color * 1f), (color), (int) (color * 1f));
+		// init colors
+		List<Color> oldColors = new ArrayList<Color>();
+		List<Color> newColors = new ArrayList<Color>();
 
-				for (int g = 0; g < sc.pixelAmount; g++) {
-					myStripe.setPixel(g, c2.getRGB());
-				}
-				device.writeData();
-				System.out.println(i);
-				Thread.sleep(40);
-			}
-			break;
-			// for (int i = 0; i < sc.pixelAmount; i++) {
-			// Color black = Color.BLACK;
-			// Color white = Color.WHITE;
-			// for (int y = 0; y < sc.pixelAmount; y++) {
-			// myStripe.setPixel(i, y == i ? white.getRGB() : black.getRGB());
-			// }
-			// device.writeData();
-			// System.out.println(i);
-			// Thread.sleep(40);
-			// }
+		for (int i = 0; i < 6; i++) {
+			oldColors.add(Color.WHITE);
+			newColors.add(getNewColor(Color.WHITE));
 		}
 
-		// device.closeConnection();
+		while (true) {
+			for (int position = 0; position < 256; position++) {
+				for (int i = 0; i < 6; i++) {
+					myStripe.setPixel(i, getTransitColor(oldColors.get(i), newColors.get(i), position).getRGB());
+				}
+
+				device.writeData();
+				Thread.sleep(40);
+			}
+			oldColors = new ArrayList<Color>(newColors);
+			for (int i = 0; i < 6; i++) {
+				newColors.set(i, getNewColor(oldColors.get(i)));
+			}
+		}
+	}
+
+
+	// device.closeConnection();
+	// }
+
+	public static Color getNewColor(Color oldColor) {
+		int[] values = new int[3];
+		Random rand = new Random();
+		int position = rand.nextInt(3);
+		values[0] = oldColor.getRed();
+		values[1] = oldColor.getGreen();
+		values[2] = oldColor.getBlue();
+
+		Random randomValue = new Random();
+		int randomInt = randomValue.nextInt(256);
+		int med = values[0] + values[1] + values[2];
+		med = med / 3;
+
+		while (Math.abs(randomInt - med) < 40) {
+			randomInt = randomValue.nextInt(256);
+		}
+		values[position] = randomInt;
+		return new Color(values[0], values[1], values[2]);
+	}
+
+
+	public static Color getTransitColor(Color old, Color newColor, int pos) {
+		int r = getTransitValue(old.getRed(), newColor.getRed(), pos);
+		int g = getTransitValue(old.getGreen(), newColor.getGreen(), pos);
+		int b = getTransitValue(old.getBlue(), newColor.getBlue(), pos);
+		return new Color(r, g, b);
+	}
+
+
+	public static int getTransitValue(long start, long end, long position) {
+		int result = (int) ((start * (255L - position) + end * position) / 255L);
+		return result;
 	}
 }
