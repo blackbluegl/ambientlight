@@ -81,7 +81,7 @@ int Tmp1812SPI::sendData(int channel, unsigned char *buffer, int sizeOfBuffer) {
  * according the tm1812 protocol and timing. so we can use the spi bus and do not have to take care of bitbanging.
  */
 string Tmp1812SPI::convertByteToTm1812Word(unsigned char byte) {
-	unsigned char spiWord1 = { 0xE }; //was 0x7
+	    unsigned char spiWord1 = { 0xE }; //was 0x7
 		unsigned char spiWord0 = { 0x4 }; //was 0x2
 
 		const int wordSize = 4;

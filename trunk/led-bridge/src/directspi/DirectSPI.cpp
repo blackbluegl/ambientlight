@@ -28,8 +28,8 @@ DirectSPI::~DirectSPI() {
 
 int DirectSPI::setup(int port) {
 	piHiPri(99);
-
-	if (wiringPiSPISetup (port, 2000000) < 0){
+	//settings for 10m ws2801 stripe with long cable configuration. up to 2mhz are possible.
+	if (wiringPiSPISetup (port, 250000) < 0){
 	  fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
 	  return -1;
 	}
