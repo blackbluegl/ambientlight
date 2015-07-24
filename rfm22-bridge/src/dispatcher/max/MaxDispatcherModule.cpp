@@ -99,7 +99,7 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 		cout << "MaxDispatcherModule - sendMessage(): sending an \"ACK\" and therefore a short preamble\n";
 		sendLong = false;
 		//the max cube seems to wait 10ms after it sent an ack. 5ms seem to work quiet well on the raspberry
-		waitForResponseInMs = 20;
+		waitForResponseInMs = 30;
 	}
 
 	if (message.payLoad.size() > 2 && message.payLoad.at(2) == 0x01) {
@@ -141,7 +141,11 @@ int MaxDispatcherModule::sendMessage(RF22 *rf22, OutMessage message) {
 	rf22->send(sendData, length);
 	rf22->waitPacketSent();
 
-	lastMessageOnAir = time(NULL);
+	//start counter for last message on air to indicate if we need next time a long preamble.
+	//If vcube answers to request from outside the thermostates will not stay awake for a new period.
+	if (message.payLoad.at(2) != 0x02) {
+		lastMessageOnAir = time(NULL);
+	}
 	return waitForResponseInMs;
 }
 
