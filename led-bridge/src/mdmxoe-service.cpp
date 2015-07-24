@@ -95,9 +95,16 @@ int main(int argc, char *argv[]) {
 		// initialize the runtime parameter - this will be closed after client continues to datahandling
 		CotrolSocketHandling cth;
 		map<int, StripePortMapping> stripePortMapping = cth.handleControlRequests(controlSocket);
+		/*  Close the connected control socket  */
+		if (close(controlSocket) < 0) {
+			fprintf(stderr, "ECHOSERV: Error calling close()\n");
+			exit(EXIT_FAILURE);
+		}
+		printf("closing control socket and waiting for data.\n");
+		fflush(stdout);
 
 		if (stripePortMapping.size() > 0) {
-			printf("Accepted new client with %u configured stripes. Waiting for data.\n", (int)stripePortMapping.size());
+			printf("Accepted new client with %u configured stripes. Waiting for data.\n", (int) stripePortMapping.size());
 			fflush(stdout);
 
 			//wait for datas to be send
@@ -105,11 +112,16 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr, "mdmxoe-service: Error calling accept for data\n");
 				exit(EXIT_FAILURE);
 			}
+			// 30 seconds timeout
+			struct timeval tv;
+			tv.tv_sec = 30;
+			tv.tv_usec = 0;
+			setsockopt(working_data_socket, SOL_SOCKET, SO_RCVTIMEO, (char *) &tv, sizeof(struct timeval));
 
 			//handle datas as long this socket is open
 			DataSocketHandling dsh;
 			dsh.handleDataRequests(working_data_socket, stripePortMapping);
-			printf("finishing receiving data\n");
+			printf("finishing receiving data. Waiting for new clients.\n");
 
 			/*  Close the connected socket  */
 			if (close(working_data_socket) < 0) {
@@ -120,13 +132,5 @@ int main(int argc, char *argv[]) {
 			printf("Client could not be accepted. Configuration handling could not be finished properly.\n");
 			fflush(stdout);
 		}
-
-		/*  Close the connected control socket  */
-		if (close(controlSocket) < 0) {
-			fprintf(stderr, "ECHOSERV: Error calling close()\n");
-			exit(EXIT_FAILURE);
-		}
-		printf("closing control socket and waiting for new client.\n");
-		fflush(stdout);
 	}
 }

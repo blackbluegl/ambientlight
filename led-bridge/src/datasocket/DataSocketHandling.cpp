@@ -62,6 +62,7 @@ void DataSocketHandling::handleDataRequests(int &workingControlSocket, map<int, 
 			unsigned char* data = (unsigned char *) malloc(3 * pixelAmount * sizeof(unsigned char));
 
 			if (readData(workingControlSocket, data, 3 * pixelAmount) <= 0) {
+				printf("Timeout. Do not wait for new data.");
 				return;
 			}
 
