@@ -47,31 +47,32 @@ public class AddThermostateHandler implements MessageActionHandler {
 	private boolean isFinished = false;
 
 
-	public AddThermostateHandler(MaxPairPingMessage pairMessage, CallBackManager callbackManager, QeueManager qeueManager,
-			Persistence persistence, ClimateManagerConfiguration config) {
+	public AddThermostateHandler(boolean newPairing, MaxPairPingMessage pairMessage, CallBackManager callbackManager,
+			QeueManager qeueManager, Persistence persistence, ClimateManagerConfiguration config) {
 
 		// add new device
-		persistence.beginTransaction();
+		if (newPairing) {
+			persistence.beginTransaction();
+			// create device in ambientcontrol
+			Thermostat device = new Thermostat();
+			// we need a value to start with. so use the current temperature of the room.
+			device.setTemperature(config.temperature);
+			device.setOffset(MaxUtil.DEFAULT_OFFSET);
+			device.setLabel("Thermostat");
+			device.setAdress(pairMessage.getFromAdress());
+			device.setBatteryLow(false);
+			device.setFirmware(pairMessage.getFirmware());
+			device.setInvalidArgument(false);
+			device.setLastUpdate(new Date());
+			device.setRfError(false);
+			device.setSerial(pairMessage.getSerial());
+			device.setTimedOut(false);
 
-		// create device in ambientcontrol
-		Thermostat device = new Thermostat();
-		// we need a value to start with. so use the current temperature of the room.
-		device.setTemperature(config.temperature);
-		device.setOffset(MaxUtil.DEFAULT_OFFSET);
-		device.setLabel("Thermostat");
-		device.setAdress(pairMessage.getFromAdress());
-		device.setBatteryLow(false);
-		device.setFirmware(pairMessage.getFirmware());
-		device.setInvalidArgument(false);
-		device.setLastUpdate(new Date());
-		device.setRfError(false);
-		device.setSerial(pairMessage.getSerial());
-		device.setTimedOut(false);
+			// add device to ambientcontrol
+			config.devices.put(device.getAdress(), device);
 
-		// add device to ambientcontrol
-		config.devices.put(device.getAdress(), device);
-
-		persistence.commitTransaction();
+			persistence.commitTransaction();
+		}
 
 		// Setup device
 		List<Message> outMessages = new ArrayList<Message>();
@@ -83,10 +84,16 @@ public class AddThermostateHandler implements MessageActionHandler {
 		pairPong.setSequenceNumber(pairMessage.getSequenceNumber());
 		outMessages.add(pairPong);
 
-		// register the device at the rfmbridge - for direct routing
-		outMessages.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), config.vCubeAdress));
+		// register the device at the rfmbridge - for direct routing to climate manager
+		if (newPairing) {
+			outMessages
+			.add(new MaxRegisterCorrelationMessage(DispatcherType.MAX, pairMessage.getFromAdress(), config.vCubeAdress));
+		}
 
-		// setup Time;
+		// keep device woken up
+		outMessages.add(new MaxMessageCreator(config).getWakeUpMessage(pairMessage.getFromAdress()));
+
+		// setup Time
 		outMessages.add(new MaxMessageCreator(config).getTimeInfoForDevice(new Date(), pairMessage.getFromAdress()));
 
 		// setup valve
@@ -108,29 +115,30 @@ public class AddThermostateHandler implements MessageActionHandler {
 			outMessages.add(dayProfile);
 		}
 
-		// link to proxyShutterContact
-		MaxAddLinkPartnerMessage linkToShutterContact = new MaxMessageCreator(config).getLinkMessage(device.getAdress(),
-				config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
-		outMessages.add(linkToShutterContact);
+		if (newPairing) {
+			// link to proxyShutterContact
+			MaxAddLinkPartnerMessage linkToShutterContact = new MaxMessageCreator(config).getLinkMessage(
+					pairMessage.getFromAdress(), config.proxyShutterContactAdress, DeviceType.SHUTTER_CONTACT);
+			outMessages.add(linkToShutterContact);
 
-		// link devices to other thermostates
-		for (MaxComponent currentConfig : config.devices.values()) {
+			// link devices to other thermostates
+			for (MaxComponent currentConfig : config.devices.values()) {
 
-			// do not link with itself
-			if (currentConfig.getAdress() == pairMessage.getFromAdress()) {
-				continue;
-			}
+				// do not link with itself
+				if (currentConfig.getAdress() == pairMessage.getFromAdress()) {
+					continue;
+				}
 
-			if (currentConfig instanceof Thermostat) {
-				// link current to new
-				MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(
-						currentConfig.getAdress(), pairMessage.getFromAdress(), pairMessage.getDeviceType());
-				outMessages.add(linkCurrentToNew);
-
-				// link new device to current
-				MaxAddLinkPartnerMessage linkNewToCurrent = new MaxMessageCreator(config).getLinkMessage(
-						pairMessage.getFromAdress(), currentConfig.getAdress(), currentConfig.getDeviceType());
-				outMessages.add(linkNewToCurrent);
+				if (newPairing && currentConfig instanceof Thermostat) {
+					// link current to new
+					MaxAddLinkPartnerMessage linkCurrentToNew = new MaxMessageCreator(config).getLinkMessage(
+							currentConfig.getAdress(), pairMessage.getFromAdress(), pairMessage.getDeviceType());
+					outMessages.add(linkCurrentToNew);
+					// link new device to current
+					MaxAddLinkPartnerMessage linkNewToCurrent = new MaxMessageCreator(config).getLinkMessage(
+							pairMessage.getFromAdress(), currentConfig.getAdress(), currentConfig.getDeviceType());
+					outMessages.add(linkNewToCurrent);
+				}
 			}
 		}
 

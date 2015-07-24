@@ -46,23 +46,28 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 	private void initSession() throws IOException {
 		Socket controlSocket = new Socket(this.configuration.hostName, this.configuration.port);
 
-		PrintStream os = new PrintStream(controlSocket.getOutputStream());
+		try {
+			PrintStream os = new PrintStream(controlSocket.getOutputStream());
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(controlSocket.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(controlSocket.getInputStream()));
 
-		for (Stripe current : stripes) {
+			for (Stripe current : stripes) {
 
-			os.println(current.configuration.port + "|" + current.configuration.protocollType + "|"
-					+ current.configuration.pixelAmount);
+				os.println(current.configuration.port + "|" + current.configuration.protocollType + "|"
+						+ current.configuration.pixelAmount);
 
-			in = new BufferedReader(new InputStreamReader(controlSocket.getInputStream()));
+				in = new BufferedReader(new InputStreamReader(controlSocket.getInputStream()));
 
-			String stripePortResult = in.readLine();
-			if (stripePortResult == null || !"OK".equals(stripePortResult))
-				throw new IOException("server did not correclty respond!");
+				String stripePortResult = in.readLine();
+				if (stripePortResult == null || !"OK".equals(stripePortResult))
+					throw new IOException("server did not correclty respond!");
+			}
+			in.close();
+			os.close();
+		} finally {
+			controlSocket.close();
 		}
-		in.close();
-		controlSocket.close();
+
 	}
 
 
@@ -72,12 +77,18 @@ public class MultistripeOverEthernetClientDeviceDriver implements LedStripeDevic
 		try {
 			os.flush();
 			os.close();
-			if (dataSocket != null) {
-				dataSocket.close();
-			}
 		} catch (Exception e) {
 			// we cannot do much here
 			e.printStackTrace();
+		} finally {
+			if (dataSocket != null) {
+				try {
+					dataSocket.close();
+				} catch (IOException e) {
+					// we cannot do much here
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
